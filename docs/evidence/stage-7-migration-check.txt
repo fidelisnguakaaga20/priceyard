@@ -1,0 +1,4 @@
+Stage 7 migration check
+Migration files:
+0001_create_mvp_foundation.py
+PASS: Stage 7 introduced no new migration; existing Stage 3 migration remains the only migration.

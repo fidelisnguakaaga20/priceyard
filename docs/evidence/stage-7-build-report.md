@@ -17,6 +17,6 @@
 15. **Traceability update:** Stage 6 marked RETESTED/PASS; Stage 7 requirements added as IN PROGRESS/PASS where only scope evidence is final.
 16. **Project status update:** Stage 7 IN PROGRESS awaiting owner runtime proof.
 17. **No unapproved feature added:** Confirmed. No Stage 8 search/history/filter work, signals, marketplace, payment gateway, AI prediction, or other deferred feature added.
-18. **Git commit/hash:** recorded after final Stage 7 build commit.
+18. **Git commit/hash:** `b5c8b51b58f6bc0e492e7812dab9a22c98a82858`.
 19. **Next stage:** Stage 8 — only after Stage 7 owner PASS and explicit approval.
 20. **Approval gate:** Owner must run the supplied Supabase-backed smoke test and approve before Stage 8.
