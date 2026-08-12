@@ -1,0 +1,3 @@
+jwt generation: PASS
+jwt verification: PASS
+token subject: PASS

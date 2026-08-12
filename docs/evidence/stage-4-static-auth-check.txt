@@ -1,0 +1,14 @@
+auth router included: PASS
+register endpoint: PASS
+login endpoint: PASS
+me endpoint: PASS
+registration fixed to free_user: PASS
+bcrypt hash used: PASS
+bcrypt verify used: PASS
+inactive login check: PASS
+inactive protected-route check: PASS
+MVP role set: PASS
+safe response excludes password hash: PASS
+bcrypt dependency declared: PASS
+PyJWT dependency declared: PASS
+email validation dependency declared: PASS

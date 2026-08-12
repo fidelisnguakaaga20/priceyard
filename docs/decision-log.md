@@ -39,3 +39,16 @@
 - Test effect: Stage 3 requires PostgreSQL connection, migration, table, relationship, and required-field proof before completion.
 - Completed-stage effect: Stage 2 becomes completed and owner-approved.
 - Approval: Owner-approved in conversation.
+
+## DEC-004 — Stage 3 approval and Stage 4 authorization
+- Date: 2026-08-12
+- Current requirement: Do not proceed from Stage 3 until owner approval.
+- Source: PriceYard AI Project Execution Plan.
+- Owner instruction: `approved` after the owner's live Supabase PostgreSQL connection, Alembic migration, table inspection, and `price_updates` field inspection passed.
+- Decision: Stage 3 is owner-verified and approved. Stage 4 — Authentication is authorized.
+- Database effect: No Stage 4 schema change required; the approved `users` table already contains the required authentication fields.
+- API effect: Authorizes only `POST /auth/register`, `POST /auth/login`, and `GET /auth/me` for Stage 4.
+- Frontend effect: None.
+- Test effect: Stage 4 must prove registration, duplicate rejection, login, wrong-password rejection, inactive-user blocking, JWT handling, `/auth/me`, bcrypt storage, and password-hash non-disclosure.
+- Completed-stage effect: Stage 3 becomes completed and owner-approved.
+- Approval: Owner-approved in conversation.

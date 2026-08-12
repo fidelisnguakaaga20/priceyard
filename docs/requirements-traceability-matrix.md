@@ -27,3 +27,12 @@
 | S3-04 | Execution | Verify model relationships/foreign keys | MVP | 3 | backend/app/models/* | SQLAlchemy mapper configuration and FK inspection | docs/evidence/stage-3-model-mapper-check.txt | PASS |
 | S3-05 | Execution | `price_updates` supports required range/source/meaning/action/confidence fields | MVP | 3 | backend/app/models/price_update.py; migration | Required-column inspection | docs/evidence/stage-3-price-update-fields-check.txt | PASS |
 | S3-06 | Execution | Deferred later-stage tables are not created | MVP | 3 | SQLAlchemy metadata; migration | Exact table-name scope check | docs/evidence/stage-3-schema-scope-check.txt | PASS |
+| S4-01 | Execution/Architecture | Register user with safe response | MVP | 4 | backend/app/routes/auth_routes.py; schemas; auth service | Owner auth smoke | docs/evidence/stage-4-owner-smoke.py | IN PROGRESS |
+| S4-02 | Execution | Duplicate email rejected | MVP | 4 | backend/app/services/auth_service.py | Owner auth smoke | docs/evidence/stage-4-owner-smoke.py | IN PROGRESS |
+| S4-03 | Execution/Architecture | Login with bcrypt password verification and JWT generation | MVP | 4 | backend/app/utils/password.py; backend/app/security.py; auth route/service | Owner auth smoke | docs/evidence/stage-4-owner-smoke.py | IN PROGRESS |
+| S4-04 | Execution | Wrong password rejected | MVP | 4 | backend/app/services/auth_service.py | Owner auth smoke | docs/evidence/stage-4-owner-smoke.py | IN PROGRESS |
+| S4-05 | Execution | Inactive user blocked | MVP | 4 | auth service; permissions | Owner auth smoke | docs/evidence/stage-4-owner-smoke.py | IN PROGRESS |
+| S4-06 | Execution | Missing/invalid JWT rejected | MVP | 4 | backend/app/security.py; backend/app/utils/permissions.py | Owner auth smoke | docs/evidence/stage-4-owner-smoke.py | IN PROGRESS |
+| S4-07 | Execution | GET /auth/me returns authenticated user | MVP | 4 | backend/app/routes/auth_routes.py | Owner auth smoke | docs/evidence/stage-4-owner-smoke.py | IN PROGRESS |
+| S4-08 | Execution/Security | Password is bcrypt-hashed and hash is never returned | MVP | 4 | password utility; UserResponse | Owner DB/API inspection | docs/evidence/stage-4-owner-smoke.py | IN PROGRESS |
+| S4-09 | Execution/Architecture | MVP role checking supports admin/free_user/paid_user; registration cannot self-elevate | MVP | 4 | backend/app/utils/permissions.py; auth service | Static + owner auth smoke | stage-4-static-auth-check.txt; stage-4-owner-smoke.py | IN PROGRESS |

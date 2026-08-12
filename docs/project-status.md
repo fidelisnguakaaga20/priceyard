@@ -1,7 +1,7 @@
 # PriceYard Project Status
 
 ## Current stage
-Stage 3 — Database Foundation
+Stage 4 — Authentication
 
 ## Stage 0 disposition
 Owner supplied validation metrics: 65 reached, 14 replies, 5 willing to pay, positive usefulness/trust/continuation signals, sample market records and two source types.
@@ -14,29 +14,29 @@ On 2026-08-12, the owner explicitly granted Application Coding Permission: YES. 
 
 ## Completed and owner-approved stages
 - Stage 1 — Project Setup: PASS.
-- Stage 2 — Backend Foundation: RETESTED/PASS and owner-approved after successful local verification on the owner's computer.
+- Stage 2 — Backend Foundation: RETESTED/PASS and owner-approved after local verification.
+- Stage 3 — Database Foundation: RETESTED/PASS and owner-approved after live Supabase PostgreSQL verification.
 
-## Stage 3 status
-RETESTED/PASS — implementation, static verification, real Supabase PostgreSQL connection, live Alembic migration, table inspection, and required field inspection all passed on the owner's computer.
+## Stage 4 status
+IN PROGRESS — authentication implementation is built and statically verified. Owner/local runtime proof against the configured PostgreSQL database is still required before Stage 4 can be marked PASS.
 
-## Stage 3 implementation completed
-- SQLAlchemy database/session foundation.
-- PostgreSQL configuration through `DATABASE_URL`.
-- Alembic migration system.
-- Exactly 10 approved Stage 3 tables modeled.
-- Initial migration created.
-- Required `price_updates` fields including `possible_meaning`, `suggested_action`, `source_1`, `source_2`, previous range fields and confidence level.
-- ORM relationship mapping verified.
-- PostgreSQL offline migration SQL rendered successfully.
+## Stage 4 implementation completed
+- `POST /auth/register`.
+- `POST /auth/login`.
+- `GET /auth/me`.
+- bcrypt password hashing/verification with no silent >72-byte truncation.
+- JWT generation and verification.
+- active/inactive user enforcement.
+- MVP role-checking dependency for `admin`, `free_user`, `paid_user`.
+- public registration fixed to `free_user` to prevent privilege self-escalation.
+- safe user response schema that excludes `password_hash`.
+- Stage 4 owner smoke test prepared to exercise the real configured PostgreSQL database and clean up its temporary test user.
 
-## Stage 3 live verification
-Owner/local verification on 2026-08-12 proved:
-1. database connection succeeds;
-2. `python -m alembic upgrade head` succeeds;
-3. all 10 approved PriceYard Stage 3 tables exist;
-4. required `price_updates` columns exist.
-
-Evidence: `docs/evidence/stage-3-owner-local-verification.txt`.
+## AI-environment verification
+- Python compilation: PASS.
+- JWT encode/decode: PASS.
+- Static auth/API/security structure checks: PASS.
+- Full auth runtime test: BLOCKED in the AI environment because the `bcrypt` package cannot be downloaded due environment network/DNS restrictions. `bcrypt` is declared in `requirements.txt` and must be installed/verified on the owner's computer.
 
 ## Outstanding project issue
 Stage 0 independent-source/duration evidence remains unresolved and must be reconciled before Stage 24 final acceptance.
@@ -44,5 +44,5 @@ Stage 0 independent-source/duration evidence remains unresolved and must be reco
 ## Unapproved features added
 None.
 
-## Next stage
-Stage 4 — Authentication, only after owner approval.
+## Next gate
+Stage 4 owner/local runtime verification. Stage 5 must not begin until Stage 4 passes and the owner approves.

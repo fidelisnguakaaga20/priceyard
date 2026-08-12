@@ -1,0 +1,8 @@
+fastapi AVAILABLE 0.128.2
+sqlalchemy AVAILABLE 2.0.50
+alembic AVAILABLE 1.18.4
+psycopg MISSING ModuleNotFoundError No module named 'psycopg'
+jwt AVAILABLE 2.13.0
+email_validator AVAILABLE 2.3.0
+httpx AVAILABLE 0.28.1
+bcrypt MISSING ModuleNotFoundError No module named 'bcrypt'

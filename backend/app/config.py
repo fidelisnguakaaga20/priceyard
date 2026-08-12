@@ -10,6 +10,9 @@ class Settings(BaseSettings):
     app_env: str = "development"
     debug: bool = False
     database_url: str | None = None
+    jwt_secret: str | None = None
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 60
 
     model_config = SettingsConfigDict(
         env_file=".env",
