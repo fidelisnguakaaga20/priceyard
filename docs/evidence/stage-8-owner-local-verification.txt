@@ -1,0 +1,23 @@
+Stage 8 owner/local verification — 2026-08-12
+Environment: Owner Windows PC, Python 3.14, configured Supabase PostgreSQL database.
+Command: python ../docs/evidence/stage-8-owner-smoke.py
+
+Owner-supplied terminal result:
+STAGE 8 OWNER SMOKE: PASS
+
+Verified checks reported PASS:
+- Stage 6 Egusi, Nasarawa, and Kwali Market prerequisites exist.
+- Admin login works.
+- Multiple approved price updates created for same-day and next-day timestamps.
+- Commodity search works case-insensitively.
+- Latest search returns latest same-day record per market.
+- Market, date, and movement filters work; invalid movement is rejected.
+- Chronological history works.
+- Same-day time-of-day records and afternoon filter work.
+- Market comparison returns both markets and latest current record per market.
+- Previous/current comparison fields are preserved.
+- Possible Meaning and Suggested Action are preserved through comparison.
+- Private source identities are hidden from /price-updates, /price-updates/history, and /price-updates/comparison.
+
+Stage gate result: RETESTED/PASS.
+Owner approval to start Stage 9 is still required.

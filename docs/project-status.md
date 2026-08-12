@@ -1,7 +1,7 @@
 # PriceYard Project Status
 
 ## Current stage
-Stage 8 — Search, Filters, History, Comparison
+Stage 8 — Search, Filters, History, Comparison — RETESTED/PASS; owner approval pending
 
 ## Stage 0 disposition
 Owner supplied validation metrics: 65 reached, 14 replies, 5 willing to pay, positive usefulness/trust/continuation signals, sample market records and two source types.
@@ -25,7 +25,7 @@ On 2026-08-12, the owner explicitly granted Application Coding Permission: YES. 
 Owner/local Stage 7 smoke passed on 2026-08-12. Create/edit/approve/reject/delete/mark-outdated/latest-approved flows, range/action/observation validation, public source privacy, Possible Meaning/Suggested Action preservation, non-admin blocking, and operation without a market signal all passed.
 
 ## Stage 8 status
-IN PROGRESS — Search, filters, chronological history, previous/current comparison, market comparison, and same-day time-of-day query behavior are built. Owner/local runtime verification against the configured Supabase PostgreSQL database is still required before Stage 8 can become PASS.
+RETESTED/PASS — Owner/local Supabase-backed Stage 8 smoke verification passed on 2026-08-12. Owner approval is still required before Stage 9 may begin.
 
 ## Stage 8 implementation completed
 - Existing `GET /price-updates` keeps its default latest-approved behavior and accepts optional commodity, market, date and movement filters.
@@ -35,6 +35,9 @@ IN PROGRESS — Search, filters, chronological history, previous/current compari
 - Possible Meaning and Suggested Action remain present.
 - Private `source_1` / `source_2` remain excluded from public responses.
 - No complex charts, Stage 9 API, database migration, or dependency was added.
+
+## Stage 8 owner/local verification summary
+Owner/local smoke reported `STAGE 8 OWNER SMOKE: PASS`. Commodity search, market/date/movement filters, chronological history, same-day time-of-day records, previous/current comparison, market comparison, Possible Meaning/Suggested Action preservation, and private-source hiding all passed. Evidence: `docs/evidence/stage-8-owner-local-verification.txt`.
 
 ## Stage 8 AI-environment verification
 - Python compilation: PASS.
@@ -49,4 +52,4 @@ Stage 0 independent-source/duration evidence remains unresolved and must be reco
 None.
 
 ## Next gate
-Stage 8 owner/local verification. Stage 9 must not begin until Stage 8 passes and the owner approves.
+Owner approval for completed Stage 8. Stage 9 must not begin until the owner explicitly approves.
