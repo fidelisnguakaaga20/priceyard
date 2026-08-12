@@ -25,6 +25,9 @@ PASS — awaiting owner approval.
 - Uvicorn starts successfully.
 - `GET /health` returned HTTP 200 and `{"status":"healthy"}`.
 
+## Stage 2 implementation commit
+`bf5c0a0c8bf52a8b117fd245795f0bd9c9e2eb10`
+
 ## Outstanding issue
 Stage 0 independent-source/duration evidence remains unresolved and must be reconciled before Stage 24 final acceptance.
 
