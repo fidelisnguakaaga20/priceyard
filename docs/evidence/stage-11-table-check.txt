@@ -1,0 +1,3 @@
+TABLE True
+COLUMNS ['id', 'commodity_id', 'market_id', 'price_update_id', 'suitability_status', 'import_risk', 'oversupply_risk', 'spoilage_risk', 'buyer_availability', 'quality_storage_notes', 'summary', 'created_at', 'updated_at']
+STAGE 11 INTERNAL TABLE CHECK: PASS

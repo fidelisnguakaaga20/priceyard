@@ -1,7 +1,7 @@
 # PriceYard Database Schema
 
 ## Status
-Stage 3 — Database Foundation: RETESTED/PASS after owner live Supabase PostgreSQL verification. Stage 10 adds the approved `buying_zones` and `sell_watch_windows` tables through Alembic revision `0002_stage10_buy_sell_watch`; owner Supabase migration verification is still pending.
+Stage 3 foundation is RETESTED/PASS. Stage 10 tables are owner-verified. Stage 11 adds the approved `storage_suitability` table through Alembic revision `0003_stage11_storage_suitability`; owner Supabase migration/runtime verification is pending.
 
 ## Approved database stack
 - PostgreSQL
@@ -237,4 +237,37 @@ Integrity rules:
 
 `start_period` and `end_period` are short text fields rather than forced calendar dates so approved observations such as “December ending” and “January upward” can be stored without inventing false precision.
 
-Stage 10 does not create `storage_suitability`, `cost_breakdowns`, `watchlists`, alerts, reports, or any other later-stage table.
+Stage 10 did not create `storage_suitability`, `cost_breakdowns`, `watchlists`, alerts, reports, or any other later-stage table.
+
+
+## Stage 11 — Storage Suitability
+
+Alembic revision `0003_stage11_storage_suitability` creates the approved `storage_suitability` table.
+
+Fields:
+- id
+- commodity_id
+- market_id
+- price_update_id
+- suitability_status
+- import_risk
+- oversupply_risk
+- spoilage_risk
+- buyer_availability
+- quality_storage_notes
+- summary
+- created_at
+- updated_at
+
+Approved `suitability_status` values:
+- `good`
+- `watch`
+- `risky`
+- `not_recommended`
+
+Relationships:
+- commodity and market are required foreign keys;
+- `price_update_id` is optional and, when used, must match the same commodity and market;
+- deleting a linked price update sets the optional storage-suitability link to null rather than deleting the storage observation.
+
+Stage 11 does not create `cost_breakdowns`, `watchlists`, alerts, reports, or other later-stage tables.

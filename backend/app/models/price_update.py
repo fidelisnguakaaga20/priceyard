@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from app.models.market import Market
     from app.models.market_signal import MarketSignal
     from app.models.quality_signal import QualitySignal
+    from app.models.storage_suitability import StorageSuitability
     from app.models.user import User
 
 
@@ -71,3 +72,4 @@ class PriceUpdate(Base):
     approver: Mapped[User | None] = relationship(back_populates="approved_price_updates", foreign_keys=[approved_by])
     market_signals: Mapped[list[MarketSignal]] = relationship(back_populates="price_update")
     quality_signals: Mapped[list[QualitySignal]] = relationship(back_populates="price_update")
+    storage_suitability: Mapped[list[StorageSuitability]] = relationship(back_populates="price_update")

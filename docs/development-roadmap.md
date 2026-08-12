@@ -6,4 +6,4 @@ Follow the approved stage sequence strictly:
 
 Only one stage may be active at a time unless the owner explicitly approves a change.
 
-Stages 9 and 10 are RETESTED/PASS and owner-approved. Stage 11 — Storage Suitability is authorized and is the only stage that may now be built.
+Stages 9 and 10 are RETESTED/PASS and owner-approved. Stage 11 — Storage Suitability is built but remains IN PROGRESS until its migration and owner/local Supabase smoke pass and the owner approves Stage 12.

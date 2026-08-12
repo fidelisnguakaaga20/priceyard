@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from app.models.price_update import PriceUpdate
     from app.models.quality_signal import QualitySignal
     from app.models.sell_watch_window import SellWatchWindow
+    from app.models.storage_suitability import StorageSuitability
 
 
 class Commodity(Base):
@@ -31,3 +32,4 @@ class Commodity(Base):
     quality_signals: Mapped[list[QualitySignal]] = relationship(back_populates="commodity")
     buying_zones: Mapped[list[BuyingZone]] = relationship(back_populates="commodity")
     sell_watch_windows: Mapped[list[SellWatchWindow]] = relationship(back_populates="commodity")
+    storage_suitability: Mapped[list[StorageSuitability]] = relationship(back_populates="commodity")

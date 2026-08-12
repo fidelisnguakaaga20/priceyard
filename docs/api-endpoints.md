@@ -360,4 +360,32 @@ Sell-watch API disclaimer:
 
 > Sell-watch windows are market observations and are not guaranteed profit periods, guaranteed selling opportunities, predictions, or financial advice.
 
-No Stage 11 storage-suitability API is included in Stage 10.
+Stage 10 did not include the Stage 11 storage-suitability API.
+
+
+## Stage 11 — Storage Suitability
+
+### GET /storage-suitability
+Purpose: list storage-suitability observations.
+Authentication/access: admin, active trial, or active paid access required. Free/expired/cancelled users do not receive this full-intelligence view.
+Response includes the approved storage-suitability disclaimer.
+
+### GET /storage-suitability/{item_id}
+Purpose: view one storage-suitability observation.
+Authentication/access: admin, active trial, or active paid access required.
+
+### POST /storage-suitability
+Purpose: create a storage-suitability observation.
+Authentication: admin bearer JWT required.
+Fields: `commodity_id`, `market_id`, optional `price_update_id`, `suitability_status`, optional `import_risk`, `oversupply_risk`, `spoilage_risk`, `buyer_availability`, `quality_storage_notes`, `summary`.
+Rules: status must be `good`, `watch`, `risky`, or `not_recommended`; optional price-update link must match the same commodity and market; explicit guaranteed profit/preservation/scarcity/future-price wording is rejected.
+
+### PATCH /storage-suitability/{item_id}
+Purpose: edit a storage-suitability observation.
+Authentication: admin bearer JWT required.
+
+Storage-suitability API disclaimer:
+
+> Storage suitability is based on available market and quality information. It does not guarantee profit, preservation, or future price increase.
+
+No Stage 12 cost-breakdown API is included in Stage 11.

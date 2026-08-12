@@ -1,0 +1,6 @@
+0003_stage11_storage_suitability (head)
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001_create_mvp_foundation, create MVP database foundation
+INFO  [alembic.runtime.migration] Running upgrade 0001_create_mvp_foundation -> 0002_stage10_buy_sell_watch, add Stage 10 buying zones and sell-watch windows
+INFO  [alembic.runtime.migration] Running upgrade 0002_stage10_buy_sell_watch -> 0003_stage11_storage_suitability, add Stage 11 storage suitability

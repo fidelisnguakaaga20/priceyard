@@ -9,6 +9,7 @@ from app.routes.market_signal_routes import router as market_signal_router
 from app.routes.price_update_routes import router as price_update_router
 from app.routes.quality_signal_routes import router as quality_signal_router
 from app.routes.sell_watch_window_routes import router as sell_watch_window_router
+from app.routes.storage_suitability_routes import router as storage_suitability_router
 from app.routes.subscription_routes import router as subscription_router
 from app.routes.user_routes import router as user_router
 
@@ -29,6 +30,7 @@ app.include_router(market_signal_router)
 app.include_router(quality_signal_router)
 app.include_router(buying_zone_router)
 app.include_router(sell_watch_window_router)
+app.include_router(storage_suitability_router)
 
 
 @app.get("/health")

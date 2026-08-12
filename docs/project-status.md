@@ -1,7 +1,7 @@
 # PriceYard Project Status
 
 ## Current stage
-Stage 11 — Storage Suitability — AUTHORIZED/NOT YET BUILT. Stage 10 is RETESTED/PASS and owner-approved.
+Stage 11 — Storage Suitability — BUILT/IN PROGRESS; owner Supabase migration and runtime smoke verification are required before completion.
 
 ## Stage 0 disposition
 Owner supplied validation metrics: 65 reached, 14 replies, 5 willing to pay, positive usefulness/trust/continuation signals, sample market records and two source types.
@@ -45,6 +45,26 @@ On 2026-08-12, the owner explicitly granted Application Coding Permission: YES. 
 ## Stage 10 owner verification
 PASS. Owner applied Alembic revision `0002_stage10_buy_sell_watch` against Supabase PostgreSQL and `docs/evidence/stage-10-owner-smoke.py` ended with `STAGE 10 OWNER SMOKE: PASS`.
 
+## Stage 11 implementation completed
+- Added `storage_suitability` model and Alembic revision `0003_stage11_storage_suitability`.
+- Added approved create/edit/view API flow.
+- Approved statuses are `good`, `watch`, `risky`, and `not_recommended`.
+- Optional price-update links are validated against the same commodity and market.
+- Trial and active-paid users have full storage-suitability view; free/expired/cancelled users remain limited; admin manages records.
+- Explicit guaranteed profit/preservation/scarcity/future-price wording is rejected.
+- Exact approved storage-suitability disclaimer is returned.
+- No Stage 12 cost-breakdown table/API or other future feature was added.
+
+## Stage 11 internal verification
+- Python compilation: PASS.
+- Static scope/contract check: PASS.
+- Temporary migration to `0003_stage11_storage_suitability`: PASS.
+- Required table/field inspection: PASS.
+- Internal API flow on temporary SQLite with an internal bcrypt compatibility stub: PASS; this is build evidence only.
+
+## Stage 11 owner verification
+PENDING. Owner must apply `python -m alembic upgrade head` to Supabase PostgreSQL and run `docs/evidence/stage-11-owner-smoke.py`.
+
 ## Outstanding project issue
 Stage 0 independent-source/duration evidence remains unresolved and must be reconciled before Stage 24 final acceptance.
 
@@ -52,4 +72,4 @@ Stage 0 independent-source/duration evidence remains unresolved and must be reco
 None.
 
 ## Next gate
-Stage 11 — Storage Suitability is authorized by the owner's instruction: “if this output is okay, then next.” Build and verify Stage 11 only; do not begin Stage 12 without a new owner approval.
+Owner Stage 11 migration/runtime verification. If it passes, request explicit owner approval before Stage 12 — Cost Breakdown.
