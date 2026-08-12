@@ -1,7 +1,7 @@
 # PriceYard Project Status
 
 ## Current stage
-Stage 11 — Storage Suitability — BUILT/IN PROGRESS; owner Supabase migration and runtime smoke verification are required before completion.
+Stage 11 — Storage Suitability — RETESTED/PASS and owner-approved. Stage 12 — Cost Breakdown is authorized but not yet verified.
 
 ## Stage 0 disposition
 Owner supplied validation metrics: 65 reached, 14 replies, 5 willing to pay, positive usefulness/trust/continuation signals, sample market records and two source types.
@@ -23,6 +23,7 @@ On 2026-08-12, the owner explicitly granted Application Coding Permission: YES. 
 - Stage 8 — Search, Filters, History, Comparison: RETESTED/PASS and owner-approved after local Supabase-backed smoke verification and the owner's instruction to continue.
 - Stage 9 — Market Signals and Quality Signals: RETESTED/PASS and owner-approved after local Supabase-backed smoke verification and the owner's instruction to continue.
 - Stage 10 — Buying Zones and Sell-Watch Windows: RETESTED/PASS and owner-approved after Alembic migration plus local Supabase-backed owner smoke verification.
+- Stage 11 — Storage Suitability: RETESTED/PASS and owner-approved after owner Supabase migration and a successful retest following one transient database connection interruption.
 
 ## Stage 10 implementation completed
 - Added `buying_zones` and `sell_watch_windows` models and approved relationships.
@@ -63,7 +64,7 @@ PASS. Owner applied Alembic revision `0002_stage10_buy_sell_watch` against Supab
 - Internal API flow on temporary SQLite with an internal bcrypt compatibility stub: PASS; this is build evidence only.
 
 ## Stage 11 owner verification
-PENDING. Owner must apply `python -m alembic upgrade head` to Supabase PostgreSQL and run `docs/evidence/stage-11-owner-smoke.py`.
+RETESTED/PASS. The Stage 11 migration reached `0003_stage11_storage_suitability`. The first runtime smoke was interrupted when the PostgreSQL/Supabase connection closed unexpectedly during SQLAlchemy refresh. No code/schema change was made. The owner then verified the database connection, confirmed Alembic head `0003_stage11_storage_suitability`, reran the smoke, and received `STAGE 11 OWNER SMOKE: PASS` with migration, fields, relationships, validation, access control, anti-guarantee wording, and disclaimer checks passing.
 
 ## Outstanding project issue
 Stage 0 independent-source/duration evidence remains unresolved and must be reconciled before Stage 24 final acceptance.
@@ -72,4 +73,4 @@ Stage 0 independent-source/duration evidence remains unresolved and must be reco
 None.
 
 ## Next gate
-Owner Stage 11 migration/runtime verification. If it passes, request explicit owner approval before Stage 12 — Cost Breakdown.
+Stage 12 — Cost Breakdown is owner-authorized. Build/test only Stage 12 and stop before Stage 13.

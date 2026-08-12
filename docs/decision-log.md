@@ -129,3 +129,17 @@ The approved execution plan defines `start_period` and `end_period` but does not
 - Test effect: Stage 11 must prove migration, required fields, create/edit/view, relationships, validation, access control, approved statuses, and storage disclaimer behavior.
 - Completed-stage effect: Stage 10 becomes RETESTED/PASS and owner-approved.
 - Approval: Conditional owner instruction satisfied by the passing Stage 10 output.
+
+## DEC-010 — Stage 11 approval and Stage 12 authorization
+- Date: 2026-08-12
+- Current requirement: Do not proceed from Stage 11 until owner approval.
+- Source: PriceYard AI Project Execution Plan.
+- Owner proof: Database connection PASS, Alembic head `0003_stage11_storage_suitability`, and `STAGE 11 OWNER SMOKE: PASS` after one transient database connection interruption that required no code/schema change.
+- Owner instruction: `approved`.
+- Decision: Stage 11 is RETESTED/PASS and owner-approved. Stage 12 — Cost Breakdown only is authorized.
+- Database effect: Authorizes one approved migration creating only `cost_breakdowns`.
+- API effect: Authorizes only Stage 12 cost-breakdown create/edit/view flows needed for the approved MVP.
+- Frontend effect: None in Stage 12.
+- Test effect: Stage 12 must prove costs save, totals calculate, edits recalculate, negative costs reject, and price-update relationship works.
+- Completed-stage effect: Stage 11 becomes RETESTED/PASS and owner-approved.
+- Approval: Owner-approved in conversation.

@@ -1,0 +1,26 @@
+Stage 11 owner local verification — 2026-08-12
+
+Environment: Owner Windows/Git Bash + configured Supabase PostgreSQL.
+
+Initial run:
+- Alembic upgrade reached 0003_stage11_storage_suitability.
+- First Stage 11 runtime smoke was interrupted by a transient PostgreSQL/Supabase connection closure during SQLAlchemy refresh.
+- No code or schema change was made in response.
+
+Retest:
+DATABASE CONNECTION: PASS
+0003_stage11_storage_suitability (head)
+STAGE 11 OWNER SMOKE: PASS
+
+Verified PASS items included:
+- storage_suitability migration and required fields
+- approved statuses
+- price-update relationship and mismatch rejection
+- admin create/edit
+- non-admin management blocking
+- trial and active-paid full viewing
+- free limited access
+- anti-guarantee storage wording
+- exact approved storage disclaimer
+
+Disposition: RETESTED/PASS.
