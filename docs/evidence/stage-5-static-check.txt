@@ -1,0 +1,24 @@
+service syntax: PASS
+routes syntax: PASS
+schema syntax: PASS
+auth syntax: PASS
+main syntax: PASS
+14-day constant: PASS
+full trial/active access logic: PASS
+limited statuses declared: PASS
+automatic expiry logic: PASS
+paid role sync: PASS
+free role sync: PASS
+new registration trial creation: PASS
+subscription router included: PASS
+list expiry uses one commit path: PASS
+approved route @router.get("",: PASS
+approved route @router.get("/{user_id}",: PASS
+approved route @router.patch("/{user_id}/status",: PASS
+status free: PASS
+status trial: PASS
+status active: PASS
+status expired: PASS
+status cancelled: PASS
+Stage 5 static scope/contract checks: PASS
+Python compileall: PASS

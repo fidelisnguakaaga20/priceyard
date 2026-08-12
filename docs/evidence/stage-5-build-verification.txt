@@ -1,0 +1,30 @@
+Stage 5 build verification
+Date: 2026-08-12
+
+Implementation scope:
+- automatic 14-day trial creation for new normal registrations
+- statuses: free, trial, active, expired, cancelled
+- full-access classification for active trial and active paid
+- limited-access classification for free, expired, cancelled
+- automatic trial expiry
+- admin-only manual subscription status update
+- approved subscription list/read APIs
+- no payment gateway
+- no database schema migration
+
+Checks:
+- Python compileall: PASS
+- static syntax/scope/contract verification: PASS
+- approved route contract presence: PASS
+- approved status validation presence: PASS
+- deferred payment gateway absent: PASS
+
+Build-test issue encountered:
+- The first static verification helper searched for an exact decorator substring that did not account for additional decorator arguments and reported a false FAIL for GET /subscriptions.
+Fix:
+- Corrected only the verification matcher to recognize the actual approved decorator form.
+Retest:
+- Static scope/contract verification: PASS.
+
+Runtime status:
+- Owner/local PostgreSQL smoke is still required before Stage 5 can be marked PASS.

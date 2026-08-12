@@ -4,6 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.models.user import User
+from app.services.subscription_service import build_trial_subscription
 from app.schemas.auth_schema import RegisterRequest
 from app.utils.password import hash_password, verify_password
 
@@ -47,6 +48,7 @@ def register_user(db: Session, payload: RegisterRequest) -> User:
         role="free_user",
         is_active=True,
     )
+    user.subscription = build_trial_subscription(user=user)
     db.add(user)
 
     try:

@@ -71,4 +71,33 @@ Rules:
 
 ## Later approved stages
 
-Subscription/trial behavior is Stage 5. Commodity, market, price, signal, quality, FAQ, feedback and admin APIs remain unimplemented until their approved stages.
+Commodity, market, price, signal, quality, FAQ, feedback and broader admin APIs remain unimplemented until their approved stages.
+
+## Stage 5 — Subscription and 14-Day Trial
+
+### GET /subscriptions
+Purpose: list subscription records for manual administration.
+Authentication: admin bearer JWT required.
+
+### GET /subscriptions/{user_id}
+Purpose: return one user's subscription/trial record.
+Authentication: bearer JWT required. A normal user may view only their own record; admin may view any user's record.
+
+### PATCH /subscriptions/{user_id}/status
+Purpose: manually set an approved subscription status.
+Authentication: admin bearer JWT required.
+
+Allowed statuses:
+- `free`
+- `trial`
+- `active`
+- `expired`
+- `cancelled`
+
+Stage 5 rules:
+- normal public registration creates a 14-day trial subscription;
+- trial status gives full-access classification only until `trial_ends_at`;
+- an expired trial transitions to `expired` and the user remains/returns `free_user`;
+- `active` is the paid/full-access status and assigns `paid_user` for a normal user;
+- `free`, `expired`, and `cancelled` are limited-access statuses;
+- payment gateway integration remains deferred.

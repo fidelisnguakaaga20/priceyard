@@ -1,7 +1,7 @@
 # PriceYard Project Status
 
 ## Current stage
-Stage 4 — Authentication
+Stage 5 — Subscription and 14-Day Trial
 
 ## Stage 0 disposition
 Owner supplied validation metrics: 65 reached, 14 replies, 5 willing to pay, positive usefulness/trust/continuation signals, sample market records and two source types.
@@ -41,6 +41,27 @@ The first owner smoke attempt failed because the verification script used a rese
 - Static auth/API/security structure checks: PASS.
 - Full auth runtime test: BLOCKED in the AI environment because the `bcrypt` package cannot be downloaded due environment network/DNS restrictions. `bcrypt` is declared in `requirements.txt` and must be installed/verified on the owner's computer.
 
+## Stage 5 status
+IN PROGRESS — Stage 5 implementation is built. Static syntax/scope/contract checks pass. Owner/local runtime verification against the configured Supabase PostgreSQL database is still required before Stage 5 can be marked PASS.
+
+## Stage 5 implementation completed
+- New normal registrations create a 14-day trial subscription.
+- Approved statuses are `free`, `trial`, `active`, `expired`, and `cancelled`.
+- Active trial and active paid are classified as full access.
+- Free, expired, and cancelled are classified as limited access.
+- Expired trials automatically transition to `expired` when subscription state is read.
+- Active paid status synchronizes a normal user to `paid_user`; trial/limited statuses keep or return a normal user to `free_user`.
+- Admin-only manual subscription status update is implemented.
+- Approved subscription list/read/status APIs are implemented.
+- Payment gateway remains deferred.
+- No Stage 5 database migration was needed because Stage 3 already created all required subscription fields.
+
+## Stage 5 build verification
+- Python compileall: PASS.
+- Static syntax/scope/contract checks: PASS.
+- One verification-script false failure occurred due to an overly exact route-decorator matcher; only the verifier was corrected and the retest passed.
+- Full PostgreSQL runtime smoke: pending owner/local verification because the AI environment does not have the owner's Supabase credentials and does not have bcrypt installed.
+
 ## Outstanding project issue
 Stage 0 independent-source/duration evidence remains unresolved and must be reconciled before Stage 24 final acceptance.
 
@@ -48,4 +69,4 @@ Stage 0 independent-source/duration evidence remains unresolved and must be reco
 None.
 
 ## Next gate
-Stage 5 — Subscription and 14-Day Trial is authorized by the owner instruction to continue after Stage 4 local PASS. Stage 6 must not begin until Stage 5 passes and the owner approves.
+Stage 5 owner/local runtime verification. Stage 6 must not begin until Stage 5 passes and the owner approves.

@@ -73,7 +73,7 @@ POST /auth/login
 GET  /auth/me
 ```
 
-Registration always creates an active `free_user`. Trial access remains a subscription status concern for Stage 5; clients cannot self-register as admin or paid users.
+Registration creates an active `free_user` account and, from Stage 5 onward, an associated 14-day `trial` subscription. Clients cannot self-register as admin or paid users.
 
 Protected requests use:
 
@@ -93,4 +93,29 @@ Expected final line:
 
 ```text
 STAGE 4 OWNER SMOKE: PASS
+```
+
+
+## Stage 5 subscription/trial endpoints
+
+```text
+GET   /subscriptions
+GET   /subscriptions/{user_id}
+PATCH /subscriptions/{user_id}/status
+```
+
+Approved statuses: `free`, `trial`, `active`, `expired`, `cancelled`. Payment gateway integration remains deferred.
+
+## Stage 5 owner smoke test
+
+With the real PostgreSQL `DATABASE_URL` and `JWT_SECRET` configured in `.env`:
+
+```bash
+python ../docs/evidence/stage-5-owner-smoke.py
+```
+
+Expected final line:
+
+```text
+STAGE 5 OWNER SMOKE: PASS
 ```

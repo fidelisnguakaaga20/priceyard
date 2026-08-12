@@ -1,7 +1,7 @@
 # PriceYard Database Schema
 
 ## Status
-Stage 3 — Database Foundation: IN PROGRESS pending live PostgreSQL migration verification.
+Stage 3 — Database Foundation: RETESTED/PASS after owner live Supabase PostgreSQL verification. Stage 5 reuses the existing `subscriptions` table; no Stage 5 schema migration is required.
 
 ## Approved database stack
 - PostgreSQL
