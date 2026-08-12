@@ -146,3 +146,18 @@ The approved execution plan defines `start_period` and `end_period` but does not
 
 ## 2026-08-12 — Stage 12 calculated totals
 The approved Stage 12 fields include both component costs and totals. To avoid inconsistent client-supplied totals, `total_additional_cost` and `total_estimated_landing_storage_cost` are calculated by the backend on create and recalculated on edit. This is an implementation choice within the approved Stage 12 scope, not a new accounting feature.
+
+
+## DEC-011 — Stage 12 approval and Stage 13 authorization
+- Date: 2026-08-12
+- Current requirement: Do not proceed from Stage 12 until owner approval.
+- Source: PriceYard AI Project Execution Plan.
+- Owner proof: Alembic upgrade to `0004_stage12_cost_breakdowns` succeeded and `STAGE 12 OWNER SMOKE: PASS` showed migration, required fields, cost saving, total calculation/recalculation, negative-cost rejection, relationship behavior, and access control all passing on the owner's Supabase-backed environment.
+- Owner instruction: `see if output okay then next`.
+- Decision: The passing output satisfies the owner's condition. Stage 12 is RETESTED/PASS and owner-approved. Stage 13 — Watchlist only is authorized.
+- Database effect: Authorizes one approved migration creating only `watchlists`.
+- API effect: Authorizes only save/list/remove own watchlist flows. Target-price alerts remain deferred.
+- Frontend effect: None in Stage 13.
+- Test effect: Stage 13 must prove commodity/market saves, own-list behavior, duplicate handling, cross-user isolation, and removal.
+- Completed-stage effect: Stage 12 becomes RETESTED/PASS and owner-approved.
+- Approval: Conditional owner instruction satisfied by the passing Stage 12 output.

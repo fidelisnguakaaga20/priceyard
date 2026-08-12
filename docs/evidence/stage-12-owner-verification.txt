@@ -1,0 +1,19 @@
+Stage 12 owner verification — 2026-08-12
+
+Owner environment: Windows / Python 3.14 / Supabase PostgreSQL
+
+Evidence supplied by owner:
+- Alembic upgrade from 0003_stage11_storage_suitability to 0004_stage12_cost_breakdowns completed.
+- Stage 12 migration/table/required-field checks: PASS.
+- Cost create/view/edit flow: PASS.
+- Additional-cost total calculation: PASS.
+- Landing/storage total calculation: PASS.
+- Edit recalculation: PASS.
+- Negative create/edit costs rejected: PASS.
+- Price-update relationship: PASS.
+- Non-admin management blocked: PASS.
+- Trial and active-paid full view: PASS.
+- Free-user full view blocked: PASS.
+- Final terminal line: STAGE 12 OWNER SMOKE: PASS
+
+Disposition: RETESTED/PASS. Owner instructed "if output okay then next", authorizing Stage 13 after this passing result.

@@ -1,7 +1,7 @@
 # PriceYard Database Schema
 
 ## Status
-Stage 3 foundation is RETESTED/PASS. Stage 10 and Stage 11 tables are owner-verified. Stage 12 adds the approved `cost_breakdowns` table through Alembic revision `0004_stage12_cost_breakdowns`; owner Supabase migration/runtime verification is pending.
+Stage 3 foundation is RETESTED/PASS. Stage 10, Stage 11, and Stage 12 tables are owner-verified. Stage 13 is authorized to add only the approved `watchlists` table.
 
 ## Approved database stack
 - PostgreSQL

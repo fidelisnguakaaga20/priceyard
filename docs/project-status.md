@@ -1,7 +1,7 @@
 # PriceYard Project Status
 
 ## Current stage
-Stage 12 — Cost Breakdown — BUILT/IN PROGRESS; owner Supabase migration and runtime smoke verification are required before completion.
+Stage 13 — Watchlist — AUTHORIZED/IN PROGRESS after Stage 12 owner verification and conditional approval.
 
 ## Stage 0 disposition
 Owner supplied validation metrics: 65 reached, 14 replies, 5 willing to pay, positive usefulness/trust/continuation signals, sample market records and two source types.
@@ -24,6 +24,7 @@ On 2026-08-12, the owner explicitly granted Application Coding Permission: YES. 
 - Stage 9 — Market Signals and Quality Signals: RETESTED/PASS and owner-approved after local Supabase-backed smoke verification and the owner's instruction to continue.
 - Stage 10 — Buying Zones and Sell-Watch Windows: RETESTED/PASS and owner-approved after Alembic migration plus local Supabase-backed owner smoke verification.
 - Stage 11 — Storage Suitability: RETESTED/PASS and owner-approved after owner Supabase migration and a successful retest following one transient database connection interruption.
+- Stage 12 — Cost Breakdown: RETESTED/PASS and owner-approved after Alembic migration plus local Supabase-backed owner smoke verification.
 
 ## Stage 10 implementation completed
 - Added `buying_zones` and `sell_watch_windows` models and approved relationships.
@@ -86,7 +87,7 @@ RETESTED/PASS. The Stage 11 migration reached `0003_stage11_storage_suitability`
 - Real Supabase owner runtime proof is still required.
 
 ## Stage 12 owner verification
-PENDING. Owner must apply `python -m alembic upgrade head` to Supabase PostgreSQL and run `docs/evidence/stage-12-owner-smoke.py`.
+RETESTED/PASS. Owner applied Alembic revision `0004_stage12_cost_breakdowns` against Supabase PostgreSQL and `docs/evidence/stage-12-owner-smoke.py` ended with `STAGE 12 OWNER SMOKE: PASS`. Migration/fields, cost saving, total calculations, edit recalculation, negative-cost rejection, relationship behavior, and access control all passed.
 
 ## Outstanding project issue
 Stage 0 independent-source/duration evidence remains unresolved and must be reconciled before Stage 24 final acceptance.
@@ -95,4 +96,4 @@ Stage 0 independent-source/duration evidence remains unresolved and must be reco
 None.
 
 ## Next gate
-Owner Stage 12 migration/runtime verification. If it passes, request explicit owner approval before Stage 13 — Watchlist.
+Stage 13 — Watchlist is authorized by the owner’s conditional instruction after the passing Stage 12 output. Build/test/prove Stage 13 only, then stop for approval before Stage 14.
