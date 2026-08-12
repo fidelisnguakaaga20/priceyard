@@ -17,7 +17,7 @@ On 2026-08-12, the owner explicitly granted Application Coding Permission: YES. 
 - Stage 2 — Backend Foundation: RETESTED/PASS and owner-approved after successful local verification on the owner's computer.
 
 ## Stage 3 status
-IN PROGRESS — implementation and static/migration-render verification completed; live PostgreSQL connection and migration proof still required.
+RETESTED/PASS — implementation, static verification, real Supabase PostgreSQL connection, live Alembic migration, table inspection, and required field inspection all passed on the owner's computer.
 
 ## Stage 3 implementation completed
 - SQLAlchemy database/session foundation.
@@ -29,12 +29,14 @@ IN PROGRESS — implementation and static/migration-render verification complete
 - ORM relationship mapping verified.
 - PostgreSQL offline migration SQL rendered successfully.
 
-## Stage 3 outstanding gate
-Before Stage 3 can be marked PASS, a real PostgreSQL instance must prove:
+## Stage 3 live verification
+Owner/local verification on 2026-08-12 proved:
 1. database connection succeeds;
 2. `python -m alembic upgrade head` succeeds;
-3. all 10 approved tables exist;
+3. all 10 approved PriceYard Stage 3 tables exist;
 4. required `price_updates` columns exist.
+
+Evidence: `docs/evidence/stage-3-owner-local-verification.txt`.
 
 ## Outstanding project issue
 Stage 0 independent-source/duration evidence remains unresolved and must be reconciled before Stage 24 final acceptance.
@@ -43,4 +45,4 @@ Stage 0 independent-source/duration evidence remains unresolved and must be reco
 None.
 
 ## Next stage
-Stage 4 — Authentication, only after Stage 3 receives live PostgreSQL proof and owner approval.
+Stage 4 — Authentication, only after owner approval.

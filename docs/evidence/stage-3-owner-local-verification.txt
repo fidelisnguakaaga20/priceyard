@@ -1,0 +1,32 @@
+Stage 3 owner/local PostgreSQL verification
+Date: 2026-08-12
+Environment: Owner Windows PC, Git Bash, Supabase PostgreSQL Session Pooler
+
+Command 1:
+python -c "from app.database import verify_database_connection; verify_database_connection(); print('database connection: PASS')"
+
+Observed result:
+database connection: PASS
+
+Command 2:
+python -m alembic upgrade head
+
+Observed result:
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001_create_mvp_foundation, create MVP database foundation
+
+Command 3:
+python -c "from sqlalchemy import inspect; from app.database import get_engine; i=inspect(get_engine()); print('TABLES:', sorted(i.get_table_names())); print('PRICE_UPDATE FIELDS:', [c['name'] for c in i.get_columns('price_updates')])"
+
+Observed tables:
+['alembic_version', 'audit_logs', 'commodities', 'faq_items', 'feedback', 'market_signals', 'markets', 'price_updates', 'quality_signals', 'subscriptions', 'users']
+
+Observed price_updates fields:
+['id', 'commodity_id', 'market_id', 'price_low', 'price_high', 'average_price', 'previous_price_low', 'previous_price_high', 'unit', 'bag_size', 'commodity_type', 'market_day', 'time_of_day', 'movement', 'confidence_level', 'source_type', 'source_1', 'source_2', 'update_date_time', 'is_outdated', 'status', 'created_by', 'approved_by', 'possible_meaning', 'suggested_action', 'notes', 'created_at', 'updated_at']
+
+Result: PASS
+Notes:
+- alembic_version is Alembic's expected migration bookkeeping table and is not a PriceYard domain table.
+- All 10 approved Stage 3 PriceYard tables exist.
+- Required price_updates fields exist.
