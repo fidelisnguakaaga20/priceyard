@@ -20,6 +20,8 @@ On 2026-08-12, the owner explicitly granted Application Coding Permission: YES. 
 ## Stage 4 status
 IN PROGRESS — authentication implementation is built and statically verified. Owner/local runtime proof against the configured PostgreSQL database is still required before Stage 4 can be marked PASS.
 
+Owner smoke attempt on 2026-08-12 initially failed because the verification script used a reserved `.test` email domain rejected by email-validator. The test script was corrected to a randomized `@example.com` address; no auth implementation or schema change was required. Corrected owner retest is pending.
+
 ## Stage 4 implementation completed
 - `POST /auth/register`.
 - `POST /auth/login`.

@@ -25,7 +25,7 @@ from app.main import app  # noqa: E402
 from app.models.user import User  # noqa: E402
 
 client = TestClient(app)
-email = f"stage4-{uuid4().hex}@priceyard.test"
+email = f"stage4-{uuid4().hex}@example.com"
 password = "Stage4LocalTest!2026"
 report: dict[str, str] = {}
 user_id: int | None = None
@@ -47,6 +47,9 @@ try:
             "password": password,
         },
     )
+    if register.status_code != 201:
+        print("REGISTER STATUS:", register.status_code)
+        print("REGISTER BODY:", register.text)
     expect(register.status_code == 201, "registration works")
     body = register.json()
     user_id = body["id"]

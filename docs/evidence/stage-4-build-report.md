@@ -42,3 +42,9 @@ Owner must install requirements, configure JWT_SECRET, and run the Stage 4 owner
 
 ## Unapproved features added
 None.
+
+
+## Owner smoke failure and fix — 2026-08-12
+The first owner/local smoke run failed at registration before exercising authentication behavior. Root cause was the verification script itself: it generated an address ending in `.test`, which Pydantic/email-validator correctly rejects as a reserved special-use domain. The application auth implementation was not established as the cause.
+
+Smallest-area fix applied: the smoke test now uses a randomized `@example.com` address and prints the registration HTTP status/body if registration fails again. No application API, database schema, or approved Stage 4 behavior was changed. Stage 4 remains IN PROGRESS until the corrected owner smoke test passes.
