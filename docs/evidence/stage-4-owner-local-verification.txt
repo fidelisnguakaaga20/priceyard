@@ -1,0 +1,28 @@
+Stage 4 owner/local authentication smoke verification
+Date: 2026-08-12
+Environment: Owner Windows machine, configured Supabase PostgreSQL database
+Command: python ../docs/evidence/stage-4-owner-smoke.py
+
+Observed PASS checks:
+- registration works
+- registration assigns free_user role
+- password hash not returned
+- registered user persisted
+- password is hashed
+- bcrypt hash stored
+- duplicate email rejected
+- wrong password rejected
+- login works
+- JWT generated
+- missing JWT rejected
+- invalid JWT rejected
+- auth me works
+- JWT resolves current user
+- auth me hides password hash
+- inactive user login blocked
+- inactive user protected access blocked
+
+Final output: STAGE 4 OWNER SMOKE: PASS
+
+Owner instruction after proof: continue based on the approved execution plan.
+Disposition: Stage 4 RETESTED/PASS and owner-approved; Stage 5 authorized.

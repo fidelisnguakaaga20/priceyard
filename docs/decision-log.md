@@ -52,3 +52,17 @@
 - Test effect: Stage 4 must prove registration, duplicate rejection, login, wrong-password rejection, inactive-user blocking, JWT handling, `/auth/me`, bcrypt storage, and password-hash non-disclosure.
 - Completed-stage effect: Stage 3 becomes completed and owner-approved.
 - Approval: Owner-approved in conversation.
+
+## DEC-005 — Stage 4 approval and Stage 5 authorization
+- Date: 2026-08-12
+- Current requirement: Do not proceed from Stage 4 until owner approval.
+- Source: PriceYard AI Project Execution Plan.
+- Owner proof: `STAGE 4 OWNER SMOKE: PASS` with all 17 approved authentication checks passing on the owner's configured Supabase PostgreSQL environment.
+- Owner instruction: `continue base on this execution plan here` after the successful Stage 4 smoke proof.
+- Decision: Treat the instruction to continue as owner approval of Stage 4 and authorization to execute Stage 5 — Subscription and 14-Day Trial only.
+- Database effect: Stage 5 uses the existing `subscriptions` table; no schema change is required unless testing reveals an approved requirement cannot be met.
+- API effect: Authorizes only the approved subscription/trial APIs and access-status logic for Stage 5.
+- Frontend effect: None.
+- Test effect: Stage 5 must prove 14-day trial timing, full/limited access classification, active paid access, invalid-status rejection, and admin subscription update.
+- Completed-stage effect: Stage 4 becomes RETESTED/PASS and owner-approved.
+- Approval: Owner instruction in conversation.

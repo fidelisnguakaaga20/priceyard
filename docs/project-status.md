@@ -16,11 +16,12 @@ On 2026-08-12, the owner explicitly granted Application Coding Permission: YES. 
 - Stage 1 — Project Setup: PASS.
 - Stage 2 — Backend Foundation: RETESTED/PASS and owner-approved after local verification.
 - Stage 3 — Database Foundation: RETESTED/PASS and owner-approved after live Supabase PostgreSQL verification.
+- Stage 4 — Authentication: RETESTED/PASS and owner-approved after local authentication smoke verification.
 
 ## Stage 4 status
-IN PROGRESS — authentication implementation is built and statically verified. Owner/local runtime proof against the configured PostgreSQL database is still required before Stage 4 can be marked PASS.
+RETESTED/PASS — owner/local runtime smoke passed against the configured Supabase PostgreSQL database on 2026-08-12. All 17 approved authentication/security checks passed, including registration, duplicate rejection, login, wrong-password rejection, JWT handling, `/auth/me`, bcrypt storage, hash non-disclosure, and inactive-user blocking.
 
-Owner smoke attempt on 2026-08-12 initially failed because the verification script used a reserved `.test` email domain rejected by email-validator. The test script was corrected to a randomized `@example.com` address; no auth implementation or schema change was required. Corrected owner retest is pending.
+The first owner smoke attempt failed because the verification script used a reserved `.test` email domain. The script was corrected to use a randomized `@example.com` address. A later run failed because the freshly extracted Stage 4 snapshot intentionally contained no `.env`; after the owner restored the approved Stage 3 database URL and a fresh JWT secret locally, the corrected smoke test passed. No authentication implementation or database schema change was required for either verification issue.
 
 ## Stage 4 implementation completed
 - `POST /auth/register`.
@@ -47,4 +48,4 @@ Stage 0 independent-source/duration evidence remains unresolved and must be reco
 None.
 
 ## Next gate
-Stage 4 owner/local runtime verification. Stage 5 must not begin until Stage 4 passes and the owner approves.
+Stage 5 — Subscription and 14-Day Trial is authorized by the owner instruction to continue after Stage 4 local PASS. Stage 6 must not begin until Stage 5 passes and the owner approves.
