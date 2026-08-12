@@ -182,3 +182,9 @@ Exactly these MVP foundation tables are implemented:
 No database migration is required for Stage 6. The approved Stage 3 tables already contain the fields needed for user, commodity, market, and subscription management.
 
 Stage 6 does not create any Stage 7+ table or column.
+
+## Stage 7 — Price Updates
+
+No migration is required. Stage 7 uses the existing Stage 3 `price_updates` table and its approved fields/constraints.
+
+API-layer validation now additionally enforces the approved suggested-action choices, current/previous range consistency, and observational/non-guaranteed `possible_meaning` wording. Private `source_1`/`source_2` values remain stored in PostgreSQL but are excluded from public price response schemas.

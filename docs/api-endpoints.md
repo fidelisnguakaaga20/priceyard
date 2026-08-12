@@ -175,3 +175,52 @@ Initial approved markets:
 - Benue — market day not set unless independently verified
 
 Stage 6 reuses the Stage 5 subscription management APIs. No new payment behavior is introduced.
+
+## Stage 7 — Price Updates
+
+### GET /price-updates
+Purpose: return the latest approved, current price record for each commodity/market pair.
+Authentication: none at Stage 7; full access-tier enforcement is tested in the approved later access-control stage.
+Public privacy rule: `source_1` and `source_2` are never returned.
+Stage boundary: this is a current/latest view, not the Stage 8 chronological history/filter system.
+
+### GET /price-updates/{price_update_id}
+Purpose: return one approved price update.
+Authentication: none at Stage 7.
+Rule: pending/rejected records are not publicly returned; private source identities are excluded.
+
+### POST /price-updates
+Purpose: create a price update.
+Authentication: admin bearer JWT required.
+Rule: created records begin with `pending` status; `created_by` is server-controlled.
+
+### PATCH /price-updates/{price_update_id}
+Purpose: edit a price update.
+Authentication: admin bearer JWT required.
+
+### PATCH /price-updates/{price_update_id}/approve
+Purpose: approve a price update for public retrieval.
+Authentication: admin bearer JWT required.
+Rule: records the approving admin in `approved_by`.
+
+### PATCH /price-updates/{price_update_id}/reject
+Purpose: reject a price update.
+Authentication: admin bearer JWT required.
+
+### PATCH /price-updates/{price_update_id}/mark-outdated
+Purpose: mark a price update as outdated so it is not presented as current data.
+Authentication: admin bearer JWT required.
+
+### DELETE /price-updates/{price_update_id}
+Purpose: delete an incorrect price update when no dependent record prevents deletion.
+Authentication: admin bearer JWT required.
+
+Stage 7 validation rules:
+- current price uses `price_low` and `price_high` and permits equal values only when an exact confirmed value is intentionally supplied;
+- `price_high` cannot be below `price_low`;
+- `average_price` must be within the current range;
+- previous range values are optional when not confirmed, but when supplied they must be supplied as a pair and form a valid range;
+- movement is `up`, `down`, `stable`, or `unknown`;
+- suggested action is `Watch`, `Investigate`, `Buy Carefully`, `Hold`, or `Sell Carefully`;
+- explicit guarantee/financial-advice wording is rejected from `possible_meaning`;
+- public responses exclude private `source_1` and `source_2` values.

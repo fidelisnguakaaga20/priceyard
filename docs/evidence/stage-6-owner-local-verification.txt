@@ -1,0 +1,19 @@
+Stage 6 owner/local verification — 2026-08-12
+
+Owner ran the corrected Stage 6 Supabase-backed smoke verifier locally.
+Result: STAGE 6 OWNER SMOKE: PASS
+
+Verified outcomes included:
+- non-admin user/commodity/market/subscription management blocked;
+- approved initial commodities exist: Egusi, Beans, Palm oil;
+- approved initial markets exist: Abuja/FCT, Kwali Market, Nasarawa, Benue;
+- Nasarawa market day Monday and Kwali market day Tuesday;
+- unverified Abuja/FCT and Benue market days not invented;
+- commodity CRUD passed;
+- market CRUD passed;
+- admin user list/view/activate/deactivate/role changes passed;
+- password hash not exposed;
+- reporter role remains deferred/rejected;
+- subscription management regression passed.
+
+Final owner terminal line: STAGE 6 OWNER SMOKE: PASS

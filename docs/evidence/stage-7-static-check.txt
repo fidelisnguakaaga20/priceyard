@@ -1,0 +1,9 @@
+PASS: valid price-update schema accepted
+PASS: invalid price range rejected
+PASS: invalid suggested action rejected
+PASS: guaranteed possible meaning rejected
+PASS: required Stage 7 routes present
+PASS: public response excludes private source identities; admin response retains them
+PASS: latest retrieval is approved/current and deduplicated by commodity/market
+PASS: no Stage 7 database migration added
+PASS: Stage 8/9 route scope not introduced
