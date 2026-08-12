@@ -1,0 +1,22 @@
+PRICEYARD STAGE 1 FOLDER TREE
+
+.
+./.gitignore
+./README.md
+./backend
+./docs
+./docs/ai-project-execution-plan.md
+./docs/api-endpoints.md
+./docs/architecture-design.md
+./docs/database-schema.md
+./docs/decision-log.md
+./docs/deployment-plan.md
+./docs/development-roadmap.md
+./docs/evidence
+./docs/evidence/README.md
+./docs/evidence/stage-1-gitignore-verification.txt
+./docs/evidence/stage-1-tree.txt
+./docs/priceyard-reference-document.md
+./docs/project-status.md
+./docs/requirements-traceability-matrix.md
+./frontend

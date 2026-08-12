@@ -1,0 +1,7 @@
+--- git check-ignore -v .env ---
+.gitignore:2:.env	.env
+
+--- git status --short before commit ---
+?? .gitignore
+?? README.md
+?? docs/
