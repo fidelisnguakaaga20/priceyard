@@ -14,7 +14,13 @@ Expected successful response:
 {"status":"healthy"}
 ```
 
-Verified in Stage 2 with HTTP 200.
+Owner-verified in Stage 2 with HTTP 200.
+
+## Stage 3 — Database Foundation
+
+No new public/business API endpoint is introduced in Stage 3.
+
+Stage 3 adds only the approved PostgreSQL/SQLAlchemy/Alembic database foundation and model schema.
 
 ## Later approved stages
 
@@ -23,4 +29,4 @@ Stage 4 planned auth endpoints:
 - POST /auth/login
 - GET /auth/me
 
-No database, authentication, commodity, market, price, subscription, or other later-stage API has been implemented in Stage 2.
+Commodity, market, price, subscription, signal, quality, FAQ, feedback and admin APIs remain unimplemented until their approved stages.

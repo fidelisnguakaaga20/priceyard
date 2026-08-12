@@ -1,0 +1,6 @@
+approved tables: ['audit_logs', 'commodities', 'faq_items', 'feedback', 'market_signals', 'markets', 'price_updates', 'quality_signals', 'subscriptions', 'users']
+actual tables: ['audit_logs', 'commodities', 'faq_items', 'feedback', 'market_signals', 'markets', 'price_updates', 'quality_signals', 'subscriptions', 'users']
+missing approved: []
+unexpected tables: []
+deferred tables present: []
+Stage 3 schema scope: PASS

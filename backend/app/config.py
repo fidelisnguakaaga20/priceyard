@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     app_name: str = "PriceYard API"
     app_env: str = "development"
     debug: bool = False
+    database_url: str | None = None
 
     model_config = SettingsConfigDict(
         env_file=".env",

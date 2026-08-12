@@ -21,3 +21,9 @@
 | S2-03 | Execution | Add backend requirements and verify dependencies | MVP | 2 | backend/requirements.txt | pip requirements verification | docs/evidence/stage-2-dependency-install.txt; stage-2-dependency-availability.txt | PASS |
 | S2-04 | Execution | Add backend README | MVP | 2 | backend/README.md | File/content review | repository | PASS |
 | S2-05 | Execution | Implement GET /health | MVP | 2 | backend/app/main.py | Live HTTP request | docs/evidence/stage-2-health-response.txt; stage-2-uvicorn-output.txt | PASS |
+| S3-01 | Execution/Architecture | PostgreSQL connection and SQLAlchemy session foundation | MVP | 3 | backend/app/database.py; backend/app/config.py | Live SELECT 1 against PostgreSQL | Pending owner/local PostgreSQL verification | IN PROGRESS |
+| S3-02 | Execution/Architecture | Alembic migration system | MVP | 3 | backend/alembic.ini; backend/migrations/* | Migration render + live upgrade head | PostgreSQL render PASS; live upgrade pending | IN PROGRESS |
+| S3-03 | Execution | Create exactly 10 approved Stage 3 MVP tables | MVP | 3 | backend/app/models/*; initial migration | Metadata/table inspection + live DB inspection | Static metadata shows exactly 10 approved tables; live DB pending | IN PROGRESS |
+| S3-04 | Execution | Verify model relationships/foreign keys | MVP | 3 | backend/app/models/* | SQLAlchemy mapper configuration and FK inspection | docs/evidence/stage-3-model-mapper-check.txt | PASS |
+| S3-05 | Execution | `price_updates` supports required range/source/meaning/action/confidence fields | MVP | 3 | backend/app/models/price_update.py; migration | Required-column inspection | docs/evidence/stage-3-price-update-fields-check.txt | PASS |
+| S3-06 | Execution | Deferred later-stage tables are not created | MVP | 3 | SQLAlchemy metadata; migration | Exact table-name scope check | docs/evidence/stage-3-schema-scope-check.txt | PASS |

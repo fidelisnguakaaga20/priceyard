@@ -1,0 +1,4 @@
+required: ['average_price', 'confidence_level', 'possible_meaning', 'previous_price_high', 'previous_price_low', 'price_high', 'price_low', 'source_1', 'source_2', 'source_type', 'suggested_action']
+price_updates columns: ['approved_by', 'average_price', 'bag_size', 'commodity_id', 'commodity_type', 'confidence_level', 'created_at', 'created_by', 'id', 'is_outdated', 'market_day', 'market_id', 'movement', 'notes', 'possible_meaning', 'previous_price_high', 'previous_price_low', 'price_high', 'price_low', 'source_1', 'source_2', 'source_type', 'status', 'suggested_action', 'time_of_day', 'unit', 'update_date_time', 'updated_at']
+missing: []
+Required price_updates fields: PASS

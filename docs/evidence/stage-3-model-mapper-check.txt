@@ -1,0 +1,12 @@
+SQLAlchemy mapper configuration: PASS
+registered table count: 10
+audit_logs: columns=8, foreign_keys=1
+commodities: columns=6, foreign_keys=0
+faq_items: columns=8, foreign_keys=1
+feedback: columns=13, foreign_keys=1
+market_signals: columns=11, foreign_keys=4
+markets: columns=9, foreign_keys=0
+price_updates: columns=28, foreign_keys=4
+quality_signals: columns=11, foreign_keys=4
+subscriptions: columns=11, foreign_keys=1
+users: columns=9, foreign_keys=0

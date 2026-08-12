@@ -1,0 +1,4 @@
+SQLAlchemy 2.0.50
+alembic 1.18.4
+psycopg NOT INSTALLED IN AI ENVIRONMENT
+Note: psycopg installation requires network access in this AI environment and live PostgreSQL verification remains pending.

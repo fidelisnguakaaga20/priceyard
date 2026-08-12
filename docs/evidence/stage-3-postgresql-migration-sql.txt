@@ -1,0 +1,264 @@
+BEGIN;
+
+CREATE TABLE alembic_version (
+    version_num VARCHAR(32) NOT NULL, 
+    CONSTRAINT alembic_version_pkc PRIMARY KEY (version_num)
+);
+
+-- Running upgrade  -> 0001_create_mvp_foundation
+
+CREATE TABLE users (
+    id SERIAL NOT NULL, 
+    full_name VARCHAR(150) NOT NULL, 
+    email VARCHAR(320) NOT NULL, 
+    phone VARCHAR(30), 
+    password_hash VARCHAR(255) NOT NULL, 
+    role VARCHAR(32) NOT NULL, 
+    is_active BOOLEAN NOT NULL, 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    PRIMARY KEY (id), 
+    CONSTRAINT uq_users_email UNIQUE (email), 
+    CONSTRAINT uq_users_phone UNIQUE (phone)
+);
+
+CREATE INDEX ix_users_email ON users (email);
+
+CREATE INDEX ix_users_role ON users (role);
+
+CREATE INDEX ix_users_is_active ON users (is_active);
+
+CREATE TABLE commodities (
+    id SERIAL NOT NULL, 
+    name VARCHAR(100) NOT NULL, 
+    description TEXT, 
+    is_active BOOLEAN NOT NULL, 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    PRIMARY KEY (id), 
+    CONSTRAINT uq_commodities_name UNIQUE (name)
+);
+
+CREATE INDEX ix_commodities_name ON commodities (name);
+
+CREATE INDEX ix_commodities_is_active ON commodities (is_active);
+
+CREATE TABLE markets (
+    id SERIAL NOT NULL, 
+    name VARCHAR(150) NOT NULL, 
+    state VARCHAR(100), 
+    country VARCHAR(100) NOT NULL, 
+    market_day VARCHAR(30), 
+    description TEXT, 
+    is_active BOOLEAN NOT NULL, 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    PRIMARY KEY (id)
+);
+
+CREATE INDEX ix_markets_name ON markets (name);
+
+CREATE INDEX ix_markets_is_active ON markets (is_active);
+
+CREATE TABLE subscriptions (
+    id SERIAL NOT NULL, 
+    user_id INTEGER NOT NULL, 
+    plan_name VARCHAR(50) NOT NULL, 
+    status VARCHAR(20) NOT NULL, 
+    trial_started_at TIMESTAMP WITH TIME ZONE, 
+    trial_ends_at TIMESTAMP WITH TIME ZONE, 
+    start_date DATE, 
+    end_date DATE, 
+    payment_reference VARCHAR(255), 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    PRIMARY KEY (id), 
+    CONSTRAINT ck_subscriptions_status CHECK (status IN ('free', 'trial', 'active', 'expired', 'cancelled')), 
+    FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE, 
+    CONSTRAINT uq_subscriptions_user_id UNIQUE (user_id)
+);
+
+CREATE INDEX ix_subscriptions_user_id ON subscriptions (user_id);
+
+CREATE INDEX ix_subscriptions_status ON subscriptions (status);
+
+CREATE TABLE price_updates (
+    id SERIAL NOT NULL, 
+    commodity_id INTEGER NOT NULL, 
+    market_id INTEGER NOT NULL, 
+    price_low NUMERIC(14, 2) NOT NULL, 
+    price_high NUMERIC(14, 2) NOT NULL, 
+    average_price NUMERIC(14, 2), 
+    previous_price_low NUMERIC(14, 2), 
+    previous_price_high NUMERIC(14, 2), 
+    unit VARCHAR(100) NOT NULL, 
+    bag_size VARCHAR(100), 
+    commodity_type VARCHAR(150), 
+    market_day VARCHAR(30), 
+    time_of_day VARCHAR(20), 
+    movement VARCHAR(20) NOT NULL, 
+    confidence_level VARCHAR(100) NOT NULL, 
+    source_type VARCHAR(100), 
+    source_1 VARCHAR(255), 
+    source_2 VARCHAR(255), 
+    update_date_time TIMESTAMP WITH TIME ZONE NOT NULL, 
+    is_outdated BOOLEAN NOT NULL, 
+    status VARCHAR(20) NOT NULL, 
+    created_by INTEGER NOT NULL, 
+    approved_by INTEGER, 
+    possible_meaning TEXT, 
+    suggested_action VARCHAR(50), 
+    notes TEXT, 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    PRIMARY KEY (id), 
+    CONSTRAINT ck_price_updates_price_low_nonnegative CHECK (price_low >= 0), 
+    CONSTRAINT ck_price_updates_price_range CHECK (price_high >= price_low), 
+    CONSTRAINT ck_price_updates_average_in_range CHECK (average_price IS NULL OR (average_price >= price_low AND average_price <= price_high)), 
+    CONSTRAINT ck_price_updates_movement CHECK (movement IN ('up', 'down', 'stable', 'unknown')), 
+    CONSTRAINT ck_price_updates_status CHECK (status IN ('pending', 'approved', 'rejected')), 
+    FOREIGN KEY(commodity_id) REFERENCES commodities (id) ON DELETE RESTRICT, 
+    FOREIGN KEY(market_id) REFERENCES markets (id) ON DELETE RESTRICT, 
+    FOREIGN KEY(created_by) REFERENCES users (id) ON DELETE RESTRICT, 
+    FOREIGN KEY(approved_by) REFERENCES users (id) ON DELETE SET NULL
+);
+
+CREATE INDEX ix_price_updates_commodity_id ON price_updates (commodity_id);
+
+CREATE INDEX ix_price_updates_market_id ON price_updates (market_id);
+
+CREATE INDEX ix_price_updates_movement ON price_updates (movement);
+
+CREATE INDEX ix_price_updates_update_date_time ON price_updates (update_date_time);
+
+CREATE INDEX ix_price_updates_is_outdated ON price_updates (is_outdated);
+
+CREATE INDEX ix_price_updates_status ON price_updates (status);
+
+CREATE INDEX ix_price_updates_created_by ON price_updates (created_by);
+
+CREATE INDEX ix_price_updates_approved_by ON price_updates (approved_by);
+
+CREATE TABLE market_signals (
+    id SERIAL NOT NULL, 
+    commodity_id INTEGER NOT NULL, 
+    market_id INTEGER NOT NULL, 
+    price_update_id INTEGER, 
+    signal_type VARCHAR(100) NOT NULL, 
+    signal_description TEXT NOT NULL, 
+    possible_meaning TEXT, 
+    suggested_action VARCHAR(50), 
+    created_by INTEGER NOT NULL, 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    PRIMARY KEY (id), 
+    FOREIGN KEY(commodity_id) REFERENCES commodities (id) ON DELETE RESTRICT, 
+    FOREIGN KEY(market_id) REFERENCES markets (id) ON DELETE RESTRICT, 
+    FOREIGN KEY(price_update_id) REFERENCES price_updates (id) ON DELETE CASCADE, 
+    FOREIGN KEY(created_by) REFERENCES users (id) ON DELETE RESTRICT
+);
+
+CREATE INDEX ix_market_signals_commodity_id ON market_signals (commodity_id);
+
+CREATE INDEX ix_market_signals_market_id ON market_signals (market_id);
+
+CREATE INDEX ix_market_signals_price_update_id ON market_signals (price_update_id);
+
+CREATE INDEX ix_market_signals_signal_type ON market_signals (signal_type);
+
+CREATE INDEX ix_market_signals_created_by ON market_signals (created_by);
+
+CREATE TABLE quality_signals (
+    id SERIAL NOT NULL, 
+    commodity_id INTEGER NOT NULL, 
+    market_id INTEGER NOT NULL, 
+    price_update_id INTEGER, 
+    quality_status VARCHAR(100), 
+    moisture_status VARCHAR(100), 
+    storage_readiness VARCHAR(100), 
+    risk_note TEXT, 
+    created_by INTEGER NOT NULL, 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    PRIMARY KEY (id), 
+    FOREIGN KEY(commodity_id) REFERENCES commodities (id) ON DELETE RESTRICT, 
+    FOREIGN KEY(market_id) REFERENCES markets (id) ON DELETE RESTRICT, 
+    FOREIGN KEY(price_update_id) REFERENCES price_updates (id) ON DELETE CASCADE, 
+    FOREIGN KEY(created_by) REFERENCES users (id) ON DELETE RESTRICT
+);
+
+CREATE INDEX ix_quality_signals_commodity_id ON quality_signals (commodity_id);
+
+CREATE INDEX ix_quality_signals_market_id ON quality_signals (market_id);
+
+CREATE INDEX ix_quality_signals_price_update_id ON quality_signals (price_update_id);
+
+CREATE INDEX ix_quality_signals_created_by ON quality_signals (created_by);
+
+CREATE TABLE faq_items (
+    id SERIAL NOT NULL, 
+    question TEXT NOT NULL, 
+    answer TEXT NOT NULL, 
+    category VARCHAR(100) NOT NULL, 
+    is_published BOOLEAN NOT NULL, 
+    created_by INTEGER NOT NULL, 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    PRIMARY KEY (id), 
+    FOREIGN KEY(created_by) REFERENCES users (id) ON DELETE RESTRICT
+);
+
+CREATE INDEX ix_faq_items_category ON faq_items (category);
+
+CREATE INDEX ix_faq_items_is_published ON faq_items (is_published);
+
+CREATE INDEX ix_faq_items_created_by ON faq_items (created_by);
+
+CREATE TABLE audit_logs (
+    id SERIAL NOT NULL, 
+    user_id INTEGER NOT NULL, 
+    action VARCHAR(100) NOT NULL, 
+    table_name VARCHAR(100) NOT NULL, 
+    record_id INTEGER, 
+    old_value JSON, 
+    new_value JSON, 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    PRIMARY KEY (id), 
+    FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE RESTRICT
+);
+
+CREATE INDEX ix_audit_logs_user_id ON audit_logs (user_id);
+
+CREATE INDEX ix_audit_logs_action ON audit_logs (action);
+
+CREATE INDEX ix_audit_logs_table_name ON audit_logs (table_name);
+
+CREATE INDEX ix_audit_logs_record_id ON audit_logs (record_id);
+
+CREATE TABLE feedback (
+    id SERIAL NOT NULL, 
+    user_id INTEGER NOT NULL, 
+    rating SMALLINT NOT NULL, 
+    comment TEXT, 
+    price_usefulness TEXT, 
+    price_accuracy TEXT, 
+    missing_market_request TEXT, 
+    missing_commodity_request TEXT, 
+    complaint_or_suggestion TEXT, 
+    continue_using_feedback BOOLEAN, 
+    willingness_to_pay_feedback BOOLEAN, 
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, 
+    PRIMARY KEY (id), 
+    CONSTRAINT ck_feedback_rating CHECK (rating BETWEEN 1 AND 5), 
+    FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+CREATE INDEX ix_feedback_user_id ON feedback (user_id);
+
+CREATE INDEX ix_feedback_rating ON feedback (rating);
+
+INSERT INTO alembic_version (version_num) VALUES ('0001_create_mvp_foundation') RETURNING alembic_version.version_num;
+
+COMMIT;
+

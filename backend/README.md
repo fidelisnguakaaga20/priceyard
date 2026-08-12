@@ -1,40 +1,47 @@
 # PriceYard Backend
 
-FastAPI backend for PriceYard.
+FastAPI backend for the PriceYard MVP.
 
-## Stage 2 scope
-
-This stage contains only the backend foundation:
-
-- FastAPI application
-- environment-based configuration
-- dependency list
-- health-check endpoint
-
-Database, authentication, business APIs, and other later-stage features are intentionally not implemented yet.
+## Requirements
+- Python 3.11+
+- PostgreSQL
 
 ## Setup
 
-From `backend/`:
-
 ```bash
-python -m venv .venv
-source .venv/bin/activate   # Windows PowerShell: .venv\\Scripts\\Activate.ps1
 python -m pip install -r requirements.txt
 ```
 
-Optionally copy `.env.example` to `.env` and adjust non-secret local settings.
+Copy `.env.example` to `.env` and set `DATABASE_URL` to a PostgreSQL connection string.
 
-## Run
+Example format:
 
-```bash
-uvicorn app.main:app --host 127.0.0.1 --port 8000
+```text
+postgresql+psycopg://USER:PASSWORD@HOST:5432/DATABASE
 ```
 
-## Health check
+## Run migrations
 
 ```bash
-curl http://127.0.0.1:8000/health
+python -m alembic upgrade head
+```
+
+## Verify database connection
+
+```bash
+python -c "from app.database import verify_database_connection; verify_database_connection(); print('database connection: PASS')"
+```
+
+## Run API
+
+```bash
+python -m uvicorn app.main:app --reload
+```
+
+Health endpoint:
+
+```text
+GET /health
 ```
 
 Expected response:

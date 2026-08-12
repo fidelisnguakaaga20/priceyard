@@ -26,3 +26,16 @@
 - Test effect: Stage 2 proof must be completed before Stage 3.
 - Completed-stage effect: Stage 1 becomes completed/approved.
 - Approval: Owner instruction in conversation.
+
+## DEC-003 — Stage 2 owner approval and Stage 3 authorization
+- Date: 2026-08-12
+- Current requirement: Do not proceed from Stage 2 until owner approval.
+- Source: PriceYard AI Project Execution Plan.
+- Owner instruction: `approved` after local dependency installation, Uvicorn startup, and `GET /health` returned HTTP 200 on the owner's computer.
+- Decision: Stage 2 is owner-verified and approved. Stage 3 — Database Foundation is authorized.
+- Database effect: Authorizes only the approved Stage 3 database foundation.
+- API effect: None; no new business API is authorized in Stage 3.
+- Frontend effect: None.
+- Test effect: Stage 3 requires PostgreSQL connection, migration, table, relationship, and required-field proof before completion.
+- Completed-stage effect: Stage 2 becomes completed and owner-approved.
+- Approval: Owner-approved in conversation.
