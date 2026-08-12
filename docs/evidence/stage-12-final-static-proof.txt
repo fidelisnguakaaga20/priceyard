@@ -1,0 +1,17 @@
+compile:
+PASS
+new dependency diff:
+watchlist code search:
+stage12 files:
+backend/app/models/__pycache__/cost_breakdown.cpython-313.pyc
+backend/app/models/cost_breakdown.py
+backend/app/routes/__pycache__/cost_breakdown_routes.cpython-313.pyc
+backend/app/routes/cost_breakdown_routes.py
+backend/app/schemas/__pycache__/cost_breakdown_schema.cpython-313.pyc
+backend/app/schemas/cost_breakdown_schema.py
+backend/app/services/__pycache__/cost_breakdown_service.cpython-313.pyc
+backend/app/services/cost_breakdown_service.py
+backend/migrations/versions/0004_add_cost_breakdowns.py
+backend/migrations/versions/__pycache__/0004_add_cost_breakdowns.cpython-313.pyc
+.env ignore:
+backend/.env

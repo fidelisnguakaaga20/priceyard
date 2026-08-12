@@ -143,3 +143,6 @@ The approved execution plan defines `start_period` and `end_period` but does not
 - Test effect: Stage 12 must prove costs save, totals calculate, edits recalculate, negative costs reject, and price-update relationship works.
 - Completed-stage effect: Stage 11 becomes RETESTED/PASS and owner-approved.
 - Approval: Owner-approved in conversation.
+
+## 2026-08-12 — Stage 12 calculated totals
+The approved Stage 12 fields include both component costs and totals. To avoid inconsistent client-supplied totals, `total_additional_cost` and `total_estimated_landing_storage_cost` are calculated by the backend on create and recalculated on edit. This is an implementation choice within the approved Stage 12 scope, not a new accounting feature.

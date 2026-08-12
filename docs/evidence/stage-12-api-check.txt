@@ -1,0 +1,4 @@
+admin create via FastAPI: PASS
+admin edit/recalculate via FastAPI: PASS
+negative API validation: PASS
+STAGE12_API_CHECK: PASS

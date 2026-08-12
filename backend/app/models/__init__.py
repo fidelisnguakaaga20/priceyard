@@ -1,6 +1,7 @@
 from app.models.audit_log import AuditLog
 from app.models.buying_zone import BuyingZone
 from app.models.commodity import Commodity
+from app.models.cost_breakdown import CostBreakdown
 from app.models.faq_item import FAQItem
 from app.models.feedback import Feedback
 from app.models.market import Market
@@ -16,6 +17,7 @@ __all__ = [
     "AuditLog",
     "BuyingZone",
     "Commodity",
+    "CostBreakdown",
     "FAQItem",
     "Feedback",
     "Market",

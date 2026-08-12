@@ -1,0 +1,15 @@
+Stage 12 internal verification — 2026-08-12
+
+PASS — Python compilation for backend app, Stage 12 migration, and owner smoke script.
+PASS — Temporary Alembic chain reached 0004_stage12_cost_breakdowns (head).
+PASS — cost_breakdowns table and required columns inspected.
+PASS — service-level create saved component costs.
+PASS — total_additional_cost calculated 7,000.00 from approved test components.
+PASS — total_estimated_landing_storage_cost calculated 147,000.00 from 140,000.00 purchase reference + 7,000.00 additional cost.
+PASS — edit recalculated additional total to 8,000.00 and landing/storage total to 148,000.00.
+PASS — SQLAlchemy price_update -> cost_breakdowns relationship works.
+PASS — Pydantic rejects negative cost input.
+
+These are internal build checks only. Owner Supabase-backed migration/runtime smoke remains required.
+PASS — linked price-update deletion removes linked cost breakdown cleanly, preserving Stage 7 delete compatibility.
+PASS — FastAPI create/edit/recalculation/negative validation flow on temporary SQLite with an internal bcrypt compatibility stub.

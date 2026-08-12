@@ -1,0 +1,4 @@
+create/save totals: PASS
+edit/recalculate totals: PASS
+price-update relationship: PASS
+STAGE12_SERVICE_CHECK: PASS

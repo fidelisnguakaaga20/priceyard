@@ -11,6 +11,7 @@ from app.database import Base
 
 if TYPE_CHECKING:
     from app.models.commodity import Commodity
+    from app.models.cost_breakdown import CostBreakdown
     from app.models.market import Market
     from app.models.market_signal import MarketSignal
     from app.models.quality_signal import QualitySignal
@@ -73,3 +74,6 @@ class PriceUpdate(Base):
     market_signals: Mapped[list[MarketSignal]] = relationship(back_populates="price_update")
     quality_signals: Mapped[list[QualitySignal]] = relationship(back_populates="price_update")
     storage_suitability: Mapped[list[StorageSuitability]] = relationship(back_populates="price_update")
+    cost_breakdowns: Mapped[list[CostBreakdown]] = relationship(
+        back_populates="price_update", cascade="all, delete-orphan", passive_deletes=True
+    )

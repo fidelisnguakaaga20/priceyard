@@ -389,3 +389,27 @@ Storage-suitability API disclaimer:
 > Storage suitability is based on available market and quality information. It does not guarantee profit, preservation, or future price increase.
 
 No Stage 12 cost-breakdown API is included in Stage 11.
+
+## Stage 12 — Cost Breakdown
+
+### GET /cost-breakdowns
+Purpose: list cost breakdowns linked to price updates.
+Authentication/access: admin, active trial, or active paid access required. Free/expired/cancelled users do not receive this full-intelligence view.
+
+### GET /cost-breakdowns/{item_id}
+Purpose: view one cost breakdown.
+Authentication/access: admin, active trial, or active paid access required.
+
+### POST /cost-breakdowns
+Purpose: create a cost breakdown for a price update.
+Authentication: admin bearer JWT required.
+Input fields: `price_update_id`, `transport`, `warehouse`, `security`, `market_charges`, `loading_offloading`, `other_costs`, `purchase_price_reference`.
+Server-calculated response fields: `total_additional_cost`, `total_estimated_landing_storage_cost`.
+Rules: linked price update must exist; negative amounts are rejected; client input does not control calculated totals.
+
+### PATCH /cost-breakdowns/{item_id}
+Purpose: edit cost components or purchase-price reference.
+Authentication: admin bearer JWT required.
+Rules: every edit recalculates both totals; negative amounts are rejected.
+
+No full accounting, average-cost calculator, Stage 13 watchlist API, or other future feature is included in Stage 12.

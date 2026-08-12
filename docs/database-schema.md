@@ -1,7 +1,7 @@
 # PriceYard Database Schema
 
 ## Status
-Stage 3 foundation is RETESTED/PASS. Stage 10 tables are owner-verified. Stage 11 adds the approved `storage_suitability` table through Alembic revision `0003_stage11_storage_suitability`; owner Supabase migration/runtime verification is pending.
+Stage 3 foundation is RETESTED/PASS. Stage 10 and Stage 11 tables are owner-verified. Stage 12 adds the approved `cost_breakdowns` table through Alembic revision `0004_stage12_cost_breakdowns`; owner Supabase migration/runtime verification is pending.
 
 ## Approved database stack
 - PostgreSQL
@@ -271,3 +271,33 @@ Relationships:
 - deleting a linked price update sets the optional storage-suitability link to null rather than deleting the storage observation.
 
 Stage 11 does not create `cost_breakdowns`, `watchlists`, alerts, reports, or other later-stage tables.
+
+## Stage 12 — Cost Breakdown
+
+Alembic revision `0004_stage12_cost_breakdowns` creates the approved `cost_breakdowns` table.
+
+Fields:
+- id
+- price_update_id
+- transport
+- warehouse
+- security
+- market_charges
+- loading_offloading
+- other_costs
+- total_additional_cost
+- purchase_price_reference
+- total_estimated_landing_storage_cost
+- created_at
+- updated_at
+
+Integrity/calculation rules:
+- `price_update_id` is a required foreign key to `price_updates`;
+- each component cost and `purchase_price_reference` must be non-negative;
+- `total_additional_cost` is server-calculated as transport + warehouse + security + market charges + loading/offloading + other costs;
+- `total_estimated_landing_storage_cost` is server-calculated as purchase-price reference + total additional cost;
+- edits recalculate both totals rather than trusting client-supplied totals.
+
+This preserves cost data for a later approved average-cost feature without implementing a full accounting system or complex average-cost calculator in the MVP.
+
+Stage 12 does not create `watchlists`, alerts, reports, or any other Stage 13+ table.

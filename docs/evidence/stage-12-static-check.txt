@@ -1,0 +1,9 @@
+Stage 12 static/scope check — PASS
+
+- Only Stage 12 cost-breakdown model/schema/service/routes/migration were added.
+- No new Python dependency was added.
+- No full accounting system was added.
+- No complex average-cost calculator was added.
+- No watchlist table/model/routes were added.
+- No alert, report, payment gateway, marketplace, logistics, AI prediction, native app, chart, queue, cache, GraphQL, Elasticsearch, or microservice feature was added.
+- Existing PriceYard identity, commodities, markets, stack, roles, trial/subscription rules, and earlier APIs were not intentionally changed.

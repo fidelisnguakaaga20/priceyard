@@ -1,7 +1,7 @@
 # PriceYard Project Status
 
 ## Current stage
-Stage 11 — Storage Suitability — RETESTED/PASS and owner-approved. Stage 12 — Cost Breakdown is authorized but not yet verified.
+Stage 12 — Cost Breakdown — BUILT/IN PROGRESS; owner Supabase migration and runtime smoke verification are required before completion.
 
 ## Stage 0 disposition
 Owner supplied validation metrics: 65 reached, 14 replies, 5 willing to pay, positive usefulness/trust/continuation signals, sample market records and two source types.
@@ -66,6 +66,28 @@ PASS. Owner applied Alembic revision `0002_stage10_buy_sell_watch` against Supab
 ## Stage 11 owner verification
 RETESTED/PASS. The Stage 11 migration reached `0003_stage11_storage_suitability`. The first runtime smoke was interrupted when the PostgreSQL/Supabase connection closed unexpectedly during SQLAlchemy refresh. No code/schema change was made. The owner then verified the database connection, confirmed Alembic head `0003_stage11_storage_suitability`, reran the smoke, and received `STAGE 11 OWNER SMOKE: PASS` with migration, fields, relationships, validation, access control, anti-guarantee wording, and disclaimer checks passing.
 
+## Stage 12 implementation completed
+- Added `cost_breakdowns` model and Alembic revision `0004_stage12_cost_breakdowns`.
+- Added approved create/edit/view API flow linked to `price_updates`.
+- Component costs: transport, warehouse, security, market charges, loading/offloading, and other costs.
+- `total_additional_cost` is calculated by the backend from the component costs.
+- `total_estimated_landing_storage_cost` is calculated as `purchase_price_reference + total_additional_cost`.
+- Negative component costs and negative purchase-price references are rejected at API and database levels.
+- Editing any cost component or purchase-price reference recalculates both totals.
+- Trial and active-paid users can view full cost breakdowns; admin manages records; free/expired/cancelled users remain limited under the existing access model.
+- No full accounting system, average-cost calculator, Stage 13 watchlist, payment, alert, AI prediction, marketplace, or other future feature was added.
+
+## Stage 12 internal verification
+- Python compilation: PASS.
+- Temporary Alembic migration through `0004_stage12_cost_breakdowns`: PASS.
+- Required table/field inspection: PASS.
+- Service-level save/total/recalculation/relationship checks on temporary SQLite: PASS.
+- Negative-cost schema validation: PASS.
+- Real Supabase owner runtime proof is still required.
+
+## Stage 12 owner verification
+PENDING. Owner must apply `python -m alembic upgrade head` to Supabase PostgreSQL and run `docs/evidence/stage-12-owner-smoke.py`.
+
 ## Outstanding project issue
 Stage 0 independent-source/duration evidence remains unresolved and must be reconciled before Stage 24 final acceptance.
 
@@ -73,4 +95,4 @@ Stage 0 independent-source/duration evidence remains unresolved and must be reco
 None.
 
 ## Next gate
-Stage 12 — Cost Breakdown is owner-authorized. Build/test only Stage 12 and stop before Stage 13.
+Owner Stage 12 migration/runtime verification. If it passes, request explicit owner approval before Stage 13 — Watchlist.
