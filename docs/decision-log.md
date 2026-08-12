@@ -80,3 +80,6 @@
 - Test effect: Stage 6 must prove non-admin blocking, admin commodity CRUD, admin market CRUD, user management, and subscription management.
 - Completed-stage effect: Stage 5 becomes RETESTED/PASS and owner-approved.
 - Approval: Owner-approved in conversation.
+
+## 2026-08-12 — Stage 8 query design
+Stage 8 extends the existing public `GET /price-updates` endpoint with optional commodity/market/date/movement filters while preserving the no-query Stage 7 behavior. Dedicated `/price-updates/history` and `/price-updates/comparison` endpoints were added because the approved Stage 8 explicitly requires chronological history and comparison. No schema change or new dependency was required.

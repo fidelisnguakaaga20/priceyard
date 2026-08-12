@@ -1,0 +1,24 @@
+Stage 8 AI-environment verification — 2026-08-12
+
+PASS — Python compilation:
+python -m compileall -q backend/app docs/evidence/stage-8-owner-smoke.py
+
+PASS — route static inspection:
+GET /price-updates keeps its existing default latest-approved behavior and now accepts optional commodity, market, date, movement filters.
+GET /price-updates/history exists before the dynamic /{price_update_id} route.
+GET /price-updates/comparison exists before the dynamic /{price_update_id} route.
+GET /price-updates/{price_update_id} remains present.
+
+PASS — PostgreSQL query compilation:
+Approved-history query compiles with commodity search, market filter, date bounds, movement filter and time_of_day filter.
+
+PASS — scope review:
+- No database migration added.
+- No new dependency added.
+- No Stage 9 market/quality signal API added.
+- No charting code added.
+- Public Stage 8 responses reuse PriceUpdatePublicResponse, so source_1/source_2 remain private.
+- Possible Meaning and Suggested Action remain part of all search/history/comparison public records.
+
+AI-environment note:
+The container does not have the existing bcrypt dependency installed. A route-registration import check was therefore run with a non-runtime bcrypt import stub only to inspect FastAPI route registration; the Stage 8 static/history/comparison routes registered in the correct order. This stub is not part of the repository and is not runtime proof. Full runtime verification remains owner/local against the configured Supabase PostgreSQL database.

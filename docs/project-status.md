@@ -1,7 +1,7 @@
 # PriceYard Project Status
 
 ## Current stage
-Stage 7 — Price Updates
+Stage 8 — Search, Filters, History, Comparison
 
 ## Stage 0 disposition
 Owner supplied validation metrics: 65 reached, 14 replies, 5 willing to pay, positive usefulness/trust/continuation signals, sample market records and two source types.
@@ -19,32 +19,28 @@ On 2026-08-12, the owner explicitly granted Application Coding Permission: YES. 
 - Stage 4 — Authentication: RETESTED/PASS and owner-approved after local authentication smoke verification.
 - Stage 5 — Subscription and 14-Day Trial: RETESTED/PASS and owner-approved after corrected local runtime smoke verification.
 - Stage 6 — Admin Core Management: RETESTED/PASS and owner-approved after corrected local Supabase-backed smoke verification.
+- Stage 7 — Price Updates: RETESTED/PASS and owner-approved after local Supabase-backed smoke verification.
 
-## Stage 6 verification summary
-Owner/local smoke passed on 2026-08-12. Admin authorization, commodity CRUD, market CRUD, user management, subscription management, initial commodities/markets, verified market-day handling, password-hash non-disclosure, and reporter deferral all passed. The first Stage 6 verifier failed before API testing because its import path was wrong; only the verifier was fixed, after which the full owner smoke passed.
+## Stage 7 verification summary
+Owner/local Stage 7 smoke passed on 2026-08-12. Create/edit/approve/reject/delete/mark-outdated/latest-approved flows, range/action/observation validation, public source privacy, Possible Meaning/Suggested Action preservation, non-admin blocking, and operation without a market signal all passed.
 
-## Stage 7 status
-IN PROGRESS — Price Update implementation is built and AI-environment static/schema verification is being recorded. Owner/local runtime verification against the configured Supabase PostgreSQL database is still required before Stage 7 can become PASS.
+## Stage 8 status
+IN PROGRESS — Search, filters, chronological history, previous/current comparison, market comparison, and same-day time-of-day query behavior are built. Owner/local runtime verification against the configured Supabase PostgreSQL database is still required before Stage 8 can become PASS.
 
-## Stage 7 implementation completed
-- `POST /price-updates` — admin create; new records start pending.
-- `PATCH /price-updates/{id}` — admin edit.
-- `PATCH /price-updates/{id}/approve` — admin approval with approver recorded.
-- `PATCH /price-updates/{id}/reject` — admin rejection.
-- `PATCH /price-updates/{id}/mark-outdated` — admin outdated marking.
-- `DELETE /price-updates/{id}` — admin deletion of incorrect/unreferenced updates.
-- `GET /price-updates` — latest approved current data only, without Stage 8 history/filter behavior.
-- `GET /price-updates/{id}` — approved price detail.
-- Current price range, average-price, previous-range, movement, suggested-action and observation safety validation.
-- `possible_meaning` and `suggested_action` remain on the price update itself and do not require a market signal.
-- Public response excludes `source_1` and `source_2`; admin write responses retain them.
-- No Stage 7 database migration was required because Stage 3 already created every required price-update field.
+## Stage 8 implementation completed
+- Existing `GET /price-updates` keeps its default latest-approved behavior and accepts optional commodity, market, date and movement filters.
+- `GET /price-updates/history` returns approved records chronologically and supports commodity, market, date, movement and time-of-day filters.
+- `GET /price-updates/comparison` returns the latest approved current record per market for a commodity; each record already carries current and previous ranges.
+- Same-day records preserve morning/afternoon/evening/closing values already supported by the Stage 7 schema.
+- Possible Meaning and Suggested Action remain present.
+- Private `source_1` / `source_2` remain excluded from public responses.
+- No complex charts, Stage 9 API, database migration, or dependency was added.
 
-## Stage 7 AI-environment verification
+## Stage 8 AI-environment verification
 - Python compilation: PASS.
-- Pydantic range/action/unsafe-meaning checks: PASS.
-- Static route and public-source-privacy checks: PASS.
-- Full Supabase runtime smoke: pending owner/local verification because owner secrets are intentionally not bundled.
+- Route static inspection: PASS.
+- PostgreSQL filter/history query compilation: PASS.
+- FastAPI Stage 8 route registration: PASS using a temporary import-only bcrypt stub because bcrypt is absent from the AI container; this is not runtime proof. Owner/local Supabase verification remains the real stage gate.
 
 ## Outstanding project issue
 Stage 0 independent-source/duration evidence remains unresolved and must be reconciled before Stage 24 final acceptance.
@@ -53,4 +49,4 @@ Stage 0 independent-source/duration evidence remains unresolved and must be reco
 None.
 
 ## Next gate
-Stage 7 owner/local verification. Stage 8 must not begin until Stage 7 passes and the owner approves.
+Stage 8 owner/local verification. Stage 9 must not begin until Stage 8 passes and the owner approves.

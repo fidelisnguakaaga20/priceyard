@@ -1,14 +1,18 @@
-from fastapi import APIRouter, Depends, Response, status
+from datetime import date
+
+from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.price_update import PriceUpdate
 from app.models.user import User
 from app.schemas.price_update_schema import (
+    Movement,
     PriceUpdateAdminResponse,
     PriceUpdateCreate,
     PriceUpdatePublicResponse,
     PriceUpdateUpdate,
+    TimeOfDay,
 )
 from app.services.price_update_service import (
     approve_price_update,
@@ -17,6 +21,8 @@ from app.services.price_update_service import (
     get_approved_price_update,
     get_price_update_for_admin,
     list_latest_approved_price_updates,
+    list_market_comparison,
+    list_price_history,
     mark_price_update_outdated,
     reject_price_update,
     update_price_update,
@@ -27,8 +33,52 @@ router = APIRouter(prefix="/price-updates", tags=["price-updates"])
 
 
 @router.get("", response_model=list[PriceUpdatePublicResponse])
-def get_latest_price_updates(db: Session = Depends(get_db)) -> list[PriceUpdate]:
-    return list_latest_approved_price_updates(db)
+def get_latest_price_updates(
+    commodity: str | None = Query(default=None, min_length=1, max_length=100),
+    market: str | None = Query(default=None, min_length=1, max_length=150),
+    selected_date: date | None = Query(default=None, alias="date"),
+    movement: Movement | None = Query(default=None),
+    db: Session = Depends(get_db),
+) -> list[PriceUpdate]:
+    return list_latest_approved_price_updates(
+        db,
+        commodity_search=commodity,
+        market_search=market,
+        selected_date=selected_date,
+        movement=movement,
+    )
+
+
+@router.get("/history", response_model=list[PriceUpdatePublicResponse])
+def get_price_history(
+    commodity: str | None = Query(default=None, min_length=1, max_length=100),
+    market: str | None = Query(default=None, min_length=1, max_length=150),
+    selected_date: date | None = Query(default=None, alias="date"),
+    movement: Movement | None = Query(default=None),
+    time_of_day: TimeOfDay | None = Query(default=None),
+    db: Session = Depends(get_db),
+) -> list[PriceUpdate]:
+    return list_price_history(
+        db,
+        commodity_search=commodity,
+        market_search=market,
+        selected_date=selected_date,
+        movement=movement,
+        time_of_day=time_of_day,
+    )
+
+
+@router.get("/comparison", response_model=list[PriceUpdatePublicResponse])
+def get_market_comparison(
+    commodity: str = Query(min_length=1, max_length=100),
+    selected_date: date | None = Query(default=None, alias="date"),
+    db: Session = Depends(get_db),
+) -> list[PriceUpdate]:
+    return list_market_comparison(
+        db,
+        commodity_search=commodity,
+        selected_date=selected_date,
+    )
 
 
 @router.get("/{price_update_id}", response_model=PriceUpdatePublicResponse)

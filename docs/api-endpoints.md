@@ -224,3 +224,35 @@ Stage 7 validation rules:
 - suggested action is `Watch`, `Investigate`, `Buy Carefully`, `Hold`, or `Sell Carefully`;
 - explicit guarantee/financial-advice wording is rejected from `possible_meaning`;
 - public responses exclude private `source_1` and `source_2` values.
+
+## Stage 8 — Search, Filters, History, Comparison
+
+### GET /price-updates
+Returns latest approved, non-outdated price records (latest per commodity + market). Existing no-query behavior is preserved.
+
+Optional query parameters:
+- `commodity` — case-insensitive commodity-name search.
+- `market` — case-insensitive market-name filter.
+- `date` — exact UTC calendar date (`YYYY-MM-DD`) for the stored update timestamp.
+- `movement` — `up`, `down`, `stable`, or `unknown`.
+
+### GET /price-updates/history
+Returns approved price records in chronological order. Historical approved records remain available even when marked outdated, because outdated status means the record is no longer current, not that it should disappear from history.
+
+Optional query parameters:
+- `commodity`
+- `market`
+- `date`
+- `movement`
+- `time_of_day` — `morning`, `afternoon`, `evening`, or `closing`.
+
+### GET /price-updates/comparison
+Returns the latest approved, non-outdated record per market for a commodity. Each record contains both current and previous price ranges, movement, confidence, Possible Meaning, and Suggested Action, allowing previous/current and cross-market comparison without duplicating price data.
+
+Required query parameter:
+- `commodity`
+
+Optional query parameter:
+- `date`
+
+Public source privacy remains unchanged: `source_1` and `source_2` are not returned.

@@ -1,3 +1,4 @@
+from datetime import date, datetime, time, timedelta, timezone
 from decimal import Decimal
 
 from fastapi import HTTPException, status
@@ -9,7 +10,7 @@ from app.models.commodity import Commodity
 from app.models.market import Market
 from app.models.price_update import PriceUpdate
 from app.models.user import User
-from app.schemas.price_update_schema import PriceUpdateCreate, PriceUpdateUpdate
+from app.schemas.price_update_schema import Movement, PriceUpdateCreate, PriceUpdateUpdate, TimeOfDay
 
 
 PRICE_UPDATE_LOAD_OPTIONS = (
@@ -63,6 +64,47 @@ def _validate_final_ranges(price_update: PriceUpdate, changes: dict[str, object]
         )
 
 
+def _approved_price_statement(
+    *,
+    commodity_search: str | None = None,
+    market_search: str | None = None,
+    selected_date: date | None = None,
+    movement: Movement | None = None,
+    time_of_day: TimeOfDay | None = None,
+    include_outdated: bool = True,
+):
+    statement = select(PriceUpdate).options(*PRICE_UPDATE_LOAD_OPTIONS).where(PriceUpdate.status == "approved")
+
+    if not include_outdated:
+        statement = statement.where(PriceUpdate.is_outdated.is_(False))
+
+    if commodity_search:
+        statement = statement.join(Commodity, PriceUpdate.commodity_id == Commodity.id).where(
+            Commodity.name.ilike(f"%{commodity_search}%")
+        )
+
+    if market_search:
+        statement = statement.join(Market, PriceUpdate.market_id == Market.id).where(
+            Market.name.ilike(f"%{market_search}%")
+        )
+
+    if selected_date is not None:
+        start = datetime.combine(selected_date, time.min, tzinfo=timezone.utc)
+        end = start + timedelta(days=1)
+        statement = statement.where(
+            PriceUpdate.update_date_time >= start,
+            PriceUpdate.update_date_time < end,
+        )
+
+    if movement is not None:
+        statement = statement.where(PriceUpdate.movement == movement)
+
+    if time_of_day is not None:
+        statement = statement.where(PriceUpdate.time_of_day == time_of_day)
+
+    return statement
+
+
 def create_price_update(db: Session, payload: PriceUpdateCreate, creator: User) -> PriceUpdate:
     _validate_reference_records(db, payload.commodity_id, payload.market_id)
     price_update = PriceUpdate(
@@ -104,19 +146,75 @@ def get_approved_price_update(db: Session, price_update_id: int) -> PriceUpdate:
     return price_update
 
 
-def list_latest_approved_price_updates(db: Session) -> list[PriceUpdate]:
-    statement = (
-        select(PriceUpdate)
-        .options(*PRICE_UPDATE_LOAD_OPTIONS)
-        .where(PriceUpdate.status == "approved")
-        .order_by(PriceUpdate.update_date_time.desc(), PriceUpdate.id.desc())
-    )
+def list_latest_approved_price_updates(
+    db: Session,
+    *,
+    commodity_search: str | None = None,
+    market_search: str | None = None,
+    selected_date: date | None = None,
+    movement: Movement | None = None,
+) -> list[PriceUpdate]:
+    # Preserve the Stage 7 current-price rule: first identify the latest approved
+    # record for each commodity/market pair, then exclude it if it is outdated.
+    # This prevents an older non-outdated record from resurfacing as "current".
+    # Movement is also applied after selecting the latest record so a movement
+    # filter cannot accidentally surface an older historical match.
+    statement = _approved_price_statement(
+        commodity_search=commodity_search,
+        market_search=market_search,
+        selected_date=selected_date,
+        movement=None,
+        include_outdated=True,
+    ).order_by(PriceUpdate.update_date_time.desc(), PriceUpdate.id.desc())
+
     latest_by_market_commodity: dict[tuple[int, int], PriceUpdate] = {}
     for item in db.scalars(statement).all():
         key = (item.commodity_id, item.market_id)
         if key not in latest_by_market_commodity:
             latest_by_market_commodity[key] = item
-    return [item for item in latest_by_market_commodity.values() if not item.is_outdated]
+
+    return [
+        item
+        for item in latest_by_market_commodity.values()
+        if not item.is_outdated and (movement is None or item.movement == movement)
+    ]
+
+
+def list_price_history(
+    db: Session,
+    *,
+    commodity_search: str | None = None,
+    market_search: str | None = None,
+    selected_date: date | None = None,
+    movement: Movement | None = None,
+    time_of_day: TimeOfDay | None = None,
+) -> list[PriceUpdate]:
+    statement = _approved_price_statement(
+        commodity_search=commodity_search,
+        market_search=market_search,
+        selected_date=selected_date,
+        movement=movement,
+        time_of_day=time_of_day,
+        include_outdated=True,
+    ).order_by(PriceUpdate.update_date_time.asc(), PriceUpdate.id.asc())
+    return list(db.scalars(statement).all())
+
+
+def list_market_comparison(
+    db: Session,
+    *,
+    commodity_search: str,
+    selected_date: date | None = None,
+) -> list[PriceUpdate]:
+    # Each returned record already carries current range, previous range,
+    # movement, confidence, possible meaning and suggested action. Returning
+    # the latest approved current record per market makes both previous/current
+    # and cross-market comparison possible without creating duplicate data.
+    return list_latest_approved_price_updates(
+        db,
+        commodity_search=commodity_search,
+        selected_date=selected_date,
+    )
 
 
 def update_price_update(db: Session, price_update: PriceUpdate, payload: PriceUpdateUpdate) -> PriceUpdate:
