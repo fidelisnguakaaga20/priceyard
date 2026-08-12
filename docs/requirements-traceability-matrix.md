@@ -16,3 +16,8 @@
 | S1-02 | Execution | Add governance files | MVP | 1 | docs/* | File existence/content review | repository | PASS |
 | S1-03 | Execution | Ignore .env and secrets | MVP | 1 | .gitignore | git check-ignore | evidence file | PASS |
 | S1-04 | Execution | Initialize Git and create first commit | MVP | 1 | .git | git log | `8a87c04b6d06e535458e1c07d06bf01cde4add19` | PASS |
+| S2-01 | Execution | Create FastAPI application foundation | MVP | 2 | backend/app/main.py | Import/startup verification | docs/evidence/stage-2-import-check.txt; stage-2-uvicorn-output.txt | PASS |
+| S2-02 | Execution | Add environment configuration | MVP | 2 | backend/app/config.py; backend/.env.example | Configuration import check | docs/evidence/stage-2-import-check.txt; stage-2-env-config-check.txt; stage-2-env-ignore-check.txt | PASS |
+| S2-03 | Execution | Add backend requirements and verify dependencies | MVP | 2 | backend/requirements.txt | pip requirements verification | docs/evidence/stage-2-dependency-install.txt; stage-2-dependency-availability.txt | PASS |
+| S2-04 | Execution | Add backend README | MVP | 2 | backend/README.md | File/content review | repository | PASS |
+| S2-05 | Execution | Implement GET /health | MVP | 2 | backend/app/main.py | Live HTTP request | docs/evidence/stage-2-health-response.txt; stage-2-uvicorn-output.txt | PASS |

@@ -1,0 +1,32 @@
+Name: fastapi
+Version: 0.128.2
+Summary: FastAPI framework, high performance, easy to learn, fast to code, ready for production
+Home-page: https://github.com/fastapi/fastapi
+Author: 
+Author-email: =?utf-8?q?Sebasti=C3=A1n_Ram=C3=ADrez?= <tiangolo@gmail.com>
+License-Expression: MIT
+Location: /opt/pyvenv/lib/python3.13/site-packages
+Requires: annotated-doc, pydantic, starlette, typing-extensions, typing-inspection
+Required-by: gradio
+---
+Name: uvicorn
+Version: 0.48.0
+Summary: The lightning-fast ASGI server.
+Home-page: https://uvicorn.dev/
+Author: 
+Author-email: Tom Christie <tom@tomchristie.com>
+License-Expression: BSD-3-Clause
+Location: /opt/pyvenv/lib/python3.13/site-packages
+Requires: click, h11
+Required-by: fastapi-cli, fastapi-cloud-cli, gradio
+---
+Name: pydantic-settings
+Version: 2.14.1
+Summary: Settings management using Pydantic
+Home-page: https://github.com/pydantic/pydantic-settings
+Author: 
+Author-email: Samuel Colvin <s@muelcolvin.com>, Eric Jolibois <em.jolibois@gmail.com>, Hasan Ramezani <hasan.r67@gmail.com>
+License-Expression: MIT
+Location: /opt/pyvenv/lib/python3.13/site-packages
+Requires: pydantic, python-dotenv, typing-inspection
+Required-by: 

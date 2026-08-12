@@ -1,0 +1,4 @@
+app_title: PriceYard API
+app_env: development
+debug: False
+import_check: PASS

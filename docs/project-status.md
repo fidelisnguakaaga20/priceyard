@@ -1,29 +1,35 @@
 # PriceYard Project Status
 
 ## Current stage
-Stage 1 — Project Setup
+Stage 2 — Backend Foundation
 
 ## Stage 0 disposition
 Owner supplied validation metrics: 65 reached, 14 replies, 5 willing to pay, positive usefulness/trust/continuation signals, sample market records and two source types.
 
-Two Stage 0 claims are not independently proven as written:
+Two Stage 0 claims remain not independently proven as written:
 1. The owner explicitly stated the 14-day completion entry was used for form testing and that real completion would need later confirmation.
-2. The second source is WhatsApp/live-session intelligence and was itself described as requiring later independent confirmation.
+2. The second source is WhatsApp/live-session intelligence and was described as requiring later independent confirmation.
 
-On 2026-08-12, the owner explicitly granted **Application Coding Permission: YES**. This is recorded as an owner-approved Stage 0 exception/accepted business risk, not as fabricated independent proof. Stage 1 is therefore authorized.
+On 2026-08-12, the owner explicitly granted Application Coding Permission: YES. This remains an owner-approved Stage 0 exception/accepted business risk, not fabricated independent proof.
 
 ## Completed stages
-None fully signed off yet.
+- Stage 1 — Project Setup: PASS and owner-approved to continue.
 
-## Stage 1 status
-PASS — awaiting owner approval
+## Stage 2 status
+PASS — awaiting owner approval.
 
-## Stage 1 first Git commit
-`8a87c04b6d06e535458e1c07d06bf01cde4add19`
+## Stage 2 verification
+- FastAPI application imports successfully.
+- Environment configuration loads successfully.
+- Approved dependencies are present and satisfy `backend/requirements.txt`.
+- Uvicorn starts successfully.
+- `GET /health` returned HTTP 200 and `{"status":"healthy"}`.
 
+## Outstanding issue
+Stage 0 independent-source/duration evidence remains unresolved and must be reconciled before Stage 24 final acceptance.
 
 ## Unapproved features added
 None.
 
 ## Next stage
-Stage 2 — Backend Foundation, only after Stage 1 proof and owner approval.
+Stage 3 — Database Foundation, only after Stage 2 proof and owner approval.

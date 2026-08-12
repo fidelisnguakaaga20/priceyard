@@ -1,0 +1,4 @@
+app_name: PriceYard API Test
+app_env: test
+debug: False
+environment_config: PASS

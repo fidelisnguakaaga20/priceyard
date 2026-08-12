@@ -1,0 +1,1 @@
+"""PriceYard backend application package."""
