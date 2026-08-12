@@ -21,6 +21,6 @@ Status: IN PROGRESS — live PostgreSQL verification pending.
 15. Traceability: S3-04, S3-05, S3-06 PASS; S3-01 through S3-03 remain IN PROGRESS pending live database proof.
 16. Project status: Stage 3 IN PROGRESS.
 17. Unapproved features added: None.
-18. Git commit: to be recorded after Stage 3 build commit.
+18. Git build commit: .
 19. Next stage: Stage 4 — Authentication.
 20. Approval: Stage 4 is blocked until Stage 3 live proof and owner approval.
