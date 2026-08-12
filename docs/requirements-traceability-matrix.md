@@ -15,4 +15,4 @@
 | S1-01 | Execution | Create root project structure | MVP | 1 | repository | Tree inspection | docs/evidence/stage-1-tree.txt | PASS |
 | S1-02 | Execution | Add governance files | MVP | 1 | docs/* | File existence/content review | repository | PASS |
 | S1-03 | Execution | Ignore .env and secrets | MVP | 1 | .gitignore | git check-ignore | evidence file | PASS |
-| S1-04 | Execution | Initialize Git and create first commit | MVP | 1 | .git | git log |  | PASS |
+| S1-04 | Execution | Initialize Git and create first commit | MVP | 1 | .git | git log | `8a87c04b6d06e535458e1c07d06bf01cde4add19` | PASS |

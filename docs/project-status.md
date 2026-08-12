@@ -18,7 +18,8 @@ None fully signed off yet.
 ## Stage 1 status
 PASS — awaiting owner approval
 
-## Stage 1 Git commit
+## Stage 1 first Git commit
+`8a87c04b6d06e535458e1c07d06bf01cde4add19`
 
 
 ## Unapproved features added
