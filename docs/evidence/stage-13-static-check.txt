@@ -1,0 +1,13 @@
+Stage 13 static/scope verification — 2026-08-12
+
+PASS: Python compileall for backend/app and Stage 13 owner smoke script.
+PASS: Alembic migration chain on temporary SQLite reached 0005_stage13_watchlists.
+PASS: watchlists table exists with user_id, commodity_id, market_id, target_price, created_at, updated_at.
+PASS: service-level create/list/duplicate/delete checks passed on temporary SQLite.
+PASS: create schema requires commodity_id or market_id and forbids unapproved extra input such as target_price.
+PASS: watchlist service uses the authenticated user id; caller cannot choose another user_id.
+PASS: cross-user deletion is prevented by querying item_id together with current user_id.
+PASS: no target-price alert behavior was added; target_price remains a dormant architecture-approved database field only.
+PASS: no Stage 14 FAQ API/model changes, alert system, payment, AI prediction, marketplace, or new dependency added.
+
+AI-environment limitation: full FastAPI application import is blocked in this container because bcrypt is not installed. This is not treated as runtime proof. The owner Supabase-backed smoke test is required before Stage 13 can complete.

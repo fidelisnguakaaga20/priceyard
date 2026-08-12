@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     from app.models.quality_signal import QualitySignal
     from app.models.sell_watch_window import SellWatchWindow
     from app.models.subscription import Subscription
+    from app.models.watchlist import Watchlist
 
 
 class User(Base):
@@ -49,3 +50,4 @@ class User(Base):
     sell_watch_windows: Mapped[list[SellWatchWindow]] = relationship(back_populates="creator")
     faq_items: Mapped[list[FAQItem]] = relationship(back_populates="creator")
     audit_logs: Mapped[list[AuditLog]] = relationship(back_populates="user")
+    watchlist_items: Mapped[list[Watchlist]] = relationship(back_populates="user", cascade="all, delete-orphan", passive_deletes=True)

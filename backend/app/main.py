@@ -13,6 +13,7 @@ from app.routes.sell_watch_window_routes import router as sell_watch_window_rout
 from app.routes.storage_suitability_routes import router as storage_suitability_router
 from app.routes.subscription_routes import router as subscription_router
 from app.routes.user_routes import router as user_router
+from app.routes.watchlist_routes import router as watchlist_router
 
 settings = get_settings()
 
@@ -33,6 +34,7 @@ app.include_router(buying_zone_router)
 app.include_router(sell_watch_window_router)
 app.include_router(storage_suitability_router)
 app.include_router(cost_breakdown_router)
+app.include_router(watchlist_router)
 
 
 @app.get("/health")

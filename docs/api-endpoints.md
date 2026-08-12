@@ -413,3 +413,23 @@ Authentication: admin bearer JWT required.
 Rules: every edit recalculates both totals; negative amounts are rejected.
 
 No full accounting, average-cost calculator, Stage 13 watchlist API, or other future feature is included in Stage 12.
+
+## Stage 13 — Watchlist
+
+### POST /watchlist
+Purpose: save a commodity, market, or commodity+market combination to the authenticated user's own watchlist.
+Authentication: active bearer JWT required.
+Input fields: optional `commodity_id`, optional `market_id`; at least one is required.
+Rules: referenced commodity/market must exist and be active; `user_id` is server-controlled; an exact duplicate for the same user returns HTTP 409; target-price input/alert behavior is not part of Stage 13.
+
+### GET /watchlist
+Purpose: list only the authenticated user's own watchlist items.
+Authentication: active bearer JWT required.
+Rule: no user-id query parameter is accepted; the JWT identity is the authority.
+
+### DELETE /watchlist/{item_id}
+Purpose: remove one item from the authenticated user's own watchlist.
+Authentication: active bearer JWT required.
+Rule: an item owned by another user is not exposed or removed.
+
+Stage 13 does not add target-price alerts, Stage 14 FAQ management, or any later-stage feature.

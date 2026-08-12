@@ -301,3 +301,25 @@ Integrity/calculation rules:
 This preserves cost data for a later approved average-cost feature without implementing a full accounting system or complex average-cost calculator in the MVP.
 
 Stage 12 does not create `watchlists`, alerts, reports, or any other Stage 13+ table.
+
+## Stage 13 — Watchlist
+
+Alembic revision `0005_stage13_watchlists` creates the approved `watchlists` table.
+
+Fields:
+- id
+- user_id
+- commodity_id
+- market_id
+- target_price
+- created_at
+- updated_at
+
+Integrity/relationship rules:
+- `user_id` is required and links each item to its owner;
+- at least one of `commodity_id` or `market_id` must be present;
+- commodity and market links are optional so a user can save a commodity only, a market only, or both;
+- `target_price` is nullable and retained from the approved Architecture Design, but Stage 13 does not expose it through the API or implement target-price alerts;
+- deleting the owning user, commodity, or market cascades removal of the affected watchlist row.
+
+Stage 13 does not create FAQ, alert, report, reporter, payment, or other Stage 14+ tables.

@@ -6,4 +6,4 @@ Follow the approved stage sequence strictly:
 
 Only one stage may be active at a time unless the owner explicitly approves a change.
 
-Stages 9, 10, 11, and 12 are RETESTED/PASS and owner-approved. Stage 13 — Watchlist is the only active build stage.
+Stages 9, 10, 11, and 12 are RETESTED/PASS and owner-approved. Stage 13 — Watchlist is BUILT/IN PROGRESS and requires owner Supabase migration/runtime proof before Stage 14.

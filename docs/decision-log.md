@@ -161,3 +161,6 @@ The approved Stage 12 fields include both component costs and totals. To avoid i
 - Test effect: Stage 13 must prove commodity/market saves, own-list behavior, duplicate handling, cross-user isolation, and removal.
 - Completed-stage effect: Stage 12 becomes RETESTED/PASS and owner-approved.
 - Approval: Conditional owner instruction satisfied by the passing Stage 12 output.
+
+## 2026-08-12 — Stage 13 target-price field boundary
+The approved Architecture Design includes nullable `target_price` in the `watchlists` table, while the Execution Plan explicitly defers target-price alerts. Stage 13 therefore retains the architecture-approved database column for compatibility but does not accept target-price API input and does not implement any alert behavior. This preserves both approved documents without expanding MVP functionality.

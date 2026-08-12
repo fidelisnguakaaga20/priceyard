@@ -97,3 +97,26 @@ None.
 
 ## Next gate
 Stage 13 — Watchlist is authorized by the owner’s conditional instruction after the passing Stage 12 output. Build/test/prove Stage 13 only, then stop for approval before Stage 14.
+
+
+## Stage 13 implementation completed
+- Added `watchlists` model and Alembic revision `0005_stage13_watchlists`.
+- Added authenticated save/list/remove-own watchlist API flow.
+- Users can save a commodity only, a market only, or a commodity+market combination.
+- Empty selections are rejected.
+- Referenced commodities/markets must exist and be active.
+- Exact duplicates for the same user are rejected with HTTP 409.
+- Ownership is derived from the JWT/current user; clients cannot assign `user_id`.
+- Cross-user removal is blocked without exposing another user's watchlist record.
+- Architecture-approved nullable `target_price` exists only in the database; Stage 13 does not accept target-price input or implement alerts.
+- No Stage 14 FAQ work, alerts, payment, AI prediction, marketplace, or other future feature was added.
+
+## Stage 13 internal verification
+- Python compilation: PASS.
+- Temporary Alembic migration through `0005_stage13_watchlists`: PASS.
+- Required table/field inspection: PASS.
+- Service-level save/list/duplicate/delete behavior on temporary SQLite: PASS.
+- Full FastAPI app runtime in the AI container was unavailable because bcrypt is not installed; this is not counted as runtime proof.
+
+## Stage 13 owner verification
+PENDING. Owner must apply `python -m alembic upgrade head` against Supabase PostgreSQL and run `docs/evidence/stage-13-owner-smoke.py`.

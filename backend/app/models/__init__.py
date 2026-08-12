@@ -12,6 +12,7 @@ from app.models.sell_watch_window import SellWatchWindow
 from app.models.storage_suitability import StorageSuitability
 from app.models.subscription import Subscription
 from app.models.user import User
+from app.models.watchlist import Watchlist
 
 __all__ = [
     "AuditLog",
@@ -28,4 +29,5 @@ __all__ = [
     "StorageSuitability",
     "Subscription",
     "User",
+    "Watchlist",
 ]

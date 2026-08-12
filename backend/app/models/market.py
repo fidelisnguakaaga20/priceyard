@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     from app.models.quality_signal import QualitySignal
     from app.models.sell_watch_window import SellWatchWindow
     from app.models.storage_suitability import StorageSuitability
+    from app.models.watchlist import Watchlist
 
 
 class Market(Base):
@@ -36,3 +37,4 @@ class Market(Base):
     buying_zones: Mapped[list[BuyingZone]] = relationship(back_populates="market")
     sell_watch_windows: Mapped[list[SellWatchWindow]] = relationship(back_populates="market")
     storage_suitability: Mapped[list[StorageSuitability]] = relationship(back_populates="market")
+    watchlist_items: Mapped[list[Watchlist]] = relationship(back_populates="market", passive_deletes=True)
