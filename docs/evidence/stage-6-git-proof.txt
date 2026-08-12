@@ -1,0 +1,3 @@
+Stage 6 implementation commit: cf1e2ee6a2475bc857a4f9356831ed4b2d1c1be7
+Working tree after implementation commit before proof commit:
+?? docs/evidence/stage-6-git-proof.txt
