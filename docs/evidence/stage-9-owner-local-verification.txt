@@ -1,0 +1,28 @@
+PriceYard Stage 9 Owner Local Verification
+Date: 2026-08-12
+Environment: Owner Windows/Git Bash + configured Supabase PostgreSQL
+Command: python ../docs/evidence/stage-9-owner-smoke.py
+
+Result: STAGE 9 OWNER SMOKE: PASS
+
+Verified PASS checks included:
+- Approved Stage 6 Egusi, Nasarawa and Kwali records available.
+- Normal user registration and admin/user login work.
+- Stage 7 price update creation/approval works for signal linking.
+- Unauthenticated market/quality signal viewing blocked.
+- Non-admin market/quality signal creation and edits blocked.
+- Guaranteed market-signal wording rejected.
+- Unsupported laboratory claim rejected.
+- Mismatched price-update links rejected for both signal types.
+- Admin market signal create/edit/view/list/delete works.
+- Admin quality signal create/edit/view/list/delete works.
+- Optional links to price updates work.
+- created_by is server-controlled admin.
+- Market-signal possible meaning and suggested action are preserved.
+- Required market-signal disclaimer is returned.
+- Quality risk note is preserved.
+- Linked price update remains publicly retrievable.
+- Price-update possible meaning/suggested action remain separate from market-signal meaning/action.
+
+Final owner terminal line:
+STAGE 9 OWNER SMOKE: PASS

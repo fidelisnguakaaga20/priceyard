@@ -1,7 +1,7 @@
 # PriceYard Project Status
 
 ## Current stage
-Stage 9 — Market Signals and Quality Signals — BUILT / IN PROGRESS; owner/local Supabase verification pending.
+Stage 9 — Market Signals and Quality Signals — RETESTED/PASS after owner/local Supabase verification; awaiting owner approval before Stage 10.
 
 ## Stage 0 disposition
 Owner supplied validation metrics: 65 reached, 14 replies, 5 willing to pay, positive usefulness/trust/continuation signals, sample market records and two source types.
@@ -41,7 +41,7 @@ On 2026-08-12, the owner explicitly granted Application Coding Permission: YES. 
 - Scope review: PASS; no Stage 10 route/table/migration or new dependency introduced.
 
 ## Stage 9 owner verification
-Pending. `docs/evidence/stage-9-owner-smoke.py` must pass against the owner's configured Supabase PostgreSQL environment before Stage 9 can become RETESTED/PASS.
+RETESTED/PASS on 2026-08-12 against the owner's configured Supabase PostgreSQL environment. Evidence: `docs/evidence/stage-9-owner-local-verification.txt`. Stage 9 still requires explicit owner approval before Stage 10 begins.
 
 ## Outstanding project issue
 Stage 0 independent-source/duration evidence remains unresolved and must be reconciled before Stage 24 final acceptance.
@@ -50,4 +50,4 @@ Stage 0 independent-source/duration evidence remains unresolved and must be reco
 None.
 
 ## Next gate
-Run the Stage 9 owner smoke test. If it passes, Stage 9 can be marked RETESTED/PASS, after which owner approval is required before Stage 10.
+Owner approval of Stage 9. After approval, begin Stage 10 — Buying Zones and Sell-Watch Windows only.
