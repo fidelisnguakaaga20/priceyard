@@ -1,0 +1,33 @@
+--- git init ---
+Initialized empty Git repository in /mnt/data/priceyard/.git/
+
+--- first commit ---
+[master (root-commit) 8a87c04] chore: initialize PriceYard project structure
+ 16 files changed, 374 insertions(+)
+ create mode 100644 .gitignore
+ create mode 100644 README.md
+ create mode 100644 docs/ai-project-execution-plan.md
+ create mode 100644 docs/api-endpoints.md
+ create mode 100644 docs/architecture-design.md
+ create mode 100644 docs/database-schema.md
+ create mode 100644 docs/decision-log.md
+ create mode 100644 docs/deployment-plan.md
+ create mode 100644 docs/development-roadmap.md
+ create mode 100644 docs/evidence/README.md
+ create mode 100644 docs/evidence/stage-1-file-check.txt
+ create mode 100644 docs/evidence/stage-1-gitignore-verification.txt
+ create mode 100644 docs/evidence/stage-1-tree.txt
+ create mode 100644 docs/priceyard-reference-document.md
+ create mode 100644 docs/project-status.md
+ create mode 100644 docs/requirements-traceability-matrix.md
+
+--- evidence/status commit ---
+[master 3f40892] docs: record Stage 1 verification evidence
+ 2 files changed, 5 insertions(+), 2 deletions(-)
+
+--- final git log ---
+3f40892 docs: record Stage 1 verification evidence
+8a87c04 chore: initialize PriceYard project structure
+
+--- final status ---
+?? docs/evidence/stage-1-git-proof.txt
