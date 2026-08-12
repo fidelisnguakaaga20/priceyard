@@ -1,0 +1,14 @@
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 0001_create_mvp_foundation, create MVP database foundation
+INFO  [alembic.runtime.migration] Running upgrade 0001_create_mvp_foundation -> 0002_stage10_buy_sell_watch, add Stage 10 buying zones and sell-watch windows
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running downgrade 0002_stage10_buy_sell_watch -> 0001_create_mvp_foundation, add Stage 10 buying zones and sell-watch windows
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 0001_create_mvp_foundation -> 0002_stage10_buy_sell_watch, add Stage 10 buying zones and sell-watch windows
+TABLES: ['alembic_version', 'audit_logs', 'buying_zones', 'commodities', 'faq_items', 'feedback', 'market_signals', 'markets', 'price_updates', 'quality_signals', 'sell_watch_windows', 'subscriptions', 'users']
+BUYING_ZONE_FIELDS: ['id', 'commodity_id', 'market_id', 'price_low', 'price_high', 'reason', 'valid_from', 'valid_to', 'confidence', 'created_by', 'created_at', 'updated_at']
+SELL_WATCH_FIELDS: ['id', 'commodity_id', 'market_id', 'start_period', 'end_period', 'observation', 'confidence', 'created_by', 'created_at', 'updated_at']
+STAGE 10 MIGRATION CYCLE: PASS

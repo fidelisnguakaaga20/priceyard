@@ -9,12 +9,14 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 
 if TYPE_CHECKING:
+    from app.models.buying_zone import BuyingZone
     from app.models.audit_log import AuditLog
     from app.models.feedback import Feedback
     from app.models.faq_item import FAQItem
     from app.models.market_signal import MarketSignal
     from app.models.price_update import PriceUpdate
     from app.models.quality_signal import QualitySignal
+    from app.models.sell_watch_window import SellWatchWindow
     from app.models.subscription import Subscription
 
 
@@ -43,5 +45,7 @@ class User(Base):
     )
     market_signals: Mapped[list[MarketSignal]] = relationship(back_populates="creator")
     quality_signals: Mapped[list[QualitySignal]] = relationship(back_populates="creator")
+    buying_zones: Mapped[list[BuyingZone]] = relationship(back_populates="creator")
+    sell_watch_windows: Mapped[list[SellWatchWindow]] = relationship(back_populates="creator")
     faq_items: Mapped[list[FAQItem]] = relationship(back_populates="creator")
     audit_logs: Mapped[list[AuditLog]] = relationship(back_populates="user")

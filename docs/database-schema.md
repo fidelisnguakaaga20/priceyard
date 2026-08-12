@@ -1,7 +1,7 @@
 # PriceYard Database Schema
 
 ## Status
-Stage 3 — Database Foundation: RETESTED/PASS after owner live Supabase PostgreSQL verification. Stage 5 reuses the existing `subscriptions` table; no Stage 5 schema migration is required.
+Stage 3 — Database Foundation: RETESTED/PASS after owner live Supabase PostgreSQL verification. Stage 10 adds the approved `buying_zones` and `sell_watch_windows` tables through Alembic revision `0002_stage10_buy_sell_watch`; owner Supabase migration verification is still pending.
 
 ## Approved database stack
 - PostgreSQL
@@ -168,8 +168,6 @@ Exactly these MVP foundation tables are implemented:
 - Overall feedback ratings are limited to 1–5; price usefulness/accuracy fields remain free-text feedback as described in the architecture.
 
 ## Deferred tables — not created in Stage 3
-- buying_zones
-- sell_watch_windows
 - storage_suitability
 - watchlists
 - cost_breakdowns
@@ -200,3 +198,43 @@ Stage 9 adds API/service validation only:
 - quality risk notes reject explicit unsupported laboratory-confirmation wording.
 
 `possible_meaning` and `suggested_action` on `market_signals` remain separate from the same-named fields on `price_updates`.
+
+## Stage 10 — Buying Zones and Sell-Watch Windows
+
+Alembic revision `0002_stage10_buy_sell_watch` creates the two Stage 10 tables that were intentionally deferred at Stage 3.
+
+### `buying_zones`
+- id
+- commodity_id
+- market_id
+- price_low
+- price_high
+- reason
+- valid_from
+- valid_to
+- confidence
+- created_by
+- created_at
+- updated_at
+
+Integrity rules:
+- `price_low` cannot be negative;
+- `price_high` cannot be below `price_low`;
+- `valid_to`, when both dates are supplied, cannot be earlier than `valid_from`;
+- commodity, market, and creator are relational foreign keys.
+
+### `sell_watch_windows`
+- id
+- commodity_id
+- market_id
+- start_period
+- end_period
+- observation
+- confidence
+- created_by
+- created_at
+- updated_at
+
+`start_period` and `end_period` are short text fields rather than forced calendar dates so approved observations such as “December ending” and “January upward” can be stored without inventing false precision.
+
+Stage 10 does not create `storage_suitability`, `cost_breakdowns`, `watchlists`, alerts, reports, or any other later-stage table.

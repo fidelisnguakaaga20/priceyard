@@ -9,9 +9,11 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 
 if TYPE_CHECKING:
+    from app.models.buying_zone import BuyingZone
     from app.models.market_signal import MarketSignal
     from app.models.price_update import PriceUpdate
     from app.models.quality_signal import QualitySignal
+    from app.models.sell_watch_window import SellWatchWindow
 
 
 class Market(Base):
@@ -30,3 +32,5 @@ class Market(Base):
     price_updates: Mapped[list[PriceUpdate]] = relationship(back_populates="market")
     market_signals: Mapped[list[MarketSignal]] = relationship(back_populates="market")
     quality_signals: Mapped[list[QualitySignal]] = relationship(back_populates="market")
+    buying_zones: Mapped[list[BuyingZone]] = relationship(back_populates="market")
+    sell_watch_windows: Mapped[list[SellWatchWindow]] = relationship(back_populates="market")

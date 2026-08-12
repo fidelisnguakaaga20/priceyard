@@ -6,4 +6,4 @@ Follow the approved stage sequence strictly:
 
 Only one stage may be active at a time unless the owner explicitly approves a change.
 
-Stage 9 is built but remains IN PROGRESS until the owner/local Supabase smoke passes and the owner approves progression to Stage 10.
+Stage 9 is RETESTED/PASS and owner-approved. Stage 10 is built but remains IN PROGRESS until the Stage 10 migration and owner/local Supabase smoke pass and the owner approves progression to Stage 11.

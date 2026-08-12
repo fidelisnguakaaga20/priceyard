@@ -310,3 +310,54 @@ Purpose: delete quality/readiness information.
 Authentication: admin bearer JWT required.
 
 For both signal types, an optional linked price update must use the same commodity and market. Market-signal meaning/action remains separate from price-update meaning/action.
+
+
+## Stage 10 — Buying Zones and Sell-Watch Windows
+
+### GET /buying-zones
+Purpose: list buying-zone market observations.
+Authentication/access: admin, active trial, or active paid access required. Free/expired/cancelled users do not receive this full-intelligence view.
+Response includes the buying-zone safety disclaimer.
+
+### GET /buying-zones/{zone_id}
+Purpose: view one buying-zone observation.
+Authentication/access: admin, active trial, or active paid access required.
+
+### POST /buying-zones
+Purpose: create a buying-zone observation.
+Authentication: admin bearer JWT required.
+Fields: `commodity_id`, `market_id`, `price_low`, `price_high`, `reason`, optional `valid_from`, optional `valid_to`, `confidence`.
+Rules: invalid ranges and reversed validity periods are rejected; `created_by` is server-controlled; guarantee/financial-advice wording is rejected.
+
+### PATCH /buying-zones/{zone_id}
+Purpose: edit a buying-zone observation.
+Authentication: admin bearer JWT required.
+
+Buying-zone API disclaimer:
+
+> Buying zones are market observations and are not guaranteed lowest prices, guaranteed buying opportunities, predictions, or financial advice.
+
+### GET /sell-watch-windows
+Purpose: list sell-watch market observations.
+Authentication/access: admin, active trial, or active paid access required. Free/expired/cancelled users do not receive this full-intelligence view.
+Response includes the sell-watch safety disclaimer.
+
+### GET /sell-watch-windows/{window_id}
+Purpose: view one sell-watch observation.
+Authentication/access: admin, active trial, or active paid access required.
+
+### POST /sell-watch-windows
+Purpose: create a sell-watch observation.
+Authentication: admin bearer JWT required.
+Fields: `commodity_id`, `market_id`, `start_period`, optional `end_period`, `observation`, `confidence`.
+Rules: `created_by` is server-controlled; guaranteed-profit/prediction/financial-advice wording is rejected.
+
+### PATCH /sell-watch-windows/{window_id}
+Purpose: edit a sell-watch observation.
+Authentication: admin bearer JWT required.
+
+Sell-watch API disclaimer:
+
+> Sell-watch windows are market observations and are not guaranteed profit periods, guaranteed selling opportunities, predictions, or financial advice.
+
+No Stage 11 storage-suitability API is included in Stage 10.

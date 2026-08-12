@@ -1,7 +1,7 @@
 # PriceYard Project Status
 
 ## Current stage
-Stage 9 — Market Signals and Quality Signals — RETESTED/PASS after owner/local Supabase verification; awaiting owner approval before Stage 10.
+Stage 10 — Buying Zones and Sell-Watch Windows — BUILT/IN PROGRESS; owner Supabase migration and runtime smoke verification are required before completion.
 
 ## Stage 0 disposition
 Owner supplied validation metrics: 65 reached, 14 replies, 5 willing to pay, positive usefulness/trust/continuation signals, sample market records and two source types.
@@ -21,27 +21,28 @@ On 2026-08-12, the owner explicitly granted Application Coding Permission: YES. 
 - Stage 6 — Admin Core Management: RETESTED/PASS and owner-approved after corrected local Supabase-backed smoke verification.
 - Stage 7 — Price Updates: RETESTED/PASS and owner-approved after local Supabase-backed smoke verification.
 - Stage 8 — Search, Filters, History, Comparison: RETESTED/PASS and owner-approved after local Supabase-backed smoke verification and the owner's instruction to continue.
+- Stage 9 — Market Signals and Quality Signals: RETESTED/PASS and owner-approved after local Supabase-backed smoke verification and the owner's instruction to continue.
 
-## Stage 9 implementation completed
-- Market signal create/edit/view/list/delete APIs.
-- Quality signal create/edit/view/list/delete APIs.
-- Admin-only signal management; active authenticated user required for viewing at this stage.
-- Optional `price_update_id` link validation, including commodity/market consistency.
-- Market-signal Possible Meaning/Suggested Action remains separate from price-update Possible Meaning/Suggested Action.
-- Explicit guarantee/financial-advice wording is rejected from market-signal observation fields.
-- Explicit unsupported laboratory-confirmation wording is rejected from quality risk notes.
-- Approved market-signal disclaimer is returned by market-signal response schemas.
-- Existing Stage 3 tables are reused; no migration is required.
-- No Stage 10 table/API, chart, payment, reporter workflow, AI prediction, or other future feature was added.
+## Stage 10 implementation completed
+- Added `buying_zones` and `sell_watch_windows` models and approved relationships.
+- Added Alembic revision `0002_stage10_buy_sell_watch`.
+- Added admin create/edit APIs and full-access view APIs for buying zones and sell-watch windows.
+- Buying zones validate price ranges and optional validity dates.
+- Buying-zone reason and sell-watch observation reject explicit guarantee/prediction/financial-advice wording.
+- Trial and active-paid users can view the full Stage 10 intelligence; free/expired/cancelled users are limited; admin retains full access.
+- Feature responses include safety disclaimers that implement the approved “not guaranteed lowest price / not guaranteed profit window” rules.
+- No Stage 11 table/API, payment, alert, chart, AI prediction, marketplace, or other future feature was added.
 
-## Stage 9 AI-environment verification
-- Python compilation: PASS.
-- Stage 9 schema-safety validation: PASS.
-- FastAPI Stage 9 route registration: PASS using a temporary import-only bcrypt stub because bcrypt is absent from the AI container; this is not owner/runtime database proof.
-- Scope review: PASS; no Stage 10 route/table/migration or new dependency introduced.
+## Stage 10 AI-environment verification
+- Python compilation/static schema work: PASS.
+- Temporary Alembic migration from the Stage 3 foundation through Stage 10 head: PASS.
+- Stage 10 table and required-column inspection: PASS.
+- Stage 10 schema/service create/edit/validation checks: PASS.
+- Stage 10 FastAPI/API flow against temporary SQLite with a temporary bcrypt test stub: PASS; this is build evidence only.
+- Full real-bcrypt/Supabase owner runtime proof is still required on the owner environment.
 
-## Stage 9 owner verification
-RETESTED/PASS on 2026-08-12 against the owner's configured Supabase PostgreSQL environment. Evidence: `docs/evidence/stage-9-owner-local-verification.txt`. Stage 9 still requires explicit owner approval before Stage 10 begins.
+## Stage 10 owner verification
+PENDING. Owner must apply `python -m alembic upgrade head` against the configured Supabase PostgreSQL database and run `docs/evidence/stage-10-owner-smoke.py`.
 
 ## Outstanding project issue
 Stage 0 independent-source/duration evidence remains unresolved and must be reconciled before Stage 24 final acceptance.
@@ -50,4 +51,4 @@ Stage 0 independent-source/duration evidence remains unresolved and must be reco
 None.
 
 ## Next gate
-Owner approval of Stage 9. After approval, begin Stage 10 — Buying Zones and Sell-Watch Windows only.
+Owner Stage 10 migration/runtime verification. If it passes, request explicit owner approval before Stage 11 — Storage Suitability.

@@ -97,3 +97,21 @@ Stage 8 extends the existing public `GET /price-updates` endpoint with optional 
 - Test effect: Stage 9 must prove create/edit/view/link validation, access control, observational wording, quality-claim safety, and market-signal disclaimer behavior.
 - Completed-stage effect: Stage 8 becomes RETESTED/PASS and owner-approved.
 - Approval: Owner instruction in conversation.
+
+
+## DEC-008 — Stage 9 approval and Stage 10 authorization
+- Date: 2026-08-12
+- Current requirement: Do not proceed from Stage 9 until owner approval.
+- Source: PriceYard AI Project Execution Plan.
+- Owner proof: `STAGE 9 OWNER SMOKE: PASS` with market/quality CRUD, link validation, access control, observational wording, quality-claim safety, disclaimer behavior, and separation from price-update meaning/action passing on the owner's Supabase-backed environment.
+- Owner instruction: `continue base on this execution plan here`.
+- Decision: Treat the instruction to continue as owner approval of Stage 9 and authorization to execute Stage 10 — Buying Zones and Sell-Watch Windows only.
+- Database effect: Authorizes the approved Stage 10 migration creating only `buying_zones` and `sell_watch_windows`.
+- API effect: Authorizes only the approved Stage 10 create/edit/view flows and their access/safety rules.
+- Frontend effect: None.
+- Test effect: Stage 10 must prove migration, create/edit/view, invalid-range rejection, access control, and disclaimer behavior.
+- Completed-stage effect: Stage 9 becomes RETESTED/PASS and owner-approved.
+- Approval: Owner instruction in conversation.
+
+## 2026-08-12 — Stage 10 period representation
+The approved execution plan defines `start_period` and `end_period` but does not require exact calendar dates. They are stored as short text so observations such as “December ending” and “January upward” can be represented without inventing false date precision. This is an implementation choice within the approved Stage 10 fields, not a product-scope change.

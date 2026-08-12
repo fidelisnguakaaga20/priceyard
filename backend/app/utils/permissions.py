@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.user import User
 from app.security import decode_access_token
+from app.services.subscription_service import get_subscription_for_user, has_full_access
 
 bearer_scheme = HTTPBearer(auto_error=False)
 VALID_MVP_ROLES = frozenset({"admin", "free_user", "paid_user"})
@@ -65,3 +66,19 @@ def require_roles(*roles: str) -> Callable[[User], User]:
         return current_user
 
     return dependency
+
+
+def require_full_access(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> User:
+    if current_user.role == "admin":
+        return current_user
+
+    subscription = get_subscription_for_user(db, current_user.id)
+    if not has_full_access(subscription):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Full subscription or active trial required",
+        )
+    return current_user
