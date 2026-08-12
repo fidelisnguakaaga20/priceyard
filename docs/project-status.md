@@ -46,7 +46,23 @@ The first owner smoke attempt failed because the verification script used a rese
 RETESTED/PASS — owner/local runtime smoke passed against the configured Supabase PostgreSQL database on 2026-08-12. All 31 approved subscription/trial checks passed. An earlier verifier cleanup defect was fixed without changing product code, schema, or API behavior.
 
 ## Stage 6 status
-IN PROGRESS — authorized by owner on 2026-08-12. Build only admin authorization, user management, commodity management, market management, and subscription management.
+IN PROGRESS — implementation is built and static verification passes. Owner/local runtime verification against the configured Supabase PostgreSQL database is required before Stage 6 can become PASS.
+
+## Stage 6 implementation completed
+- Admin-only user list/view/update management.
+- Admin user activation/deactivation.
+- Admin role changes limited to `admin`, `free_user`, `paid_user`; reporter remains deferred.
+- Role changes keep normal-user subscription state consistent (`paid_user` -> active, `free_user` -> free).
+- Commodity public read plus admin create/edit/delete.
+- Market public read plus admin create/edit/delete.
+- Existing Stage 5 subscription management remains protected and reused.
+- No database migration was required.
+- Stage 6 owner verifier ensures approved initial commodities and markets exist, with only Nasarawa Monday and Kwali Tuesday populated as verified market days.
+
+## Stage 6 build verification
+- Python compilation: PASS.
+- Static route/access/scope checks: PASS.
+- Full PostgreSQL runtime smoke: pending owner/local verification because the AI environment does not have the owner's Supabase credentials/bcrypt runtime.
 
 ## Outstanding project issue
 Stage 0 independent-source/duration evidence remains unresolved and must be reconciled before Stage 24 final acceptance.

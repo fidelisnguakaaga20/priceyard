@@ -101,3 +101,77 @@ Stage 5 rules:
 - `active` is the paid/full-access status and assigns `paid_user` for a normal user;
 - `free`, `expired`, and `cancelled` are limited-access statuses;
 - payment gateway integration remains deferred.
+
+## Stage 6 — Admin Core Management
+
+### GET /users
+Purpose: list PriceYard users for administration.
+Authentication: admin bearer JWT required.
+
+### GET /users/{user_id}
+Purpose: view one user's safe account details.
+Authentication: admin bearer JWT required.
+Rule: password hashes are never returned.
+
+### PATCH /users/{user_id}
+Purpose: change an approved MVP role and/or activate/deactivate a user.
+Authentication: admin bearer JWT required.
+Allowed roles: `admin`, `free_user`, `paid_user`.
+Reporter remains deferred.
+Role/subscription consistency:
+- `paid_user` synchronizes to active paid subscription status;
+- `free_user` synchronizes to free subscription status;
+- `admin` grants administration role directly.
+
+### GET /commodities
+Purpose: view commodities.
+Authentication: none.
+
+### GET /commodities/{commodity_id}
+Purpose: view one commodity.
+Authentication: none.
+
+### POST /commodities
+Purpose: add a commodity.
+Authentication: admin bearer JWT required.
+
+### PATCH /commodities/{commodity_id}
+Purpose: edit a commodity.
+Authentication: admin bearer JWT required.
+
+### DELETE /commodities/{commodity_id}
+Purpose: delete a commodity when it is not referenced by dependent records.
+Authentication: admin bearer JWT required.
+
+Initial approved commodities:
+- Egusi
+- Beans
+- Palm oil
+
+### GET /markets
+Purpose: view markets.
+Authentication: none.
+
+### GET /markets/{market_id}
+Purpose: view one market.
+Authentication: none.
+
+### POST /markets
+Purpose: add a market.
+Authentication: admin bearer JWT required.
+
+### PATCH /markets/{market_id}
+Purpose: edit a market.
+Authentication: admin bearer JWT required.
+
+### DELETE /markets/{market_id}
+Purpose: delete a market when it is not referenced by dependent records.
+Authentication: admin bearer JWT required.
+
+Initial approved markets:
+- Abuja/FCT — market day not set unless independently verified
+- Kwali Market — Tuesday
+- Nasarawa — Monday
+- Benue — market day not set unless independently verified
+
+Stage 6 reuses the Stage 5 subscription management APIs. No new payment behavior is introduced.

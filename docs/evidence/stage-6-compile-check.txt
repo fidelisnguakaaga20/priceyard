@@ -1,0 +1,2 @@
+compileall: PASS
+final compileall: PASS

@@ -1,0 +1,26 @@
+ backend/README.md                                 |  14 ++
+ backend/app/main.py                               |   6 +
+ backend/app/routes/__init__.py                    |   5 +-
+ backend/app/routes/commodity_routes.py            |  56 +++++
+ backend/app/routes/market_routes.py               |  50 ++++
+ backend/app/routes/user_routes.py                 |  37 +++
+ backend/app/schemas/commodity_schema.py           |  30 +++
+ backend/app/schemas/market_schema.py              |  42 ++++
+ backend/app/schemas/user_schema.py                |   6 +
+ backend/app/services/__init__.py                  |   4 +-
+ backend/app/services/commodity_service.py         |  68 ++++++
+ backend/app/services/market_service.py            |  76 ++++++
+ backend/app/services/user_service.py              |  42 ++++
+ docs/api-endpoints.md                             |  74 ++++++
+ docs/database-schema.md                           |   6 +
+ docs/evidence/stage-6-build-report.md             |  36 +++
+ docs/evidence/stage-6-compile-check.txt           |   2 +
+ docs/evidence/stage-6-diff-stat.txt               |  10 +
+ docs/evidence/stage-6-migration-check.txt         |   2 +
+ docs/evidence/stage-6-owner-smoke.py              | 284 ++++++++++++++++++++++
+ docs/evidence/stage-6-owner-verification-steps.md |  16 ++
+ docs/evidence/stage-6-static-check.py             |  31 +++
+ docs/evidence/stage-6-static-check.txt            |  11 +
+ docs/project-status.md                            |  18 +-
+ docs/requirements-traceability-matrix.md          |  10 +
+ 25 files changed, 928 insertions(+), 8 deletions(-)

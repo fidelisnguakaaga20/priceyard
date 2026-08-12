@@ -176,3 +176,9 @@ Exactly these MVP foundation tables are implemented:
 - reporter_submissions
 - alerts
 - reports
+
+## Stage 6 — Admin Core Management
+
+No database migration is required for Stage 6. The approved Stage 3 tables already contain the fields needed for user, commodity, market, and subscription management.
+
+Stage 6 does not create any Stage 7+ table or column.

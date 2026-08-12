@@ -1,0 +1,11 @@
+main includes user router: PASS
+main includes commodity router: PASS
+main includes market router: PASS
+commodity admin mutations protected: PASS
+market admin mutations protected: PASS
+user management admin protected: PASS
+subscription admin update remains protected: PASS
+reporter role remains deferred: PASS
+market day validation supports weekdays: PASS
+no Stage 7 price update API introduced: PASS
+no forbidden infrastructure introduced: PASS

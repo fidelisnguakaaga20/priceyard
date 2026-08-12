@@ -119,3 +119,17 @@ Expected final line:
 ```text
 STAGE 5 OWNER SMOKE: PASS
 ```
+
+## Stage 6 owner verification
+
+With the same `.env` used for the working Supabase PostgreSQL database:
+
+```bash
+python ../docs/evidence/stage-6-owner-smoke.py
+```
+
+Expected final line:
+
+```text
+STAGE 6 OWNER SMOKE: PASS
+```

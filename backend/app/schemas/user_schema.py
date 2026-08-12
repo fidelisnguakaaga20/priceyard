@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, EmailStr
 
@@ -13,3 +14,8 @@ class UserResponse(BaseModel):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class AdminUserUpdate(BaseModel):
+    role: Literal["admin", "free_user", "paid_user"] | None = None
+    is_active: bool | None = None
