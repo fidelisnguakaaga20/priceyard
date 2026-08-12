@@ -188,3 +188,15 @@ Stage 6 does not create any Stage 7+ table or column.
 No migration is required. Stage 7 uses the existing Stage 3 `price_updates` table and its approved fields/constraints.
 
 API-layer validation now additionally enforces the approved suggested-action choices, current/previous range consistency, and observational/non-guaranteed `possible_meaning` wording. Private `source_1`/`source_2` values remain stored in PostgreSQL but are excluded from public price response schemas.
+
+## Stage 9 — Market Signals and Quality Signals
+
+No database migration is required. Stage 9 uses the existing Stage 3 `market_signals` and `quality_signals` tables exactly as approved.
+
+Stage 9 adds API/service validation only:
+- referenced commodity and market must exist and be active;
+- optional `price_update_id`, when supplied, must point to an existing price update with the same commodity and market;
+- market-signal observations reject explicit guarantee/financial-advice wording;
+- quality risk notes reject explicit unsupported laboratory-confirmation wording.
+
+`possible_meaning` and `suggested_action` on `market_signals` remain separate from the same-named fields on `price_updates`.

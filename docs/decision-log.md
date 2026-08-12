@@ -83,3 +83,17 @@
 
 ## 2026-08-12 — Stage 8 query design
 Stage 8 extends the existing public `GET /price-updates` endpoint with optional commodity/market/date/movement filters while preserving the no-query Stage 7 behavior. Dedicated `/price-updates/history` and `/price-updates/comparison` endpoints were added because the approved Stage 8 explicitly requires chronological history and comparison. No schema change or new dependency was required.
+
+## DEC-007 — Stage 8 approval and Stage 9 authorization
+- Date: 2026-08-12
+- Current requirement: Do not proceed from Stage 8 until owner approval.
+- Source: PriceYard AI Project Execution Plan.
+- Owner proof: `STAGE 8 OWNER SMOKE: PASS` with commodity search, market/date/movement filters, chronological history, same-day time-of-day records, market comparison, previous/current comparison, Possible Meaning/Suggested Action preservation, and private-source hiding passing on the owner's Supabase-backed environment.
+- Owner instruction: `continue base on this execution plan here` after the successful Stage 8 smoke proof.
+- Decision: Treat the instruction to continue as owner approval of Stage 8 and authorization to execute Stage 9 — Market Signals and Quality Signals only.
+- Database effect: No migration is required; Stage 9 uses the existing `market_signals` and `quality_signals` tables created in Stage 3.
+- API effect: Authorizes only the approved market-signal and quality-signal CRUD/view flows.
+- Frontend effect: None.
+- Test effect: Stage 9 must prove create/edit/view/link validation, access control, observational wording, quality-claim safety, and market-signal disclaimer behavior.
+- Completed-stage effect: Stage 8 becomes RETESTED/PASS and owner-approved.
+- Approval: Owner instruction in conversation.

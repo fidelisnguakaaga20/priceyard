@@ -4,7 +4,9 @@ from app.config import get_settings
 from app.routes.auth_routes import router as auth_router
 from app.routes.commodity_routes import router as commodity_router
 from app.routes.market_routes import router as market_router
+from app.routes.market_signal_routes import router as market_signal_router
 from app.routes.price_update_routes import router as price_update_router
+from app.routes.quality_signal_routes import router as quality_signal_router
 from app.routes.subscription_routes import router as subscription_router
 from app.routes.user_routes import router as user_router
 
@@ -21,6 +23,8 @@ app.include_router(user_router)
 app.include_router(commodity_router)
 app.include_router(market_router)
 app.include_router(price_update_router)
+app.include_router(market_signal_router)
+app.include_router(quality_signal_router)
 
 
 @app.get("/health")

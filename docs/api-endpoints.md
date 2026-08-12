@@ -256,3 +256,57 @@ Optional query parameter:
 - `date`
 
 Public source privacy remains unchanged: `source_1` and `source_2` are not returned.
+
+## Stage 9 — Market Signals and Quality Signals
+
+### GET /market-signals
+Purpose: list market signals created by PriceYard administration.
+Authentication: active bearer JWT required at Stage 9. Full tier-by-tier premium access enforcement remains scheduled for Stage 20.
+Response includes the approved market-signal disclaimer.
+
+### GET /market-signals/{signal_id}
+Purpose: view one market signal.
+Authentication: active bearer JWT required.
+Response includes the approved market-signal disclaimer.
+
+### POST /market-signals
+Purpose: create a market signal.
+Authentication: admin bearer JWT required.
+Fields: `commodity_id`, `market_id`, optional `price_update_id`, `signal_type`, `signal_description`, optional `possible_meaning`, optional approved `suggested_action`.
+Rules: explicit guarantee/financial-advice wording is rejected; `created_by` is server-controlled.
+
+### PATCH /market-signals/{signal_id}
+Purpose: edit a market signal.
+Authentication: admin bearer JWT required.
+
+### DELETE /market-signals/{signal_id}
+Purpose: delete a market signal.
+Authentication: admin bearer JWT required.
+
+Market-signal disclaimer returned by the API:
+
+> Market signals are observations based on available market information. They are not guaranteed predictions or financial advice. Users should verify before making major buying, selling, or storage decisions.
+
+### GET /quality-signals
+Purpose: list quality/readiness observations.
+Authentication: active bearer JWT required at Stage 9. Full tier-by-tier premium access enforcement remains scheduled for Stage 20.
+
+### GET /quality-signals/{signal_id}
+Purpose: view one quality/readiness observation.
+Authentication: active bearer JWT required.
+
+### POST /quality-signals
+Purpose: create quality/readiness information.
+Authentication: admin bearer JWT required.
+Fields: `commodity_id`, `market_id`, optional `price_update_id`, optional `quality_status`, `moisture_status`, `storage_readiness`, `risk_note`.
+Rule: explicit unsupported laboratory-confirmation wording is rejected; `created_by` is server-controlled.
+
+### PATCH /quality-signals/{signal_id}
+Purpose: edit quality/readiness information.
+Authentication: admin bearer JWT required.
+
+### DELETE /quality-signals/{signal_id}
+Purpose: delete quality/readiness information.
+Authentication: admin bearer JWT required.
+
+For both signal types, an optional linked price update must use the same commodity and market. Market-signal meaning/action remains separate from price-update meaning/action.

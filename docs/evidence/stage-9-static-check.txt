@@ -1,0 +1,16 @@
+Stage 9 AI build verification — 2026-08-12
+
+PASS: Python compilation for backend/app.
+PASS: Stage 9 market-signal schema accepts observational wording and approved Suggested Action.
+PASS: Explicit guaranteed-profit / sure-rise wording is rejected by market-signal schema.
+PASS: Explicit unsupported laboratory-confirmation wording is rejected by quality-signal schema.
+PASS: FastAPI route registration contains GET/POST/PATCH/DELETE market-signal APIs.
+PASS: FastAPI route registration contains GET/POST/PATCH/DELETE quality-signal APIs.
+PASS: In-memory SQLAlchemy service smoke created, edited, listed, linked and deleted both signal types while preserving price-update meaning/action.
+PASS: No /buying-zones or sell-watch route was introduced.
+PASS: Existing Stage 3 market_signals and quality_signals tables are reused; no migration added.
+PASS: No dependency change introduced.
+PASS: No Stage 10+ feature added.
+
+Environment note:
+The AI container does not contain bcrypt or psycopg. Route-registration inspection used a temporary import-only bcrypt stub. No Supabase runtime/database claim is made from this static check. The owner/local Stage 9 smoke is the required runtime proof gate.
