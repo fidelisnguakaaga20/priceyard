@@ -1,0 +1,27 @@
+Stage 10 owner/local Supabase verification — 2026-08-12
+
+Owner ran:
+- python -m pip install -r requirements-dev.txt
+- python -m alembic upgrade head
+- python ../docs/evidence/stage-10-owner-smoke.py
+
+Observed migration:
+Running upgrade 0001_create_mvp_foundation -> 0002_stage10_buy_sell_watch, add Stage 10 buying zones and sell-watch windows
+
+Observed smoke result:
+- buying_zones migration/fields: PASS
+- sell_watch_windows migration/fields: PASS
+- admin create/edit flows: PASS
+- full-access trial view: PASS
+- free-user full view blocked: PASS
+- active-paid full view: PASS
+- invalid range/period rejection: PASS
+- guaranteed buying/selling wording rejected: PASS
+- non-admin create/edit blocked: PASS
+- disclaimers returned: PASS
+- creator server-controlled: PASS
+
+Final owner output:
+STAGE 10 OWNER SMOKE: PASS
+
+Source: owner-provided terminal output in the PriceYard development conversation.

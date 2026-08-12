@@ -115,3 +115,17 @@ Stage 8 extends the existing public `GET /price-updates` endpoint with optional 
 
 ## 2026-08-12 — Stage 10 period representation
 The approved execution plan defines `start_period` and `end_period` but does not require exact calendar dates. They are stored as short text so observations such as “December ending” and “January upward” can be represented without inventing false date precision. This is an implementation choice within the approved Stage 10 fields, not a product-scope change.
+
+## DEC-009 — Stage 10 approval and Stage 11 authorization
+- Date: 2026-08-12
+- Current requirement: Do not proceed from Stage 10 until owner approval.
+- Source: PriceYard AI Project Execution Plan.
+- Owner proof: Alembic upgrade to `0002_stage10_buy_sell_watch` succeeded and `STAGE 10 OWNER SMOKE: PASS` showed migration, required fields, create/edit/view, access control, invalid-range/period rejection, disclaimer behavior, and anti-guarantee wording all passing on the owner's Supabase-backed environment.
+- Owner instruction: `if this output is okay, then next`.
+- Decision: Stage 10 is RETESTED/PASS and owner-approved. Stage 11 — Storage Suitability only is authorized.
+- Database effect: Authorizes one approved migration creating only `storage_suitability`.
+- API effect: Authorizes only Stage 11 storage-suitability create/edit/view flows and approved access/safety rules.
+- Frontend effect: None.
+- Test effect: Stage 11 must prove migration, required fields, create/edit/view, relationships, validation, access control, approved statuses, and storage disclaimer behavior.
+- Completed-stage effect: Stage 10 becomes RETESTED/PASS and owner-approved.
+- Approval: Conditional owner instruction satisfied by the passing Stage 10 output.

@@ -1,7 +1,7 @@
 # PriceYard Project Status
 
 ## Current stage
-Stage 10 — Buying Zones and Sell-Watch Windows — BUILT/IN PROGRESS; owner Supabase migration and runtime smoke verification are required before completion.
+Stage 11 — Storage Suitability — AUTHORIZED/NOT YET BUILT. Stage 10 is RETESTED/PASS and owner-approved.
 
 ## Stage 0 disposition
 Owner supplied validation metrics: 65 reached, 14 replies, 5 willing to pay, positive usefulness/trust/continuation signals, sample market records and two source types.
@@ -22,6 +22,7 @@ On 2026-08-12, the owner explicitly granted Application Coding Permission: YES. 
 - Stage 7 — Price Updates: RETESTED/PASS and owner-approved after local Supabase-backed smoke verification.
 - Stage 8 — Search, Filters, History, Comparison: RETESTED/PASS and owner-approved after local Supabase-backed smoke verification and the owner's instruction to continue.
 - Stage 9 — Market Signals and Quality Signals: RETESTED/PASS and owner-approved after local Supabase-backed smoke verification and the owner's instruction to continue.
+- Stage 10 — Buying Zones and Sell-Watch Windows: RETESTED/PASS and owner-approved after Alembic migration plus local Supabase-backed owner smoke verification.
 
 ## Stage 10 implementation completed
 - Added `buying_zones` and `sell_watch_windows` models and approved relationships.
@@ -42,7 +43,7 @@ On 2026-08-12, the owner explicitly granted Application Coding Permission: YES. 
 - Full real-bcrypt/Supabase owner runtime proof is still required on the owner environment.
 
 ## Stage 10 owner verification
-PENDING. Owner must apply `python -m alembic upgrade head` against the configured Supabase PostgreSQL database and run `docs/evidence/stage-10-owner-smoke.py`.
+PASS. Owner applied Alembic revision `0002_stage10_buy_sell_watch` against Supabase PostgreSQL and `docs/evidence/stage-10-owner-smoke.py` ended with `STAGE 10 OWNER SMOKE: PASS`.
 
 ## Outstanding project issue
 Stage 0 independent-source/duration evidence remains unresolved and must be reconciled before Stage 24 final acceptance.
@@ -51,4 +52,4 @@ Stage 0 independent-source/duration evidence remains unresolved and must be reco
 None.
 
 ## Next gate
-Owner Stage 10 migration/runtime verification. If it passes, request explicit owner approval before Stage 11 — Storage Suitability.
+Stage 11 — Storage Suitability is authorized by the owner's instruction: “if this output is okay, then next.” Build and verify Stage 11 only; do not begin Stage 12 without a new owner approval.
