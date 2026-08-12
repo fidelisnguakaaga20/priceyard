@@ -150,13 +150,18 @@ try:
     expect(listing.status_code == 200, "admin can list subscriptions")
     expect(any(item["user_id"] == user_id for item in listing.json()), "admin list contains trial user")
 
-    print(json.dumps(report, indent=2))
-    print("STAGE 5 OWNER SMOKE: PASS")
 finally:
     with get_session_factory()() as db:
         for cleanup_id in [user_id, admin_id]:
             if cleanup_id is not None:
+                subscription = db.scalar(select(Subscription).where(Subscription.user_id == cleanup_id))
+                if subscription is not None:
+                    db.delete(subscription)
+                    db.flush()
                 user = db.get(User, cleanup_id)
                 if user is not None:
                     db.delete(user)
         db.commit()
+
+print(json.dumps(report, indent=2))
+print("STAGE 5 OWNER SMOKE: PASS")

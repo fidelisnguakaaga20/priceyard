@@ -66,3 +66,17 @@
 - Test effect: Stage 5 must prove 14-day trial timing, full/limited access classification, active paid access, invalid-status rejection, and admin subscription update.
 - Completed-stage effect: Stage 4 becomes RETESTED/PASS and owner-approved.
 - Approval: Owner instruction in conversation.
+
+## DEC-006 — Stage 5 approval and Stage 6 authorization
+- Date: 2026-08-12
+- Current requirement: Do not proceed from Stage 5 until owner approval.
+- Source: PriceYard AI Project Execution Plan.
+- Owner proof: Corrected `STAGE 5 OWNER SMOKE: PASS` with all 31 approved subscription/trial checks passing on the owner's configured Supabase PostgreSQL environment.
+- Owner instruction: `approved`.
+- Decision: Stage 5 is RETESTED/PASS and owner-approved. Stage 6 — Admin Core Management is authorized.
+- Database effect: No schema change is expected; Stage 6 uses existing `users`, `commodities`, `markets`, and `subscriptions` tables.
+- API effect: Authorizes only admin authorization, user management, commodity management, market management, and approved subscription management.
+- Frontend effect: None.
+- Test effect: Stage 6 must prove non-admin blocking, admin commodity CRUD, admin market CRUD, user management, and subscription management.
+- Completed-stage effect: Stage 5 becomes RETESTED/PASS and owner-approved.
+- Approval: Owner-approved in conversation.

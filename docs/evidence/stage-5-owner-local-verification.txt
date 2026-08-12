@@ -1,0 +1,21 @@
+Stage 5 owner/local verification — 2026-08-12
+
+Owner ran:
+  python ../docs/evidence/stage-5-owner-smoke.py
+
+Result: STAGE 5 OWNER SMOKE: PASS
+
+All 31 approved Stage 5 checks passed, including:
+- normal registration creates a subscription
+- new normal user starts a 14-day trial
+- exact 14-day trial duration
+- active trial full access classification
+- free/expired/cancelled limited access classification
+- active paid full access classification and paid_user role
+- invalid status rejected
+- non-admin subscription updates blocked
+- admin manual status changes work
+- expired trial transitions to expired and free_user
+- admin subscription list works
+
+An earlier smoke run passed the functional assertions but failed during test cleanup because the verifier deleted a user before its non-null subscription FK. Only the verifier cleanup order was fixed; product code/schema/API were unchanged. The corrected verifier deletes subscription before user and completed successfully.
