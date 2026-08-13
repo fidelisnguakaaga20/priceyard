@@ -199,3 +199,9 @@ New FAQ records start hidden and publication state is changed only through the a
 
 ## 2026-08-13 — Stage 15 summary boundary
 The Execution Plan permits only basic feedback count/average and explicitly forbids advanced analytics. Stage 15 therefore exposes only total count and average rating in the admin summary.
+
+## 2026-08-13 — Stage 18 local frontend/backend integration
+- Decision: use Vite's local `/api` development proxy for Stage 18 instead of changing backend production CORS behavior early.
+- Reason: Stage 18 requires local React/FastAPI integration; production allowed-origin configuration is explicitly part of the later security/deployment stages.
+- Scope: frontend development only. `VITE_API_URL` is reserved for the deployed FastAPI base URL.
+- No database/API contract change results from this decision.

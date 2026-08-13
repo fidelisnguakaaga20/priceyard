@@ -546,3 +546,11 @@ Rules:
 - no PDF generation, report-storage table, advanced analytics, or Stage 18 frontend is included.
 
 Response: `text/csv` attachment named `priceyard-price-report.csv`.
+
+## Stage 18 — Frontend API Integration
+
+Stage 18 adds no new backend API contract. The React + TypeScript public/user frontend consumes the approved APIs from Stages 4–15, including authentication, subscription self-view, commodities, markets, price updates/history/comparison, signals, quality, buying zones, sell-watch windows, storage suitability, cost breakdowns, FAQ, feedback, and watchlist.
+
+Local Vite development uses `/api/*` as a proxy to `http://127.0.0.1:8000`. Deployment will use `VITE_API_URL` and the approved production CORS/origin configuration in Stages 21–22.
+
+Private `source_1` / `source_2` values are not consumed by the Stage 18 frontend. Admin-management API consumption is deferred to Stage 19.

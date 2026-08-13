@@ -206,3 +206,28 @@ RETESTED/PASS. Owner confirmed Alembic remains at `0005_stage13_watchlists` and 
 
 ## Next gate
 Stage 17 — Simple CSV Report Export is RETESTED/PASS and owner-approved. Stage 18 — Public and User Frontend MVP may start; Stage 19 remains blocked until Stage 18 owner approval.
+
+## Stage 18 implementation completed
+- Added the approved React + TypeScript public/user frontend under `frontend/`.
+- Added Home, Prices, Commodity Detail, Price History, Market-Day Calendar, FAQ, Feedback, Login, Register, User Dashboard, and Watchlist routes/pages.
+- Added a small shared API client and authentication context using the existing JWT APIs and subscription endpoint.
+- Added display states for Guest, Free, Trial, Active Paid, and Admin. Backend authorization remains the security authority; frontend hiding is only presentation.
+- Added current-price cards, filters, chronological history, market-day view, and commodity-detail full-intelligence panels for market signals, quality readiness, buying zones, sell-watch, storage suitability and cost breakdown.
+- Preserved Possible Meaning and Suggested Action and labels them as observational/non-guaranteed guidance.
+- Added the exact approved price, market-signal and storage-suitability disclaimers.
+- Added authenticated watchlist and feedback UI using the already approved Stage 13/15 APIs. Target-price alerts remain deferred.
+- Added responsive CSS and mobile navigation; no complex chart library was added.
+- Added Vite local `/api` proxy for Stage 18 local integration and `VITE_API_URL` for later deployed backend configuration. Production CORS remains a Stage 21/22 security/deployment concern.
+- No database migration or backend API-contract change was introduced; Alembic head remains `0005_stage13_watchlists`.
+- No admin management frontend, payment gateway, marketplace, logistics, AI prediction, native mobile, alerts, complex charting or other deferred feature was added.
+
+## Stage 18 internal verification
+- Backend Python compilation after frontend addition: PASS.
+- Stage 18 source/static scope check: PASS.
+- TypeScript/TSX syntax transpilation check using the container's global TypeScript compiler: PASS.
+- Assistant-container `npm install` could not complete because package-registry access was unavailable/timed out in that container, so a real production `npm run build` and browser runtime are intentionally not claimed as internally verified.
+- Owner verification helper `docs/evidence/stage-18-owner-smoke.py` installs frontend dependencies in the owner's environment, runs the production build, starts FastAPI + Vite, verifies the API proxy, renders key routes with local Chrome, and creates a 390x844 mobile screenshot.
+- Register/login/watchlist/feedback interaction and visual mobile usability still require owner confirmation before Stage 18 can pass.
+
+## Next gate
+Stage 18 — Public and User Frontend MVP is BUILT/IN PROGRESS. Stage 19 — Admin Frontend MVP must not start until the owner sends the Stage 18 build/browser proof and explicitly approves Stage 18.

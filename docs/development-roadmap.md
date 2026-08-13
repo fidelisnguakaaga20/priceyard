@@ -6,4 +6,4 @@ Follow the approved stage sequence strictly:
 
 Only one stage may be active at a time unless the owner explicitly approves a change.
 
-Stages 1 through 17 are completed/owner-approved under the execution gates. Stage 18 — Public and User Frontend MVP is the current stage. Stage 19 must not start until Stage 18 passes and receives owner approval.
+Stages 1 through 17 are completed/owner-approved under the execution gates. Stage 18 — Public and User Frontend MVP is BUILT/IN PROGRESS and awaits owner production-build/browser/API/auth/watchlist/feedback/mobile proof. Stage 19 must not start until Stage 18 passes and receives owner approval.

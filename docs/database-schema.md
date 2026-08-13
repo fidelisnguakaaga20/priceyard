@@ -350,3 +350,7 @@ Stage 16 rules:
 
 ## Stage 17 — CSV export schema use
 Stage 17 requires no migration and creates no report-storage table. The CSV export reads approved `price_updates` and their existing commodity, market, market-signal, and quality-signal relationships. Repository Alembic head remains `0005_stage13_watchlists`.
+
+## Stage 18 — No database change
+
+The public/user React frontend introduces no database table, column, constraint, relationship, or migration. Alembic head remains `0005_stage13_watchlists`.
