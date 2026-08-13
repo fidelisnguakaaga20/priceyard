@@ -1,7 +1,7 @@
 # PriceYard Project Status
 
 ## Current stage
-Stage 17 — Simple CSV Report Export — IN PROGRESS; Stage 16 passed owner Supabase-backed verification and was approved by the owner instruction to continue to the next stage.
+Stage 18 — Public and User Frontend MVP — BUILT/IN PROGRESS. The first owner production-build attempt exposed TypeScript TS5096 and the first fix added `noEmit: true`. The owner retest then exposed TS2580 because `vite.config.ts` referenced Node `process.cwd()` without Node type definitions. The owner approved the smallest configuration-only fix. Stage 19 remains blocked until Stage 18 owner proof passes.
 
 ## Stage 0 disposition
 Owner supplied validation metrics: 65 reached, 14 replies, 5 willing to pay, positive usefulness/trust/continuation signals, sample market records and two source types.
@@ -235,3 +235,7 @@ Stage 18 — Public and User Frontend MVP is BUILT/IN PROGRESS. Stage 19 — Adm
 
 ## Stage 18 owner build attempt / fix — 2026-08-13
 Owner dependency installation completed, but the production build stopped on TypeScript TS5096 in `frontend/tsconfig.node.json`. The defect was isolated to compiler configuration: `allowImportingTsExtensions` required `noEmit` or `emitDeclarationOnly`. The smallest fix added `noEmit: true`; no dependency, API, database, backend, or Stage 19 change was made. Assistant configuration validation and TS/TSX syntax checks pass. Owner full Stage 18 smoke retest and manual browser interactions are still required before Stage 18 can be RETESTED/PASS. Stage 19 remains blocked. npm reported 5 dependency vulnerabilities (1 moderate, 4 high); no force-upgrade was applied and this remains tracked for the approved security review.
+
+
+## Stage 18 second owner build failure / approved fix — 2026-08-13
+The owner retest passed dependency installation and progressed beyond TS5096, then production build stopped on TypeScript TS2580 because `frontend/vite.config.ts` used `process.cwd()` without Node type definitions. Under Change Control, the owner explicitly approved the smallest fix. `loadEnv(mode, process.cwd(), "")` was changed to `loadEnv(mode, ".", "")`, avoiding a new `@types/node` dependency. No backend, API, database, access rule, deferred feature, or Stage 19 work was changed. Full owner Stage 18 smoke retest and manual browser checks remain required before Stage 18 can be RETESTED/PASS.

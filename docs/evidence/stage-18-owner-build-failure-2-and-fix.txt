@@ -1,0 +1,20 @@
+Stage 18 owner production-build retest — second failure and approved fix
+Date: 2026-08-13
+
+Owner-observed failure:
+- npm install completed.
+- npm reported 5 vulnerabilities (1 moderate, 4 high); force-upgrade was not applied.
+- npm run build progressed past the prior TS5096 error.
+- TypeScript then stopped with TS2580 in frontend/vite.config.ts because `process.cwd()` referenced Node `process` without Node type definitions.
+
+Change Control:
+- Owner approved the smallest fix.
+- Changed only frontend/vite.config.ts loadEnv root from `process.cwd()` to `.`.
+- No @types/node dependency was added.
+- No database, backend API, access rule, or Stage 19 feature changed.
+
+Status:
+- Source fix applied.
+- Full production build remains owner-retest evidence and is not claimed PASS here.
+- Stage 18 remains BUILT/IN PROGRESS.
+- Stage 19 remains blocked.
