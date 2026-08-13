@@ -1,0 +1,22 @@
+Stage 18 owner verification attempt — 2026-08-13
+
+OWNER RESULT BEFORE FIX
+- npm install: PASS (70 packages added)
+- npm reported: 5 vulnerabilities (1 moderate, 4 high). No automatic force upgrade was applied; dependency/security review remains for the approved security stage.
+- npm run build: FAIL
+- TypeScript error: TS5096 — allowImportingTsExtensions requires noEmit or emitDeclarationOnly.
+- Stage 18 owner smoke stopped before runtime/browser checks.
+
+SMALLEST FIX APPLIED
+- File: frontend/tsconfig.node.json
+- Added compilerOptions.noEmit = true.
+- No dependency change.
+- No backend/API/database/schema change.
+- No Stage 19 feature added.
+
+ASSISTANT RETEST
+- `tsc -p frontend/tsconfig.node.json --showConfig`: PASS (configuration accepted; no TS5096)
+- Stage 18 TS/TSX syntax transpilation check: PASS
+
+OWNER RETEST STILL REQUIRED
+Run docs/evidence/stage-18-owner-smoke.py in the fixed package. Stage 18 remains IN PROGRESS until the full production build, API proxy, browser routes, mobile render, and required manual interactions pass.

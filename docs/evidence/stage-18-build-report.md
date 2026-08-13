@@ -36,3 +36,12 @@ Owner proof required:
 - feedback submit
 - full-access intelligence display for trial/active paid/admin
 - 390x844 mobile render + visual usability check
+
+
+## Owner build attempt and configuration fix — 2026-08-13
+- Owner `npm install`: PASS.
+- Owner `npm run build`: FAIL with TypeScript TS5096 because `frontend/tsconfig.node.json` enabled `allowImportingTsExtensions` without `noEmit` or `emitDeclarationOnly`.
+- Smallest fix: added `"noEmit": true` to `frontend/tsconfig.node.json`; no dependency, backend, API, database, or feature change.
+- Assistant config retest via `tsc -p frontend/tsconfig.node.json --showConfig`: PASS; Stage 18 TS/TSX syntax check remains PASS.
+- Owner full Stage 18 smoke retest is still required; Stage 19 remains blocked.
+- Owner npm also reported 5 dependency vulnerabilities (1 moderate, 4 high). No `npm audit fix --force` was run because that could change approved dependency versions; this is tracked for security review rather than silently changing dependencies.

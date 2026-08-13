@@ -231,3 +231,7 @@ Stage 17 — Simple CSV Report Export is RETESTED/PASS and owner-approved. Stage
 
 ## Next gate
 Stage 18 — Public and User Frontend MVP is BUILT/IN PROGRESS. Stage 19 — Admin Frontend MVP must not start until the owner sends the Stage 18 build/browser proof and explicitly approves Stage 18.
+
+
+## Stage 18 owner build attempt / fix — 2026-08-13
+Owner dependency installation completed, but the production build stopped on TypeScript TS5096 in `frontend/tsconfig.node.json`. The defect was isolated to compiler configuration: `allowImportingTsExtensions` required `noEmit` or `emitDeclarationOnly`. The smallest fix added `noEmit: true`; no dependency, API, database, backend, or Stage 19 change was made. Assistant configuration validation and TS/TSX syntax checks pass. Owner full Stage 18 smoke retest and manual browser interactions are still required before Stage 18 can be RETESTED/PASS. Stage 19 remains blocked. npm reported 5 dependency vulnerabilities (1 moderate, 4 high); no force-upgrade was applied and this remains tracked for the approved security review.
