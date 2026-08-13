@@ -1,0 +1,14 @@
+import { FormEvent, useState } from "react";
+import { apiFetch } from "../../services/api";
+import type { Commodity } from "../../types/api";
+import { AdminStatus, errorText, useAdminList } from "./adminUtils";
+
+export function AdminCommoditiesPage() {
+  const { data, loading, error: loadError, reload, token } = useAdminList<Commodity>("/commodities");
+  const [editing, setEditing] = useState<Commodity | null>(null); const [error, setError] = useState(""); const [message, setMessage] = useState("");
+  async function submit(e: FormEvent<HTMLFormElement>) { e.preventDefault(); if (!token) return; const f = new FormData(e.currentTarget); const payload = { name: String(f.get("name")), description: String(f.get("description") || "") || null, is_active: f.get("is_active") === "on" }; try { if (editing) await apiFetch(`/commodities/${editing.id}`, { method: "PATCH", body: JSON.stringify(payload) }, token); else await apiFetch("/commodities", { method: "POST", body: JSON.stringify(payload) }, token); setEditing(null); e.currentTarget.reset(); setMessage(editing ? "Commodity updated." : "Commodity created."); setError(""); await reload(); } catch (err) { setError(errorText(err)); setMessage(""); } }
+  async function remove(id: number) { if (!token || !confirm("Delete this commodity?")) return; try { await apiFetch(`/commodities/${id}`, { method: "DELETE" }, token); setMessage("Commodity deleted."); await reload(); } catch (err) { setError(errorText(err)); } }
+  return <div><h2>Commodities</h2><AdminStatus error={error || loadError} success={message} /><form key={editing?.id ?? "new"} className="form-stack card admin-form" onSubmit={submit}><label>Name<input name="name" defaultValue={editing?.name || ""} required /></label><label>Description<textarea name="description" defaultValue={editing?.description || ""} /></label><label className="check-row"><input type="checkbox" name="is_active" defaultChecked={editing?.is_active ?? true} /> Active</label><div className="button-row"><button className="button" type="submit">{editing ? "Save commodity" : "Create commodity"}</button>{editing && <button className="button button-secondary" type="button" onClick={() => setEditing(null)}>Cancel</button>}</div></form>
+    {loading ? <div className="status-box">Loading…</div> : <div className="admin-card-list">{data.map((item) => <article className="card" key={item.id}><div className="card-row"><div><h3>{item.name}</h3><p>{item.description || "No description"}</p><small>{item.is_active ? "Active" : "Inactive"}</small></div><div className="button-row"><button className="button button-small button-secondary" onClick={() => setEditing(item)}>Edit</button><button className="button button-small button-danger" onClick={() => void remove(item.id)}>Delete</button></div></div></article>)}</div>}
+  </div>;
+}

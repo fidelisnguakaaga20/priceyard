@@ -44,3 +44,30 @@ button { cursor: pointer; }
 .site-footer { width: 100%; max-width: 100%; border-top: 1px solid #dfe5db; background: #edf0e9; min-height: 100px; padding: 28px max(20px, calc((100% - 1180px)/2)); display: flex; justify-content: space-between; gap: 20px; color: #657267; font-size: .84rem; overflow-wrap: anywhere; }
 @media (max-width: 900px) { .hero { grid-template-columns: 1fr; min-height: auto; gap: 25px; }.card-grid, .watchlist-grid, .market-day-grid { grid-template-columns: repeat(2,1fr); }.filter-bar { grid-template-columns: repeat(2, 1fr); }.shortcut-grid { grid-template-columns: repeat(2,1fr); }.menu-button { display: block; }.main-nav { display: none; position: absolute; top: 72px; left: 20px; right: 20px; padding: 12px; background: white; border: 1px solid #dfe5db; border-radius: 12px; box-shadow: 0 18px 40px rgba(20,40,25,.12); flex-direction: column; align-items: stretch; }.main-nav.open { display: flex; }.main-nav a, .nav-button { text-align: left; }.brand small { display: none; } }
 @media (max-width: 640px) { html, body, #root, .app-shell, main, .site-header { width: 100%; max-width: 100%; overflow-x: hidden; }.page, .narrow { width: 100%; max-width: 100%; padding-inline: 12px; margin-inline: 0; }.header-inner { width: 100%; max-width: 100%; padding-inline: 12px; gap: 12px; }.brand { max-width: calc(100% - 76px); }.brand-mark { flex: 0 0 40px; }.menu-button { flex: 0 0 auto; }.main-nav { left: 12px; right: 12px; max-width: calc(100% - 24px); }.access-strip { justify-content: space-between; padding-inline: 12px; gap: 8px 12px; }.page-title, .filter-bar, .filter-bar > *, .filter-bar label, .card-grid, .detail-grid, .intelligence-grid, .dashboard-grid, .watchlist-grid, .market-day-grid, .card { min-width: 0; max-width: 100%; }.page-title p, .card p, .card h2, .card h3, .site-footer > div { overflow-wrap: anywhere; word-break: normal; }.filter-bar select, .filter-bar input, .form-stack select, .form-stack input, .form-stack textarea { min-width: 0; max-width: 100%; }.hero { padding-block: 46px; }.hero h1 { font-size: 3.25rem; }.card-grid, .detail-grid, .intelligence-grid, .dashboard-grid, .watchlist-grid, .market-day-grid, .three-column, .form-grid { grid-template-columns: minmax(0, 1fr); }.filter-bar { grid-template-columns: minmax(0, 1fr); }.filter-actions { width: 100%; min-width: 0; }.filter-actions .button { flex: 1; min-width: 0; }.section-heading { align-items: flex-start; flex-direction: column; }.data-list { grid-template-columns: minmax(0, 1fr); }.guidance { grid-template-columns: minmax(0, 1fr); }.shortcut-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }.site-footer { flex-direction: column; padding-inline: 12px; }.mini-grid { grid-template-columns: minmax(0, 1fr); }.auth-card { padding: 22px; }.page-section { padding-top: 38px; } }
+
+/* Stage 19 admin frontend */
+.admin-page { width: min(1320px, calc(100% - 40px)); }
+.admin-nav { display: flex; flex-wrap: wrap; gap: 7px; padding: 12px; margin-bottom: 24px; border: 1px solid #dfe5db; border-radius: 14px; background: white; }
+.admin-nav a { text-decoration: none; padding: 8px 11px; border-radius: 8px; color: #536158; font-size: .84rem; font-weight: 700; }
+.admin-nav a:hover, .admin-nav a.active { background: #173d28; color: white; }
+.admin-content > div > h2 { font-size: 2rem; margin: 5px 0 8px; }
+.admin-form { margin: 18px 0 24px; }
+.admin-form h3 { margin: 0; }
+.check-row { display: flex !important; grid-template-columns: none !important; align-items: center; gap: 8px !important; }
+.check-row input { width: auto !important; }
+.admin-card-list { display: grid; gap: 12px; margin-top: 18px; }
+.admin-card-list .card { min-width: 0; }
+.admin-action-panel { display: flex; align-items: end; justify-content: space-between; gap: 16px; padding: 16px; margin: 18px 0; border: 1px solid #dfe5db; border-radius: 14px; background: #fdfefb; }
+.admin-action-panel label { display: grid; gap: 6px; min-width: 180px; font-size: .82rem; font-weight: 750; color: #435047; }
+.admin-action-panel input, .admin-inline-filter select, .admin-table select { border: 1px solid #cbd5c9; border-radius: 8px; padding: 9px 10px; background: #fcfdfb; }
+.admin-metric-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin: 18px 0 28px; }
+.admin-metric { min-width: 0; border: 1px solid #dfe5db; background: white; border-radius: 14px; padding: 18px; }
+.admin-metric span { display: block; font-size: .76rem; color: #718077; text-transform: uppercase; letter-spacing: .06em; font-weight: 800; }
+.admin-metric strong { display: block; margin-top: 8px; font-size: 1.8rem; color: #173d28; }
+.admin-inline-filter { display: inline-grid; gap: 6px; margin: 0 0 16px; font-size: .82rem; font-weight: 750; }
+.admin-table { min-width: 860px; }
+.admin-table tr[onClick] { cursor: pointer; }
+.admin-table tr[onClick]:hover { background: #f5f7f2; }
+.admin-table select { min-width: 130px; }
+@media (max-width: 900px) { .admin-metric-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }.admin-action-panel { align-items: stretch; flex-direction: column; }.admin-action-panel label { min-width: 0; width: 100%; } }
+@media (max-width: 640px) { .admin-page { width: 100%; max-width: 100%; padding-inline: 12px; }.admin-nav { flex-wrap: nowrap; overflow-x: auto; max-width: 100%; }.admin-nav a { flex: 0 0 auto; }.admin-metric-grid { grid-template-columns: minmax(0,1fr) minmax(0,1fr); }.admin-content, .admin-content > div, .admin-form, .admin-action-panel { min-width: 0; max-width: 100%; }.admin-action-panel .button-row { width: 100%; }.admin-action-panel .button { flex: 1; min-width: 120px; }.admin-table { min-width: 760px; } }

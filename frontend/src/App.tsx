@@ -1,4 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import { AdminLayout } from "./components/AdminLayout";
+import { AdminRoute } from "./components/AdminRoute";
 import { Layout } from "./components/Layout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { CommodityDetailPage } from "./pages/CommodityDetailPage";
@@ -12,6 +14,18 @@ import { PriceHistoryPage } from "./pages/PriceHistoryPage";
 import { PricesPage } from "./pages/PricesPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { WatchlistPage } from "./pages/WatchlistPage";
+import { AdminAuditLogsPage } from "./pages/admin/AdminAuditLogsPage";
+import { AdminCommoditiesPage } from "./pages/admin/AdminCommoditiesPage";
+import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage";
+import { AdminExportPage } from "./pages/admin/AdminExportPage";
+import { AdminFAQPage } from "./pages/admin/AdminFAQPage";
+import { AdminFeedbackPage } from "./pages/admin/AdminFeedbackPage";
+import { AdminBuyingZonesPage, AdminCostBreakdownPage, AdminSellWatchPage, AdminStoragePage } from "./pages/admin/AdminIntelligencePages";
+import { AdminMarketsPage } from "./pages/admin/AdminMarketsPage";
+import { AdminPriceUpdatesPage } from "./pages/admin/AdminPriceUpdatesPage";
+import { AdminMarketSignalsPage, AdminQualitySignalsPage } from "./pages/admin/AdminSignalsPage";
+import { AdminSubscriptionsPage } from "./pages/admin/AdminSubscriptionsPage";
+import { AdminUsersPage } from "./pages/admin/AdminUsersPage";
 
 export default function App() {
   return (
@@ -28,6 +42,24 @@ export default function App() {
         <Route path="dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
         <Route path="watchlist" element={<ProtectedRoute><WatchlistPage /></ProtectedRoute>} />
         <Route path="feedback" element={<ProtectedRoute><FeedbackPage /></ProtectedRoute>} />
+        <Route path="admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+          <Route index element={<AdminDashboardPage />} />
+          <Route path="users" element={<AdminUsersPage />} />
+          <Route path="commodities" element={<AdminCommoditiesPage />} />
+          <Route path="markets" element={<AdminMarketsPage />} />
+          <Route path="prices" element={<AdminPriceUpdatesPage />} />
+          <Route path="market-signals" element={<AdminMarketSignalsPage />} />
+          <Route path="quality-signals" element={<AdminQualitySignalsPage />} />
+          <Route path="buying-zones" element={<AdminBuyingZonesPage />} />
+          <Route path="sell-watch" element={<AdminSellWatchPage />} />
+          <Route path="storage" element={<AdminStoragePage />} />
+          <Route path="costs" element={<AdminCostBreakdownPage />} />
+          <Route path="faq" element={<AdminFAQPage />} />
+          <Route path="subscriptions" element={<AdminSubscriptionsPage />} />
+          <Route path="feedback" element={<AdminFeedbackPage />} />
+          <Route path="audit" element={<AdminAuditLogsPage />} />
+          <Route path="export" element={<AdminExportPage />} />
+        </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

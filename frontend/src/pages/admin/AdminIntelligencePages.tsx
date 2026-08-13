@@ -1,0 +1,48 @@
+import { FormEvent, useState } from "react";
+import { apiFetch } from "../../services/api";
+import type { BuyingZone, CostBreakdown, SellWatchWindow, StorageSuitability } from "../../types/api";
+import { AdminStatus, errorText, optionalNumber, useAdminList } from "./adminUtils";
+
+export function AdminBuyingZonesPage() {
+  const r = useAdminList<BuyingZone>("/buying-zones");
+  const [error, setError] = useState(""); const [message, setMessage] = useState("");
+  async function save(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault(); if (!r.token) return; const f = new FormData(e.currentTarget); const id = String(f.get("id") || "").trim();
+    const payload = { commodity_id: Number(f.get("commodity_id")), market_id: Number(f.get("market_id")), price_low: Number(f.get("price_low")), price_high: Number(f.get("price_high")), reason: String(f.get("reason")), valid_from: String(f.get("valid_from") || "") || null, valid_to: String(f.get("valid_to") || "") || null, confidence: String(f.get("confidence")) };
+    try { await apiFetch(id ? `/buying-zones/${id}` : "/buying-zones", { method: id ? "PATCH" : "POST", body: JSON.stringify(payload) }, r.token); setMessage(id ? "Buying zone updated." : "Buying zone created."); setError(""); await r.reload(); } catch (err) { setError(errorText(err)); }
+  }
+  return <div><h2>Buying zones</h2><AdminStatus error={error || r.error} success={message} /><form className="form-stack card admin-form" onSubmit={save}><div className="form-grid"><label>ID to edit<input name="id" type="number" min="1" /></label><label>Commodity ID<input name="commodity_id" type="number" min="1" required /></label><label>Market ID<input name="market_id" type="number" min="1" required /></label><label>Low<input name="price_low" type="number" min="0" step="0.01" required /></label><label>High<input name="price_high" type="number" min="0" step="0.01" required /></label><label>Confidence<input name="confidence" required /></label><label>Valid from<input name="valid_from" type="date" /></label><label>Valid to<input name="valid_to" type="date" /></label></div><label>Reason<textarea name="reason" required /></label><button className="button">Save buying zone</button></form>{r.loading ? <div className="status-box">Loading…</div> : <div className="admin-card-list">{r.data.map((x) => <article className="card" key={x.id}><span className="eyebrow">#{x.id}</span><h3>{x.price_low} – {x.price_high}</h3><p>{x.reason}</p><small>Confidence: {x.confidence}</small></article>)}</div>}</div>;
+}
+
+export function AdminSellWatchPage() {
+  const r = useAdminList<SellWatchWindow>("/sell-watch-windows");
+  const [error, setError] = useState(""); const [message, setMessage] = useState("");
+  async function save(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault(); if (!r.token) return; const f = new FormData(e.currentTarget); const id = String(f.get("id") || "").trim();
+    const payload = { commodity_id: Number(f.get("commodity_id")), market_id: Number(f.get("market_id")), start_period: String(f.get("start_period")), end_period: String(f.get("end_period") || "") || null, observation: String(f.get("observation")), confidence: String(f.get("confidence")) };
+    try { await apiFetch(id ? `/sell-watch-windows/${id}` : "/sell-watch-windows", { method: id ? "PATCH" : "POST", body: JSON.stringify(payload) }, r.token); setMessage(id ? "Sell-watch window updated." : "Sell-watch window created."); setError(""); await r.reload(); } catch (err) { setError(errorText(err)); }
+  }
+  return <div><h2>Sell-watch windows</h2><AdminStatus error={error || r.error} success={message} /><form className="form-stack card admin-form" onSubmit={save}><div className="form-grid"><label>ID to edit<input name="id" type="number" min="1" /></label><label>Commodity ID<input name="commodity_id" type="number" min="1" required /></label><label>Market ID<input name="market_id" type="number" min="1" required /></label><label>Start period<input name="start_period" required /></label><label>End period<input name="end_period" /></label><label>Confidence<input name="confidence" required /></label></div><label>Observation<textarea name="observation" required /></label><button className="button">Save sell-watch window</button></form>{r.loading ? <div className="status-box">Loading…</div> : <div className="admin-card-list">{r.data.map((x) => <article className="card" key={x.id}><span className="eyebrow">#{x.id}</span><h3>{x.start_period}{x.end_period ? ` – ${x.end_period}` : ""}</h3><p>{x.observation}</p><small>{x.confidence}</small></article>)}</div>}</div>;
+}
+
+export function AdminStoragePage() {
+  const r = useAdminList<StorageSuitability>("/storage-suitability");
+  const [error, setError] = useState(""); const [message, setMessage] = useState("");
+  async function save(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault(); if (!r.token) return; const f = new FormData(e.currentTarget); const id = String(f.get("id") || "").trim();
+    const payload = { commodity_id: Number(f.get("commodity_id")), market_id: Number(f.get("market_id")), price_update_id: optionalNumber(f.get("price_update_id")), suitability_status: String(f.get("suitability_status")), import_risk: String(f.get("import_risk") || "") || null, oversupply_risk: String(f.get("oversupply_risk") || "") || null, spoilage_risk: String(f.get("spoilage_risk") || "") || null, buyer_availability: String(f.get("buyer_availability") || "") || null, quality_storage_notes: String(f.get("quality_storage_notes") || "") || null, summary: String(f.get("summary") || "") || null };
+    try { await apiFetch(id ? `/storage-suitability/${id}` : "/storage-suitability", { method: id ? "PATCH" : "POST", body: JSON.stringify(payload) }, r.token); setMessage(id ? "Storage suitability updated." : "Storage suitability created."); setError(""); await r.reload(); } catch (err) { setError(errorText(err)); }
+  }
+  return <div><h2>Storage suitability</h2><AdminStatus error={error || r.error} success={message} /><form className="form-stack card admin-form" onSubmit={save}><div className="form-grid"><label>ID to edit<input name="id" type="number" min="1" /></label><label>Commodity ID<input name="commodity_id" type="number" min="1" required /></label><label>Market ID<input name="market_id" type="number" min="1" required /></label><label>Price update ID<input name="price_update_id" type="number" min="1" /></label><label>Status<select name="suitability_status">{["good", "watch", "risky", "not_recommended"].map((x) => <option key={x}>{x}</option>)}</select></label><label>Import risk<input name="import_risk" /></label><label>Oversupply risk<input name="oversupply_risk" /></label><label>Spoilage risk<input name="spoilage_risk" /></label><label>Buyer availability<input name="buyer_availability" /></label></div><label>Quality/storage notes<textarea name="quality_storage_notes" /></label><label>Summary<textarea name="summary" /></label><button className="button">Save storage suitability</button></form>{r.loading ? <div className="status-box">Loading…</div> : <div className="admin-card-list">{r.data.map((x) => <article className="card" key={x.id}><span className="eyebrow">#{x.id}</span><h3>{x.suitability_status}</h3><p>{x.summary || "No summary"}</p><small>{x.spoilage_risk || "No spoilage risk note"}</small></article>)}</div>}</div>;
+}
+
+export function AdminCostBreakdownPage() {
+  const r = useAdminList<CostBreakdown>("/cost-breakdowns"); const [error, setError] = useState(""); const [message, setMessage] = useState("");
+  async function save(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault(); if (!r.token) return; const f = new FormData(e.currentTarget); const id = String(f.get("id") || "").trim();
+    const payload = { price_update_id: Number(f.get("price_update_id")), transport: Number(f.get("transport") || 0), warehouse: Number(f.get("warehouse") || 0), security: Number(f.get("security") || 0), market_charges: Number(f.get("market_charges") || 0), loading_offloading: Number(f.get("loading_offloading") || 0), other_costs: Number(f.get("other_costs") || 0), purchase_price_reference: Number(f.get("purchase_price_reference")) };
+    try { await apiFetch(id ? `/cost-breakdowns/${id}` : "/cost-breakdowns", { method: id ? "PATCH" : "POST", body: JSON.stringify(payload) }, r.token); setMessage(id ? "Cost breakdown updated." : "Cost breakdown created."); setError(""); await r.reload(); } catch (err) { setError(errorText(err)); }
+  }
+  const costs = [["transport", "Transport"], ["warehouse", "Warehouse"], ["security", "Security"], ["market_charges", "Market charges"], ["loading_offloading", "Loading/offloading"], ["other_costs", "Other costs"], ["purchase_price_reference", "Purchase price reference"]] as const;
+  return <div><h2>Cost breakdown</h2><AdminStatus error={error || r.error} success={message} /><form className="form-stack card admin-form" onSubmit={save}><div className="form-grid"><label>ID to edit<input name="id" type="number" min="1" /></label><label>Price update ID<input name="price_update_id" type="number" min="1" required /></label>{costs.map(([name, label]) => <label key={name}>{label}<input name={name} type="number" min="0" step="0.01" defaultValue="0" required={name === "purchase_price_reference"} /></label>)}</div><button className="button">Save cost breakdown</button></form>{r.loading ? <div className="status-box">Loading…</div> : <div className="admin-card-list">{r.data.map((x) => <article className="card" key={x.id}><span className="eyebrow">#{x.id} · Price update #{x.price_update_id}</span><h3>Total landing/storage: {x.total_estimated_landing_storage_cost}</h3><p>Additional cost: {x.total_additional_cost}</p></article>)}</div>}</div>;
+}

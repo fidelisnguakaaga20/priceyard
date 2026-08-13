@@ -554,3 +554,9 @@ Stage 18 adds no new backend API contract. The React + TypeScript public/user fr
 Local Vite development uses `/api/*` as a proxy to `http://127.0.0.1:8000`. Deployment will use `VITE_API_URL` and the approved production CORS/origin configuration in Stages 21–22.
 
 Private `source_1` / `source_2` values are not consumed by the Stage 18 frontend. Admin-management API consumption is deferred to Stage 19.
+
+## Stage 19 — Admin Frontend Integration
+
+Stage 19 adds no backend API endpoint and does not change any approved API contract. The React admin frontend reuses the existing authenticated/admin endpoints from Stages 6–17 for users, commodities, markets, price updates, signals, buying zones, sell-watch windows, storage suitability, costs, FAQ, subscriptions, feedback, audit logs and CSV export.
+
+Backend role/subscription authorization remains authoritative; frontend route hiding is presentation only.

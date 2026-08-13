@@ -1,0 +1,1 @@
+Stage 19 adds no database migration. Existing Alembic head remains 0005_stage13_watchlists. No backend model/schema/API file was changed in Stage 19.

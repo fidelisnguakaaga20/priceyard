@@ -177,3 +177,19 @@ export type WatchlistItem = {
   created_at: string;
   updated_at: string;
 };
+
+export type PriceUpdateAdmin = PriceUpdate & {
+  source_1: string | null;
+  source_2: string | null;
+  created_by: number;
+  approved_by: number | null;
+};
+
+export type FeedbackItem = {
+  id: number; user_id: number; rating: number; comment: string | null; price_usefulness: string | null; price_accuracy: string | null;
+  missing_market_request: string | null; missing_commodity_request: string | null; complaint_or_suggestion: string | null;
+  continue_using_feedback: boolean | null; willingness_to_pay_feedback: boolean | null; created_at: string; updated_at: string;
+};
+
+export type FeedbackSummary = { count: number; average_rating: number | null };
+export type AuditLog = { id: number; user_id: number; action: string; table_name: string; record_id: number | null; old_value: unknown; new_value: unknown; created_at: string };

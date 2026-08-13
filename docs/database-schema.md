@@ -354,3 +354,7 @@ Stage 17 requires no migration and creates no report-storage table. The CSV expo
 ## Stage 18 — No database change
 
 The public/user React frontend introduces no database table, column, constraint, relationship, or migration. Alembic head remains `0005_stage13_watchlists`.
+
+## Stage 19 — No Database Change
+
+Stage 19 is frontend-only. No table, column, relationship, constraint or migration is added or changed. Alembic head remains `0005_stage13_watchlists`.

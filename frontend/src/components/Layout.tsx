@@ -26,6 +26,7 @@ export function Layout() {
             {navItems.map(([to, label]) => <NavLink key={to} to={to} onClick={() => setOpen(false)}>{label}</NavLink>)}
             {user && <NavLink to="/watchlist" onClick={() => setOpen(false)}>Watchlist</NavLink>}
             {user && <NavLink to="/feedback" onClick={() => setOpen(false)}>Feedback</NavLink>}
+            {user?.role === "admin" && <NavLink to="/admin" onClick={() => setOpen(false)}>Admin</NavLink>}
             {user ? (
               <>
                 <NavLink to="/dashboard" onClick={() => setOpen(false)}>Dashboard</NavLink>
