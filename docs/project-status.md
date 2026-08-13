@@ -1,7 +1,7 @@
 # PriceYard Project Status
 
 ## Current stage
-Stage 14 — FAQ — AUTHORIZED/IN PROGRESS after Stage 13 owner verification and the owner instruction to continue.
+Stage 14 — FAQ — RETESTED/PASS after owner Supabase-backed runtime verification; awaiting owner approval before Stage 15.
 
 ## Stage 0 disposition
 Owner supplied validation metrics: 65 reached, 14 replies, 5 willing to pay, positive usefulness/trust/continuation signals, sample market records and two source types.
@@ -132,7 +132,7 @@ RETESTED/PASS. Owner applied Alembic revision `0005_stage13_watchlists` against 
 - Internal FastAPI/API flow against temporary SQLite with a temporary bcrypt compatibility stub: PASS; this is build evidence only and not owner/runtime proof.
 
 ## Stage 14 owner verification
-PENDING. Owner must run `docs/evidence/stage-14-owner-smoke.py` against the configured Supabase PostgreSQL environment.
+RETESTED/PASS. Owner confirmed Alembic remains at `0005_stage13_watchlists` because Stage 14 requires no migration, then ran `docs/evidence/stage-14-owner-smoke.py` against the configured Supabase PostgreSQL environment and received `STAGE 14 OWNER SMOKE: PASS`. Create/edit/publish/hide/delete, public visibility, unauthorized-management blocking, content-safety validation, disclaimer preservation, and FAQ relationships all passed.
 
 ## Outstanding project issue
 Stage 0 independent-source/duration evidence remains unresolved and must be reconciled before Stage 24 final acceptance.
@@ -141,4 +141,4 @@ Stage 0 independent-source/duration evidence remains unresolved and must be reco
 None.
 
 ## Next gate
-Stage 14 — FAQ is built and awaits owner Supabase-backed runtime proof. Do not start Stage 15 until Stage 14 passes and the owner approves.
+Stage 14 — FAQ is RETESTED/PASS and awaits owner approval. Do not start Stage 15 until the owner explicitly approves.

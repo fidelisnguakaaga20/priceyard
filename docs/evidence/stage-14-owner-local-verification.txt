@@ -1,0 +1,31 @@
+Stage 14 Owner Local Verification
+Date: 2026-08-13
+Environment: Owner Windows/Git Bash + configured Supabase PostgreSQL
+
+Commands run from backend/:
+- python -m pip install -r requirements-dev.txt
+- python -m alembic current
+- python ../docs/evidence/stage-14-owner-smoke.py
+
+Observed migration head:
+0005_stage13_watchlists (head)
+
+Observed result:
+STAGE 14 OWNER SMOKE: PASS
+
+Verified by owner runtime output:
+- Existing faq_items table and approved fields exist.
+- Public FAQ list is accessible.
+- Non-admin FAQ create/edit/publish/hide/delete are blocked.
+- New FAQ starts hidden and cannot bypass publish flow.
+- Guaranteed-profit FAQ content is rejected.
+- Private account and phone instructions are rejected.
+- Admin create/edit/publish/hide/delete work.
+- Hidden FAQ is not publicly visible.
+- Published FAQ is publicly visible and appears in public list.
+- Public FAQ does not expose creator ID or publication-control fields.
+- Approved disclaimer content is accepted and preserved.
+- SQLAlchemy FAQ relationship works.
+
+Final owner runtime verdict: RETESTED/PASS
+Owner approval for Stage 15: NOT YET GIVEN.
