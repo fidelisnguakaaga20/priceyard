@@ -1,7 +1,7 @@
 # PriceYard Project Status
 
 ## Current stage
-Stage 15 — User Feedback and 1–5 Star Rating — BUILT/IN PROGRESS; awaiting owner Supabase-backed runtime verification before Stage 16.
+Stage 16 — Audit Logs — IN PROGRESS; Stage 15 has passed owner Supabase-backed verification and was approved by the owner instruction to continue to the next stage.
 
 ## Stage 0 disposition
 Owner supplied validation metrics: 65 reached, 14 replies, 5 willing to pay, positive usefulness/trust/continuation signals, sample market records and two source types.
@@ -159,5 +159,8 @@ None.
 - Static scope review: PASS.
 - Real Supabase owner runtime proof is still required.
 
+## Stage 15 owner verification
+RETESTED/PASS. Owner confirmed Alembic remains at `0005_stage13_watchlists` because Stage 15 requires no migration, then ran `docs/evidence/stage-15-owner-smoke.py` against the configured Supabase PostgreSQL environment and received `STAGE 15 OWNER SMOKE: PASS`. Rating boundaries, authenticated user linkage, private-feedback protection, admin listing/filter/detail/summary/delete, complaint/suggestion preservation, and SQLAlchemy relationship checks all passed. The owner explicitly instructed that if the output was okay, continue to the next stage, which approves Stage 15 and Stage 16 start.
+
 ## Next gate
-Stage 15 — User Feedback and 1–5 Star Rating is BUILT/IN PROGRESS and awaits owner Supabase-backed runtime verification. Do not start Stage 16 until Stage 15 passes and the owner explicitly approves.
+Stage 16 — Audit Logs is IN PROGRESS. Do not start Stage 17 until Stage 16 is implemented, owner-tested, proven, documented, and explicitly approved.
