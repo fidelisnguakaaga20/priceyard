@@ -20,6 +20,13 @@ FRONTEND = ROOT / "frontend"
 if str(BACKEND) not in sys.path:
     sys.path.insert(0, str(BACKEND))
 
+# app.config intentionally reads `.env` relative to the current working
+# directory. Owner smoke tests are launched from the project root, while the
+# approved runtime environment file lives at backend/.env. Enter the backend
+# directory before importing app modules so the real owner configuration is
+# loaded exactly as it is when Uvicorn is started from backend/.
+os.chdir(BACKEND)
+
 from fastapi.testclient import TestClient
 from sqlalchemy import select
 from app.database import get_session_factory

@@ -275,3 +275,6 @@ Stage 18 is RETESTED/PASS and owner-approved. Stage 19 — Admin Frontend MVP is
 
 ## Stage 19 next gate
 Run `docs/evidence/stage-19-owner-smoke.py` in the owner environment, then visually confirm the Admin dashboard and at least one management page. Stage 20 remains blocked until owner approval.
+
+## Stage 19 owner smoke environment-path failure / smallest fix — 2026-08-13
+The first owner Stage 19 smoke attempt stopped before application verification with `DATABASE_URL is required for database operations`. The owner had correctly copied `backend/.env`; the helper was launched from the project root while application settings resolve `.env` relative to the working directory. The smallest fix changes only `docs/evidence/stage-19-owner-smoke.py` to enter `backend/` before importing application modules. Helper compilation, Stage 19 static scope checks, and a temporary non-secret backend `.env` resolution check pass. No frontend feature, backend business logic, API, database schema, migration, dependency, or Stage 20 work changed. Owner Stage 19 smoke retest is still required.
