@@ -14,6 +14,7 @@ from app.schemas.price_update_schema import (
     PriceUpdateUpdate,
     TimeOfDay,
 )
+from app.services.audit_service import create_audit_log, snapshot_model
 from app.services.price_update_service import (
     approve_price_update,
     create_price_update,
@@ -92,7 +93,12 @@ def add_price_update(
     db: Session = Depends(get_db),
     current_admin: User = Depends(require_roles("admin")),
 ) -> PriceUpdate:
-    return create_price_update(db, payload, current_admin)
+    item = create_price_update(db, payload, current_admin)
+    create_audit_log(
+        db, actor=current_admin, action="price_update.create", table_name="price_updates",
+        record_id=item.id, new_value=snapshot_model(item),
+    )
+    return item
 
 
 @router.patch("/{price_update_id}", response_model=PriceUpdateAdminResponse)
@@ -100,9 +106,16 @@ def edit_price_update(
     price_update_id: int,
     payload: PriceUpdateUpdate,
     db: Session = Depends(get_db),
-    _: User = Depends(require_roles("admin")),
+    current_admin: User = Depends(require_roles("admin")),
 ) -> PriceUpdate:
-    return update_price_update(db, get_price_update_for_admin(db, price_update_id), payload)
+    item = get_price_update_for_admin(db, price_update_id)
+    old_value = snapshot_model(item)
+    item = update_price_update(db, item, payload)
+    create_audit_log(
+        db, actor=current_admin, action="price_update.edit", table_name="price_updates",
+        record_id=item.id, old_value=old_value, new_value=snapshot_model(item),
+    )
+    return item
 
 
 @router.patch("/{price_update_id}/approve", response_model=PriceUpdateAdminResponse)
@@ -111,32 +124,60 @@ def approve_update(
     db: Session = Depends(get_db),
     current_admin: User = Depends(require_roles("admin")),
 ) -> PriceUpdate:
-    return approve_price_update(db, get_price_update_for_admin(db, price_update_id), current_admin)
+    item = get_price_update_for_admin(db, price_update_id)
+    old_value = snapshot_model(item)
+    item = approve_price_update(db, item, current_admin)
+    create_audit_log(
+        db, actor=current_admin, action="price_update.approve", table_name="price_updates",
+        record_id=item.id, old_value=old_value, new_value=snapshot_model(item),
+    )
+    return item
 
 
 @router.patch("/{price_update_id}/reject", response_model=PriceUpdateAdminResponse)
 def reject_update(
     price_update_id: int,
     db: Session = Depends(get_db),
-    _: User = Depends(require_roles("admin")),
+    current_admin: User = Depends(require_roles("admin")),
 ) -> PriceUpdate:
-    return reject_price_update(db, get_price_update_for_admin(db, price_update_id))
+    item = get_price_update_for_admin(db, price_update_id)
+    old_value = snapshot_model(item)
+    item = reject_price_update(db, item)
+    create_audit_log(
+        db, actor=current_admin, action="price_update.reject", table_name="price_updates",
+        record_id=item.id, old_value=old_value, new_value=snapshot_model(item),
+    )
+    return item
 
 
 @router.patch("/{price_update_id}/mark-outdated", response_model=PriceUpdateAdminResponse)
 def mark_outdated(
     price_update_id: int,
     db: Session = Depends(get_db),
-    _: User = Depends(require_roles("admin")),
+    current_admin: User = Depends(require_roles("admin")),
 ) -> PriceUpdate:
-    return mark_price_update_outdated(db, get_price_update_for_admin(db, price_update_id))
+    item = get_price_update_for_admin(db, price_update_id)
+    old_value = snapshot_model(item)
+    item = mark_price_update_outdated(db, item)
+    create_audit_log(
+        db, actor=current_admin, action="price_update.mark_outdated", table_name="price_updates",
+        record_id=item.id, old_value=old_value, new_value=snapshot_model(item),
+    )
+    return item
 
 
 @router.delete("/{price_update_id}", status_code=status.HTTP_204_NO_CONTENT)
 def remove_price_update(
     price_update_id: int,
     db: Session = Depends(get_db),
-    _: User = Depends(require_roles("admin")),
+    current_admin: User = Depends(require_roles("admin")),
 ) -> Response:
-    delete_price_update(db, get_price_update_for_admin(db, price_update_id))
+    item = get_price_update_for_admin(db, price_update_id)
+    old_value = snapshot_model(item)
+    record_id = item.id
+    delete_price_update(db, item)
+    create_audit_log(
+        db, actor=current_admin, action="price_update.delete", table_name="price_updates",
+        record_id=record_id, old_value=old_value,
+    )
     return Response(status_code=status.HTTP_204_NO_CONTENT)

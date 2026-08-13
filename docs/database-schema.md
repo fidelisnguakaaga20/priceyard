@@ -337,3 +337,13 @@ Integrity/access rules:
 - feedback is linked to the submitting user;
 - ordinary users can submit feedback but cannot browse all users' private feedback;
 - admin summary is limited to count and average rating, with no advanced analytics.
+
+## Stage 16 — Audit-log schema use
+Stage 16 requires no migration. It reuses the `audit_logs` table created in Stage 3 with fields `id`, `user_id`, `action`, `table_name`, `record_id`, `old_value`, `new_value`, and `created_at`.
+
+Stage 16 rules:
+- `user_id` identifies the admin who performed the audited action;
+- `old_value` and `new_value` contain JSON-safe snapshots where applicable;
+- password/password-hash data, JWT/secret/token data, database credentials/URLs, `.env` data, and private price-source identities are excluded from audit snapshots;
+- ordinary users cannot view audit history;
+- no Stage 17 CSV-report schema or other later-stage schema is introduced.

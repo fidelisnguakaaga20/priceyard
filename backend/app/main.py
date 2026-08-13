@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
 from app.config import get_settings
+from app.routes.audit_log_routes import router as audit_log_router
 from app.routes.auth_routes import router as auth_router
 from app.routes.buying_zone_routes import router as buying_zone_router
 from app.routes.commodity_routes import router as commodity_router
@@ -25,6 +26,7 @@ app = FastAPI(
 )
 
 app.include_router(auth_router)
+app.include_router(audit_log_router)
 app.include_router(subscription_router)
 app.include_router(user_router)
 app.include_router(commodity_router)

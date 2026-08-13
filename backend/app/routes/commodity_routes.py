@@ -5,6 +5,7 @@ from app.database import get_db
 from app.models.commodity import Commodity
 from app.models.user import User
 from app.schemas.commodity_schema import CommodityCreate, CommodityResponse, CommodityUpdate
+from app.services.audit_service import create_audit_log, snapshot_model
 from app.services.commodity_service import (
     create_commodity,
     delete_commodity,
@@ -31,9 +32,14 @@ def get_commodity_by_id(commodity_id: int, db: Session = Depends(get_db)) -> Com
 def add_commodity(
     payload: CommodityCreate,
     db: Session = Depends(get_db),
-    _: User = Depends(require_roles("admin")),
+    admin: User = Depends(require_roles("admin")),
 ) -> Commodity:
-    return create_commodity(db, payload)
+    item = create_commodity(db, payload)
+    create_audit_log(
+        db, actor=admin, action="commodity.create", table_name="commodities",
+        record_id=item.id, new_value=snapshot_model(item),
+    )
+    return item
 
 
 @router.patch("/{commodity_id}", response_model=CommodityResponse)
@@ -41,16 +47,30 @@ def edit_commodity(
     commodity_id: int,
     payload: CommodityUpdate,
     db: Session = Depends(get_db),
-    _: User = Depends(require_roles("admin")),
+    admin: User = Depends(require_roles("admin")),
 ) -> Commodity:
-    return update_commodity(db, get_commodity(db, commodity_id), payload)
+    item = get_commodity(db, commodity_id)
+    old_value = snapshot_model(item)
+    item = update_commodity(db, item, payload)
+    create_audit_log(
+        db, actor=admin, action="commodity.edit", table_name="commodities",
+        record_id=item.id, old_value=old_value, new_value=snapshot_model(item),
+    )
+    return item
 
 
 @router.delete("/{commodity_id}", status_code=status.HTTP_204_NO_CONTENT)
 def remove_commodity(
     commodity_id: int,
     db: Session = Depends(get_db),
-    _: User = Depends(require_roles("admin")),
+    admin: User = Depends(require_roles("admin")),
 ) -> Response:
-    delete_commodity(db, get_commodity(db, commodity_id))
+    item = get_commodity(db, commodity_id)
+    old_value = snapshot_model(item)
+    record_id = item.id
+    delete_commodity(db, item)
+    create_audit_log(
+        db, actor=admin, action="commodity.delete", table_name="commodities",
+        record_id=record_id, old_value=old_value,
+    )
     return Response(status_code=status.HTTP_204_NO_CONTENT)

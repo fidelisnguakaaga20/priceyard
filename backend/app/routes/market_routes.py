@@ -5,6 +5,7 @@ from app.database import get_db
 from app.models.market import Market
 from app.models.user import User
 from app.schemas.market_schema import MarketCreate, MarketResponse, MarketUpdate
+from app.services.audit_service import create_audit_log, snapshot_model
 from app.services.market_service import create_market, delete_market, get_market, list_markets, update_market
 from app.utils.permissions import require_roles
 
@@ -25,9 +26,11 @@ def get_market_by_id(market_id: int, db: Session = Depends(get_db)) -> Market:
 def add_market(
     payload: MarketCreate,
     db: Session = Depends(get_db),
-    _: User = Depends(require_roles("admin")),
+    admin: User = Depends(require_roles("admin")),
 ) -> Market:
-    return create_market(db, payload)
+    item = create_market(db, payload)
+    create_audit_log(db, actor=admin, action="market.create", table_name="markets", record_id=item.id, new_value=snapshot_model(item))
+    return item
 
 
 @router.patch("/{market_id}", response_model=MarketResponse)
@@ -35,16 +38,24 @@ def edit_market(
     market_id: int,
     payload: MarketUpdate,
     db: Session = Depends(get_db),
-    _: User = Depends(require_roles("admin")),
+    admin: User = Depends(require_roles("admin")),
 ) -> Market:
-    return update_market(db, get_market(db, market_id), payload)
+    item = get_market(db, market_id)
+    old_value = snapshot_model(item)
+    item = update_market(db, item, payload)
+    create_audit_log(db, actor=admin, action="market.edit", table_name="markets", record_id=item.id, old_value=old_value, new_value=snapshot_model(item))
+    return item
 
 
 @router.delete("/{market_id}", status_code=status.HTTP_204_NO_CONTENT)
 def remove_market(
     market_id: int,
     db: Session = Depends(get_db),
-    _: User = Depends(require_roles("admin")),
+    admin: User = Depends(require_roles("admin")),
 ) -> Response:
-    delete_market(db, get_market(db, market_id))
+    item = get_market(db, market_id)
+    old_value = snapshot_model(item)
+    record_id = item.id
+    delete_market(db, item)
+    create_audit_log(db, actor=admin, action="market.delete", table_name="markets", record_id=record_id, old_value=old_value)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

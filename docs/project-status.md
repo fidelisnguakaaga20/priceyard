@@ -162,5 +162,22 @@ None.
 ## Stage 15 owner verification
 RETESTED/PASS. Owner confirmed Alembic remains at `0005_stage13_watchlists` because Stage 15 requires no migration, then ran `docs/evidence/stage-15-owner-smoke.py` against the configured Supabase PostgreSQL environment and received `STAGE 15 OWNER SMOKE: PASS`. Rating boundaries, authenticated user linkage, private-feedback protection, admin listing/filter/detail/summary/delete, complaint/suggestion preservation, and SQLAlchemy relationship checks all passed. The owner explicitly instructed that if the output was okay, continue to the next stage, which approves Stage 15 and Stage 16 start.
 
+## Stage 16 implementation completed
+- Reused the existing Stage 3 `audit_logs` table; no migration is required.
+- Added audit schema/service and admin-only `GET /audit-logs` plus `GET /audit-logs/{id}`.
+- Added audit recording for price create/edit/approve/reject/mark-outdated/delete, commodity changes, market changes, FAQ changes, subscription changes, user status/role changes, and feedback admin delete.
+- Price edit audit snapshots preserve changes to Possible Meaning and Suggested Action.
+- Audit sanitization excludes password/hash fields, token/secret/database credential fields, `.env` values, and private price-source identities.
+- No Stage 17 CSV export, migration, new dependency, payment, alert, AI prediction, marketplace, or other future feature was added.
+
+## Stage 16 internal verification
+- Python compilation: PASS.
+- Full temporary SQLite FastAPI flow with a temporary bcrypt compatibility stub: PASS.
+- Required admin-action audit coverage: PASS.
+- Admin audit-history access / ordinary-user blocking: PASS.
+- Possible Meaning and Suggested Action change capture: PASS.
+- Sensitive/private-source absence checks: PASS.
+- Real Supabase owner runtime proof is still required.
+
 ## Next gate
-Stage 16 — Audit Logs is IN PROGRESS. Do not start Stage 17 until Stage 16 is implemented, owner-tested, proven, documented, and explicitly approved.
+Stage 16 — Audit Logs is BUILT/IN PROGRESS and awaits owner Supabase-backed runtime verification. Do not start Stage 17 until Stage 16 passes and the owner explicitly approves.

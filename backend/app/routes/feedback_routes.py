@@ -7,6 +7,7 @@ from app.database import get_db
 from app.models.feedback import Feedback
 from app.models.user import User
 from app.schemas.feedback_schema import FeedbackCreate, FeedbackResponse, FeedbackSummaryResponse
+from app.services.audit_service import create_audit_log, snapshot_model
 from app.services.feedback_service import (
     create_feedback,
     delete_feedback,
@@ -58,8 +59,11 @@ def get_feedback_item(
 def remove_feedback(
     feedback_id: int,
     db: Session = Depends(get_db),
-    _admin: User = Depends(require_roles("admin")),
+    admin: User = Depends(require_roles("admin")),
 ) -> Response:
     item = get_feedback(db, feedback_id)
+    old_value = snapshot_model(item)
+    record_id = item.id
     delete_feedback(db, item)
+    create_audit_log(db, actor=admin, action="feedback.delete", table_name="feedback", record_id=record_id, old_value=old_value)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

@@ -1,0 +1,15 @@
+Stage 16 static/build scope check
+- Existing Stage 3 audit_logs table reused; no migration introduced: PASS
+- Admin-only audit history endpoints added: PASS
+- Price create/edit/approve/reject/outdated/delete logging added: PASS
+- Commodity create/edit/delete logging added: PASS
+- Market create/edit/delete logging added: PASS
+- FAQ create/edit/publish/hide/delete logging added: PASS
+- Subscription status change logging added: PASS
+- User status/role change logging added: PASS
+- Feedback admin delete logging added: PASS
+- Price Possible Meaning and Suggested Action are present in price edit old/new snapshots: PASS
+- Password/token/secret/database/.env keys are sanitized from audit snapshots: PASS
+- Private price source identities source_1/source_2 are excluded from audit snapshots: PASS
+- No Stage 17 CSV export added: PASS
+- No payment, alerts, AI prediction, marketplace, reporter portal, or other deferred feature added: PASS

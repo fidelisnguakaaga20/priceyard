@@ -509,3 +509,19 @@ Purpose: admin-only removal of a feedback record under the Architecture-approved
 Authentication: admin bearer JWT required.
 
 Stage 15 reuses the existing Stage 3 `feedback` table and adds no migration, Stage 16 audit-log behavior, advanced analytics, or other later-stage feature.
+
+## Stage 16 — Audit Logs
+
+### GET /audit-logs
+Purpose: allow an admin to view audit history for important administrative changes.
+Authentication: admin bearer JWT required.
+Response fields: `id`, `user_id`, `action`, `table_name`, `record_id`, `old_value`, `new_value`, `created_at`.
+Rule: ordinary users cannot browse audit history.
+
+### GET /audit-logs/{audit_log_id}
+Purpose: allow an admin to view one audit record.
+Authentication: admin bearer JWT required.
+
+Stage 16 records important admin changes for price updates, commodities, markets, FAQ, subscriptions, users, and feedback administration. Price-update edit snapshots preserve changes to `possible_meaning` and `suggested_action`.
+
+Audit snapshots intentionally exclude password/password-hash fields, secrets/tokens, database credentials/URLs, `.env` values, and private price-source identities (`source_1`, `source_2`). Stage 16 adds no CSV export or Stage 17 feature.
