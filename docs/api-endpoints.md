@@ -433,3 +433,49 @@ Authentication: active bearer JWT required.
 Rule: an item owned by another user is not exposed or removed.
 
 Stage 13 does not add target-price alerts, Stage 14 FAQ management, or any later-stage feature.
+
+## Stage 14 — FAQ
+
+### GET /faq
+Purpose: publicly list published FAQ items only.
+Authentication: none required.
+Rule: hidden/unpublished FAQ items are excluded. Public responses do not expose admin creator identity or publication-control fields.
+
+### GET /faq/{faq_id}
+Purpose: publicly view one published FAQ item.
+Authentication: none required.
+Rule: hidden/unpublished FAQ items return HTTP 404.
+
+### POST /faq
+Purpose: create a new FAQ draft.
+Authentication: admin bearer JWT required.
+Input fields: `question`, `answer`, `category`.
+Rule: new FAQ items start hidden; clients cannot publish through the create payload.
+
+### PATCH /faq/{faq_id}
+Purpose: edit FAQ question, answer, or category.
+Authentication: admin bearer JWT required.
+
+### PATCH /faq/{faq_id}/publish
+Purpose: publish an FAQ item for public viewing.
+Authentication: admin bearer JWT required.
+
+### PATCH /faq/{faq_id}/hide
+Purpose: hide an FAQ item from public viewing.
+Authentication: admin bearer JWT required.
+
+### DELETE /faq/{faq_id}
+Purpose: delete an incorrect FAQ item.
+Authentication: admin bearer JWT required.
+This endpoint is included because the approved Architecture Design defines FAQ deletion as part of the FAQ management API.
+
+Stage 14 content rules:
+- write FAQ content in PriceYard's own words;
+- do not copy paid-group content word-for-word;
+- do not include private phone/account numbers or vendor contact/payment instructions;
+- avoid guaranteed-profit, guaranteed-prediction, forced buy/sell, or financial-advice claims;
+- preserve approved PriceYard disclaimers where relevant.
+
+The paid-source word-for-word rule requires human/editorial source comparison; it is not represented as an automated plagiarism detector.
+
+No Stage 15 feedback-management API or later-stage feature is added in Stage 14.

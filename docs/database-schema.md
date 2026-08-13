@@ -323,3 +323,6 @@ Integrity/relationship rules:
 - deleting the owning user, commodity, or market cascades removal of the affected watchlist row.
 
 Stage 13 does not create FAQ, alert, report, reporter, payment, or other Stage 14+ tables.
+
+## Stage 14 — FAQ schema use
+Stage 14 requires no migration. It reuses the `faq_items` table created in the Stage 3 foundation with fields `id`, `question`, `answer`, `category`, `is_published`, `created_by`, `created_at`, and `updated_at`. Publication is controlled by the FAQ publish/hide API flow.

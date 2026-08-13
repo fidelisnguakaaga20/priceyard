@@ -1,0 +1,16 @@
+FAQ router registered: PASS
+public FAQ list route exists: PASS
+public FAQ detail route exists: PASS
+admin FAQ create route exists: PASS
+admin FAQ edit route exists: PASS
+publish route exists: PASS
+hide route exists: PASS
+architecture-approved delete route exists: PASS
+new FAQ starts hidden server-side: PASS
+public view filters published only: PASS
+public schema hides creator: PASS
+safety validation present: PASS
+no Stage 14 migration added: PASS
+no new dependency added for Stage 14: PASS
+no Stage 15 feedback route registered: PASS
+STAGE 14 STATIC/SCOPE CHECK: PASS

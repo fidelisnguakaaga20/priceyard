@@ -164,3 +164,20 @@ The approved Stage 12 fields include both component costs and totals. To avoid i
 
 ## 2026-08-12 — Stage 13 target-price field boundary
 The approved Architecture Design includes nullable `target_price` in the `watchlists` table, while the Execution Plan explicitly defers target-price alerts. Stage 13 therefore retains the architecture-approved database column for compatibility but does not accept target-price API input and does not implement any alert behavior. This preserves both approved documents without expanding MVP functionality.
+
+## DEC-012 — Stage 13 approval and Stage 14 authorization
+- Date: 2026-08-13
+- Current requirement: Do not proceed from Stage 13 until owner approval.
+- Source: PriceYard AI Project Execution Plan.
+- Owner proof: Alembic upgrade to `0005_stage13_watchlists` succeeded and `STAGE 13 OWNER SMOKE: PASS` showed commodity/market saves, duplicate handling, own-list isolation, cross-user protection, removal, target-price deferral, and SQLAlchemy relationships all passing on the owner's Supabase-backed environment.
+- Owner instruction: `continue base on this execution plan here` after returning from the documented Stage 13 checkpoint.
+- Decision: Treat the instruction to continue as owner approval of Stage 13 and authorization to execute Stage 14 — FAQ only.
+- Database effect: No migration; Stage 14 reuses the approved `faq_items` table created in Stage 3.
+- API effect: Authorizes FAQ create/edit/publish/hide plus the Architecture-approved delete operation, and public viewing of published FAQ items.
+- Frontend effect: None in Stage 14.
+- Test effect: Stage 14 must prove create/edit/publish/hide/delete, public visibility rules, unauthorized management blocking, content-safety behavior, and disclaimer preservation.
+- Completed-stage effect: Stage 13 becomes RETESTED/PASS and owner-approved.
+- Approval: Owner instruction in conversation.
+
+## 2026-08-13 — Stage 14 publication boundary
+New FAQ records start hidden and publication state is changed only through the approved publish/hide actions. This keeps accidental drafts out of public FAQ responses. Public FAQ responses omit creator and publication-control fields. The paid-group word-for-word rule remains a human/editorial source-check because no paid-source corpus is stored for automated comparison.

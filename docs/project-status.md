@@ -1,7 +1,7 @@
 # PriceYard Project Status
 
 ## Current stage
-Stage 13 — Watchlist — AUTHORIZED/IN PROGRESS after Stage 12 owner verification and conditional approval.
+Stage 14 — FAQ — AUTHORIZED/IN PROGRESS after Stage 13 owner verification and the owner instruction to continue.
 
 ## Stage 0 disposition
 Owner supplied validation metrics: 65 reached, 14 replies, 5 willing to pay, positive usefulness/trust/continuation signals, sample market records and two source types.
@@ -25,6 +25,7 @@ On 2026-08-12, the owner explicitly granted Application Coding Permission: YES. 
 - Stage 10 — Buying Zones and Sell-Watch Windows: RETESTED/PASS and owner-approved after Alembic migration plus local Supabase-backed owner smoke verification.
 - Stage 11 — Storage Suitability: RETESTED/PASS and owner-approved after owner Supabase migration and a successful retest following one transient database connection interruption.
 - Stage 12 — Cost Breakdown: RETESTED/PASS and owner-approved after Alembic migration plus local Supabase-backed owner smoke verification.
+- Stage 13 — Watchlist: RETESTED/PASS and owner-approved after Alembic migration plus local Supabase-backed owner smoke verification and the owner instruction to continue.
 
 ## Stage 10 implementation completed
 - Added `buying_zones` and `sell_watch_windows` models and approved relationships.
@@ -89,16 +90,6 @@ RETESTED/PASS. The Stage 11 migration reached `0003_stage11_storage_suitability`
 ## Stage 12 owner verification
 RETESTED/PASS. Owner applied Alembic revision `0004_stage12_cost_breakdowns` against Supabase PostgreSQL and `docs/evidence/stage-12-owner-smoke.py` ended with `STAGE 12 OWNER SMOKE: PASS`. Migration/fields, cost saving, total calculations, edit recalculation, negative-cost rejection, relationship behavior, and access control all passed.
 
-## Outstanding project issue
-Stage 0 independent-source/duration evidence remains unresolved and must be reconciled before Stage 24 final acceptance.
-
-## Unapproved features added
-None.
-
-## Next gate
-Stage 13 — Watchlist is authorized by the owner’s conditional instruction after the passing Stage 12 output. Build/test/prove Stage 13 only, then stop for approval before Stage 14.
-
-
 ## Stage 13 implementation completed
 - Added `watchlists` model and Alembic revision `0005_stage13_watchlists`.
 - Added authenticated save/list/remove-own watchlist API flow.
@@ -119,4 +110,35 @@ Stage 13 — Watchlist is authorized by the owner’s conditional instruction af
 - Full FastAPI app runtime in the AI container was unavailable because bcrypt is not installed; this is not counted as runtime proof.
 
 ## Stage 13 owner verification
-PENDING. Owner must apply `python -m alembic upgrade head` against Supabase PostgreSQL and run `docs/evidence/stage-13-owner-smoke.py`.
+RETESTED/PASS. Owner applied Alembic revision `0005_stage13_watchlists` against Supabase PostgreSQL and `docs/evidence/stage-13-owner-smoke.py` ended with `STAGE 13 OWNER SMOKE: PASS`. Commodity/market saves, duplicate handling, own-list isolation, cross-user removal protection, removal, target-price deferral, and SQLAlchemy relationships all passed.
+
+## Stage 14 implementation completed
+- Reused the existing Stage 3 `faq_items` table; no migration is required.
+- Added FAQ schemas, service, routes, and FastAPI router registration.
+- Admin can create FAQ items, edit them, publish them, hide them, and delete incorrect FAQ items as approved by the Architecture Design.
+- New FAQ items start hidden; publication state is controlled only by the dedicated publish/hide endpoints.
+- Public users can list and view published FAQ items without authentication; hidden FAQ items return not found and are omitted from public lists.
+- Public FAQ responses do not expose `created_by` or publication-control fields.
+- FAQ content validation rejects explicit guaranteed-profit/forced-trading claims and private phone/account/vendor instructions.
+- Approved disclaimer wording is accepted and preserved.
+- The “do not copy paid-group content word-for-word” rule remains an editorial/source-verification responsibility because PriceYard does not store the paid-source corpus for automated text comparison.
+- No Stage 15 feedback API, migration, dependency, payment, alert, AI prediction, marketplace, or other future feature was added.
+
+## Stage 14 internal verification
+- Python source compilation: PASS.
+- FAQ schema safety checks: PASS.
+- Static route/scope review: PASS.
+- Existing `faq_items` schema confirmed from the approved Stage 3 model/migration; no new migration is introduced.
+- Internal FastAPI/API flow against temporary SQLite with a temporary bcrypt compatibility stub: PASS; this is build evidence only and not owner/runtime proof.
+
+## Stage 14 owner verification
+PENDING. Owner must run `docs/evidence/stage-14-owner-smoke.py` against the configured Supabase PostgreSQL environment.
+
+## Outstanding project issue
+Stage 0 independent-source/duration evidence remains unresolved and must be reconciled before Stage 24 final acceptance.
+
+## Unapproved features added
+None.
+
+## Next gate
+Stage 14 — FAQ is built and awaits owner Supabase-backed runtime proof. Do not start Stage 15 until Stage 14 passes and the owner approves.

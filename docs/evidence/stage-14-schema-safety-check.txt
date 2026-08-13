@@ -1,0 +1,5 @@
+STAGE 14 FAQ SCHEMA SAFETY CHECK: PASS
+- approved non-guarantee disclaimer wording accepted
+- explicit guaranteed-profit claim rejected
+- private account-number instruction rejected
+- private phone instruction rejected

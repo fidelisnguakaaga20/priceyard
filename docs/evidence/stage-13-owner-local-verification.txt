@@ -1,0 +1,9 @@
+Stage 13 owner verification — 2026-08-13
+
+Owner applied Alembic revision 0005_stage13_watchlists and ran docs/evidence/stage-13-owner-smoke.py against the configured Supabase PostgreSQL database.
+
+Final line: STAGE 13 OWNER SMOKE: PASS
+
+Verified: watchlist migration/fields; Egusi/Beans/Palm oil saves; market save; combined commodity+market save; empty selection rejection; deferred target-price input rejection; duplicate handling; own-list isolation; cross-user removal blocking; removal; SQLAlchemy relationships.
+
+Status: RETESTED/PASS.
