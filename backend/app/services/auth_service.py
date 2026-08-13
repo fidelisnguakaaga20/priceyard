@@ -60,7 +60,10 @@ def register_user(db: Session, payload: RegisterRequest) -> User:
             detail="User account already exists",
         ) from exc
 
-    db.refresh(user)
+    # SessionLocal uses expire_on_commit=False and PostgreSQL/SQLAlchemy returns
+    # generated fields during INSERT, so avoid a second database round trip after
+    # a successful commit. This prevents a transient pooler disconnect after the
+    # commit from turning a successfully created account into a false HTTP 500.
     return user
 
 

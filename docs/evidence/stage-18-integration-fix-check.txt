@@ -1,0 +1,27 @@
+Stage 18 integration-fix internal verification — 2026-08-13
+
+Owner evidence before this fix:
+- Automated Stage 18 owner smoke reached final line: STAGE 18 OWNER SMOKE: PASS.
+- Manual browser/API check then exposed POST /auth/register -> 500 after a successful commit when db.refresh(user) hit a transient Supabase/pooler disconnect.
+- A subsequent login for that account returned 200, confirming the account had in fact been created.
+- Manual feedback submission returned 201 Created.
+- Manual watchlist add returned 201 Created and remove returned 204 No Content.
+- Owner iPhone SE / 375px browser screenshot showed Watchlist introductory content clipped horizontally; mobile visual approval was withheld.
+
+Approved smallest fixes:
+1. Registration: remove the post-commit db.refresh(user) round trip. SessionLocal already uses expire_on_commit=False, and generated INSERT fields are available without this second query. This prevents a successful registration commit from being reported as a false HTTP 500 solely because the follow-up refresh connection drops.
+2. Mobile layout: constrain mobile page/filter/watchlist grid children with min-width:0/max-width:100%, use minmax(0,1fr) grid tracks, explicit calc(100% - 24px) mobile page width, and safe text wrapping.
+
+Internal checks:
+- backend/app compilation: PASS
+- Stage 18 TypeScript/TSX syntax check: PASS
+- Stage 18 static scope check: PASS
+- Registration endpoint with an internal SQLite session whose refresh() intentionally raises if called: HTTP 201 PASS; response included id, created_at, role, active state; proves register no longer performs the post-commit refresh.
+- CSS parsed with tinycss2: 0 parse errors.
+- Required mobile min-width/max-width/minmax/overflow-wrap rules present: PASS.
+
+No database migration.
+No API contract change.
+No new dependency.
+No Stage 19 feature.
+Owner retest is still required before Stage 18 can be RETESTED/PASS.

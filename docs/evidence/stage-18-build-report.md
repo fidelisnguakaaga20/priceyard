@@ -60,3 +60,13 @@ Owner proof required:
 - Assistant `py_compile` of the helper: PASS.
 - Stage 18 static scope check after helper change: PASS.
 - Owner full browser/mobile retest is still required; Stage 19 remains blocked.
+
+## Owner manual integration findings and approved smallest fixes — 2026-08-13
+- Automated owner smoke now reaches `STAGE 18 OWNER SMOKE: PASS` for build/proxy/browser-route/mobile-screenshot automation.
+- Manual feedback returned 201; watchlist add returned 201 and delete returned 204.
+- Manual registration exposed a false 500 after the successful commit because `db.refresh(user)` performed an unnecessary post-commit database round trip and the Supabase/pooler connection dropped at that moment; subsequent login returned 200 for the created account.
+- Smallest backend fix: remove only that post-commit refresh. Internal fault-injection registration test returns HTTP 201 even when Session.refresh is configured to fail if called.
+- Manual iPhone-SE-width visual check exposed Watchlist horizontal clipping.
+- Smallest frontend fix: tighten mobile width/grid child sizing and text wrapping; CSS parses with 0 errors and the Stage 18 static/syntax checks remain PASS.
+- No database migration, API-contract change, new dependency, or Stage 19 feature.
+- Owner registration + mobile visual retest still required before Stage 18 approval.

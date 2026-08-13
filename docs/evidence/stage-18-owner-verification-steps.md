@@ -52,3 +52,16 @@ Open `http://127.0.0.1:5173` and verify:
 - At a narrow/mobile browser width the page remains usable without clipped controls or unreadable content.
 
 Send the automated terminal output and confirm the manual items above before Stage 18 is approved. Stage 19 must not start before that approval.
+
+
+## 4. Integration-fix retest
+
+After the approved registration/mobile integration fixes, use the latest Stage 18 integration-fixed folder. Start backend and frontend, then verify:
+
+- Register a new unique user: the browser must receive a successful registration response, not 500.
+- Log in with that new user.
+- Open Watchlist at an iPhone SE / 375px-style viewport and confirm the introductory paragraph, filters, cards and buttons fit without horizontal clipping.
+- Watchlist add/remove and feedback already produced owner 201/204/201 evidence, but may be spot-checked again.
+- Transient Supabase DNS/pooler failures must not be mistaken for frontend layout defects; if connectivity drops, confirm `verify_database_connection()` and retry.
+
+Stage 19 remains blocked until the owner confirms registration and mobile visual PASS and approves Stage 18.
