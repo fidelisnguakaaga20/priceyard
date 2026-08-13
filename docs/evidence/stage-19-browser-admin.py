@@ -1,9 +1,13 @@
 """Create a temporary Stage 19 admin account for manual browser rendering checks."""
 from __future__ import annotations
+import os
 import sys
 from pathlib import Path
 from uuid import uuid4
 BACKEND = Path(__file__).resolve().parents[2] / "backend"
+if not (BACKEND / ".env").exists():
+    raise SystemExit("FAIL: backend/.env is missing. Copy it from the previous stage first.")
+os.chdir(BACKEND)
 if str(BACKEND) not in sys.path: sys.path.insert(0, str(BACKEND))
 from app.database import get_session_factory
 from app.models.user import User
@@ -14,7 +18,7 @@ email = f"stage19-browser-admin-{uuid4().hex[:10]}@example.com"
 SessionLocal = get_session_factory()
 with SessionLocal() as db:
     user = User(full_name="Stage 19 Browser Admin", email=email, password_hash=hash_password(password), role="admin", is_active=True)
-    db.add(user); db.commit(); db.refresh(user)
+    db.add(user); db.commit()
     print("STAGE 19 TEMP ADMIN CREATED")
     print(f"EMAIL: {email}")
     print(f"PASSWORD: {password}")

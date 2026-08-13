@@ -1,9 +1,13 @@
 """Remove the temporary Stage 19 browser admin created by stage-19-browser-admin.py."""
 from __future__ import annotations
+import os
 import sys
 from pathlib import Path
 from sqlalchemy import select
 BACKEND = Path(__file__).resolve().parents[2] / "backend"
+if not (BACKEND / ".env").exists():
+    raise SystemExit("FAIL: backend/.env is missing. Copy it from the previous stage first.")
+os.chdir(BACKEND)
 if str(BACKEND) not in sys.path: sys.path.insert(0, str(BACKEND))
 from app.database import get_session_factory
 from app.models.audit_log import AuditLog

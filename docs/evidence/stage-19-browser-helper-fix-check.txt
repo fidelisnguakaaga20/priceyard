@@ -1,0 +1,19 @@
+Stage 19 browser helper fix verification
+
+Problem reproduced by owner:
+- stage-19-browser-admin.py raised RuntimeError: DATABASE_URL is required for database operations
+- Cause: helper imported app configuration from project root while approved .env lives in backend/.env
+
+Fix:
+- stage-19-browser-admin.py checks backend/.env and chdir()s to backend before importing app modules
+- stage-19-browser-admin-cleanup.py does the same
+- Removed unnecessary db.refresh(user) from temporary-admin creation to avoid a needless post-commit database round trip
+
+Verification performed:
+- Python compile for both helper scripts: PASS
+- Static order check: os.chdir(BACKEND) occurs before app.database import: PASS
+- backend/.env existence guard present in both helpers: PASS
+- Temporary-admin helper has no db.refresh(user): PASS
+- No application frontend/backend route/schema/migration/dependency changes: PASS
+
+Owner PostgreSQL/Supabase execution still required for final manual Stage 19 browser proof.
