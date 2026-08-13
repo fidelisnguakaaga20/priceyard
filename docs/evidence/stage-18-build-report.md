@@ -70,3 +70,11 @@ Owner proof required:
 - Smallest frontend fix: tighten mobile width/grid child sizing and text wrapping; CSS parses with 0 errors and the Stage 18 static/syntax checks remain PASS.
 - No database migration, API-contract change, new dependency, or Stage 19 feature.
 - Owner registration + mobile visual retest still required before Stage 18 approval.
+
+## Second mobile visual retest / overflow hardening — 2026-08-13
+- Owner reran the corrected Stage 18 smoke: production build PASS, FastAPI health PASS, Vite proxy PASS, public route screenshots PASS, 390x844 automated mobile render PASS, final `STAGE 18 OWNER SMOKE: PASS`.
+- Owner manual integration retest then confirmed a unique registration returned 201, login returned 200, watchlist create returned 201 and watchlist delete returned 204. Duplicate registration/watchlist attempts correctly returned 409.
+- Owner iPhone SE 375x667 screenshots still showed horizontal panning/clipping: the Watchlist introduction/header/footer could be shifted sideways. Stage 18 therefore remains IN PROGRESS.
+- Smallest second mobile fix only changes responsive CSS: root/app/main width guards, mobile page/header full-width border-box padding, brand/access-strip constraints, card/form min-width clamps, footer wrapping, and horizontal overflow containment.
+- No backend, API, database, dependency, access-control, or Stage 19 code changed.
+- Stage 18 static scope check and mobile-overflow static fix check pass. Owner visual retest at 375px remains required.

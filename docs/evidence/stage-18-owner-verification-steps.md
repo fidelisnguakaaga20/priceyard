@@ -65,3 +65,9 @@ After the approved registration/mobile integration fixes, use the latest Stage 1
 - Transient Supabase DNS/pooler failures must not be mistaken for frontend layout defects; if connectivity drops, confirm `verify_database_connection()` and retry.
 
 Stage 19 remains blocked until the owner confirms registration and mobile visual PASS and approves Stage 18.
+
+
+## Latest second-mobile-fix retest
+The owner can open Commodity Detail directly at `/commodities/Egusi`. When the latest approved Egusi price card exists, the Prices page also exposes the `View intelligence →` link. A missing current approved Egusi record may render the page with an empty-state message; the route itself must still render normally.
+
+After starting the latest backend/frontend, verify at iPhone SE 375x667 that there is no horizontal panning: header, access strip, Watchlist heading/description, form, saved item card, Remove button and footer must all stay within the viewport.

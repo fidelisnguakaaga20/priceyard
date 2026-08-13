@@ -1,0 +1,22 @@
+Stage 18 second mobile overflow fix internal check
+
+Owner evidence before fix:
+- Stage 18 owner smoke final line: PASS
+- unique POST /auth/register: 201 Created
+- POST /auth/login: 200 OK
+- POST /watchlist: 201 Created
+- DELETE /watchlist/{id}: 204 No Content
+- iPhone SE 375x667 screenshots: horizontal panning/clipping still visible -> FAIL
+
+Internal checks after smallest CSS-only fix:
+- Stage 18 static scope check: PASS
+- CSS brace balance: PASS
+- root html/body horizontal overflow guard present: PASS
+- mobile page full-width border-box padding present: PASS
+- mobile header width clamp present: PASS
+- mobile card/grid width clamps present: PASS
+- footer width/wrapping clamp present: PASS
+
+No backend/API/database/dependency/Stage 19 change.
+Owner 375px visual retest remains required.
+STAGE 18 MOBILE OVERFLOW STATIC FIX CHECK: PASS
