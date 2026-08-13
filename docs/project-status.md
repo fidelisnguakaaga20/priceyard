@@ -199,7 +199,10 @@ RETESTED/PASS. Owner confirmed Alembic remains at `0005_stage13_watchlists`, the
 - Temporary SQLite full FastAPI/API smoke with an internal bcrypt compatibility stub: PASS; this is build evidence only.
 - Current/previous ranges, Possible Meaning, Suggested Action, linked market/quality signals, and private-source exclusion: PASS.
 - Repository Alembic head unchanged at `0005_stage13_watchlists`: PASS.
-- Real Supabase owner runtime proof is still required.
+- Real Supabase owner runtime proof: PASS.
+
+## Stage 17 owner verification
+RETESTED/PASS. Owner confirmed Alembic remains at `0005_stage13_watchlists` and ran `docs/evidence/stage-17-owner-smoke.py` against the configured Supabase PostgreSQL environment. Final output: `STAGE 17 OWNER SMOKE: PASS`. CSV authorization, filtering, field accuracy, linked signals, privacy exclusions, and rejected-record exclusion all passed. The owner instructed that if the output was okay, continue to the next stage; that condition was satisfied, approving Stage 17 and Stage 18 start.
 
 ## Next gate
-Stage 17 — Simple CSV Report Export is BUILT/IN PROGRESS and awaits owner Supabase-backed runtime verification. Do not start Stage 18 until Stage 17 passes and the owner explicitly approves.
+Stage 17 — Simple CSV Report Export is RETESTED/PASS and owner-approved. Stage 18 — Public and User Frontend MVP may start; Stage 19 remains blocked until Stage 18 owner approval.

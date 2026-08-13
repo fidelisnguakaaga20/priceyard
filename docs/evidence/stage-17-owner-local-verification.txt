@@ -1,0 +1,28 @@
+Stage 17 owner Supabase-backed verification
+Date: 2026-08-13
+
+Owner ran from backend:
+- python -m pip install -r requirements-dev.txt
+- python -m alembic current
+- python ../docs/evidence/stage-17-owner-smoke.py
+
+Observed Alembic head:
+0005_stage13_watchlists (head)
+
+Observed owner smoke result:
+STAGE 17 OWNER SMOKE: PASS
+
+Owner-reported PASS coverage included:
+- unauthenticated CSV export blocked
+- ordinary user CSV export blocked
+- approved Egusi/Beans records exported correctly
+- linked market and quality signals exported
+- invalid CSV date range rejected
+- CSV content type and attachment filename correct
+- commodity/market/date filters work
+- current/previous ranges, movement, confidence, Possible Meaning and Suggested Action match database records
+- private source 1/source 2 absent
+- password/hash and JWT/token fields absent
+- rejected price update excluded
+
+Owner instruction: if output is okay, continue to the next stage. This condition was satisfied, so Stage 17 is owner-approved and Stage 18 may start.
