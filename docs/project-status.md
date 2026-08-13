@@ -1,7 +1,7 @@
 # PriceYard Project Status
 
 ## Current stage
-Stage 18 — Public and User Frontend MVP — BUILT/IN PROGRESS. The first owner production-build attempt exposed TypeScript TS5096 and the first fix added `noEmit: true`. The owner retest then exposed TS2580 because `vite.config.ts` referenced Node `process.cwd()` without Node type definitions. The owner approved the smallest configuration-only fix. Stage 19 remains blocked until Stage 18 owner proof passes.
+Stage 19 — Admin Frontend MVP — IN PROGRESS. Stage 18 Public/User Frontend has RETESTED/PASS owner proof covering production build, API integration, registration/login, feedback, watchlist add/remove, narrow-screen usability, and the Egusi commodity-detail route. Stage 20 remains blocked until Stage 19 owner proof passes.
 
 ## Stage 0 disposition
 Owner supplied validation metrics: 65 reached, 14 replies, 5 willing to pay, positive usefulness/trust/continuation signals, sample market records and two source types.
@@ -249,3 +249,9 @@ The owner reran `stage-18-owner-smoke.py`; production build, health, API proxy, 
 
 ## Stage 18 deterministic smoke-helper correction — 2026-08-13
 Owner retest of the latest mobile fix passed npm installation, production build, FastAPI health, Vite proxy and `/price-updates` 200, but Windows Chrome intermittently failed to create the first automated headless screenshot. Because prior interactive owner browser evidence already proves the frontend can render and the execution plan separately requires manual visual/mobile approval, the Stage 18 smoke helper was narrowed to deterministic automated proof: build, backend health, proxy, and SPA route availability including `/commodities/Egusi`. Headless screenshot generation is no longer a gate. Manual 375px browser inspection remains mandatory before Stage 18 can be RETESTED/PASS. No application code, API, database, dependency, migration or Stage 19 scope changed.
+
+## Stage 18 owner verification
+RETESTED/PASS and owner-approved. Owner evidence included a successful TypeScript/Vite production build, FastAPI health and proxy checks, public/user route rendering, registration 201, login 200, feedback 201, watchlist create 201/remove 204, iPhone SE 375px visual verification after the overflow fix, and normal rendering of `/commodities/Egusi` including the approved price disclaimer and Guest access lock. Intermittent Supabase/DNS connection failures and Windows headless-Chrome helper failures were isolated during retests and corrected or removed from the proof path without expanding product scope. The npm audit finding (1 moderate, 4 high) remains explicitly deferred to Stage 21 security review; `npm audit fix --force` was not run.
+
+## Next gate
+Stage 18 is RETESTED/PASS and owner-approved. Stage 19 — Admin Frontend MVP is now active. Stage 20 remains blocked pending Stage 19 completion and owner approval.

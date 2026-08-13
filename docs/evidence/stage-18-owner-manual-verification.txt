@@ -1,0 +1,27 @@
+Stage 18 owner verification summary
+Date: 2026-08-13
+
+Automated/runtime evidence supplied by owner across Stage 18 retests:
+- npm install completed.
+- production build completed with Vite/TypeScript: PASS.
+- FastAPI GET /health: 200 PASS.
+- Vite -> FastAPI proxy: PASS.
+- public/user frontend routes rendered.
+- /price-updates and related public APIs returned 200 during browser use.
+- final Stage 18 automated owner smoke previously ended with: STAGE 18 OWNER SMOKE: PASS.
+
+Manual owner interaction evidence:
+- New user registration returned 201 Created after the approved registration integration fix.
+- Login returned 200 OK; /auth/me returned 200.
+- Feedback submission returned 201 Created.
+- Watchlist create returned 201 Created, list returned 200, and removal returned 204 No Content.
+- Duplicate registration/watchlist attempts returned expected 409 Conflict.
+- iPhone SE / 375px watchlist screenshots after the mobile overflow fix show header, access strip, title, explanatory text, form, saved cards, remove controls and footer contained within the viewport with no observed horizontal clipping.
+- Egusi commodity detail route rendered normally at /commodities/Egusi. With no current approved Egusi row it correctly displayed the no-current-record state, exact price disclaimer, and Guest full-intelligence lock state.
+- Guest /auth/me requests returned 401 as expected while public commodity price requests returned 200.
+
+Known deferred/security item:
+- npm audit reports 5 dependency vulnerabilities (1 moderate, 4 high). Per the approved plan these are not auto-fixed with --force during Stage 18; they remain explicitly scheduled for Stage 21 full security review.
+
+Owner instruction: if evidence is okay, continue. Evidence is sufficient to close Stage 18 and start Stage 19.
+Stage 18 disposition: RETESTED/PASS and owner-approved.
