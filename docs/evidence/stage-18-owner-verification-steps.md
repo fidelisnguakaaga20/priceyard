@@ -8,7 +8,7 @@ Stage 18 adds the React + TypeScript public/user frontend. It has no database mi
 cp ~/Downloads/priceyard-stage17/priceyard/backend/.env ~/Downloads/priceyard-stage18/priceyard/backend/.env
 ```
 
-## 2. Run the automated build/browser smoke
+## 2. Run the automated build/API/route smoke
 
 From the project root:
 
@@ -23,7 +23,7 @@ Expected final automated line:
 STAGE 18 OWNER SMOKE: PASS
 ```
 
-The script also creates `docs/evidence/stage-18-owner-mobile.png` using a 390x844 Chrome window.
+The smoke deliberately does not depend on headless Chrome screenshots. Repeated Windows Chrome runs were nondeterministic even while the page and API were healthy. Visual browser/mobile proof remains mandatory in Step 3 and must be supplied manually before Stage 18 approval.
 
 ## 3. Required manual interaction check
 

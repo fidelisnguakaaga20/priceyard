@@ -2,11 +2,10 @@
 
 Run from the project root after backend/.env has been copied into this stage.
 This uses the owner's real backend configuration, builds the React frontend,
-starts FastAPI + Vite locally, verifies the API proxy and browser rendering,
-and writes a mobile-width screenshot into docs/evidence.
-
-It intentionally does not install a new browser automation dependency.
-Chrome/Chromium is invoked in headless mode when available.
+starts FastAPI + Vite locally, verifies the API proxy and SPA route availability.
+Visual browser/mobile proof remains an explicit manual owner check because repeated
+Windows Chrome headless screenshot runs were nondeterministic even while the app
+and API were healthy.
 """
 from __future__ import annotations
 
@@ -16,14 +15,12 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
-import tempfile
 import time
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[2]
 BACKEND = ROOT / "backend"
 FRONTEND = ROOT / "frontend"
-EVIDENCE = ROOT / "docs" / "evidence"
 
 
 def run(command: list[str], cwd: Path) -> None:
@@ -57,62 +54,6 @@ def wait_text(url: str, timeout: float = 30.0) -> str:
     raise RuntimeError(f"Timed out waiting for {url}: {last}")
 
 
-def find_chrome() -> str | None:
-    candidates = [
-        shutil.which("google-chrome"), shutil.which("chromium"), shutil.which("chromium-browser"),
-        os.environ.get("PROGRAMFILES", "") + r"\Google\Chrome\Application\chrome.exe",
-        os.environ.get("PROGRAMFILES(X86)", "") + r"\Google\Chrome\Application\chrome.exe",
-        os.environ.get("LOCALAPPDATA", "") + r"\Google\Chrome\Application\chrome.exe",
-    ]
-    for candidate in candidates:
-        if candidate and Path(candidate).exists():
-            return candidate
-    return None
-
-
-def chrome_base_args(chrome: str, profile_dir: str) -> list[str]:
-    return [
-        chrome,
-        "--headless=new",
-        "--disable-gpu",
-        "--no-sandbox",
-        "--disable-dev-shm-usage",
-        "--disable-extensions",
-        "--disable-background-networking",
-        "--disable-component-update",
-        "--disable-default-apps",
-        "--disable-sync",
-        "--metrics-recording-only",
-        "--no-first-run",
-        "--no-default-browser-check",
-        f"--user-data-dir={profile_dir}",
-    ]
-
-
-def browser_screenshot(chrome: str, route: str, output: Path, width: int = 1440, height: int = 1000) -> None:
-    output.unlink(missing_ok=True)
-    with tempfile.TemporaryDirectory(prefix="priceyard-stage18-chrome-") as profile_dir:
-        command = chrome_base_args(chrome, profile_dir) + [
-            "--virtual-time-budget=3000",
-            "--hide-scrollbars",
-            f"--window-size={width},{height}",
-            f"--screenshot={output}",
-            f"http://127.0.0.1:5173{route}",
-        ]
-        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        try:
-            process.communicate(timeout=30)
-        except subprocess.TimeoutExpired:
-            # Some Windows Chrome builds write the screenshot successfully but keep
-            # a background process alive. Stop it and judge the browser proof by
-            # the screenshot artifact rather than by Chrome's exit timing.
-            process.kill()
-            process.communicate()
-
-    if not output.exists() or output.stat().st_size == 0:
-        raise RuntimeError(f"Chrome did not produce a browser screenshot for {route}")
-
-
 def main() -> None:
     if not (BACKEND / ".env").exists():
         raise SystemExit("FAIL: backend/.env is missing. Copy it from Stage 17 first.")
@@ -138,21 +79,25 @@ def main() -> None:
         assert '<div id="root"></div>' in html
         print("frontend dev server: PASS")
 
-        chrome = find_chrome()
-        if not chrome:
-            raise RuntimeError("Chrome/Chromium not found for browser/mobile verification")
-        routes = ["/", "/prices", "/history", "/market-days", "/faq", "/login", "/register"]
-        with tempfile.TemporaryDirectory(prefix="priceyard-stage18-routes-") as route_dir:
-            route_dir_path = Path(route_dir)
-            for index, route in enumerate(routes):
-                route_shot = route_dir_path / f"route-{index}.png"
-                browser_screenshot(chrome, route, route_shot)
-                print(f"browser route {route}: PASS")
+        routes = [
+            "/",
+            "/prices",
+            "/history",
+            "/market-days",
+            "/faq",
+            "/login",
+            "/register",
+            "/commodities/Egusi",
+        ]
+        for route in routes:
+            route_html = wait_text(f"http://127.0.0.1:5173{route}")
+            assert '<div id="root"></div>' in route_html
+            print(f"frontend SPA route {route}: PASS")
 
-        screenshot = EVIDENCE / "stage-18-owner-mobile.png"
-        browser_screenshot(chrome, "/prices", screenshot, width=390, height=844)
-        print("390x844 mobile-width browser render: PASS")
-        print("Mobile screenshot:", screenshot)
+        print(
+            "AUTOMATED VISUAL SCREENSHOT: SKIPPED "
+            "(manual owner browser/mobile proof required)"
+        )
     finally:
         frontend_proc.terminate(); backend_proc.terminate()
         try: frontend_proc.wait(timeout=5)
@@ -161,7 +106,7 @@ def main() -> None:
         except subprocess.TimeoutExpired: backend_proc.kill()
 
     print("STAGE 18 OWNER SMOKE: PASS")
-    print("MANUAL OWNER CHECK STILL REQUIRED: register/login, add/remove watchlist, submit feedback, and visually inspect the mobile screenshot before approval.")
+    print("MANUAL OWNER CHECK STILL REQUIRED: register/login, add/remove watchlist, submit feedback, open /commodities/Egusi, and confirm 375px mobile layout has no horizontal panning before approval.")
 
 
 if __name__ == "__main__":

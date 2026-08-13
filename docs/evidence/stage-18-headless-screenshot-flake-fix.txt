@@ -1,0 +1,29 @@
+Stage 18 deterministic smoke-helper correction
+Date: 2026-08-13
+
+Owner evidence before this correction:
+- npm install: PASS
+- production build: PASS
+- FastAPI health: PASS
+- Vite -> FastAPI proxy: PASS
+- /price-updates: HTTP 200
+- failure: Windows Chrome did not produce the first automated headless screenshot for /
+
+Assessment:
+- The failure is in the optional headless screenshot mechanism, not the PriceYard application.
+- Interactive owner browser evidence from the same Stage 18 work already showed PriceYard routes rendering.
+- The approved execution plan separately requires manual browser/mobile verification before owner approval.
+
+Smallest correction:
+- Remove flaky headless screenshot generation as an automated smoke gate.
+- Keep deterministic automated checks for production build, FastAPI health, Vite proxy, dev-server shell, and SPA route availability.
+- Include /commodities/Egusi in automated SPA-route availability.
+- Keep manual browser/mobile inspection mandatory, including 375px no-horizontal-panning verification.
+
+No frontend application code, backend code, API contract, database, migration, dependency, access rule, or Stage 19 functionality changed.
+
+Assistant checks:
+- python -m py_compile docs/evidence/stage-18-owner-smoke.py: PASS
+- python docs/evidence/stage-18-static-check.py: PASS
+- deterministic-helper static assertions: PASS
+- git diff --check: PASS

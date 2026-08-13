@@ -78,3 +78,10 @@ Owner proof required:
 - Smallest second mobile fix only changes responsive CSS: root/app/main width guards, mobile page/header full-width border-box padding, brand/access-strip constraints, card/form min-width clamps, footer wrapping, and horizontal overflow containment.
 - No backend, API, database, dependency, access-control, or Stage 19 code changed.
 - Stage 18 static scope check and mobile-overflow static fix check pass. Owner visual retest at 375px remains required.
+
+## Deterministic owner-smoke correction — 2026-08-13
+- Latest owner retest: production build PASS, FastAPI health PASS, Vite proxy PASS, `/price-updates` returned 200, then Windows Chrome failed to produce the first headless screenshot.
+- This is a verification-helper failure, not evidence of an application failure. The same Stage 18 pages have already rendered interactively in the owner's browser.
+- Smallest fix: automated smoke now verifies the production build, FastAPI, Vite proxy, and SPA route availability (including `/commodities/Egusi`) without depending on flaky headless Chrome screenshot output.
+- Manual browser/mobile visual proof remains mandatory before Stage 18 approval, including 375px no-horizontal-panning verification.
+- No frontend application, backend, API, database, dependency, migration, access rule, or Stage 19 feature changed.
