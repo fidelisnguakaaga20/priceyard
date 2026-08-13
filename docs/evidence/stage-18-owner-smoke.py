@@ -16,6 +16,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 import urllib.request
 
@@ -69,12 +70,33 @@ def find_chrome() -> str | None:
     return None
 
 
+def chrome_base_args(chrome: str, profile_dir: str) -> list[str]:
+    return [
+        chrome,
+        "--headless=new",
+        "--disable-gpu",
+        "--no-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-extensions",
+        "--disable-background-networking",
+        "--disable-component-update",
+        "--disable-default-apps",
+        "--disable-sync",
+        "--metrics-recording-only",
+        "--no-first-run",
+        "--no-default-browser-check",
+        f"--user-data-dir={profile_dir}",
+    ]
+
+
 def browser_dump(chrome: str, route: str) -> str:
-    result = subprocess.run(
-        [chrome, "--headless", "--disable-gpu", "--no-sandbox", "--virtual-time-budget=2500", "--dump-dom", f"http://127.0.0.1:5173{route}"],
-        check=True, capture_output=True, text=True, timeout=30,
-    )
-    return result.stdout
+    with tempfile.TemporaryDirectory(prefix="priceyard-stage18-chrome-") as profile_dir:
+        result = subprocess.run(
+            chrome_base_args(chrome, profile_dir)
+            + ["--virtual-time-budget=2500", "--dump-dom", f"http://127.0.0.1:5173{route}"],
+            check=True, capture_output=True, text=True, timeout=45,
+        )
+        return result.stdout
 
 
 def main() -> None:
@@ -120,10 +142,18 @@ def main() -> None:
             print(f"browser route {route}: PASS")
 
         screenshot = EVIDENCE / "stage-18-owner-mobile.png"
-        subprocess.run([
-            chrome, "--headless", "--disable-gpu", "--no-sandbox", "--virtual-time-budget=2500",
-            "--window-size=390,844", f"--screenshot={screenshot}", "http://127.0.0.1:5173/prices"
-        ], check=True, timeout=30)
+        with tempfile.TemporaryDirectory(prefix="priceyard-stage18-mobile-") as profile_dir:
+            subprocess.run(
+                chrome_base_args(chrome, profile_dir)
+                + [
+                    "--virtual-time-budget=2500",
+                    "--hide-scrollbars",
+                    "--window-size=390,844",
+                    f"--screenshot={screenshot}",
+                    "http://127.0.0.1:5173/prices",
+                ],
+                check=True, timeout=45,
+            )
         assert screenshot.exists() and screenshot.stat().st_size > 0
         print("390x844 mobile-width browser render: PASS")
         print("Mobile screenshot:", screenshot)

@@ -45,3 +45,18 @@ Owner proof required:
 - Assistant config retest via `tsc -p frontend/tsconfig.node.json --showConfig`: PASS; Stage 18 TS/TSX syntax check remains PASS.
 - Owner full Stage 18 smoke retest is still required; Stage 19 remains blocked.
 - Owner npm also reported 5 dependency vulnerabilities (1 moderate, 4 high). No `npm audit fix --force` was run because that could change approved dependency versions; this is tracked for security review rather than silently changing dependencies.
+
+## Owner browser-verification attempt and approved helper fix — 2026-08-13
+- Owner database connectivity retest: PASS.
+- Owner `npm install`: PASS.
+- Owner `npm run build`: PASS.
+- Owner FastAPI `/health`: PASS.
+- Owner Vite -> FastAPI proxy: PASS.
+- Owner frontend dev server: PASS.
+- Remaining failure: Windows Chrome headless `--dump-dom` process timed out after 30 seconds before browser-route proof completed.
+- Change Control approval received for test-helper-only correction.
+- Smallest fix: `docs/evidence/stage-18-owner-smoke.py` now launches Chrome with an isolated temporary user-data directory, `--headless=new`, safer noninteractive/background flags, and a 45-second browser timeout. The mobile screenshot uses the same isolated-profile approach.
+- Product frontend, backend, APIs, database, dependencies, and Stage 19 scope are unchanged.
+- Assistant `py_compile` of the helper: PASS.
+- Stage 18 static scope check after helper change: PASS.
+- Owner full browser/mobile retest is still required; Stage 19 remains blocked.

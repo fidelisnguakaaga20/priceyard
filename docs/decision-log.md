@@ -205,3 +205,16 @@ The Execution Plan permits only basic feedback count/average and explicitly forb
 - Reason: Stage 18 requires local React/FastAPI integration; production allowed-origin configuration is explicitly part of the later security/deployment stages.
 - Scope: frontend development only. `VITE_API_URL` is reserved for the deployed FastAPI base URL.
 - No database/API contract change results from this decision.
+
+## 2026-08-13 — Stage 18 Chrome verification-helper correction
+- Current requirement: Stage 18 requires browser/mobile verification before approval.
+- Source: PriceYard AI Project Execution Plan, Stage 18 and Change Control Rule.
+- Owner proof before change: frontend production build, FastAPI health, Vite proxy, and frontend dev server passed; Windows Chrome headless `--dump-dom` timed out.
+- Proposed/approved change: modify only `docs/evidence/stage-18-owner-smoke.py` to use isolated temporary Chrome profiles, `--headless=new`, noninteractive/background-reduction flags, and a 45-second browser timeout.
+- Reason: remove Windows Chrome profile/process interference from the verification helper without changing PriceYard product code.
+- Database effect: None.
+- API effect: None.
+- Frontend effect: None.
+- Test effect: Stage 18 browser/mobile verification helper only.
+- Completed-stage effect: None.
+- Approval: Owner explicitly said `approved chrome test fix`.

@@ -1,0 +1,43 @@
+STAGE 18 OWNER BROWSER RETEST / CHANGE CONTROL RECORD
+Date: 2026-08-13
+
+OWNER PROOF BEFORE FIX
+- Database connection: PASS
+- npm install: PASS
+- npm run build: PASS
+- frontend production build: PASS
+- FastAPI health: PASS
+- Vite -> FastAPI API proxy: PASS
+- frontend dev server: PASS
+- Browser route verification: FAIL/BLOCKED by Chrome headless timeout on Windows
+
+FAILURE
+subprocess.TimeoutExpired while invoking Chrome --headless --dump-dom against http://127.0.0.1:5173/
+
+APPROVED CHANGE
+Owner approved: "approved chrome test fix"
+
+IMPLEMENTED FIX
+- Test helper only: docs/evidence/stage-18-owner-smoke.py
+- Use --headless=new
+- Use isolated temporary --user-data-dir for each browser invocation
+- Disable nonessential background Chrome behavior for deterministic smoke testing
+- Increase browser invocation timeout from 30 to 45 seconds
+- Apply isolated profile to 390x844 screenshot verification too
+
+NO PRODUCT CHANGE
+- frontend application: unchanged
+- backend: unchanged
+- API contracts: unchanged
+- database: unchanged
+- dependencies: unchanged
+- Stage 19: not started
+
+ASSISTANT RETEST
+- Python helper compile: PASS
+- Stage 18 static scope check: PASS
+
+OWNER ACTION REQUIRED
+Rerun: python docs/evidence/stage-18-owner-smoke.py
+Required final automated line: STAGE 18 OWNER SMOKE: PASS
+Manual owner checks remain required before Stage 18 approval.
