@@ -479,3 +479,33 @@ Stage 14 content rules:
 The paid-source word-for-word rule requires human/editorial source comparison; it is not represented as an automated plagiarism detector.
 
 No Stage 15 feedback-management API or later-stage feature is added in Stage 14.
+
+
+## Stage 15 — User Feedback and 1–5 Star Rating
+
+### POST /feedback
+Purpose: allow an authenticated user to submit PriceYard experience feedback.
+Authentication: active bearer JWT required.
+Input fields: `rating`, `comment`, `price_usefulness`, `price_accuracy`, `missing_market_request`, `missing_commodity_request`, `complaint_or_suggestion`, `continue_using_feedback`, `willingness_to_pay_feedback`.
+Rules: rating must be 1 through 5; `user_id` is server-controlled from the authenticated user and cannot be supplied by the client.
+
+### GET /feedback
+Purpose: admin-only feedback list with optional rating filter.
+Authentication: admin bearer JWT required.
+Query: optional `rating=1..5`.
+Rule: ordinary users cannot browse private feedback from other users.
+
+### GET /feedback/summary
+Purpose: admin-only basic feedback summary.
+Authentication: admin bearer JWT required.
+Response: total feedback count and average rating only. No advanced analytics are included.
+
+### GET /feedback/{feedback_id}
+Purpose: admin-only view of one feedback record, including complaints/suggestions.
+Authentication: admin bearer JWT required.
+
+### DELETE /feedback/{feedback_id}
+Purpose: admin-only removal of a feedback record under the Architecture-approved Feedback API.
+Authentication: admin bearer JWT required.
+
+Stage 15 reuses the existing Stage 3 `feedback` table and adds no migration, Stage 16 audit-log behavior, advanced analytics, or other later-stage feature.

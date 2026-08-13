@@ -1,0 +1,2 @@
+{'rating 0 rejected': 'PASS', 'rating 6 rejected': 'PASS', 'rating 1 saved': 'PASS', 'rating 5 saved': 'PASS', 'user link server controlled': 'PASS', 'rating filter works': 'PASS', 'summary count works': 'PASS', 'summary average works': 'PASS', 'relationship works': 'PASS'}
+STAGE 15 INTERNAL SERVICE CHECK: PASS

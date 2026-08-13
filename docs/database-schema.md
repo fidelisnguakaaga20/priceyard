@@ -326,3 +326,14 @@ Stage 13 does not create FAQ, alert, report, reporter, payment, or other Stage 1
 
 ## Stage 14 — FAQ schema use
 Stage 14 requires no migration. It reuses the `faq_items` table created in the Stage 3 foundation with fields `id`, `question`, `answer`, `category`, `is_published`, `created_by`, `created_at`, and `updated_at`. Publication is controlled by the FAQ publish/hide API flow.
+
+
+## Stage 15 — Feedback schema use
+Stage 15 requires no migration. It reuses the `feedback` table created in Stage 3 with fields `id`, `user_id`, `rating`, `comment`, `price_usefulness`, `price_accuracy`, `missing_market_request`, `missing_commodity_request`, `complaint_or_suggestion`, `continue_using_feedback`, `willingness_to_pay_feedback`, `created_at`, and `updated_at`.
+
+Integrity/access rules:
+- rating remains constrained to 1 through 5 at both API and database levels;
+- `user_id` is derived from the authenticated user, not client input;
+- feedback is linked to the submitting user;
+- ordinary users can submit feedback but cannot browse all users' private feedback;
+- admin summary is limited to count and average rating, with no advanced analytics.

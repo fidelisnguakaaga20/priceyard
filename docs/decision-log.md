@@ -181,3 +181,21 @@ The approved Architecture Design includes nullable `target_price` in the `watchl
 
 ## 2026-08-13 — Stage 14 publication boundary
 New FAQ records start hidden and publication state is changed only through the approved publish/hide actions. This keeps accidental drafts out of public FAQ responses. Public FAQ responses omit creator and publication-control fields. The paid-group word-for-word rule remains a human/editorial source-check because no paid-source corpus is stored for automated comparison.
+
+
+## DEC-013 — Stage 14 approval and Stage 15 authorization
+- Date: 2026-08-13
+- Current requirement: Do not proceed from Stage 14 until owner approval.
+- Source: PriceYard AI Project Execution Plan.
+- Owner proof: Alembic remained at `0005_stage13_watchlists` as expected and `STAGE 14 OWNER SMOKE: PASS` showed FAQ create/edit/publish/hide/delete, public visibility, unauthorized management blocking, safety validation, disclaimer preservation, and relationships passing on the owner's Supabase-backed environment.
+- Owner instruction: `continue 15`.
+- Decision: Treat the instruction as explicit approval of Stage 14 and authorization to execute Stage 15 — User Feedback and 1–5 Star Rating only.
+- Database effect: No migration; Stage 15 reuses the approved `feedback` table created in Stage 3.
+- API effect: Authorizes authenticated user feedback submission plus admin list/filter/detail/basic summary. The Architecture-approved feedback delete endpoint is included.
+- Frontend effect: None in Stage 15.
+- Test effect: Stage 15 must prove ratings 1 and 5 work, 0 and 6 fail, user linkage works, admin view/filter/basic summary work, and ordinary users cannot browse all private feedback.
+- Completed-stage effect: Stage 14 becomes RETESTED/PASS and owner-approved.
+- Approval: Owner instruction in conversation.
+
+## 2026-08-13 — Stage 15 summary boundary
+The Execution Plan permits only basic feedback count/average and explicitly forbids advanced analytics. Stage 15 therefore exposes only total count and average rating in the admin summary.

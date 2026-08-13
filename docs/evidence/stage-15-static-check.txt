@@ -1,0 +1,10 @@
+Stage 15 static/build scope check
+- Existing Stage 3 feedback table reused: PASS
+- No Stage 15 migration introduced: PASS
+- Feedback rating input constrained to 1..5: PASS
+- Feedback user_id is server-controlled from authenticated user: PASS
+- Admin-only list/filter/detail/summary: PASS
+- Architecture-approved admin delete endpoint present: PASS
+- Summary limited to count and average rating; no advanced analytics: PASS
+- No Stage 16 audit-log implementation added: PASS
+- No payment, alerts, AI prediction, marketplace, reporter portal, or other deferred feature added: PASS

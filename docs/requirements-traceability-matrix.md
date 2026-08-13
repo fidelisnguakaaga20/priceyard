@@ -126,3 +126,12 @@
 | S14-07 | Reference/Execution | Approved disclaimer wording can be stored and displayed without being blocked by safety validation | MVP | 14 | faq schema/routes | Schema + owner Stage 14 smoke | docs/evidence/stage-14-owner-smoke.py | RETESTED/PASS |
 | S14-08 | Architecture | Admin can delete an incorrect FAQ item | MVP | 14 | DELETE /faq/{faq_id}; faq service | Owner Stage 14 smoke | docs/evidence/stage-14-owner-smoke.py | RETESTED/PASS |
 | S14-09 | Execution | Stage 14 reuses existing faq_items table and adds no Stage 15+ feature or new dependency | MVP | 14 | existing Stage 3 schema; repository scope | Static scope review | docs/evidence/stage-14-static-check.txt | PASS |
+
+| S15-01 | Execution | Authenticated user can submit feedback with approved Stage 15 fields | MVP | 15 | feedback schema/service/routes | Internal service + owner smoke | docs/evidence/stage-15-internal-output.txt; docs/evidence/stage-15-owner-smoke.py | IN PROGRESS |
+| S15-02 | Execution | Feedback rating accepts only 1–5 | MVP | 15 | feedback schema; existing DB check constraint | Internal validation + owner smoke | docs/evidence/stage-15-internal-output.txt; docs/evidence/stage-15-owner-smoke.py | IN PROGRESS |
+| S15-03 | Execution | Feedback user link is server-controlled and relational | MVP | 15 | feedback service; Feedback.user relationship | Internal relationship + owner smoke | docs/evidence/stage-15-internal-output.txt; docs/evidence/stage-15-owner-smoke.py | IN PROGRESS |
+| S15-04 | Execution | Admin can view feedback and filter by rating | MVP | 15 | GET /feedback | Owner smoke | docs/evidence/stage-15-owner-smoke.py | IN PROGRESS |
+| S15-05 | Execution | Admin can see basic feedback count and average rating only | MVP | 15 | GET /feedback/summary | Internal summary + owner smoke | docs/evidence/stage-15-internal-output.txt; docs/evidence/stage-15-owner-smoke.py | IN PROGRESS |
+| S15-06 | Execution | Non-admin cannot browse all private feedback | MVP | 15 | admin role dependencies | Owner smoke | docs/evidence/stage-15-owner-smoke.py | IN PROGRESS |
+| S15-07 | Architecture | Admin can read complaints/suggestions and delete feedback through approved API | MVP | 15 | GET/DELETE /feedback/{id} | Owner smoke | docs/evidence/stage-15-owner-smoke.py | IN PROGRESS |
+| S15-08 | Execution | No advanced analytics, migration, Stage 16 audit behavior, or later feature added | MVP | 15 | repository scope | Static scope review | docs/evidence/stage-15-static-check.txt | PASS |

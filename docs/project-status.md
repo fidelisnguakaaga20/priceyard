@@ -1,7 +1,7 @@
 # PriceYard Project Status
 
 ## Current stage
-Stage 14 — FAQ — RETESTED/PASS after owner Supabase-backed runtime verification; awaiting owner approval before Stage 15.
+Stage 15 — User Feedback and 1–5 Star Rating — BUILT/IN PROGRESS; awaiting owner Supabase-backed runtime verification before Stage 16.
 
 ## Stage 0 disposition
 Owner supplied validation metrics: 65 reached, 14 replies, 5 willing to pay, positive usefulness/trust/continuation signals, sample market records and two source types.
@@ -26,6 +26,7 @@ On 2026-08-12, the owner explicitly granted Application Coding Permission: YES. 
 - Stage 11 — Storage Suitability: RETESTED/PASS and owner-approved after owner Supabase migration and a successful retest following one transient database connection interruption.
 - Stage 12 — Cost Breakdown: RETESTED/PASS and owner-approved after Alembic migration plus local Supabase-backed owner smoke verification.
 - Stage 13 — Watchlist: RETESTED/PASS and owner-approved after Alembic migration plus local Supabase-backed owner smoke verification and the owner instruction to continue.
+- Stage 14 — FAQ: RETESTED/PASS and owner-approved after local Supabase-backed owner smoke verification and the owner instruction `continue 15`.
 
 ## Stage 10 implementation completed
 - Added `buying_zones` and `sell_watch_windows` models and approved relationships.
@@ -140,5 +141,23 @@ Stage 0 independent-source/duration evidence remains unresolved and must be reco
 ## Unapproved features added
 None.
 
+## Stage 15 implementation completed
+- Reused the existing Stage 3 `feedback` table; no migration is required.
+- Added feedback schemas, service, routes, and FastAPI router registration.
+- Authenticated users can submit 1–5 star feedback with comment, usefulness, accuracy, missing-market/commodity requests, complaint/suggestion, continue-using feedback, and willingness-to-pay feedback.
+- `user_id` is server-controlled from the authenticated user and cannot be supplied by clients.
+- Admin can list feedback, filter by rating, view one feedback record, and see a basic count/average summary.
+- Ordinary users cannot browse all private feedback, view admin summaries/details, or delete feedback.
+- Included the Architecture-approved admin delete endpoint.
+- No advanced analytics, Stage 16 audit behavior, migration, dependency, payment, alert, AI prediction, marketplace, or other future feature was added.
+
+## Stage 15 internal verification
+- Python compilation: PASS.
+- Existing feedback model/table field review: PASS.
+- Rating 0/6 schema rejection: PASS.
+- Rating 1/5 service save, user linkage, filter, summary count/average, and relationship checks on temporary SQLite: PASS.
+- Static scope review: PASS.
+- Real Supabase owner runtime proof is still required.
+
 ## Next gate
-Stage 14 — FAQ is RETESTED/PASS and awaits owner approval. Do not start Stage 15 until the owner explicitly approves.
+Stage 15 — User Feedback and 1–5 Star Rating is BUILT/IN PROGRESS and awaits owner Supabase-backed runtime verification. Do not start Stage 16 until Stage 15 passes and the owner explicitly approves.
