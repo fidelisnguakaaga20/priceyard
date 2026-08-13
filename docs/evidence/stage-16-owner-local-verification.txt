@@ -1,0 +1,38 @@
+Stage 16 owner local verification
+Date: 2026-08-13
+Environment: owner Windows/Git Bash + configured Supabase PostgreSQL
+
+Commands reported by owner:
+- copy prior .env into Stage 16 backend
+- python -m pip install -r requirements-dev.txt
+- python -m alembic current
+- python ../docs/evidence/stage-16-owner-smoke.py
+
+Observed database migration head:
+0005_stage13_watchlists (head)
+
+Owner smoke result:
+STAGE 16 OWNER SMOKE: PASS
+
+Verified checks reported PASS include:
+- existing audit_logs table and approved fields
+- admin-only audit history/detail access
+- ordinary user blocked
+- commodity create/edit/delete auditing
+- market create/edit/delete auditing
+- price create/edit/approve/mark-outdated/delete auditing
+- FAQ create/edit/publish/hide/delete auditing
+- user status/reactivation auditing
+- subscription status/reset auditing
+- feedback admin deletion auditing
+- required Stage 16 action set present
+- possible_meaning and suggested_action changes preserved in audit history
+- plaintext password absent
+- password hash fields absent
+- JWT/token secrets absent
+- database secrets absent
+- .env data absent
+- private source_1/source_2 values absent
+
+Owner instruction: if output is okay, continue to the next stage.
+Disposition: RETESTED/PASS and owner-approved; Stage 17 may start.

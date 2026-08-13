@@ -1,7 +1,7 @@
 # PriceYard Project Status
 
 ## Current stage
-Stage 16 — Audit Logs — IN PROGRESS; Stage 15 has passed owner Supabase-backed verification and was approved by the owner instruction to continue to the next stage.
+Stage 17 — Simple CSV Report Export — IN PROGRESS; Stage 16 passed owner Supabase-backed verification and was approved by the owner instruction to continue to the next stage.
 
 ## Stage 0 disposition
 Owner supplied validation metrics: 65 reached, 14 replies, 5 willing to pay, positive usefulness/trust/continuation signals, sample market records and two source types.
@@ -179,5 +179,8 @@ RETESTED/PASS. Owner confirmed Alembic remains at `0005_stage13_watchlists` beca
 - Sensitive/private-source absence checks: PASS.
 - Real Supabase owner runtime proof is still required.
 
+## Stage 16 owner verification
+RETESTED/PASS. Owner confirmed Alembic remains at `0005_stage13_watchlists`, then ran `docs/evidence/stage-16-owner-smoke.py` against the configured Supabase PostgreSQL environment and received `STAGE 16 OWNER SMOKE: PASS`. Required audit actions, admin-only access, Possible Meaning/Suggested Action change capture, and sensitive/private-source exclusion all passed. The owner instructed that if the output was okay, continue to the next stage, which approves Stage 16 and Stage 17 start.
+
 ## Next gate
-Stage 16 — Audit Logs is BUILT/IN PROGRESS and awaits owner Supabase-backed runtime verification. Do not start Stage 17 until Stage 16 passes and the owner explicitly approves.
+Stage 17 — Simple CSV Report Export is approved to start. Build and verify Stage 17 only; do not start Stage 18 until Stage 17 owner verification and approval.
