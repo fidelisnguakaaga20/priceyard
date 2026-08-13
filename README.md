@@ -7,6 +7,6 @@ Tagline: **Know the market before you buy or sell.**
 This repository is governed by the approved PriceYard Reference Document, Architecture Design, and AI Project Execution Plan in `docs/`.
 
 ## Current stage
-Stage 11 — Storage Suitability: BUILT/IN PROGRESS.
+Stage 17 — Simple CSV Report Export: BUILT/IN PROGRESS.
 
-Stages 1–10 are completed/owner-approved under the execution gates. Stage 11 has been built and internally checked, but the owner must apply the Stage 11 migration and pass the Supabase-backed owner smoke before Stage 12 can begin.
+Stages 1–16 are completed/owner-approved under the execution gates. Stage 17 has been built and internally checked, but the owner must run the Supabase-backed Stage 17 smoke before Stage 18 can begin.

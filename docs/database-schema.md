@@ -347,3 +347,6 @@ Stage 16 rules:
 - password/password-hash data, JWT/secret/token data, database credentials/URLs, `.env` data, and private price-source identities are excluded from audit snapshots;
 - ordinary users cannot view audit history;
 - no Stage 17 CSV-report schema or other later-stage schema is introduced.
+
+## Stage 17 — CSV export schema use
+Stage 17 requires no migration and creates no report-storage table. The CSV export reads approved `price_updates` and their existing commodity, market, market-signal, and quality-signal relationships. Repository Alembic head remains `0005_stage13_watchlists`.

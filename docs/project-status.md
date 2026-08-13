@@ -182,5 +182,24 @@ RETESTED/PASS. Owner confirmed Alembic remains at `0005_stage13_watchlists` beca
 ## Stage 16 owner verification
 RETESTED/PASS. Owner confirmed Alembic remains at `0005_stage13_watchlists`, then ran `docs/evidence/stage-16-owner-smoke.py` against the configured Supabase PostgreSQL environment and received `STAGE 16 OWNER SMOKE: PASS`. Required audit actions, admin-only access, Possible Meaning/Suggested Action change capture, and sensitive/private-source exclusion all passed. The owner instructed that if the output was okay, continue to the next stage, which approves Stage 16 and Stage 17 start.
 
+## Stage 17 implementation completed
+- Added admin-only simple CSV export at `GET /reports/prices.csv`.
+- Added optional commodity, market, `date_from`, and `date_to` filters with inclusive date-range handling.
+- Export includes approved price-update commodity/market, current range, previous range, movement, update date/time, confidence, Possible Meaning, Suggested Action, and linked market/quality signals.
+- Only approved price updates are exported; rejected/pending records are excluded.
+- Private `source_1`/`source_2`, password/hash fields, JWT/secrets, and unnecessary personal data are not CSV columns.
+- Existing Stage 9 signals have no separate approval-status field; linked admin-managed signals are included only when attached to an approved price update.
+- No migration or dependency was added; repository Alembic head remains `0005_stage13_watchlists`.
+- No PDF reporting, report-storage table, advanced analytics, Stage 18 frontend, payment, alert, AI prediction, marketplace, or other future feature was added.
+
+## Stage 17 internal verification
+- Python compilation: PASS.
+- Static route/field/privacy/scope check: PASS.
+- Temporary SQLite filter/CSV-content test: PASS.
+- Temporary SQLite full FastAPI/API smoke with an internal bcrypt compatibility stub: PASS; this is build evidence only.
+- Current/previous ranges, Possible Meaning, Suggested Action, linked market/quality signals, and private-source exclusion: PASS.
+- Repository Alembic head unchanged at `0005_stage13_watchlists`: PASS.
+- Real Supabase owner runtime proof is still required.
+
 ## Next gate
-Stage 17 — Simple CSV Report Export is approved to start. Build and verify Stage 17 only; do not start Stage 18 until Stage 17 owner verification and approval.
+Stage 17 — Simple CSV Report Export is BUILT/IN PROGRESS and awaits owner Supabase-backed runtime verification. Do not start Stage 18 until Stage 17 passes and the owner explicitly approves.

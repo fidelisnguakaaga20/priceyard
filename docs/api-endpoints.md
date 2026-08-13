@@ -525,3 +525,24 @@ Authentication: admin bearer JWT required.
 Stage 16 records important admin changes for price updates, commodities, markets, FAQ, subscriptions, users, and feedback administration. Price-update edit snapshots preserve changes to `possible_meaning` and `suggested_action`.
 
 Audit snapshots intentionally exclude password/password-hash fields, secrets/tokens, database credentials/URLs, `.env` values, and private price-source identities (`source_1`, `source_2`). Stage 16 adds no CSV export or Stage 17 feature.
+
+## Stage 17 — Simple CSV Report Export
+
+### GET /reports/prices.csv
+Purpose: download a simple CSV report of approved PriceYard price intelligence.
+Authentication: admin bearer JWT required.
+Query filters:
+- optional `commodity`
+- optional `market`
+- optional `date_from` (YYYY-MM-DD)
+- optional `date_to` (YYYY-MM-DD)
+
+Rules:
+- only approved `price_updates` are exported;
+- date range is inclusive; `date_from` later than `date_to` is rejected;
+- export includes commodity, market, current price range, previous price range, movement, update date/time, confidence, Possible Meaning, Suggested Action, linked market signals, and linked quality signals;
+- the Stage 9 signal schema has no separate approval-status field, so linked admin-managed signals are exported only when attached to an approved price update;
+- private source identities (`source_1`, `source_2`), password data, JWT/secrets, and unnecessary personal data are not exported;
+- no PDF generation, report-storage table, advanced analytics, or Stage 18 frontend is included.
+
+Response: `text/csv` attachment named `priceyard-price-report.csv`.

@@ -1,0 +1,2 @@
+{'filters isolate approved Egusi/Nasarawa row': 'PASS', 'CSV row generated': 'PASS', 'current range exported': 'PASS', 'previous range exported': 'PASS', 'possible meaning preserved': 'PASS', 'suggested action preserved': 'PASS', 'market signal included': 'PASS', 'quality signal included': 'PASS', 'private source identities absent': 'PASS', 'date range returns both approved rows only': 'PASS', 'invalid date order rejected': 'PASS'}
+STAGE 17 INTERNAL CHECK: PASS
