@@ -6,4 +6,4 @@ Follow the approved stage sequence strictly:
 
 Only one stage may be active at a time unless the owner explicitly approves a change.
 
-Stages 1 through 18 are completed/owner-approved under the execution gates. Stage 19 — Admin Frontend MVP is RETESTED/PASS with owner runtime/browser proof complete and now awaits explicit owner approval. Stage 20 must not start until that approval is received.
+Stages 1 through 19 are completed/owner-approved under the execution gates. Stage 20 — Access Control and Subscription Testing is active. Its pre-fix assessment found three access-control gaps that require Change Control approval before application behavior is modified. Stage 21 must not start until Stage 20 is RETESTED/PASS and owner-approved.

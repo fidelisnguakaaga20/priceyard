@@ -218,3 +218,9 @@ The Execution Plan permits only basic feedback count/average and explicitly forb
 - Test effect: Stage 18 browser/mobile verification helper only.
 - Completed-stage effect: None.
 - Approval: Owner explicitly said `approved chrome test fix`.
+
+## 2026-08-18 — Stage 20 access-control assessment before correction
+- Decision: Start Stage 20 only after explicit owner approval of Stage 19.
+- Decision: Create the access-control matrix and run a no-behavior-change assessment before editing routes/schemas.
+- Finding: Existing full-access and admin/inactive controls pass static inspection, but Guest public-price payload depth, limited market-signal payload depth, and quality-signal access do not yet meet the approved Stage 20 limited/full separation.
+- Decision: Stop under Change Control and request owner approval before changing those existing API response/access behaviors.

@@ -1,0 +1,16 @@
+inactive accounts are rejected by backend current-user dependency: PASS
+admin role has full-access bypass: PASS
+active paid status is full access: PASS
+trial access expires by time: PASS
+free/cancelled/expired are not classified full-access: PASS
+buying zones use backend full-access guard: PASS
+sell-watch uses backend full-access guard: PASS
+storage suitability uses backend full-access guard: PASS
+cost breakdown uses backend full-access guard: PASS
+feedback submission requires authenticated active user: PASS
+watchlist requires authenticated active user: PASS
+admin APIs use admin role guards: PASS
+guest public price payload excludes deeper premium guidance: FAIL (expected pre-fix)
+limited-user market signal payload is basic only: FAIL (expected pre-fix)
+quality signals require full approved access: FAIL (expected pre-fix)
+STAGE 20 STATIC ASSESSMENT: COMPLETE — 3 APPROVED-REQUIREMENT GAPS REQUIRE CHANGE CONTROL
