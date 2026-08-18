@@ -1,7 +1,7 @@
 # PriceYard Project Status
 
 ## Current stage
-Stage 19 — Admin Frontend MVP — BUILT/IN PROGRESS. Stage 18 Public/User Frontend is RETESTED/PASS and owner-approved. Stage 19 admin routes/pages are built and internally checked; real owner npm build/admin API proof is still required. Stage 20 remains blocked until Stage 19 owner proof passes.
+Stage 19 — Admin Frontend MVP — RETESTED/PASS; runtime, browser, data-repair, and cleanup proof are complete. Explicit owner approval is the remaining gate. Stage 20 remains blocked until that approval is given.
 
 ## Stage 0 disposition
 Owner supplied validation metrics: 65 reached, 14 replies, 5 willing to pay, positive usefulness/trust/continuation signals, sample market records and two source types.
@@ -278,3 +278,7 @@ Run `docs/evidence/stage-19-owner-smoke.py` in the owner environment, then visua
 
 ## Stage 19 owner smoke environment-path failure / smallest fix — 2026-08-13
 The first owner Stage 19 smoke attempt stopped before application verification with `DATABASE_URL is required for database operations`. The owner had correctly copied `backend/.env`; the helper was launched from the project root while application settings resolve `.env` relative to the working directory. The smallest fix changes only `docs/evidence/stage-19-owner-smoke.py` to enter `backend/` before importing application modules. Helper compilation, Stage 19 static scope checks, and a temporary non-secret backend `.env` resolution check pass. No frontend feature, backend business logic, API, database schema, migration, dependency, or Stage 20 work changed. Owner Stage 19 smoke retest is still required.
+
+
+## Stage 19 owner verification complete — 2026-08-19
+Owner proof is complete. Data repair restored the accidental browser-test mutations and verified the exact MVP core commodities/markets. The Stage 19 static check, npm production build, owner API smoke, non-admin authorization checks, browser Admin Overview, editable Possible Meaning / Suggested Action controls, three consecutive history requests, and temporary-admin cleanup all passed. The earlier Price Update 422 was confirmed to be expected validation because the entered average price was outside the current range. A transient Supabase pooler DNS lookup failure on `/auth/me` later recovered without code change and is recorded as a non-reproducible environment/network observation. npm audit findings remain reserved for Stage 21. Stage 20 has not started; explicit owner approval of Stage 19 is still required.
