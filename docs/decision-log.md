@@ -358,3 +358,12 @@ The Execution Plan permits only basic feedback count/average and explicitly forb
 10. Approval: owner explicitly stated `suspend the stage 20-21 and host now`.
 
 Scope boundary: no marketplace, payment, AI prediction, alert, logistics, or other future feature is authorized. Stage 24 cannot pass while Stages 20–21 remain deferred.
+
+
+## 2026-08-25 — Stage 22 Render backend build/start result
+
+- Build command completed and Alembic connected to PostgreSQL successfully.
+- Uvicorn application startup completed on Render.
+- Primary URL: `https://priceyard-api.onrender.com`.
+- Root `404`: expected; no root endpoint exists.
+- Next proof: owner opens `/health`, then deploys the React Static Site.

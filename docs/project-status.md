@@ -368,3 +368,10 @@ CR-06 is RETESTED/PASS and owner-approved. Login and Register Show/Hide worked, 
 The owner explicitly instructed PriceYard to suspend Stages 20–21 and host now. Incomplete Stage 20 requirements and Stage 21 are DEFERRED with accepted business/security risk; they are not marked PASS. Stage 24 final acceptance remains blocked until they are resumed and passed.
 
 Stage 22 is IN PROGRESS using Render Static Site for React, Render Free Web Service for FastAPI, and the existing Supabase PostgreSQL database. Deployment-specific CORS preparation is implemented with exact environment-controlled origins and no wildcard.
+
+
+## Stage 22 Render backend deployment — build/start PASS — 2026-08-25
+
+Render checked out commit `e462deb0fb00154f0b1d2b36dd0c628eb6ed9dd4`, used Python 3.12.8, installed approved dependencies, ran Alembic successfully against PostgreSQL, uploaded the build, and started Uvicorn on Render's assigned port. Render reported the service live at `https://priceyard-api.onrender.com`.
+
+The root-path `404 Not Found` is expected because no `GET /` API is defined. Direct `GET /health` owner verification remains the next proof before the backend portion is marked complete.

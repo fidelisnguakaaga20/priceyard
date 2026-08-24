@@ -217,3 +217,5 @@
 | S21-SUSPENDED | Owner-approved change control | Stage 21 full MVP testing and security review is suspended before deployment; it must be resumed before Stage 24 | MVP | 21 | project governance | Owner decision record | docs/decision-log.md; docs/deployment-plan.md | DEFERRED |
 | S22-01 | Execution/Deployment | FastAPI uses exact environment-controlled CORS origins for the deployed React frontend | MVP | 22 | backend config/main | Static/compile + production preflight | docs/evidence/stage-22-deployment-prep-check.py | IN PROGRESS |
 | S22-02 | Execution/Deployment | React deploys on Render Static Site, FastAPI on Render Web Service, and existing PostgreSQL remains on Supabase | MVP | 22 | Render services; Supabase | Live deployment verification | docs/evidence/stage-22-owner-deployment-steps.md | IN PROGRESS |
+
+| S22-03 | Execution/Deployment | Render builds the FastAPI backend, applies Alembic, starts Uvicorn and exposes the service URL | MVP | 22 | Render Web Service | Render deploy logs + health URL | docs/evidence/stage-22-render-backend-deployment.md | IN PROGRESS |
