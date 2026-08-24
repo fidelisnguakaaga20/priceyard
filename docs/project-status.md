@@ -12,6 +12,12 @@ CR-02 Success Confirmation Popups is RETESTED/PASS and owner-approved. Login, re
 
 The owner authorized continuation under the approved execution plan. CR-03 is now the only authorized change stage; CR-04 has not started.
 
+## Approved change request CR-03 — 2026-08-24
+
+CR-03 Active MVP Data Reset is implemented and automated checks pass. Existing `is_active` fields are reused. Data revision `0006_cr03_egusi_kwali` preserves every record while focusing active data on Egusi and Kwali Market. Public catalogs/prices filter inactive references; protected admin all-record endpoints preserve CRUD/reactivation and history visibility. Python compilation, focused static checks, TypeScript, and Vite production build pass.
+
+Owner PostgreSQL migration, API/CRUD smoke, and browser verification remain required. CR-04 has not started.
+
 ## Current stage
 Stage 19 — Admin Frontend MVP — RETESTED/PASS; runtime, browser, data-repair, and cleanup proof are complete. Explicit owner approval is the remaining gate. Stage 20 remains blocked until that approval is given.
 

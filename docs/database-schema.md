@@ -358,3 +358,15 @@ The public/user React frontend introduces no database table, column, constraint,
 ## Stage 19 — No Database Change
 
 Stage 19 is frontend-only. No table, column, relationship, constraint or migration is added or changed. Alembic head remains `0005_stage13_watchlists`.
+
+## CR-03 — Active MVP Data Focus
+
+Alembic revision `0006_cr03_egusi_kwali` changes data flags only; it creates no table or column.
+
+- Ensures one canonical `Egusi` commodity and `Kwali Market` market exist for fresh databases.
+- Sets every commodity inactive, then activates only the canonical Egusi record.
+- Sets every market inactive, then activates only the canonical Kwali Market record.
+- Preserves all existing rows, relationships, users, subscriptions, audit logs, authentication data, and historical price intelligence.
+- Admin can later create or reactivate commodities/markets through the existing `is_active` CRUD fields.
+
+Alembic head becomes `0006_cr03_egusi_kwali` after owner migration verification.

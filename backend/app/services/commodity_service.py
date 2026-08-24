@@ -7,8 +7,11 @@ from app.models.commodity import Commodity
 from app.schemas.commodity_schema import CommodityCreate, CommodityUpdate
 
 
-def list_commodities(db: Session) -> list[Commodity]:
-    return list(db.scalars(select(Commodity).order_by(Commodity.name)).all())
+def list_commodities(db: Session, *, active_only: bool = False) -> list[Commodity]:
+    statement = select(Commodity)
+    if active_only:
+        statement = statement.where(Commodity.is_active.is_(True))
+    return list(db.scalars(statement.order_by(Commodity.name)).all())
 
 
 def get_commodity(db: Session, commodity_id: int) -> Commodity:

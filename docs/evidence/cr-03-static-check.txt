@@ -1,0 +1,18 @@
+CR-03 STATIC CHECK: PASS
+
+PASS: commodities and markets already use is_active
+PASS: migration follows 0005_stage13_watchlists and ensures Egusi/Kwali records
+PASS: migration deactivates prior sets and activates only canonical Egusi/Kwali
+PASS: migration deletes no table/business record and does not touch users/subscriptions/audit logs
+PASS: public commodity/market catalogs are active-only
+PASS: protected admin all-record catalog endpoints exist
+PASS: commodity/market CRUD remains intact
+PASS: public current/detail/history/comparison price queries require active commodity and market
+PASS: protected admin price history preserves management visibility
+PASS: price creation still rejects inactive references
+PASS: public filters load active commodities/markets and use selects
+PASS: admin commodity/market/dashboard/price pages preserve all-record management
+
+Command:
+python docs/evidence/cr-03-static-check.py
+

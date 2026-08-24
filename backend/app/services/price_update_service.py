@@ -72,21 +72,27 @@ def _approved_price_statement(
     movement: Movement | None = None,
     time_of_day: TimeOfDay | None = None,
     include_outdated: bool = True,
+    active_only: bool = True,
 ):
-    statement = select(PriceUpdate).options(*PRICE_UPDATE_LOAD_OPTIONS).where(PriceUpdate.status == "approved")
+    statement = (
+        select(PriceUpdate)
+        .join(Commodity, PriceUpdate.commodity_id == Commodity.id)
+        .join(Market, PriceUpdate.market_id == Market.id)
+        .options(*PRICE_UPDATE_LOAD_OPTIONS)
+        .where(PriceUpdate.status == "approved")
+    )
+
+    if active_only:
+        statement = statement.where(Commodity.is_active.is_(True), Market.is_active.is_(True))
 
     if not include_outdated:
         statement = statement.where(PriceUpdate.is_outdated.is_(False))
 
     if commodity_search:
-        statement = statement.join(Commodity, PriceUpdate.commodity_id == Commodity.id).where(
-            Commodity.name.ilike(f"%{commodity_search}%")
-        )
+        statement = statement.where(Commodity.name.ilike(f"%{commodity_search}%"))
 
     if market_search:
-        statement = statement.join(Market, PriceUpdate.market_id == Market.id).where(
-            Market.name.ilike(f"%{market_search}%")
-        )
+        statement = statement.where(Market.name.ilike(f"%{market_search}%"))
 
     if selected_date is not None:
         start = datetime.combine(selected_date, time.min, tzinfo=timezone.utc)
@@ -137,8 +143,15 @@ def get_price_update_for_admin(db: Session, price_update_id: int) -> PriceUpdate
 def get_approved_price_update(db: Session, price_update_id: int) -> PriceUpdate:
     statement = (
         select(PriceUpdate)
+        .join(Commodity, PriceUpdate.commodity_id == Commodity.id)
+        .join(Market, PriceUpdate.market_id == Market.id)
         .options(*PRICE_UPDATE_LOAD_OPTIONS)
-        .where(PriceUpdate.id == price_update_id, PriceUpdate.status == "approved")
+        .where(
+            PriceUpdate.id == price_update_id,
+            PriceUpdate.status == "approved",
+            Commodity.is_active.is_(True),
+            Market.is_active.is_(True),
+        )
     )
     price_update = db.scalar(statement)
     if price_update is None:
@@ -196,6 +209,14 @@ def list_price_history(
         movement=movement,
         time_of_day=time_of_day,
         include_outdated=True,
+    ).order_by(PriceUpdate.update_date_time.asc(), PriceUpdate.id.asc())
+    return list(db.scalars(statement).all())
+
+
+def list_admin_approved_price_history(db: Session) -> list[PriceUpdate]:
+    statement = _approved_price_statement(
+        include_outdated=True,
+        active_only=False,
     ).order_by(PriceUpdate.update_date_time.asc(), PriceUpdate.id.asc())
     return list(db.scalars(statement).all())
 

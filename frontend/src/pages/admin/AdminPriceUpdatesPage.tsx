@@ -7,7 +7,7 @@ import { AdminActionButton, AdminLoading, AdminStatus, errorText, useAdminList }
 const actions = ["Watch", "Investigate", "Buy Carefully", "Hold", "Sell Carefully"];
 export function AdminPriceUpdatesPage() {
   const { token } = useAuth();
-  const { data: history, loading, error: loadError, reload } = useAdminList<PriceUpdate>("/price-updates/history");
+  const { data: history, loading, error: loadError, reload } = useAdminList<PriceUpdate>("/price-updates/admin/history");
   const [commodities, setCommodities] = useState<Commodity[]>([]); const [markets, setMarkets] = useState<Market[]>([]);
   const [created, setCreated] = useState<PriceUpdate[]>([]); const [error, setError] = useState(""); const [message, setMessage] = useState(""); const [targetId, setTargetId] = useState("");
   const [busy, setBusy] = useState(false); const [optionsLoading, setOptionsLoading] = useState(true);

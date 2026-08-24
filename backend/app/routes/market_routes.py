@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -14,12 +14,23 @@ router = APIRouter(prefix="/markets", tags=["markets"])
 
 @router.get("", response_model=list[MarketResponse])
 def get_markets(db: Session = Depends(get_db)) -> list[Market]:
+    return list_markets(db, active_only=True)
+
+
+@router.get("/admin/all", response_model=list[MarketResponse])
+def get_all_markets_for_admin(
+    db: Session = Depends(get_db),
+    _admin: User = Depends(require_roles("admin")),
+) -> list[Market]:
     return list_markets(db)
 
 
 @router.get("/{market_id}", response_model=MarketResponse)
 def get_market_by_id(market_id: int, db: Session = Depends(get_db)) -> Market:
-    return get_market(db, market_id)
+    item = get_market(db, market_id)
+    if not item.is_active:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Active market not found")
+    return item
 
 
 @router.post("", response_model=MarketResponse, status_code=status.HTTP_201_CREATED)

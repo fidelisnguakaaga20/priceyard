@@ -15,8 +15,8 @@ export function AdminDashboardPage() {
   useEffect(() => { if (!token) return; void (async () => {
     try {
       const [users, commodities, markets, latest, history, subscriptions, feedback] = await Promise.all([
-        apiFetch<User[]>("/users", {}, token), apiFetch<Commodity[]>("/commodities", {}, token), apiFetch<Market[]>("/markets", {}, token),
-        apiFetch<PriceUpdate[]>("/price-updates", {}, token), apiFetch<PriceUpdate[]>("/price-updates/history", {}, token),
+        apiFetch<User[]>("/users", {}, token), apiFetch<Commodity[]>("/commodities/admin/all", {}, token), apiFetch<Market[]>("/markets/admin/all", {}, token),
+        apiFetch<PriceUpdate[]>("/price-updates", {}, token), apiFetch<PriceUpdate[]>("/price-updates/admin/history", {}, token),
         apiFetch<Subscription[]>("/subscriptions", {}, token), apiFetch<Summary>("/feedback/summary", {}, token),
       ]);
       setMetrics({ users: users.length, commodities: commodities.length, markets: markets.length, latest: latest.length,

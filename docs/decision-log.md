@@ -259,3 +259,15 @@ The Execution Plan permits only basic feedback count/average and explicitly forb
 - Decision: CR-02 is RETESTED/PASS and owner-approved.
 - Owner instruction: Continue under the approved PriceYard Change Execution Plan.
 - Authorization: Begin CR-03 Active MVP Data Reset only. CR-04 remains blocked until CR-03 implementation, testing, proof, owner verification, and approval.
+
+## 2026-08-24 — CR-03 active-data implementation boundary
+
+- Audit finding: Commodity and Market already contain indexed `is_active` fields and existing admin CRUD supports their update; no new column is required.
+- Decision: Use one Alembic data revision to ensure canonical Egusi/Kwali records, deactivate other records without deleting them, and preserve all relationships/history.
+- Public behavior: Active-only catalog and approved-price queries; Prices filters use those active catalogs.
+- Admin preservation: Add protected all-record catalog/history reads so inactive records remain manageable/reactivatable and completed admin work is not removed.
+- Database effect: Activity-flag data only; no table/column/record deletion and no user/subscription/auth/audit mutation.
+- API effect: Add three admin-protected reads and narrow public reads to active references.
+- Frontend effect: Active catalog selects and protected admin all-record paths only.
+- Test effect: Static/build checks pass; real owner PostgreSQL migration/runtime/browser proof is required.
+- Scope boundary: CR-04 regression testing and CR-05 final reporting remain blocked.

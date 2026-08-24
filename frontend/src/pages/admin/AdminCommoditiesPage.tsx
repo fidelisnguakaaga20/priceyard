@@ -4,7 +4,7 @@ import type { Commodity } from "../../types/api";
 import { AdminActionButton, AdminLoading, AdminStatus, errorText, useAdminList } from "./adminUtils";
 
 export function AdminCommoditiesPage() {
-  const { data, loading, error: loadError, reload, token } = useAdminList<Commodity>("/commodities");
+  const { data, loading, error: loadError, reload, token } = useAdminList<Commodity>("/commodities/admin/all");
   const [editing, setEditing] = useState<Commodity | null>(null); const [error, setError] = useState(""); const [message, setMessage] = useState(""); const [busy, setBusy] = useState(false);
   async function submit(e: FormEvent<HTMLFormElement>) { e.preventDefault(); if (!token || busy) return; const form = e.currentTarget; const f = new FormData(form); const payload = { name: String(f.get("name")), description: String(f.get("description") || "") || null, is_active: f.get("is_active") === "on" }; setBusy(true); try { if (editing) await apiFetch(`/commodities/${editing.id}`, { method: "PATCH", body: JSON.stringify(payload) }, token); else await apiFetch("/commodities", { method: "POST", body: JSON.stringify(payload) }, token); setEditing(null); form.reset(); setMessage(editing ? "Commodity updated." : "Commodity created."); setError(""); await reload(); } catch (err) { setError(errorText(err)); setMessage(""); } finally { setBusy(false); } }
   async function remove(id: number) { if (!token || busy || !confirm("Delete this commodity?")) return; setBusy(true); try { await apiFetch(`/commodities/${id}`, { method: "DELETE" }, token); setMessage("Commodity deleted."); await reload(); } catch (err) { setError(errorText(err)); } finally { setBusy(false); } }

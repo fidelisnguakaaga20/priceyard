@@ -126,10 +126,16 @@ Role/subscription consistency:
 ### GET /commodities
 Purpose: view commodities.
 Authentication: none.
+CR-03 rule: returns active commodities only.
+
+### GET /commodities/admin/all
+Purpose: allow administration to view active and inactive commodities for CRUD/reactivation.
+Authentication: admin bearer JWT required.
 
 ### GET /commodities/{commodity_id}
 Purpose: view one commodity.
 Authentication: none.
+CR-03 rule: inactive commodities return 404 publicly.
 
 ### POST /commodities
 Purpose: add a commodity.
@@ -151,10 +157,16 @@ Initial approved commodities:
 ### GET /markets
 Purpose: view markets.
 Authentication: none.
+CR-03 rule: returns active markets only.
+
+### GET /markets/admin/all
+Purpose: allow administration to view active and inactive markets for CRUD/reactivation.
+Authentication: admin bearer JWT required.
 
 ### GET /markets/{market_id}
 Purpose: view one market.
 Authentication: none.
+CR-03 rule: inactive markets return 404 publicly.
 
 ### POST /markets
 Purpose: add a market.
@@ -229,6 +241,7 @@ Stage 7 validation rules:
 
 ### GET /price-updates
 Returns latest approved, non-outdated price records (latest per commodity + market). Existing no-query behavior is preserved.
+CR-03 rule: public results require both an active commodity and an active market.
 
 Optional query parameters:
 - `commodity` — case-insensitive commodity-name search.
@@ -238,6 +251,11 @@ Optional query parameters:
 
 ### GET /price-updates/history
 Returns approved price records in chronological order. Historical approved records remain available even when marked outdated, because outdated status means the record is no longer current, not that it should disappear from history.
+CR-03 rule: public history requires both an active commodity and an active market; protected admin history preserves management visibility for inactive references.
+
+### GET /price-updates/admin/history
+Purpose: preserve administration visibility of approved history linked to active or inactive commodity/market records.
+Authentication: admin bearer JWT required.
 
 Optional query parameters:
 - `commodity`

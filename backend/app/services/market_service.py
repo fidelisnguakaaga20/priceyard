@@ -7,8 +7,11 @@ from app.models.market import Market
 from app.schemas.market_schema import MarketCreate, MarketUpdate
 
 
-def list_markets(db: Session) -> list[Market]:
-    return list(db.scalars(select(Market).order_by(Market.name)).all())
+def list_markets(db: Session, *, active_only: bool = False) -> list[Market]:
+    statement = select(Market)
+    if active_only:
+        statement = statement.where(Market.is_active.is_(True))
+    return list(db.scalars(statement.order_by(Market.name)).all())
 
 
 def get_market(db: Session, market_id: int) -> Market:
