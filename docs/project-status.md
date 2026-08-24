@@ -313,3 +313,8 @@ CR-04 Regression Testing is IN PROGRESS. A focused owner regression helper and v
 ## CR-04 first owner run / evidence-helper correction — 2026-08-24
 
 Frontend production build, CR-02 popup check and CR-03 active-data check passed. CR-01 reported a test-only false failure because its original cleanup assertion required `finally` in Login/Register even though the approved CR-02 sequence explicitly clears busy state before showing popups. The checker now counts both explicit success/error `setBusy(false)` paths. The CR-04 owner helper was interrupted after an unexplained silent wait; it now emits immediate phase/PASS progress and uses a helper-only 15-second PostgreSQL connection timeout. No PriceYard application, API, schema, data, dependency or access behavior changed. Owner retest remains required.
+
+
+## CR-04 automated owner regression — 2026-08-24
+
+RETESTED/PASS. Corrected CR-01, CR-02 and CR-03 focused checks passed; the existing frontend TypeScript/Vite production build passed with 71 transformed modules; and the configured PostgreSQL/API regression ended with `CR-04 OWNER REGRESSION: PASS`. Authentication, role/subscription access, inactive blocking, admin reads/CRUD, price approval/outdated behavior, feedback/privacy, temporary-record cleanup and final Egusi/Kwali-only public state passed. Only the required read-only browser verification remains before CR-04 owner approval and CR-05 authorization.

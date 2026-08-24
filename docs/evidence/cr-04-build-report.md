@@ -4,9 +4,9 @@ Date: 2026-08-24
 
 ## Current result
 
-Regression helper implementation and syntax verification: PASS.
+Regression helper implementation/syntax, focused CR-01/02/03 checks, frontend production build, and configured PostgreSQL/API regression: RETESTED/PASS.
 
-Owner production build, configured PostgreSQL/API regression and read-only browser verification: REQUIRED before final CR-04 approval.
+Read-only owner browser verification: REQUIRED before final CR-04 approval.
 
 ## Coverage
 
@@ -42,3 +42,21 @@ No application source, API contract, database schema/data migration, dependency,
 - CR-01 checker: false FAIL because it required a literal `finally` in Login/Register. CR-02 intentionally uses explicit `setBusy(false)` in both success and error paths before popup display; the checker now verifies both occurrences without changing application code.
 - CR-04 helper: owner interrupted after more than 20 minutes with no progress output after the password prompt. The helper now prints each phase/PASS immediately and applies a helper-only 15-second PostgreSQL connection timeout, allowing the exact wait point or network failure to be identified.
 - Application code, database schema/data, API behavior and dependencies remain unchanged.
+
+
+## Owner automated regression proof
+
+- Corrected CR-01 static check: PASS.
+- CR-02 popup static check: PASS.
+- CR-03 active-data static check: PASS.
+- Frontend production build: PASS; TypeScript completed and Vite transformed 71 modules in 2.64 seconds.
+- Configured PostgreSQL/API regression: PASS.
+- Authentication, missing JWT, duplicate email, wrong password and password-hash exclusion: PASS.
+- Trial/active/free/expired/cancelled and inactive-user access rules: PASS.
+- Admin users/subscriptions/catalog/history/feedback/full-access reads: PASS.
+- Temporary commodity, market and Egusi/Kwali price CRUD/approval/outdated/cleanup: PASS.
+- Feedback rating validation, submission, privacy, filtering, summary and cleanup: PASS.
+- Final public active data remained Egusi and Kwali Market only: PASS.
+- Final helper line: `CR-04 OWNER REGRESSION: PASS`.
+
+The helper's fallback cleanup completed. No approved business record was removed.
