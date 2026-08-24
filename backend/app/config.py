@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     jwt_secret: str | None = None
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
+    cors_origins: str = ""
 
     model_config = SettingsConfigDict(
         env_file=".env",

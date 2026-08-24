@@ -357,3 +357,14 @@ CR-06 status: IN PROGRESS pending owner production build plus Login/Register/mob
 Owner pulled commit `f15ee6a9fd296a195c8e6e2f6fdc5a63bb5a0892`. The focused CR-06 check ended with `CR-06 STATIC CHECK: PASS`. TypeScript and Vite production build passed: 71 modules transformed in 914 ms.
 
 CR-06 remains IN PROGRESS only for Login/Register Show/Hide browser and narrow/mobile verification. Hosting remains blocked by the approved stage order.
+
+
+## CR-06 owner visual approval — 2026-08-25
+
+CR-06 is RETESTED/PASS and owner-approved. Login and Register Show/Hide worked, password values remained unchanged, mobile layout was clean, and the login spinner/popup continued working.
+
+## Owner-approved Stage 20–21 suspension and Stage 22 start — 2026-08-25
+
+The owner explicitly instructed PriceYard to suspend Stages 20–21 and host now. Incomplete Stage 20 requirements and Stage 21 are DEFERRED with accepted business/security risk; they are not marked PASS. Stage 24 final acceptance remains blocked until they are resumed and passed.
+
+Stage 22 is IN PROGRESS using Render Static Site for React, Render Free Web Service for FastAPI, and the existing Supabase PostgreSQL database. Deployment-specific CORS preparation is implemented with exact environment-controlled origins and no wildcard.

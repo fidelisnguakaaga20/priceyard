@@ -336,3 +336,25 @@ The Execution Plan permits only basic feedback count/average and explicitly forb
 - Decision: implementation and compiled proof pass.
 - Remaining gate: owner Login/Register/mobile browser verification.
 - Stage effect: CR-06 is not yet owner-approved; Stage 20 reconciliation, Stage 21 and Stage 22 remain blocked.
+
+
+## 2026-08-25 — CR-06 approval
+
+- Owner proof: Login/Register Show/Hide worked, values remained unchanged, mobile layout was clean, and login spinner/popup still worked.
+- Decision: CR-06 is RETESTED/PASS and owner-approved.
+- Database/API/dependency/security-policy effect: none.
+
+## 2026-08-25 — Owner suspension of Stages 20–21 and Stage 22 authorization
+
+1. Current requirement: complete Stage 20 access control and Stage 21 full security testing before Stage 22; frontend host was Vercel.
+2. Source: PriceYard AI Project Execution Plan, Stages 20–22 and Change Control Rule.
+3. Approved change: suspend incomplete Stages 20–21, begin Stage 22 now, and use Render for both frontend and backend with Supabase PostgreSQL.
+4. Database effect: no schema/data change; existing Supabase database remains.
+5. API effect: add exact-origin, environment-controlled CORS required for the separately hosted frontend.
+6. Frontend effect: deploy existing React build with `VITE_API_URL` set to the Render backend URL.
+7. Test effect: deployment-specific health, database, auth, admin, price, FAQ, subscription, feedback, mobile and HTTPS checks remain required; full Stage 21 remains deferred.
+8. Completed-stage effect: none; incomplete Stage 20 is not relabeled as passed.
+9. Risk accepted: public pilot deployment occurs before unresolved access-depth corrections and the full security review; Render/Supabase free-tier cold-start/pause limitations apply.
+10. Approval: owner explicitly stated `suspend the stage 20-21 and host now`.
+
+Scope boundary: no marketplace, payment, AI prediction, alert, logistics, or other future feature is authorized. Stage 24 cannot pass while Stages 20–21 remain deferred.

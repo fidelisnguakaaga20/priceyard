@@ -1,7 +1,7 @@
 # CR-06 Password Visibility — Build Report
 
 Date: 2026-08-24  
-Current result: IMPLEMENTED / STATIC PASS / PRODUCTION BUILD PASS / OWNER BROWSER VERIFICATION REQUIRED
+Current result: RETESTED/PASS and owner-approved
 
 ## Requirements covered
 
@@ -31,10 +31,8 @@ Current result: IMPLEMENTED / STATIC PASS / PRODUCTION BUILD PASS / OWNER BROWSE
 
 Focused content/static assertions: PASS.
 
-## Outstanding proof
+## Owner browser proof
 
-- Owner Login/Register browser verification.
-- Owner mobile/narrow verification.
-- Auth spinner/popup regression verification.
+Login/Register Show/Hide, value preservation, mobile layout, and login spinner/popup regression: PASS.
 
-Owner static verification and the React/TypeScript production build passed. CR-06 remains IN PROGRESS only until the owner supplies Login/Register/mobile browser evidence.
+CR-06 is RETESTED/PASS and owner-approved.
