@@ -4,9 +4,15 @@
 
 The cloud browser could not access the local Vite preview. Navigation to `http://127.0.0.1:4173` was blocked with `ERR_BLOCKED_BY_CLIENT` by the browser security boundary. The browser instructions prohibit bypassing that boundary or switching to an alternate browser-control surface.
 
-This is recorded as an environment limitation, not as visual proof. Production compilation and focused source checks pass, but owner-side visual interaction remains required before CR-01 receives final visual approval.
+This is recorded as an environment limitation, not as visual proof. Production compilation and focused source checks passed, so owner-side visual interaction was used for the final visual gate.
 
-## Owner visual checklist
+## Owner verification result — 2026-08-24
+
+RETESTED/PASS. The owner restored the configured backend environment, confirmed the database connection passed, started the FastAPI backend, and received `200 OK` responses for price updates, markets, price history, and FAQ. The owner then exercised the frontend waiting actions and reported: `all i clicked spined stylishly`.
+
+This satisfies the CR-01 owner visual gate. The owner instructed PriceYard to continue.
+
+## Owner visual checklist used
 
 1. Run the frontend and backend using the existing project READMEs.
 2. Confirm login, registration, and logout show the circular button spinner and block a repeated click.
@@ -18,4 +24,3 @@ This is recorded as an environment limitation, not as visual proof. Production c
 8. At a phone-width viewport, confirm loader labels remain readable and do not cause horizontal overflow.
 9. Confirm the spinner uses green, bright green, gold, and white with a soft glow.
 10. Confirm light/dark full-page overlays use the approved translucent backgrounds.
-

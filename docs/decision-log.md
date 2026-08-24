@@ -236,3 +236,11 @@ The Execution Plan permits only basic feedback count/average and explicitly forb
 - Test effect: Require a passing TypeScript/Vite production build and focused static coverage check. Owner-side browser verification remains required because the cloud browser cannot access the local Vite address.
 - Completed-stage effect: None; existing Stage 0–20 implementation is preserved.
 - Scope boundary: No success popup, active-data reset, dependency, theme redesign or future feature is included.
+
+## 2026-08-24 — CR-01 owner verification and CR-02 authorization
+
+- Owner proof: `DATABASE_URL loaded: True`, `JWT_SECRET loaded: True`, `database connection: PASS`, and successful `200 OK` requests for price updates, markets, price history, and FAQ.
+- Owner visual result: `all i clicked spined stylishly`.
+- Decision: CR-01 is RETESTED/PASS and owner-approved.
+- Owner instruction: `CONFIRM if okay, continue`.
+- Authorization: Begin CR-02 Success Confirmation Popups only. CR-03 remains blocked until CR-02 implementation, testing, proof, owner verification, and approval.

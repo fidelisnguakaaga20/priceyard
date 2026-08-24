@@ -6,7 +6,7 @@ Date: 2026-08-24
 
 Implementation and automated verification: PASS.
 
-Owner-side visual browser verification: REQUIRED. The cloud browser was prevented from reaching the local preview by its local-address security boundary; no workaround was attempted.
+Owner-side visual browser verification: RETESTED/PASS on 2026-08-24. The owner confirmed database connectivity, successful API responses, and stylish spinner behavior across the actions exercised.
 
 ## Requirements covered
 
@@ -27,7 +27,7 @@ One shared lightweight component module was added and existing page/action loadi
 
 - `npm run build`: PASS; TypeScript and Vite production build completed.
 - `node docs/evidence/cr-01-static-check.mjs`: PASS after correcting one false test expectation for the CSV page, which has no initial data request and therefore correctly uses only an async action spinner.
-- Cloud-browser visual navigation: BLOCKED by `ERR_BLOCKED_BY_CLIENT`; recorded in `cr-01-browser-verification.md`.
+- Cloud-browser visual navigation: BLOCKED by `ERR_BLOCKED_BY_CLIENT`; owner-side visual verification subsequently RETESTED/PASS and is recorded in `cr-01-browser-verification.md`.
 
 ## Database and API effects
 
@@ -36,4 +36,3 @@ None. No migration, seed, table, backend route, or API contract changed.
 ## Scope confirmation
 
 No CR-02 popup work, CR-03 data reset, future feature, new dependency, or theme redesign was included.
-
