@@ -50,7 +50,7 @@ Expected final line:
 CR-04 OWNER REGRESSION: PASS
 ```
 
-The helper creates only uniquely named temporary records and removes them. Approved audit evidence remains.
+The helper creates only uniquely named temporary records and removes them. Approved audit evidence remains. It prints each phase/PASS immediately and limits new PostgreSQL connection attempts to 15 seconds; if it stops, return the last displayed CHECK/PASS line.
 
 ## 5. Read-only browser verification
 

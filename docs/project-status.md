@@ -308,3 +308,8 @@ Stage 19 was explicitly owner-approved and Stage 20 — Access Control and Subsc
 ## Approved change request CR-04 — 2026-08-24
 
 CR-04 Regression Testing is IN PROGRESS. A focused owner regression helper and verification steps have been added; application source, APIs, database schema, dependencies, access rules, subscriptions, disclaimers, spinner, popups, and CR-03 active-data behavior are unchanged. Helper syntax compilation passes. Owner PostgreSQL/API regression, frontend production build, static spinner/popup/data checks, and final read-only browser verification remain required before CR-04 can pass.
+
+
+## CR-04 first owner run / evidence-helper correction — 2026-08-24
+
+Frontend production build, CR-02 popup check and CR-03 active-data check passed. CR-01 reported a test-only false failure because its original cleanup assertion required `finally` in Login/Register even though the approved CR-02 sequence explicitly clears busy state before showing popups. The checker now counts both explicit success/error `setBusy(false)` paths. The CR-04 owner helper was interrupted after an unexplained silent wait; it now emits immediate phase/PASS progress and uses a helper-only 15-second PostgreSQL connection timeout. No PriceYard application, API, schema, data, dependency or access behavior changed. Owner retest remains required.

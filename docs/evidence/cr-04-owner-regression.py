@@ -17,7 +17,9 @@ if str(BACKEND_DIR) not in sys.path:
 
 from fastapi.testclient import TestClient  # noqa: E402
 from sqlalchemy import select, text  # noqa: E402
+from sqlalchemy.engine import make_url  # noqa: E402
 
+from app.config import get_settings  # noqa: E402
 from app.database import get_session_factory  # noqa: E402
 from app.main import app  # noqa: E402
 from app.models.commodity import Commodity  # noqa: E402
@@ -32,6 +34,11 @@ if len(sys.argv) != 2:
 
 admin_email = sys.argv[1].strip().lower()
 admin_password = getpass.getpass("Existing PriceYard admin password (not displayed): ")
+settings = get_settings()
+if settings.database_url:
+    settings.database_url = make_url(settings.database_url).update_query_dict(
+        {"connect_timeout": "15"}
+    ).render_as_string(hide_password=False)
 client = TestClient(app)
 SessionLocal = get_session_factory()
 results: dict[str, str] = {}
@@ -51,6 +58,7 @@ def expect(condition: bool, label: str) -> None:
     if not condition:
         raise AssertionError(label)
     results[label] = "PASS"
+    print(f"PASS: {label}", flush=True)
 
 
 def auth(token: str) -> dict[str, str]:
@@ -62,6 +70,7 @@ def names(response) -> list[str]:
 
 
 try:
+    print("CHECK: database preflight", flush=True)
     with SessionLocal() as db:
         version = db.execute(text("SELECT version_num FROM alembic_version")).scalar()
         expect(version == "0006_cr03_egusi_kwali", "database migration remains at CR-03 head")
@@ -81,6 +90,7 @@ try:
     expect(latest.status_code == 200, "public prices load")
     expect(all(x["commodity"]["name"] == "Egusi" and x["market"]["name"] == "Kwali Market" for x in latest.json()), "public prices do not leak inactive data")
 
+    print("CHECK: admin login and protected reads", flush=True)
     admin_login = client.post("/auth/login", json={"email": admin_email, "password": admin_password})
     expect(admin_login.status_code == 200, "admin login works")
     admin_token = admin_login.json()["access_token"]
@@ -96,6 +106,7 @@ try:
     expect(client.get("/feedback/summary", headers=admin_headers).status_code == 200, "admin feedback summary loads")
     expect(client.get("/buying-zones", headers=admin_headers).status_code == 200, "admin full access works")
 
+    print("CHECK: registration and subscription access matrix", flush=True)
     register_payload = {"full_name": "CR-04 Regression User", "email": test_email, "password": test_password}
     register = client.post("/auth/register", json=register_payload)
     expect(register.status_code == 201, "registration works")
@@ -129,6 +140,7 @@ try:
     expect(client.get("/auth/me", headers=user_headers).status_code == 403, "inactive user is blocked")
     expect(client.patch(f"/users/{test_user_id}", headers=admin_headers, json={"is_active": True}).status_code == 200, "admin can reactivate a user")
 
+    print("CHECK: admin CRUD and public active-data filtering", flush=True)
     commodity_create = client.post("/commodities", headers=admin_headers, json={"name": commodity_name})
     expect(commodity_create.status_code == 201, "admin commodity create works")
     commodity_id = commodity_create.json()["id"]
@@ -170,6 +182,7 @@ try:
     expect(client.get(f"/price-updates/{price_id}").status_code == 200, "approved price is publicly retrievable")
     expect(client.patch(f"/price-updates/{price_id}/mark-outdated", headers=admin_headers).status_code == 200, "admin outdated action works")
 
+    print("CHECK: feedback and cleanup", flush=True)
     expect(client.post("/feedback", headers=user_headers, json={"rating": 0}).status_code == 422, "feedback rating 0 is rejected")
     expect(client.post("/feedback", headers=user_headers, json={"rating": 6}).status_code == 422, "feedback rating 6 is rejected")
     feedback_create = client.post("/feedback", headers=user_headers, json={"rating": 5, "comment": "CR-04 regression feedback", "continue_using_feedback": True})
@@ -192,6 +205,7 @@ try:
     print(results)
 
 finally:
+    print("CHECK: fallback cleanup", flush=True)
     with SessionLocal() as db:
         if feedback_id is not None:
             item = db.get(Feedback, feedback_id)

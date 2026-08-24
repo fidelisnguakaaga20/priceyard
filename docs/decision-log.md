@@ -284,3 +284,14 @@ The Execution Plan permits only basic feedback count/average and explicitly forb
 - API/frontend effect: Verification only; no behavior change is authorized unless a regression is proven and separately approved.
 - Test effect: Run existing CR-01/02/03 checks, production build, focused PostgreSQL/API regression, and owner browser checklist.
 - Scope boundary: CR-05 remains blocked until CR-04 proof and owner approval.
+
+
+## 2026-08-24 — CR-04 evidence-helper correction
+
+- Failure: CR-01 checker falsely required `finally` in Login/Register; CR-04 helper gave no progress during a prolonged PostgreSQL/API wait.
+- Current implementation: Login/Register explicitly clear busy state in success and error paths before popup display, as required and already proven by CR-02.
+- Decision: Change evidence utilities only. Count the two explicit cleanup paths, print each regression phase/result immediately, and add a helper-only 15-second PostgreSQL connection timeout.
+- Database/API/frontend product effect: None.
+- Test effect: False failure removed and future stalls become bounded/locatable.
+- Completed-stage effect: None; CR-01/02/03 product implementations remain unchanged.
+- Approval basis: Owner reported the stuck verification run and requested continuation under CR-04 fix/retest rules.

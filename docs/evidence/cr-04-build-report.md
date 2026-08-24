@@ -33,3 +33,12 @@ Existing CR-01, CR-02 and CR-03 source checks cover spinner/popup colors, overla
 ## Scope confirmation
 
 No application source, API contract, database schema/data migration, dependency, access rule, subscription rule, disclaimer, Stage 0–20 feature or deferred feature was changed. CR-04 is verification-only.
+
+
+## First owner run — failure and smallest fix
+
+- Frontend production build: PASS (71 modules, Vite build completed).
+- CR-02 and CR-03 focused checks: PASS.
+- CR-01 checker: false FAIL because it required a literal `finally` in Login/Register. CR-02 intentionally uses explicit `setBusy(false)` in both success and error paths before popup display; the checker now verifies both occurrences without changing application code.
+- CR-04 helper: owner interrupted after more than 20 minutes with no progress output after the password prompt. The helper now prints each phase/PASS immediately and applies a helper-only 15-second PostgreSQL connection timeout, allowing the exact wait point or network failure to be identified.
+- Application code, database schema/data, API behavior and dependencies remain unchanged.

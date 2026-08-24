@@ -15,6 +15,12 @@ function requireText(relativePath, ...needles) {
   }
 }
 
+function requireCount(relativePath, needle, minimum) {
+  const source = read(relativePath);
+  const count = source.split(needle).length - 1;
+  if (count < minimum) failures.push(`${relativePath}: expected ${minimum} occurrences of ${needle}, found ${count}`);
+}
+
 requireText(
   "frontend/src/components/LoadingSpinner.tsx",
   "export function LoadingSpinner",
@@ -81,9 +87,10 @@ for (const name of adminLoaders) {
 }
 requireText("frontend/src/pages/admin/AdminExportPage.tsx", "AdminActionButton", "busy", "finally");
 
+requireCount("frontend/src/pages/LoginPage.tsx", "setBusy(false)", 2);
+requireCount("frontend/src/pages/RegisterPage.tsx", "setBusy(false)", 2);
+
 const completionFiles = [
-  "frontend/src/pages/LoginPage.tsx",
-  "frontend/src/pages/RegisterPage.tsx",
   "frontend/src/pages/FeedbackPage.tsx",
   "frontend/src/pages/WatchlistPage.tsx",
   "frontend/src/pages/admin/AdminCommoditiesPage.tsx",
