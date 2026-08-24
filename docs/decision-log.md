@@ -252,3 +252,10 @@ The Execution Plan permits only basic feedback count/average and explicitly forb
 - Behavior: Clear the existing busy/spinner state, yield a browser paint, trigger the success/error popup, then preserve the approved redirect flow.
 - Database/API/dependency effect: None.
 - Scope boundary: Only login, registration, and logout authentication feedback is changed. CR-03 data reset remains blocked pending CR-02 owner verification and approval.
+
+## 2026-08-24 — CR-02 owner verification and CR-03 authorization
+
+- Owner proof: successful login/account/subscription API responses, wrong-login `401`, duplicate-registration `409`, and the explicit statement `CR-02 visual verification PASS — login, error, registration and logout popups all worked.`
+- Decision: CR-02 is RETESTED/PASS and owner-approved.
+- Owner instruction: Continue under the approved PriceYard Change Execution Plan.
+- Authorization: Begin CR-03 Active MVP Data Reset only. CR-04 remains blocked until CR-03 implementation, testing, proof, owner verification, and approval.

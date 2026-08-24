@@ -6,7 +6,7 @@ Date: 2026-08-24
 
 Implementation and automated verification: PASS.
 
-Owner browser verification: REQUIRED before CR-02 final approval and CR-03 authorization.
+Owner browser verification: RETESTED/PASS on 2026-08-24. The owner confirmed login, error, registration, and logout popups all worked and authorized continuation.
 
 ## Requirements covered
 
@@ -29,7 +29,7 @@ The CR-00 search found no existing toast/notification system. One small shared `
 - Vite production build: PASS.
 - Focused CR-02 static check: PASS.
 - Compiled bundle contains all exact approved messages and color values: PASS.
-- Owner browser interaction: pending.
+- Owner browser interaction: RETESTED/PASS.
 
 ## Database and API effects
 
@@ -38,4 +38,3 @@ None. No migration, seed, table, backend route, or API contract changed.
 ## Scope confirmation
 
 No CR-03 commodity/market data reset, future feature, dependency, backend change, or theme redesign was included.
-
