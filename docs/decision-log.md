@@ -327,3 +327,12 @@ The Execution Plan permits only basic feedback count/average and explicitly forb
 - Test effect: hidden default, show/hide, value preservation, non-submit behavior, accessibility, build, auth regression, and mobile verification.
 - Completed-stage effect: none; CR-01 spinner and CR-02 popup flows remain intact.
 - Scope boundary: no password reset, strength meter, confirm-password field, icon package, auth policy, Stage 20 correction, Stage 21, or deployment work.
+
+
+## 2026-08-24 — CR-06 owner static/build proof
+
+- Focused password-visibility check: PASS.
+- TypeScript/Vite production build: PASS; 71 modules transformed in 914 ms.
+- Decision: implementation and compiled proof pass.
+- Remaining gate: owner Login/Register/mobile browser verification.
+- Stage effect: CR-06 is not yet owner-approved; Stage 20 reconciliation, Stage 21 and Stage 22 remain blocked.

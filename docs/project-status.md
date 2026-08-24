@@ -350,3 +350,10 @@ Login and Register now have accessible Show/Hide controls. The change affects in
 Internal focused static verification: PASS.
 
 CR-06 status: IN PROGRESS pending owner production build plus Login/Register/mobile browser verification. No next stage is authorized.
+
+
+## CR-06 owner static/build proof — 2026-08-24
+
+Owner pulled commit `f15ee6a9fd296a195c8e6e2f6fdc5a63bb5a0892`. The focused CR-06 check ended with `CR-06 STATIC CHECK: PASS`. TypeScript and Vite production build passed: 71 modules transformed in 914 ms.
+
+CR-06 remains IN PROGRESS only for Login/Register Show/Hide browser and narrow/mobile verification. Hosting remains blocked by the approved stage order.
