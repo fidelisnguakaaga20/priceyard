@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
+import type { ButtonHTMLAttributes } from "react";
+import { ButtonSpinner, LoadingSpinner } from "../../components/LoadingSpinner";
 import { apiFetch, ApiError } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 
@@ -22,6 +24,19 @@ export function AdminStatus({ error, success }: { error?: string; success?: stri
   if (error) return <div className="status-box error">{error}</div>;
   if (success) return <div className="status-box success">{success}</div>;
   return null;
+}
+
+export function AdminLoading({ label = "Loading records…" }: { label?: string }) {
+  return <LoadingSpinner label={label} />;
+}
+
+type AdminActionButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+  busy?: boolean;
+  busyLabel?: string;
+};
+
+export function AdminActionButton({ busy = false, busyLabel = "Please wait…", children, disabled, ...props }: AdminActionButtonProps) {
+  return <button {...props} disabled={disabled || busy}>{busy ? <ButtonSpinner label={busyLabel} /> : children}</button>;
 }
 
 export function errorText(err: unknown): string {

@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import { Disclaimer, PRICE_DISCLAIMER } from "../components/Disclaimer";
+import { ButtonSpinner, LoadingSpinner } from "../components/LoadingSpinner";
 import { PriceCard } from "../components/PriceCard";
 import { apiFetch } from "../services/api";
 import type { Market, PriceUpdate } from "../types/api";
@@ -12,6 +13,7 @@ export function PricesPage() {
   const [movement, setMovement] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [marketsLoading, setMarketsLoading] = useState(true);
 
   const load = async (params?: { commodity?: string; market?: string; movement?: string }) => {
     setLoading(true); setError("");
@@ -24,7 +26,10 @@ export function PricesPage() {
     finally { setLoading(false); }
   };
 
-  useEffect(() => { void load(); apiFetch<Market[]>("/markets").then(setMarkets).catch(() => undefined); }, []);
+  useEffect(() => {
+    void load();
+    apiFetch<Market[]>("/markets").then(setMarkets).catch(() => undefined).finally(() => setMarketsLoading(false));
+  }, []);
 
   const submit = (event: FormEvent) => { event.preventDefault(); void load({ commodity, market, movement }); };
   const clear = () => { setCommodity(""); setMarket(""); setMovement(""); void load(); };
@@ -35,10 +40,10 @@ export function PricesPage() {
       <label>Commodity<input value={commodity} onChange={(e) => setCommodity(e.target.value)} placeholder="Egusi" /></label>
       <label>Market<select value={market} onChange={(e) => setMarket(e.target.value)}><option value="">All markets</option>{markets.filter((m) => m.is_active).map((m) => <option key={m.id}>{m.name}</option>)}</select></label>
       <label>Movement<select value={movement} onChange={(e) => setMovement(e.target.value)}><option value="">Any movement</option><option value="up">Up</option><option value="down">Down</option><option value="stable">Stable</option><option value="unknown">Unknown</option></select></label>
-      <div className="filter-actions"><button className="button button-small" type="submit">Apply</button><button className="button button-ghost button-small" type="button" onClick={clear}>Clear</button></div>
+      <div className="filter-actions"><button className="button button-small" type="submit" disabled={loading}>{loading ? <ButtonSpinner label="Please wait…" /> : "Apply"}</button><button className="button button-ghost button-small" type="button" onClick={clear} disabled={loading}>Clear</button></div>
     </form>
     {error && <div className="status-box error">{error}</div>}
-    {loading ? <div className="status-box">Loading approved prices…</div> : items.length ? <div className="card-grid">{items.map((item) => <PriceCard key={item.id} item={item} />)}</div> : <div className="status-box">No approved price updates match these filters.</div>}
+    {loading || marketsLoading ? <LoadingSpinner label="Loading approved prices…" /> : items.length ? <div className="card-grid">{items.map((item) => <PriceCard key={item.id} item={item} />)}</div> : <div className="status-box">No approved price updates match these filters.</div>}
     <Disclaimer>{PRICE_DISCLAIMER}</Disclaimer>
   </section>;
 }

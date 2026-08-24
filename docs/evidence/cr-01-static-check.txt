@@ -1,0 +1,11 @@
+CR-01 STATIC CHECK: PASS
+PASS: shared circular page, overlay, and button spinner components exist
+PASS: approved green/bright-green/gold/white gradient and glow are present
+PASS: approved light and dark overlay backgrounds are present
+PASS: login, registration, logout, public data, feedback, and watchlist waits are covered
+PASS: admin loading and submit/apply waits are covered
+PASS: busy buttons are disabled and completion paths clear busy state
+
+Command:
+node docs/evidence/cr-01-static-check.mjs
+

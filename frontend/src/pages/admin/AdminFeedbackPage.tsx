@@ -1,7 +1,74 @@
 import { useCallback, useEffect, useState } from "react";
 import { apiFetch } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
-import { AdminStatus, errorText } from "./adminUtils";
+import { AdminActionButton, AdminLoading, AdminStatus, errorText } from "./adminUtils";
 
-type Feedback={id:number;user_id:number;rating:number;comment:string|null;complaint_or_suggestion:string|null;missing_market_request:string|null;missing_commodity_request:string|null;created_at:string};type Summary={count:number;average_rating:number|null};
-export function AdminFeedbackPage(){const {token}=useAuth();const [items,setItems]=useState<Feedback[]>([]);const [summary,setSummary]=useState<Summary|null>(null);const [rating,setRating]=useState("");const [error,setError]=useState("");const [message,setMessage]=useState("");const load=useCallback(async()=>{if(!token)return;try{const q=rating?`?rating=${rating}`:"";const [rows,s]=await Promise.all([apiFetch<Feedback[]>(`/feedback${q}`,{},token),apiFetch<Summary>("/feedback/summary",{},token)]);setItems(rows);setSummary(s);setError("");}catch(err){setError(errorText(err));}},[token,rating]);useEffect(()=>{void load()},[load]);async function remove(id:number){if(!token||!confirm("Delete this feedback?"))return;try{await apiFetch(`/feedback/${id}`,{method:"DELETE"},token);setMessage("Feedback deleted.");await load();}catch(err){setError(errorText(err));}}return <div><h2>Feedback</h2><div className="admin-metric-grid"><article className="admin-metric"><span>Feedback count</span><strong>{summary?.count??"—"}</strong></article><article className="admin-metric"><span>Average rating</span><strong>{summary?.average_rating==null?"—":summary.average_rating.toFixed(2)}</strong></article></div><label className="admin-inline-filter">Filter rating<select value={rating} onChange={e=>setRating(e.target.value)}><option value="">All</option>{[1,2,3,4,5].map(x=><option key={x}>{x}</option>)}</select></label><AdminStatus error={error} success={message}/><div className="admin-card-list">{items.map(x=><article className="card" key={x.id}><div className="card-row"><div><span className="eyebrow">#{x.id} · {x.rating}/5 · user #{x.user_id}</span><h3>{x.comment||"Feedback"}</h3><p>{x.complaint_or_suggestion||"No complaint/suggestion"}</p><small>{x.missing_market_request?`Market request: ${x.missing_market_request}`:""} {x.missing_commodity_request?`Commodity request: ${x.missing_commodity_request}`:""}</small></div><button className="button button-small button-danger" onClick={()=>void remove(x.id)}>Delete</button></div></article>)}</div></div>}
+type Feedback = {
+  id: number;
+  user_id: number;
+  rating: number;
+  comment: string | null;
+  complaint_or_suggestion: string | null;
+  missing_market_request: string | null;
+  missing_commodity_request: string | null;
+  created_at: string;
+};
+type Summary = { count: number; average_rating: number | null };
+
+export function AdminFeedbackPage() {
+  const { token } = useAuth();
+  const [items, setItems] = useState<Feedback[]>([]);
+  const [summary, setSummary] = useState<Summary | null>(null);
+  const [rating, setRating] = useState("");
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [removingId, setRemovingId] = useState<number | null>(null);
+
+  const load = useCallback(async (showLoader = true) => {
+    if (!token) return;
+    if (showLoader) setLoading(true);
+    try {
+      const q = rating ? `?rating=${rating}` : "";
+      const [rows, feedbackSummary] = await Promise.all([
+        apiFetch<Feedback[]>(`/feedback${q}`, {}, token),
+        apiFetch<Summary>("/feedback/summary", {}, token),
+      ]);
+      setItems(rows);
+      setSummary(feedbackSummary);
+      setError("");
+    } catch (err) {
+      setError(errorText(err));
+    } finally {
+      if (showLoader) setLoading(false);
+    }
+  }, [token, rating]);
+
+  useEffect(() => { void load(); }, [load]);
+
+  async function remove(id: number) {
+    if (!token || removingId !== null || !confirm("Delete this feedback?")) return;
+    setRemovingId(id);
+    try {
+      await apiFetch(`/feedback/${id}`, { method: "DELETE" }, token);
+      setMessage("Feedback deleted.");
+      await load(false);
+    } catch (err) {
+      setError(errorText(err));
+    } finally {
+      setRemovingId(null);
+    }
+  }
+
+  return <div>
+    <h2>Feedback</h2>
+    <div className="admin-metric-grid">
+      <article className="admin-metric"><span>Feedback count</span><strong>{summary?.count ?? "—"}</strong></article>
+      <article className="admin-metric"><span>Average rating</span><strong>{summary?.average_rating == null ? "—" : summary.average_rating.toFixed(2)}</strong></article>
+    </div>
+    <label className="admin-inline-filter">Filter rating<select value={rating} disabled={loading || removingId !== null} onChange={(e) => setRating(e.target.value)}><option value="">All</option>{[1, 2, 3, 4, 5].map((x) => <option key={x}>{x}</option>)}</select></label>
+    <AdminStatus error={error} success={message} />
+    {loading ? <AdminLoading label="Loading feedback…"/> : <div className="admin-card-list">{items.map((item) => <article className="card" key={item.id}><div className="card-row"><div><span className="eyebrow">#{item.id} · {item.rating}/5 · user #{item.user_id}</span><h3>{item.comment || "Feedback"}</h3><p>{item.complaint_or_suggestion || "No complaint/suggestion"}</p><small>{item.missing_market_request ? `Market request: ${item.missing_market_request}` : ""} {item.missing_commodity_request ? `Commodity request: ${item.missing_commodity_request}` : ""}</small></div><AdminActionButton className="button button-small button-danger" busy={removingId === item.id} disabled={removingId !== null && removingId !== item.id} onClick={() => void remove(item.id)}>Delete</AdminActionButton></div></article>)}</div>}
+  </div>;
+}
+

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { ButtonSpinner } from "./LoadingSpinner";
 
 const navItems = [
   ["/prices", "Prices"],
@@ -12,6 +13,16 @@ const navItems = [
 export function Layout() {
   const { user, accessLabel, logout } = useAuth();
   const [open, setOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    if (loggingOut) return;
+    setLoggingOut(true);
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    logout();
+    setOpen(false);
+    setLoggingOut(false);
+  };
 
   return (
     <div className="app-shell">
@@ -30,7 +41,7 @@ export function Layout() {
             {user ? (
               <>
                 <NavLink to="/dashboard" onClick={() => setOpen(false)}>Dashboard</NavLink>
-                <button className="nav-button" type="button" onClick={() => { logout(); setOpen(false); }}>Log out</button>
+                <button className="nav-button" type="button" disabled={loggingOut} onClick={() => void handleLogout()}>{loggingOut ? <ButtonSpinner label="Please wait…" /> : "Log out"}</button>
               </>
             ) : (
               <NavLink className="nav-cta" to="/login" onClick={() => setOpen(false)}>Log in</NavLink>

@@ -1,5 +1,11 @@
 # PriceYard Project Status
 
+## Approved change request CR-01 — 2026-08-24
+
+CR-01 Global Loading Spinner is implemented. The React + TypeScript production build and focused loading-coverage/static checks pass. Shared page, overlay and button loaders now cover authentication waits, approved-price/data loading, search/history, feedback, watchlist and admin data/actions. No backend, API, database, dependency, access-control, subscription, disclaimer or completed-stage behavior changed.
+
+Final visual browser verification is blocked in the AI environment because the cloud browser rejects the local Vite address with `ERR_BLOCKED_BY_CLIENT`. Owner-side visual verification is the remaining CR-01 gate. CR-02 has not started.
+
 ## Current stage
 Stage 19 — Admin Frontend MVP — RETESTED/PASS; runtime, browser, data-repair, and cleanup proof are complete. Explicit owner approval is the remaining gate. Stage 20 remains blocked until that approval is given.
 

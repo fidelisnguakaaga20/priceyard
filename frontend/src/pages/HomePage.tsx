@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Disclaimer, PRICE_DISCLAIMER } from "../components/Disclaimer";
+import { LoadingSpinner } from "../components/LoadingSpinner";
 import { PriceCard } from "../components/PriceCard";
 import { apiFetch } from "../services/api";
 import type { PriceUpdate } from "../types/api";
@@ -8,11 +9,13 @@ import type { PriceUpdate } from "../types/api";
 export function HomePage() {
   const [prices, setPrices] = useState<PriceUpdate[]>([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     apiFetch<PriceUpdate[]>("/price-updates")
       .then((items) => setPrices(items.slice(0, 3)))
-      .catch((err: Error) => setError(err.message));
+      .catch((err: Error) => setError(err.message))
+      .finally(() => setLoading(false));
   }, []);
 
   return (
@@ -40,7 +43,7 @@ export function HomePage() {
 
       <section className="page section-block">
         <div className="section-heading"><div><span className="eyebrow">Latest intelligence</span><h2>Current approved price updates</h2></div><Link className="text-link" to="/prices">See all prices →</Link></div>
-        {error ? <div className="status-box error">Could not load prices: {error}</div> : prices.length ? <div className="card-grid">{prices.map((item) => <PriceCard key={item.id} item={item} />)}</div> : <div className="status-box">No approved current price updates are available yet.</div>}
+        {loading ? <LoadingSpinner label="Loading approved prices…" /> : error ? <div className="status-box error">Could not load prices: {error}</div> : prices.length ? <div className="card-grid">{prices.map((item) => <PriceCard key={item.id} item={item} />)}</div> : <div className="status-box">No approved current price updates are available yet.</div>}
       </section>
 
       <section className="page section-block three-column">

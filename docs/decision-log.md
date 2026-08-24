@@ -224,3 +224,15 @@ The Execution Plan permits only basic feedback count/average and explicitly forb
 - Decision: Create the access-control matrix and run a no-behavior-change assessment before editing routes/schemas.
 - Finding: Existing full-access and admin/inactive controls pass static inspection, but Guest public-price payload depth, limited market-signal payload depth, and quality-signal access do not yet meet the approved Stage 20 limited/full separation.
 - Decision: Stop under Change Control and request owner approval before changing those existing API response/access behaviors.
+
+## 2026-08-24 — CR-01 global loading spinner authorization and boundary
+
+- Owner instruction: `approve CR-01`.
+- Decision: Implement only the approved shared loading spinner and waiting-state coverage; stop before CR-02 popup work.
+- Implementation: Add one shared lightweight spinner module and reuse existing `loading`/`busy` state patterns across public, authenticated and admin frontend flows.
+- Database effect: None.
+- API effect: None.
+- Frontend effect: Page/data loaders, optional full-page overlays and disabled button spinners using the approved PriceYard colors.
+- Test effect: Require a passing TypeScript/Vite production build and focused static coverage check. Owner-side browser verification remains required because the cloud browser cannot access the local Vite address.
+- Completed-stage effect: None; existing Stage 0–20 implementation is preserved.
+- Scope boundary: No success popup, active-data reset, dependency, theme redesign or future feature is included.
