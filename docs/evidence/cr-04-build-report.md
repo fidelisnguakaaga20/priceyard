@@ -6,7 +6,7 @@ Date: 2026-08-24
 
 Regression helper implementation/syntax, focused CR-01/02/03 checks, frontend production build, and configured PostgreSQL/API regression: RETESTED/PASS.
 
-Read-only owner browser verification: REQUIRED before final CR-04 approval.
+Owner browser/runtime verification: PASS. CR-04 is RETESTED/PASS and owner-approved.
 
 ## Coverage
 
@@ -60,3 +60,21 @@ No application source, API contract, database schema/data migration, dependency,
 - Final helper line: `CR-04 OWNER REGRESSION: PASS`.
 
 The helper's fallback cleanup completed. No approved business record was removed.
+
+
+## Owner browser/runtime verification
+
+PASS. The final owner run showed:
+
+- FastAPI/Uvicorn startup completed successfully.
+- Public price requests returned `200 OK`.
+- Registration returned `201 Created`.
+- Valid login returned `200 OK`.
+- The intentional invalid-login test returned `401 Unauthorized`.
+- Profile and subscription reads returned `200 OK`.
+- Public commodities, markets, and the Egusi/Kwali filtered price request returned `200 OK`.
+- Protected admin all-record, user, subscription, price-history, and feedback-summary reads returned `200 OK`.
+- Watchlist reads returned `200 OK`.
+- No delete action appeared in this final browser verification.
+
+The owner instructed continuation if the output was okay. These results satisfy the CR-04 gate, so CR-04 is owner-approved and CR-05 documentation is authorized.

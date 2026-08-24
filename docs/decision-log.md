@@ -295,3 +295,19 @@ The Execution Plan permits only basic feedback count/average and explicitly forb
 - Test effect: False failure removed and future stalls become bounded/locatable.
 - Completed-stage effect: None; CR-01/02/03 product implementations remain unchanged.
 - Approval basis: Owner reported the stuck verification run and requested continuation under CR-04 fix/retest rules.
+
+
+## 2026-08-24 — CR-04 browser proof accepted and CR-05 authorized
+
+- Current requirement: finish CR-04 regression proof before moving to CR-05.
+- Evidence reviewed: successful backend startup; registration `201`; valid login `200`; intentional wrong login `401`; profile/subscription, public catalog/price, protected admin, feedback-summary, and watchlist reads `200`.
+- Decision: CR-04 is RETESTED/PASS. The owner's conditional instruction to continue when the output was okay authorizes CR-05 documentation.
+- Scope: verification and governance only; no application, API, schema, dependency, access, subscription, disclaimer, or product-scope change.
+
+## 2026-08-24 — CR-05 final change report
+
+- Decision: record CR-00 through CR-04 results in one final evidence report and request owner approval.
+- Active public data remains Egusi and Kwali Market only.
+- Admin can still view/manage inactive records and add/reactivate commodities and markets.
+- No unapproved feature was added and no completed Stage 0–20 work was removed.
+- Next gate: owner approval of CR-05 before any other work.

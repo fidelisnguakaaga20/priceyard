@@ -318,3 +318,22 @@ Frontend production build, CR-02 popup check and CR-03 active-data check passed.
 ## CR-04 automated owner regression — 2026-08-24
 
 RETESTED/PASS. Corrected CR-01, CR-02 and CR-03 focused checks passed; the existing frontend TypeScript/Vite production build passed with 71 transformed modules; and the configured PostgreSQL/API regression ended with `CR-04 OWNER REGRESSION: PASS`. Authentication, role/subscription access, inactive blocking, admin reads/CRUD, price approval/outdated behavior, feedback/privacy, temporary-record cleanup and final Egusi/Kwali-only public state passed. Only the required read-only browser verification remains before CR-04 owner approval and CR-05 authorization.
+
+
+## CR-04 Regression Testing — RETESTED/PASS and owner-approved — 2026-08-24
+
+CR-04 is complete. Focused CR-01/02/03 checks passed, the React + TypeScript production build passed, the configured PostgreSQL/API owner regression ended with `CR-04 OWNER REGRESSION: PASS`, and the final browser/runtime verification was healthy. The browser proof included successful registration, valid login, profile and subscription reads, public Egusi/Kwali filtering, protected admin reads, and watchlist reads. The observed `401 Unauthorized` was the intentional wrong-password test.
+
+The owner instructed PriceYard to continue if the output was okay. The output satisfied the approved criteria, so this condition approves CR-04 and authorizes CR-05 documentation only.
+
+## CR-05 Final Change Report — complete; owner approval requested — 2026-08-24
+
+The final report is `docs/evidence/cr-05-final-change-report.md`. CR-00 through CR-04 are documented as complete. No application source, API, database, dependency, access-control, subscription, disclaimer, or completed Stage 0–20 behavior was changed during CR-05.
+
+Current active public MVP data:
+- Commodity: Egusi.
+- Market: Kwali Market.
+
+Inactive but admin-manageable approved records include Beans, Palm oil, Abuja/FCT, Nasarawa, and Benue. Admin commodity and market CRUD remains available.
+
+No further work is authorized until the owner approves the CR-05 final change report.
