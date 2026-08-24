@@ -1,0 +1,7 @@
+CR-04 OWNER REGRESSION HELPER COMPILE: PASS
+
+Command:
+python -m py_compile docs/evidence/cr-04-owner-regression.py
+
+Result:
+Exit code 0. No application code was changed.

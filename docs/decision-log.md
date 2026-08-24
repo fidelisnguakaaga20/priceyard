@@ -271,3 +271,16 @@ The Execution Plan permits only basic feedback count/average and explicitly forb
 - Frontend effect: Active catalog selects and protected admin all-record paths only.
 - Test effect: Static/build checks pass; real owner PostgreSQL migration/runtime/browser proof is required.
 - Scope boundary: CR-04 regression testing and CR-05 final reporting remain blocked.
+
+
+## 2026-08-24 — CR-03 approval and CR-04 authorization
+
+- Owner proof: Alembic reached `0006_cr03_egusi_kwali`; `CR-03 OWNER SMOKE: PASS`; final database query showed Egusi active, Beans/Palm oil inactive, Kwali Market active, and the other approved markets inactive.
+- Repair note: Temporary browser-test deletions of inactive commodity rows and the Kwali row were detected from runtime logs and repaired. Final state was reverified before approval.
+- Decision: CR-03 is RETESTED/PASS and owner-approved.
+- Owner instruction: Continue if the corrected output is okay.
+- Authorization: Start CR-04 Regression Testing only.
+- Database effect: No new database change is authorized in CR-04.
+- API/frontend effect: Verification only; no behavior change is authorized unless a regression is proven and separately approved.
+- Test effect: Run existing CR-01/02/03 checks, production build, focused PostgreSQL/API regression, and owner browser checklist.
+- Scope boundary: CR-05 remains blocked until CR-04 proof and owner approval.

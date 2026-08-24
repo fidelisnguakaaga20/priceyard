@@ -14,9 +14,9 @@ The owner authorized continuation under the approved execution plan. CR-03 is no
 
 ## Approved change request CR-03 — 2026-08-24
 
-CR-03 Active MVP Data Reset is implemented and automated checks pass. Existing `is_active` fields are reused. Data revision `0006_cr03_egusi_kwali` preserves every record while focusing active data on Egusi and Kwali Market. Public catalogs/prices filter inactive references; protected admin all-record endpoints preserve CRUD/reactivation and history visibility. Python compilation, focused static checks, TypeScript, and Vite production build pass.
+CR-03 Active MVP Data Reset is RETESTED/PASS and owner-approved. The owner applied Alembic revision `0006_cr03_egusi_kwali`, completed the configured PostgreSQL/API/CRUD/access smoke with `CR-03 OWNER SMOKE: PASS`, and verified the final data state: Egusi active; Beans/Palm oil inactive; Kwali Market active; Abuja/FCT/Nasarawa/Benue inactive. Temporary browser-test deletions were repaired without changing schema or application code. Public/API runtime requests and protected admin all-record views passed.
 
-Owner PostgreSQL migration, API/CRUD smoke, and browser verification remain required. CR-04 has not started.
+The owner's instruction to continue after the passing proof authorizes CR-04 Regression Testing only.
 
 ## Current stage
 Stage 19 — Admin Frontend MVP — RETESTED/PASS; runtime, browser, data-repair, and cleanup proof are complete. Explicit owner approval is the remaining gate. Stage 20 remains blocked until that approval is given.
@@ -303,3 +303,8 @@ Owner proof is complete. Data repair restored the accidental browser-test mutati
 
 ## Stage 20 started — access-control pre-fix assessment — 2026-08-18
 Stage 19 was explicitly owner-approved and Stage 20 — Access Control and Subscription Testing is now the only active stage. The required access-control matrix has been created and a source-level assessment was run before changing application behavior. Existing controls already enforce inactive-account blocking, admin role guards, 14-day trial expiry, active-paid full-access classification, and full-access guards on buying zones, sell-watch windows, storage suitability, and cost breakdowns. Three approved-requirement gaps were found: the Guest/public price response exposes deeper guidance fields beyond the approved public Prices-page field set; limited authenticated users receive full market-signal meaning/action instead of a basic signal view; and quality signals are currently available to any authenticated active user instead of requiring full approved access. Under the project Change Control rule, no application/API/frontend behavior has been changed yet. Stage 20 is IN PROGRESS/FAIL pending owner approval of the smallest access-control correction and subsequent runtime matrix retest.
+
+
+## Approved change request CR-04 — 2026-08-24
+
+CR-04 Regression Testing is IN PROGRESS. A focused owner regression helper and verification steps have been added; application source, APIs, database schema, dependencies, access rules, subscriptions, disclaimers, spinner, popups, and CR-03 active-data behavior are unchanged. Helper syntax compilation passes. Owner PostgreSQL/API regression, frontend production build, static spinner/popup/data checks, and final read-only browser verification remain required before CR-04 can pass.

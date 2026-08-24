@@ -6,7 +6,7 @@ Date: 2026-08-24
 
 Implementation and automated verification: PASS.
 
-Real PostgreSQL migration, runtime smoke, and owner browser verification: REQUIRED before CR-03 final approval and CR-04 authorization.
+Owner PostgreSQL migration, runtime smoke, API/CRUD/access verification, final data query, and runtime/browser evidence: RETESTED/PASS.
 
 ## Audit findings
 
@@ -40,9 +40,9 @@ Real PostgreSQL migration, runtime smoke, and owner browser verification: REQUIR
 - TypeScript compilation: PASS.
 - Vite production build: PASS.
 
-## Outstanding gate
+## Owner verification
 
-The migration has not yet been applied to the owner's configured PostgreSQL database. The owner must run `cr-03-owner-verification-steps.md` and provide the real migration, database, API, CRUD, access-control, and browser proof.
+The owner applied revision `0006_cr03_egusi_kwali` and the configured PostgreSQL helper ended with `CR-03 OWNER SMOKE: PASS`. Final repair/retest proof showed Egusi active, Beans/Palm oil inactive, Kwali Market active, and Abuja/FCT/Nasarawa/Benue inactive. Public and protected admin API requests returned the expected success/authorization responses. CR-03 is owner-approved.
 
 ## Scope confirmation
 
