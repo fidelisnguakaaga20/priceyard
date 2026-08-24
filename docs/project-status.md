@@ -337,3 +337,16 @@ Current active public MVP data:
 Inactive but admin-manageable approved records include Beans, Palm oil, Abuja/FCT, Nasarawa, and Benue. Admin commodity and market CRUD remains available.
 
 No further work is authorized until the owner approves the CR-05 final change report.
+
+
+## CR-05 owner approval and CR-06 authorization — 2026-08-24
+
+The owner explicitly approved CR-05 and CR-06 password show/hide. CR-05 is owner-approved and complete.
+
+## CR-06 Password Visibility — implementation complete; owner proof required — 2026-08-24
+
+Login and Register now have accessible Show/Hide controls. The change affects input presentation only. No database, migration, backend API, authentication, JWT, password hashing, dependency, subscription, access-control, disclaimer, or completed Stage 0–20 feature changed.
+
+Internal focused static verification: PASS.
+
+CR-06 status: IN PROGRESS pending owner production build plus Login/Register/mobile browser verification. No next stage is authorized.

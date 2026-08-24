@@ -209,3 +209,7 @@
 
 | CR05-01 | Approved change request | CR-00 through CR-04 implementation, tests, proof, errors/fixes, retests and scope confirmations are consolidated in a final report | Change | CR-05 | final report; governance files | Evidence review and commit-scope verification | docs/evidence/cr-05-final-change-report.md | PASS |
 | CR05-02 | Approved change request | No further work starts before owner approval of the final change report | Change | CR-05 | project status; decision log | Governance gate review | docs/project-status.md; docs/decision-log.md | PASS |
+
+| CR06-01 | Owner-approved change | Login and Register password fields are hidden by default and can be shown/hidden without changing their values | Change | CR-06 | LoginPage; RegisterPage | Focused static + owner browser | docs/evidence/cr-06-static-check.txt; docs/evidence/cr-06-owner-verification-steps.md | IN PROGRESS |
+| CR06-02 | Owner-approved change | Visibility controls are non-submit, keyboard-accessible, mobile-safe and expose dynamic accessible state/labels | Change | CR-06 | auth pages; shared styles | Focused static + owner browser/mobile | docs/evidence/cr-06-static-check.txt; docs/evidence/cr-06-owner-verification-steps.md | IN PROGRESS |
+| CR06-03 | Change Control | Password visibility changes no API, database, hashing, JWT, dependency, subscription, access-control, disclaimer or completed feature | Change | CR-06 | frontend-only scope | Commit/scope review | docs/evidence/cr-06-audit.md; docs/evidence/cr-06-build-report.md | PASS |

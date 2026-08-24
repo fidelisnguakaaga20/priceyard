@@ -311,3 +311,19 @@ The Execution Plan permits only basic feedback count/average and explicitly forb
 - Admin can still view/manage inactive records and add/reactivate commodities and markets.
 - No unapproved feature was added and no completed Stage 0–20 work was removed.
 - Next gate: owner approval of CR-05 before any other work.
+
+
+## 2026-08-24 — CR-05 approval and CR-06 password visibility authorization
+
+- Owner instruction: `Approve CR-05 and approve CR-06 password show/hide`.
+- Decision: CR-05 is owner-approved and complete. CR-06 only is authorized.
+- Current requirement: Login and Register currently hide passwords with no visibility control.
+- Source: owner-approved change under the Execution Plan Change Control Rule.
+- Proposed change: accessible Show/Hide controls on Login and Register.
+- Reason: let users verify typed passwords without changing authentication security.
+- Database effect: none.
+- API/backend effect: none.
+- Frontend effect: local visibility state and shared CSS only.
+- Test effect: hidden default, show/hide, value preservation, non-submit behavior, accessibility, build, auth regression, and mobile verification.
+- Completed-stage effect: none; CR-01 spinner and CR-02 popup flows remain intact.
+- Scope boundary: no password reset, strength meter, confirm-password field, icon package, auth policy, Stage 20 correction, Stage 21, or deployment work.

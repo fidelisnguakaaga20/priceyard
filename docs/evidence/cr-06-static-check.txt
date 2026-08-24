@@ -1,0 +1,11 @@
+CR-06 INTERNAL STATIC CHECK: PASS
+PASS: login is hidden by default
+PASS: register is hidden by default
+PASS: both fields toggle only between password and text presentation
+PASS: both controls are type=button and cannot submit the form
+PASS: both controls expose aria-controls, aria-pressed, and dynamic aria-label
+PASS: visible Show/Hide text is present
+PASS: shared password field/toggle/focus styling is present
+PASS: no icon/UI dependency was added
+PASS: API, database, backend authentication, JWT, hashing, subscriptions, access control, disclaimers, and CR-01/02 behavior are untouched
+OWNER PRODUCTION BUILD AND BROWSER VERIFICATION: REQUIRED
