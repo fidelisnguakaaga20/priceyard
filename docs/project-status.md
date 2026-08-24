@@ -6,6 +6,12 @@ CR-01 Global Loading Spinner is RETESTED/PASS and owner-approved. The React + Ty
 
 The owner instructed PriceYard to continue, authorizing CR-02 only. CR-03 has not started.
 
+## Approved change request CR-02 — 2026-08-24
+
+CR-02 Success Confirmation Popups is implemented and automated checks pass. Login, registration, and logout use one shared accessible popup system with the exact approved messages, success/error colors, automatic/manual dismissal, and mobile-safe positioning. The existing spinner is cleared before the popup is triggered. TypeScript and Vite production builds pass.
+
+Owner browser interaction is the remaining CR-02 gate. CR-03 has not started.
+
 ## Current stage
 Stage 19 — Admin Frontend MVP — RETESTED/PASS; runtime, browser, data-repair, and cleanup proof are complete. Explicit owner approval is the remaining gate. Stage 20 remains blocked until that approval is given.
 

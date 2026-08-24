@@ -244,3 +244,11 @@ The Execution Plan permits only basic feedback count/average and explicitly forb
 - Decision: CR-01 is RETESTED/PASS and owner-approved.
 - Owner instruction: `CONFIRM if okay, continue`.
 - Authorization: Begin CR-02 Success Confirmation Popups only. CR-03 remains blocked until CR-02 implementation, testing, proof, owner verification, and approval.
+
+## 2026-08-24 — CR-02 shared popup boundary
+
+- Search finding: No existing toast, notification, or popup system exists; only page-local status boxes are present.
+- Decision: Add one small shared `Toast` component/context without installing a UI library.
+- Behavior: Clear the existing busy/spinner state, yield a browser paint, trigger the success/error popup, then preserve the approved redirect flow.
+- Database/API/dependency effect: None.
+- Scope boundary: Only login, registration, and logout authentication feedback is changed. CR-03 data reset remains blocked pending CR-02 owner verification and approval.

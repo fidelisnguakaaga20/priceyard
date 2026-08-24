@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { ButtonSpinner } from "./LoadingSpinner";
+import { useToast } from "../context/ToastContext";
 
 const navItems = [
   ["/prices", "Prices"],
@@ -12,6 +13,8 @@ const navItems = [
 
 export function Layout() {
   const { user, accessLabel, logout } = useAuth();
+  const { showToast } = useToast();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
 
@@ -22,6 +25,9 @@ export function Layout() {
     logout();
     setOpen(false);
     setLoggingOut(false);
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    showToast("Logout successful.");
+    navigate("/", { replace: true });
   };
 
   return (

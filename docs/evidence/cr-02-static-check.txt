@@ -1,0 +1,11 @@
+CR-02 STATIC CHECK: PASS
+PASS: shared accessible popup system exists and auto-dismisses
+PASS: login, registration, and logout use the exact approved success messages
+PASS: auth failures use error popups and never call success messages in catch paths
+PASS: spinner clears before each success/error popup is shown
+PASS: redirect follows the success popup trigger
+PASS: approved success/error colors and mobile positioning are present
+
+Command:
+node docs/evidence/cr-02-static-check.mjs
+
