@@ -7,6 +7,7 @@ from app.models.feedback import Feedback
 from app.models.market import Market
 from app.models.market_signal import MarketSignal
 from app.models.price_update import PriceUpdate
+from app.models.password_reset_token import PasswordResetToken
 from app.models.quality_signal import QualitySignal
 from app.models.sell_watch_window import SellWatchWindow
 from app.models.storage_suitability import StorageSuitability
@@ -24,6 +25,7 @@ __all__ = [
     "Market",
     "MarketSignal",
     "PriceUpdate",
+    "PasswordResetToken",
     "QualitySignal",
     "SellWatchWindow",
     "StorageSuitability",

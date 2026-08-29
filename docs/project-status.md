@@ -375,3 +375,8 @@ Stage 22 is IN PROGRESS using Render Static Site for React, Render Free Web Serv
 Render checked out commit `e462deb0fb00154f0b1d2b36dd0c628eb6ed9dd4`, used Python 3.12.8, installed approved dependencies, ran Alembic successfully against PostgreSQL, uploaded the build, and started Uvicorn on Render's assigned port. Render reported the service live at `https://priceyard-api.onrender.com`.
 
 The root-path `404 Not Found` is expected because no `GET /` API is defined. Direct `GET /health` owner verification remains the next proof before the backend portion is marked complete.
+# AUTH-01 status — 2026-08-29
+
+Status: IMPLEMENTED AND LOCALLY VERIFIED; production SMTP configuration and deployment verification remain owner actions.
+
+Delivered accessible eye icons, Forgot Password, Reset Password, migration `0007_auth01_password_reset`, generic SMTP delivery, privacy-safe responses, hashed single-use tokens, cooldown, and automated lifecycle tests.

@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     from app.models.faq_item import FAQItem
     from app.models.market_signal import MarketSignal
     from app.models.price_update import PriceUpdate
+    from app.models.password_reset_token import PasswordResetToken
     from app.models.quality_signal import QualitySignal
     from app.models.sell_watch_window import SellWatchWindow
     from app.models.subscription import Subscription
@@ -51,3 +52,6 @@ class User(Base):
     faq_items: Mapped[list[FAQItem]] = relationship(back_populates="creator")
     audit_logs: Mapped[list[AuditLog]] = relationship(back_populates="user")
     watchlist_items: Mapped[list[Watchlist]] = relationship(back_populates="user", cascade="all, delete-orphan", passive_deletes=True)
+    password_reset_tokens: Mapped[list[PasswordResetToken]] = relationship(
+        back_populates="user", cascade="all, delete-orphan", passive_deletes=True
+    )

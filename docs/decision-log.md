@@ -367,3 +367,10 @@ Scope boundary: no marketplace, payment, AI prediction, alert, logistics, or oth
 - Primary URL: `https://priceyard-api.onrender.com`.
 - Root `404`: expected; no root endpoint exists.
 - Next proof: owner opens `/health`, then deploys the React Static Site.
+# AUTH-01 — Secure password recovery (2026-08-29)
+
+- Replaced password visibility text controls with accessible eye icons.
+- Added generic SMTP configuration through environment variables; no provider secret is stored in Git.
+- Reset tokens are random, stored only as SHA-256 hashes, expire after 15 minutes, and are single-use.
+- Responses do not disclose whether an email address is registered.
+- Existing login, registration, JWT, roles, subscriptions, and admin features remain unchanged.

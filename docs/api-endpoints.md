@@ -578,3 +578,7 @@ Private `source_1` / `source_2` values are not consumed by the Stage 18 frontend
 Stage 19 adds no backend API endpoint and does not change any approved API contract. The React admin frontend reuses the existing authenticated/admin endpoints from Stages 6–17 for users, commodities, markets, price updates, signals, buying zones, sell-watch windows, storage suitability, costs, FAQ, subscriptions, feedback, audit logs and CSV export.
 
 Backend role/subscription authorization remains authoritative; frontend route hiding is presentation only.
+# AUTH-01 password recovery
+
+- `POST /auth/forgot-password` — accepts an email and always returns the same generic response. For an active matching account, a single-use 15-minute reset link is sent.
+- `POST /auth/reset-password` — accepts a reset token and an 8–72 character new password. Expired, invalid, or used tokens are rejected.

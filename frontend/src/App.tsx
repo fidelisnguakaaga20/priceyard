@@ -7,12 +7,14 @@ import { CommodityDetailPage } from "./pages/CommodityDetailPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { FAQPage } from "./pages/FAQPage";
 import { FeedbackPage } from "./pages/FeedbackPage";
+import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
 import { HomePage } from "./pages/HomePage";
 import { LoginPage } from "./pages/LoginPage";
 import { MarketDaysPage } from "./pages/MarketDaysPage";
 import { PriceHistoryPage } from "./pages/PriceHistoryPage";
 import { PricesPage } from "./pages/PricesPage";
 import { RegisterPage } from "./pages/RegisterPage";
+import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import { WatchlistPage } from "./pages/WatchlistPage";
 import { AdminAuditLogsPage } from "./pages/admin/AdminAuditLogsPage";
 import { AdminCommoditiesPage } from "./pages/admin/AdminCommoditiesPage";
@@ -39,6 +41,8 @@ export default function App() {
         <Route path="faq" element={<FAQPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
+        <Route path="forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="reset-password" element={<ResetPasswordPage />} />
         <Route path="dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
         <Route path="watchlist" element={<ProtectedRoute><WatchlistPage /></ProtectedRoute>} />
         <Route path="feedback" element={<ProtectedRoute><FeedbackPage /></ProtectedRoute>} />

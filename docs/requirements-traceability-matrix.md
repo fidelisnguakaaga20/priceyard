@@ -219,3 +219,7 @@
 | S22-02 | Execution/Deployment | React deploys on Render Static Site, FastAPI on Render Web Service, and existing PostgreSQL remains on Supabase | MVP | 22 | Render services; Supabase | Live deployment verification | docs/evidence/stage-22-owner-deployment-steps.md | IN PROGRESS |
 
 | S22-03 | Execution/Deployment | Render builds the FastAPI backend, applies Alembic, starts Uvicorn and exposes the service URL | MVP | 22 | Render Web Service | Render deploy logs + health URL | docs/evidence/stage-22-render-backend-deployment.md | IN PROGRESS |
+| AUTH-01-01 | Owner-approved AUTH-01 | Replace Show/Hide text with accessible eye icons | MVP change | AUTH-01 | PasswordField, Login, Register, Reset pages | Frontend production build | Build output | PASS |
+| AUTH-01-02 | Owner-approved AUTH-01 | Secure forgot/reset password flow | MVP change | AUTH-01 | Auth API, reset service/model/migration, SMTP service, frontend pages | unittest lifecycle tests | Test output | PASS |
+| AUTH-01-03 | Owner-approved AUTH-01 | Do not reveal whether an email is registered | Security | AUTH-01 | password_reset_service | Known/unknown response equality test | Test output | PASS |
+| AUTH-01-04 | Owner-approved AUTH-01 | Expiring, single-use, non-plaintext reset tokens | Security | AUTH-01 | password_reset_tokens | Hash storage and reuse tests | Test output | PASS |
