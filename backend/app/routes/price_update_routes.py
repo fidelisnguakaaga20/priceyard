@@ -29,7 +29,7 @@ from app.services.price_update_service import (
     reject_price_update,
     update_price_update,
 )
-from app.utils.permissions import require_roles
+from app.utils.permissions import require_full_access, require_roles
 
 router = APIRouter(prefix="/price-updates", tags=["price-updates"])
 
@@ -59,6 +59,7 @@ def get_price_history(
     movement: Movement | None = Query(default=None),
     time_of_day: TimeOfDay | None = Query(default=None),
     db: Session = Depends(get_db),
+    _current_user: User = Depends(require_full_access),
 ) -> list[PriceUpdate]:
     return list_price_history(
         db,
