@@ -17,6 +17,8 @@ class Settings(BaseSettings):
     frontend_url: str = "http://127.0.0.1:5173"
     password_reset_expire_minutes: int = 15
     password_reset_cooldown_seconds: int = 60
+    brevo_api_key: str | None = None
+    brevo_api_url: str = "https://api.brevo.com/v3/smtp/email"
     smtp_host: str | None = None
     smtp_port: int = 587
     smtp_username: str | None = None
