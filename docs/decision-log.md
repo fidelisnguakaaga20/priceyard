@@ -1,3 +1,10 @@
+# AUTH-02 — Use Brevo HTTPS API in hosted environments (2026-08-29)
+
+- Decision: prefer Brevo's transactional email HTTPS API for password-reset delivery on Render.
+- Reason: production logs showed `OSError: [Errno 101] Network is unreachable` before Gmail SMTP authentication, while local SMTP delivery passed.
+- Scope: email transport only; secure reset-token behavior remains unchanged.
+- Fallback: retain the existing SMTP implementation for local or compatible environments.
+
 # Decision Log
 
 ## DEC-001 — Stage 0 coding override
