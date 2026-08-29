@@ -1,3 +1,10 @@
+# AUTH-02 — Brevo HTTPS email delivery (2026-08-29)
+
+- Status: implemented and locally tested.
+- Password-reset email delivery now prefers Brevo's HTTPS API when `BREVO_API_KEY` is configured.
+- Existing SMTP delivery remains available as a local fallback.
+- No database, token, authentication, role, subscription, or frontend behavior changed.
+
 # PriceYard Project Status
 
 ## Approved change request CR-01 — 2026-08-24
