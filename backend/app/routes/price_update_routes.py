@@ -22,7 +22,7 @@ from app.services.price_update_service import (
     get_approved_price_update,
     get_price_update_for_admin,
     list_latest_approved_price_updates,
-    list_admin_approved_price_history,
+    list_admin_price_updates,
     list_market_comparison,
     list_price_history,
     mark_price_update_outdated,
@@ -88,7 +88,7 @@ def get_admin_price_history(
     db: Session = Depends(get_db),
     _admin: User = Depends(require_roles("admin")),
 ) -> list[PriceUpdate]:
-    return list_admin_approved_price_history(db)
+    return list_admin_price_updates(db)
 
 
 @router.get("/{price_update_id}", response_model=PriceUpdatePublicResponse)

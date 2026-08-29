@@ -213,11 +213,13 @@ def list_price_history(
     return list(db.scalars(statement).all())
 
 
-def list_admin_approved_price_history(db: Session) -> list[PriceUpdate]:
-    statement = _approved_price_statement(
-        include_outdated=True,
-        active_only=False,
-    ).order_by(PriceUpdate.update_date_time.asc(), PriceUpdate.id.asc())
+def list_admin_price_updates(db: Session) -> list[PriceUpdate]:
+    """Return every price-update status to admins so pending records remain approvable after refresh."""
+    statement = (
+        select(PriceUpdate)
+        .options(*PRICE_UPDATE_LOAD_OPTIONS)
+        .order_by(PriceUpdate.update_date_time.desc(), PriceUpdate.id.desc())
+    )
     return list(db.scalars(statement).all())
 
 
