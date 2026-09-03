@@ -1,3 +1,8 @@
+.nav-primary,
+.nav-account {
+  display: contents;
+}
+
 @media (max-width: 640px) {
   .header-inner {
     width: 100%;
@@ -23,39 +28,52 @@
   .main-nav,
   .main-nav.open {
     position: static;
-    display: flex;
+    display: grid;
     width: 100%;
     max-width: 100%;
     min-width: 0;
-    flex-direction: row;
-    align-items: center;
-    gap: 4px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
     padding: 0 0 10px;
     border: 0;
     border-radius: 0;
     background: transparent;
     box-shadow: none;
-    overflow-x: auto;
-    overflow-y: hidden;
-    white-space: nowrap;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
+    overflow: visible;
   }
 
-  .main-nav::-webkit-scrollbar {
-    display: none;
+  .nav-primary,
+  .nav-account {
+    display: flex;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2px;
   }
 
-  .main-nav a,
-  .nav-button {
-    flex: 0 0 auto;
+  .nav-primary a,
+  .nav-account a,
+  .nav-account .nav-button {
+    flex: 0 1 auto;
+    min-width: 0;
     min-height: 40px;
-    padding: 8px 10px;
+    padding: 8px 5px;
     text-align: center;
     white-space: nowrap;
   }
 
-  .main-nav .nav-cta {
+  .nav-primary a {
+    font-size: .78rem;
+  }
+
+  .nav-account a,
+  .nav-account .nav-button {
+    font-size: clamp(.7rem, 3vw, .8rem);
+  }
+
+  .nav-account .nav-cta {
     padding-inline: 12px;
   }
 }
