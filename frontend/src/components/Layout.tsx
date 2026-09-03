@@ -40,18 +40,22 @@ export function Layout() {
           </Link>
           <button className="menu-button" type="button" aria-label="Toggle navigation" aria-expanded={open} onClick={() => setOpen((value) => !value)}>Menu</button>
           <nav className={open ? "main-nav open" : "main-nav"} aria-label="Primary navigation">
-            {navItems.map(([to, label]) => <NavLink key={to} to={to} onClick={() => setOpen(false)}>{label}</NavLink>)}
-            {user && <NavLink to="/watchlist" onClick={() => setOpen(false)}>Watchlist</NavLink>}
-            {user && <NavLink to="/feedback" onClick={() => setOpen(false)}>Feedback</NavLink>}
-            {user?.role === "admin" && <NavLink to="/admin" onClick={() => setOpen(false)}>Admin</NavLink>}
-            {user ? (
-              <>
-                <NavLink to="/dashboard" onClick={() => setOpen(false)}>Dashboard</NavLink>
-                <button className="nav-button" type="button" disabled={loggingOut} onClick={() => void handleLogout()}>{loggingOut ? <ButtonSpinner label="Please wait…" /> : "Log out"}</button>
-              </>
-            ) : (
-              <NavLink className="nav-cta" to="/login" onClick={() => setOpen(false)}>Log in</NavLink>
-            )}
+            <div className="nav-primary">
+              {navItems.map(([to, label]) => <NavLink key={to} to={to} onClick={() => setOpen(false)}>{label}</NavLink>)}
+            </div>
+            <div className="nav-account">
+              {user && <NavLink to="/watchlist" onClick={() => setOpen(false)}>Watchlist</NavLink>}
+              {user && <NavLink to="/feedback" onClick={() => setOpen(false)}>Feedback</NavLink>}
+              {user?.role === "admin" && <NavLink to="/admin" onClick={() => setOpen(false)}>Admin</NavLink>}
+              {user ? (
+                <>
+                  <NavLink to="/dashboard" onClick={() => setOpen(false)}>Dashboard</NavLink>
+                  <button className="nav-button" type="button" disabled={loggingOut} onClick={() => void handleLogout()}>{loggingOut ? <ButtonSpinner label="Please wait…" /> : "Log out"}</button>
+                </>
+              ) : (
+                <NavLink className="nav-cta" to="/login" onClick={() => setOpen(false)}>Log in</NavLink>
+              )}
+            </div>
           </nav>
         </div>
         <div className="access-strip"><span>Access: <strong>{accessLabel}</strong></span>{user && <span>{user.full_name}</span>}</div>
