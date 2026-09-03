@@ -5,7 +5,7 @@ import { ButtonSpinner } from "./LoadingSpinner";
 import { useToast } from "../context/ToastContext";
 
 const navItems = [
-  ["/prices", "Prices"],
+  ["/prices", "Current Prices"],
   ["/history", "Price History"],
   ["/market-days", "Market Days"],
   ["/faq", "FAQ"],
