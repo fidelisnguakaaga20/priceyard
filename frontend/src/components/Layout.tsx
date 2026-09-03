@@ -6,7 +6,7 @@ import { useToast } from "../context/ToastContext";
 
 const navItems = [
   ["/prices", "Prices"],
-  ["/history", "History"],
+  ["/history", "Price History"],
   ["/market-days", "Market Days"],
   ["/faq", "FAQ"],
 ] as const;
