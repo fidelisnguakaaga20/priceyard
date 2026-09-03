@@ -1,0 +1,98 @@
+.mobile-nav-icon {
+  display: none;
+  width: 20px;
+  height: 20px;
+  line-height: 0;
+}
+
+.mobile-nav-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 640px) {
+  .header-inner {
+    min-height: 58px;
+    padding-inline: 8px;
+    gap: 4px;
+  }
+
+  .brand {
+    flex: 0 0 auto;
+    max-width: none;
+    margin-right: 0;
+    gap: 6px;
+  }
+
+  .brand-mark {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+    border-radius: 9px;
+    font-size: .88rem;
+  }
+
+  .brand strong {
+    font-size: .82rem;
+    white-space: nowrap;
+  }
+
+  .menu-button {
+    display: none;
+  }
+
+  .main-nav,
+  .main-nav.open {
+    position: static;
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 2px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .main-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .main-nav a,
+  .nav-button {
+    display: grid;
+    flex: 0 0 36px;
+    width: 36px;
+    min-width: 36px;
+    height: 40px;
+    min-height: 40px;
+    place-items: center;
+    padding: 0;
+    text-align: center;
+  }
+
+  .main-nav .nav-cta {
+    padding-inline: 0;
+  }
+
+  .mobile-nav-icon {
+    display: block;
+  }
+
+  .nav-label {
+    display: none;
+  }
+
+  .nav-button .button-loading-content > span:last-child {
+    display: none;
+  }
+}
