@@ -2,10 +2,12 @@ import { FormEvent, useEffect, useState } from "react";
 import { Disclaimer, PRICE_DISCLAIMER } from "../components/Disclaimer";
 import { ButtonSpinner, LoadingSpinner } from "../components/LoadingSpinner";
 import { PriceCard } from "../components/PriceCard";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { apiFetch } from "../services/api";
 import type { Commodity, Market, PriceUpdate } from "../types/api";
 
 export function PricesPage() {
+  useDocumentTitle("Current Prices");
   const [items, setItems] = useState<PriceUpdate[]>([]);
   const [commodities, setCommodities] = useState<Commodity[]>([]);
   const [markets, setMarkets] = useState<Market[]>([]);

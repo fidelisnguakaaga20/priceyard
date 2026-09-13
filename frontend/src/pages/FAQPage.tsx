@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { LoadingSpinner } from "../components/LoadingSpinner";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { apiFetch } from "../services/api";
 import type { FAQItem } from "../types/api";
 
 export function FAQPage() {
+  useDocumentTitle("FAQ");
   const [items, setItems] = useState<FAQItem[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);

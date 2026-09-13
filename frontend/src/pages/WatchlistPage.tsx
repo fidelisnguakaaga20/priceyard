@@ -1,11 +1,13 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { ButtonSpinner, LoadingSpinner } from "../components/LoadingSpinner";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import { apiFetch } from "../services/api";
 import type { Commodity, Market, WatchlistItem } from "../types/api";
 
 export function WatchlistPage() {
   const { token } = useAuth();
+  const { showToast } = useToast();
   const [items, setItems] = useState<WatchlistItem[]>([]);
   const [commodities, setCommodities] = useState<Commodity[]>([]);
   const [markets, setMarkets] = useState<Market[]>([]);
@@ -59,8 +61,10 @@ export function WatchlistPage() {
       setCommodityId("");
       setMarketId("");
       await load(false);
+      showToast("Added to your watchlist.");
     } catch (err) {
       setError((err as Error).message);
+      showToast((err as Error).message, "error");
     } finally {
       setSaving(false);
     }
@@ -72,8 +76,10 @@ export function WatchlistPage() {
     try {
       await apiFetch(`/watchlist/${id}`, { method: "DELETE" }, token);
       await load(false);
+      showToast("Removed from your watchlist.");
     } catch (err) {
       setError((err as Error).message);
+      showToast((err as Error).message, "error");
     } finally {
       setRemovingId(null);
     }

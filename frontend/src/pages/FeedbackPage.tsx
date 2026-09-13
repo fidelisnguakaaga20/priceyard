@@ -1,10 +1,12 @@
 import { FormEvent, useState } from "react";
 import { ButtonSpinner } from "../components/LoadingSpinner";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import { apiFetch } from "../services/api";
 
 export function FeedbackPage() {
   const { token } = useAuth();
+  const { showToast } = useToast();
   const [rating, setRating] = useState(5);
   const [suggestion, setSuggestion] = useState("");
   const [continueUsing, setContinueUsing] = useState<boolean | null>(null);
@@ -35,8 +37,10 @@ export function FeedbackPage() {
       setMessage("Thank you. Your feedback was submitted.");
       setSuggestion("");
       setContinueUsing(null);
+      showToast("Thank you. Your feedback was submitted.");
     } catch (err) {
       setError((err as Error).message);
+      showToast((err as Error).message, "error");
     } finally {
       setBusy(false);
     }

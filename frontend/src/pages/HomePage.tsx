@@ -1,21 +1,29 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { CommodityImage } from "../components/CommodityImage";
 import { Disclaimer, PRICE_DISCLAIMER } from "../components/Disclaimer";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { PriceCard } from "../components/PriceCard";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { apiFetch } from "../services/api";
-import type { PriceUpdate } from "../types/api";
+import type { Commodity, PriceUpdate } from "../types/api";
+import { dateOnly } from "../utils";
 
 export function HomePage() {
+  useDocumentTitle("Know the market before you buy or sell");
   const [prices, setPrices] = useState<PriceUpdate[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [upcoming, setUpcoming] = useState<Commodity[]>([]);
 
   useEffect(() => {
     apiFetch<PriceUpdate[]>("/price-updates")
       .then((items) => setPrices(items.slice(0, 3)))
       .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false));
+    apiFetch<Commodity[]>("/commodities")
+      .then((items) => setUpcoming(items.filter((item) => item.is_upcoming)))
+      .catch(() => undefined);
   }, []);
 
   return (
@@ -40,6 +48,23 @@ export function HomePage() {
           </ul>
         </div>
       </section>
+
+      {upcoming.length > 0 && (
+        <section className="page section-block">
+          <div className="section-heading"><div><span className="eyebrow">Coming soon</span><h2>New commodities on the way</h2></div></div>
+          <div className="card-grid">
+            {upcoming.map((item) => (
+              <article className="card" key={item.id}>
+                <CommodityImage src={item.image_url} alt={item.name} />
+                <span className="eyebrow">Coming soon</span>
+                <h3>{item.name}</h3>
+                {item.description && <p className="muted">{item.description}</p>}
+                {item.expected_available_date && <p className="muted"><strong>Expected:</strong> {dateOnly(item.expected_available_date)}</p>}
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="page section-block">
         <div className="section-heading"><div><span className="eyebrow">Latest intelligence</span><h2>Current approved price updates</h2></div><Link className="text-link" to="/prices">See all prices →</Link></div>

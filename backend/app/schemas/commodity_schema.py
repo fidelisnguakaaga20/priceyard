@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -16,6 +16,8 @@ class CommodityCreate(BaseModel):
     description: str | None = None
     image_url: str | None = Field(default=None, max_length=500)
     is_active: bool = True
+    is_upcoming: bool = False
+    expected_available_date: date | None = None
 
     model_config = ConfigDict(str_strip_whitespace=True)
 
@@ -30,6 +32,8 @@ class CommodityUpdate(BaseModel):
     description: str | None = None
     image_url: str | None = Field(default=None, max_length=500)
     is_active: bool | None = None
+    is_upcoming: bool | None = None
+    expected_available_date: date | None = None
 
     model_config = ConfigDict(str_strip_whitespace=True)
 
@@ -45,6 +49,8 @@ class CommodityResponse(BaseModel):
     description: str | None
     image_url: str | None
     is_active: bool
+    is_upcoming: bool
+    expected_available_date: date | None
     created_at: datetime
     updated_at: datetime
 

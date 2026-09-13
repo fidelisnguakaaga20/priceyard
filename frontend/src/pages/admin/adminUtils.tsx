@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { ButtonHTMLAttributes } from "react";
 import { ButtonSpinner, LoadingSpinner } from "../../components/LoadingSpinner";
 import { apiFetch, ApiError } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
+import { useToast } from "../../context/ToastContext";
 
 export function useAdminList<T>(path: string) {
   const { token } = useAuth();
@@ -21,6 +22,17 @@ export function useAdminList<T>(path: string) {
 }
 
 export function AdminStatus({ error, success }: { error?: string; success?: string }) {
+  const { showToast } = useToast();
+  const lastShown = useRef<string | null>(null);
+  useEffect(() => {
+    const message = error || success;
+    if (message && message !== lastShown.current) {
+      showToast(message, error ? "error" : "success");
+      lastShown.current = message;
+    } else if (!message) {
+      lastShown.current = null;
+    }
+  }, [error, success, showToast]);
   if (error) return <div className="status-box error">{error}</div>;
   if (success) return <div className="status-box success">{success}</div>;
   return null;

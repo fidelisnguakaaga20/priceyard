@@ -51,6 +51,20 @@ export function daysUntil(value: string | null | undefined): number | null {
   return Math.ceil((date.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
 }
 
+type ShareablePrice = {
+  commodity: { name: string };
+  market: { name: string };
+  price_low: string | number;
+  price_high: string | number;
+  unit: string;
+};
+
+export function whatsAppShareUrl(item: ShareablePrice): string {
+  const link = `${window.location.origin}/commodities/${encodeURIComponent(item.commodity.name)}`;
+  const text = `${item.commodity.name} @ ${item.market.name}: ${money(item.price_low)} – ${money(item.price_high)} (${item.unit}) — via PriceYard\n${link}`;
+  return `https://wa.me/?text=${encodeURIComponent(text)}`;
+}
+
 export function dateOnly(value: string | null | undefined): string {
   if (!value) return "—";
   const date = new Date(value);
