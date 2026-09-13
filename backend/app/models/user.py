@@ -30,6 +30,8 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(320), unique=True, index=True, nullable=False)
     phone: Mapped[str | None] = mapped_column(String(30), unique=True, nullable=True)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    google_id: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True)
+    auth_provider: Mapped[str] = mapped_column(String(20), nullable=False, default="local")
     role: Mapped[str] = mapped_column(String(32), nullable=False, default="free_user", index=True)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)

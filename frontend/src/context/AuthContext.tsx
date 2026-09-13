@@ -12,6 +12,7 @@ type AuthContextValue = {
   accessLabel: AccessLabel;
   hasFullAccess: boolean;
   login: (email: string, password: string) => Promise<void>;
+  loginWithGoogle: (idToken: string) => Promise<void>;
   register: (payload: { full_name: string; email: string; phone?: string; password: string }) => Promise<void>;
   logout: () => void;
   refresh: () => Promise<void>;
@@ -77,6 +78,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await refreshWithToken(response.access_token);
   };
 
+  const loginWithGoogle = async (idToken: string) => {
+    const response = await apiFetch<{ access_token: string }>("/auth/google", {
+      method: "POST",
+      body: JSON.stringify({ id_token: idToken }),
+    });
+    localStorage.setItem(STORAGE_KEY, response.access_token);
+    setToken(response.access_token);
+    await refreshWithToken(response.access_token);
+  };
+
   const register = async (payload: { full_name: string; email: string; phone?: string; password: string }) => {
     await apiFetch<User>("/auth/register", { method: "POST", body: JSON.stringify(payload) });
     await login(payload.email, payload.password);
@@ -95,6 +106,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     accessLabel: access.label,
     hasFullAccess: access.full,
     login,
+    loginWithGoogle,
     register,
     logout: clearAuth,
     refresh,

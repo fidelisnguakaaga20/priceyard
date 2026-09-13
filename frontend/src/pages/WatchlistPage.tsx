@@ -89,7 +89,7 @@ export function WatchlistPage() {
     {error && <div className="status-box error">{error}</div>}
     {loading ? <LoadingSpinner label="Loading your watchlist…" /> : <>
       <div className="watchlist-grid">{items.map((item) => <article className="card" key={item.id}><span className="eyebrow">Saved item</span><h3>{item.commodity_id ? commodityMap.get(item.commodity_id) || `Commodity #${item.commodity_id}` : "All commodities"}</h3><p>{item.market_id ? marketMap.get(item.market_id) || `Market #${item.market_id}` : "No market restriction"}</p><button className="button button-danger button-small" disabled={removingId !== null} onClick={() => void remove(item.id)}>{removingId === item.id ? <ButtonSpinner label="Please wait…" /> : "Remove"}</button></article>)}</div>
-      {!items.length && !error && <div className="status-box">Your watchlist is empty.</div>}
+      {!items.length && !error && <div className="status-box">Your watchlist is empty. Save a commodity or market above to keep an eye on it here.</div>}
     </>}
   </section>;
 }

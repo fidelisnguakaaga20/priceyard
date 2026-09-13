@@ -1,7 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 
 from app.config import get_settings
+from app.rate_limit import limiter
 from app.routes.audit_log_routes import router as audit_log_router
 from app.routes.auth_routes import router as auth_router
 from app.routes.buying_zone_routes import router as buying_zone_router
@@ -26,6 +29,9 @@ app = FastAPI(
     title=settings.app_name,
     debug=settings.debug,
 )
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 allowed_origins = [
     origin.strip().rstrip("/")

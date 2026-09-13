@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { ButtonSpinner } from "./LoadingSpinner";
 import { useToast } from "../context/ToastContext";
+import { daysUntil } from "../utils";
 
 const navItems = [
   ["/prices", "Current Prices"],
@@ -12,7 +13,8 @@ const navItems = [
 ] as const;
 
 export function Layout() {
-  const { user, accessLabel, logout } = useAuth();
+  const { user, accessLabel, subscription, logout } = useAuth();
+  const trialDaysLeft = accessLabel === "Trial" ? daysUntil(subscription?.trial_ends_at) : null;
   const { showToast } = useToast();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -60,6 +62,11 @@ export function Layout() {
         </div>
         <div className="access-strip"><span>Access: <strong>{accessLabel}</strong></span>{user && <span>{user.full_name}</span>}</div>
       </header>
+      {trialDaysLeft !== null && trialDaysLeft >= 0 && (
+        <div className="trial-banner">
+          {trialDaysLeft === 0 ? "Your trial ends today." : <>Your trial ends in <strong>{trialDaysLeft} day{trialDaysLeft === 1 ? "" : "s"}</strong>.</>}
+        </div>
+      )}
       <main><Outlet /></main>
       <footer className="site-footer">
         <div><strong>PriceYard</strong> by NGU TOP PRODUCTS AND SERVICES</div>

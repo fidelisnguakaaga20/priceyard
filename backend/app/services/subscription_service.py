@@ -63,12 +63,19 @@ def has_full_access(subscription: Subscription, *, now: datetime | None = None) 
 
 
 def get_subscription_for_user(db: Session, user_id: int) -> Subscription:
-    subscription = db.scalar(select(Subscription).where(Subscription.user_id == user_id))
+    subscription = find_subscription_for_user(db, user_id)
     if subscription is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Subscription not found",
         )
+    return subscription
+
+
+def find_subscription_for_user(db: Session, user_id: int) -> Subscription | None:
+    subscription = db.scalar(select(Subscription).where(Subscription.user_id == user_id))
+    if subscription is None:
+        return None
     return expire_trial_if_needed(db, subscription)
 
 

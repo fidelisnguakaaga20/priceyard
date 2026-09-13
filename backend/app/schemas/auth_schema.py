@@ -13,6 +13,10 @@ class LoginRequest(BaseModel):
     password: str = Field(min_length=1, max_length=72)
 
 
+class GoogleLoginRequest(BaseModel):
+    id_token: str = Field(min_length=10)
+
+
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"

@@ -43,7 +43,7 @@ export function HomePage() {
 
       <section className="page section-block">
         <div className="section-heading"><div><span className="eyebrow">Latest intelligence</span><h2>Current approved price updates</h2></div><Link className="text-link" to="/prices">See all prices →</Link></div>
-        {loading ? <LoadingSpinner label="Loading approved prices…" /> : error ? <div className="status-box error">Could not load prices: {error}</div> : prices.length ? <div className="card-grid">{prices.map((item) => <PriceCard key={item.id} item={item} />)}</div> : <div className="status-box">No approved current price updates are available yet.</div>}
+        {loading ? <LoadingSpinner label="Loading approved prices…" /> : error ? <div className="status-box error">Could not load prices: {error}</div> : prices.length ? <div className="card-grid">{prices.map((item) => <PriceCard key={item.id} item={item} />)}</div> : <div className="status-box">No approved current price updates are available yet. Check back soon.</div>}
       </section>
 
       <section className="page section-block three-column">

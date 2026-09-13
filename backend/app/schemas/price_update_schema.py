@@ -122,6 +122,7 @@ class PriceUpdateUpdate(BaseModel):
 class CommoditySummary(BaseModel):
     id: int
     name: str
+    image_url: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
 

@@ -28,6 +28,7 @@ export type Commodity = {
   id: number;
   name: string;
   description: string | null;
+  image_url: string | null;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -49,7 +50,7 @@ export type PriceUpdate = {
   id: number;
   commodity_id: number;
   market_id: number;
-  commodity: { id: number; name: string };
+  commodity: { id: number; name: string; image_url: string | null };
   market: { id: number; name: string; state: string | null; market_day: string | null };
   price_low: string | number;
   price_high: string | number;

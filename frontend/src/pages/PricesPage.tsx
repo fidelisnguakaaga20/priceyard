@@ -50,7 +50,7 @@ export function PricesPage() {
       <div className="filter-actions"><button className="button button-small" type="submit" disabled={loading}>{loading ? <ButtonSpinner label="Please wait…" /> : "Apply"}</button><button className="button button-ghost button-small" type="button" onClick={clear} disabled={loading}>Clear</button></div>
     </form>
     {error && <div className="status-box error">{error}</div>}
-    {loading || filtersLoading ? <LoadingSpinner label="Loading approved prices…" /> : items.length ? <div className="card-grid">{items.map((item) => <PriceCard key={item.id} item={item} />)}</div> : <div className="status-box">No approved price updates match these filters.</div>}
+    {loading || filtersLoading ? <LoadingSpinner label="Loading approved prices…" /> : items.length ? <div className="card-grid">{items.map((item) => <PriceCard key={item.id} item={item} />)}</div> : <div className="status-box">No approved price updates match these filters. Try clearing the filters or check back soon for new records.</div>}
     <Disclaimer>{PRICE_DISCLAIMER}</Disclaimer>
   </section>;
 }

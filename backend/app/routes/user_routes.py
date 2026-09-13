@@ -5,7 +5,7 @@ from app.database import get_db
 from app.models.user import User
 from app.schemas.user_schema import AdminUserUpdate, UserResponse
 from app.services.audit_service import create_audit_log, snapshot_model
-from app.services.subscription_service import get_subscription_for_user
+from app.services.subscription_service import find_subscription_for_user
 from app.services.user_service import get_user, list_users, update_user
 from app.utils.permissions import require_roles
 
@@ -38,17 +38,18 @@ def edit_user(
 ) -> User:
     target = get_user(db, user_id)
     old_user = snapshot_model(target)
-    subscription = get_subscription_for_user(db, user_id)
-    old_subscription = snapshot_model(subscription)
+    subscription = find_subscription_for_user(db, user_id)
+    old_subscription = snapshot_model(subscription) if subscription is not None else None
     target = update_user(db, target, payload)
     create_audit_log(
         db, actor=admin, action="user.update", table_name="users",
         record_id=target.id, old_value=old_user, new_value=snapshot_model(target),
     )
-    new_subscription = snapshot_model(subscription)
-    if old_subscription != new_subscription:
-        create_audit_log(
-            db, actor=admin, action="subscription.user_management_sync", table_name="subscriptions",
-            record_id=subscription.id, old_value=old_subscription, new_value=new_subscription,
-        )
+    if subscription is not None:
+        new_subscription = snapshot_model(subscription)
+        if old_subscription != new_subscription:
+            create_audit_log(
+                db, actor=admin, action="subscription.user_management_sync", table_name="subscriptions",
+                record_id=subscription.id, old_value=old_subscription, new_value=new_subscription,
+            )
     return target
