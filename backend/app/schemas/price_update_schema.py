@@ -38,7 +38,7 @@ class PriceUpdateWriteBase(BaseModel):
     previous_price_low: Decimal | None = Field(default=None, ge=0, max_digits=14, decimal_places=2)
     previous_price_high: Decimal | None = Field(default=None, ge=0, max_digits=14, decimal_places=2)
     unit: str = Field(min_length=1, max_length=100)
-    bag_size: str | None = Field(default=None, max_length=100)
+    bag_size: str = Field(min_length=1, max_length=100)
     commodity_type: str | None = Field(default=None, max_length=150)
     market_day: MarketDay | None = None
     time_of_day: TimeOfDay | None = None
@@ -91,7 +91,7 @@ class PriceUpdateUpdate(BaseModel):
     previous_price_low: Decimal | None = Field(default=None, ge=0, max_digits=14, decimal_places=2)
     previous_price_high: Decimal | None = Field(default=None, ge=0, max_digits=14, decimal_places=2)
     unit: str | None = Field(default=None, min_length=1, max_length=100)
-    bag_size: str | None = Field(default=None, max_length=100)
+    bag_size: str | None = Field(default=None, min_length=1, max_length=100)
     commodity_type: str | None = Field(default=None, max_length=150)
     market_day: MarketDay | None = None
     time_of_day: TimeOfDay | None = None
