@@ -135,3 +135,51 @@ def update_subscription_status(db: Session, subscription: Subscription, new_stat
     db.commit()
     db.refresh(subscription)
     return subscription
+
+
+TRIAL_REMINDER_WINDOW_DAYS = 3
+
+
+def send_trial_expiry_reminders(db: Session) -> int:
+    """Email trial users whose trial ends within the reminder window, once each."""
+    from app.services.email_service import send_email
+
+    now = utc_now()
+    window_end = now + timedelta(days=TRIAL_REMINDER_WINDOW_DAYS)
+    candidates = db.scalars(
+        select(Subscription).where(
+            Subscription.status == "trial",
+            Subscription.trial_ends_at.is_not(None),
+            Subscription.trial_ends_at <= window_end,
+            Subscription.trial_ends_at > now,
+            Subscription.trial_reminder_sent_at.is_(None),
+        )
+    ).all()
+
+    sent = 0
+    for subscription in candidates:
+        user = subscription.user
+        if not user.is_active:
+            continue
+        days_left = max((subscription.trial_ends_at - now).days, 0)
+        subject = "Your PriceYard trial is ending soon"
+        body = (
+            f"Hi {user.full_name},\n\n"
+            f"Your 14-day PriceYard trial ends in {days_left} day(s). "
+            "After it ends, you'll move to limited free access unless an admin "
+            "upgrades your account to Paid.\n\n"
+            "Log in to keep checking current prices, price history, buying zones, "
+            "and storage suitability while your trial is still active:\n"
+            "https://priceyard.onrender.com/login\n\n"
+            "PriceYard — Know the market before you buy or sell."
+        )
+        try:
+            send_email(recipient=user.email, subject=subject, body=body)
+        except Exception:
+            continue
+        subscription.trial_reminder_sent_at = now
+        sent += 1
+
+    if sent:
+        db.commit()
+    return sent

@@ -9,6 +9,7 @@ from app.services.audit_service import create_audit_log, snapshot_model
 from app.services.subscription_service import (
     get_subscription_for_user,
     list_subscriptions,
+    send_trial_expiry_reminders,
     update_subscription_status,
 )
 from app.utils.permissions import get_current_user, require_roles
@@ -36,6 +37,15 @@ def get_user_subscription(
             detail="Insufficient permissions",
         )
     return get_subscription_for_user(db, user_id)
+
+
+@router.post("/send-trial-reminders")
+def trigger_trial_reminders(
+    db: Session = Depends(get_db),
+    _: User = Depends(require_roles("admin")),
+) -> dict[str, int]:
+    sent = send_trial_expiry_reminders(db)
+    return {"sent": sent}
 
 
 @router.patch("/{user_id}/status", response_model=SubscriptionResponse)

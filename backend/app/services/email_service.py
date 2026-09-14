@@ -10,9 +10,6 @@ from app.config import get_settings
 
 def send_password_reset_email(*, recipient: str, reset_url: str) -> None:
     settings = get_settings()
-    if not settings.smtp_from_email:
-        raise RuntimeError("Password reset email is not configured")
-
     subject = "Reset your PriceYard password"
     body = (
         "We received a request to reset your PriceYard password.\n\n"
@@ -20,6 +17,13 @@ def send_password_reset_email(*, recipient: str, reset_url: str) -> None:
         f"{reset_url}\n\n"
         "If you did not request this, you can ignore this email."
     )
+    send_email(recipient=recipient, subject=subject, body=body)
+
+
+def send_email(*, recipient: str, subject: str, body: str) -> None:
+    settings = get_settings()
+    if not settings.smtp_from_email:
+        raise RuntimeError("Email delivery is not configured")
 
     if settings.brevo_api_key:
         payload = json.dumps(
@@ -51,7 +55,7 @@ def send_password_reset_email(*, recipient: str, reset_url: str) -> None:
         return
 
     if not settings.smtp_host:
-        raise RuntimeError("Password reset email is not configured")
+        raise RuntimeError("Email delivery is not configured")
 
     message = EmailMessage()
     message["Subject"] = subject

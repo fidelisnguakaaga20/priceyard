@@ -27,6 +27,7 @@ class Subscription(Base):
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="free", index=True)
     trial_started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     trial_ends_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    trial_reminder_sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     start_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     end_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     payment_reference: Mapped[str | None] = mapped_column(String(255), nullable=True)
