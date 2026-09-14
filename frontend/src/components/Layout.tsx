@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { ButtonSpinner } from "./LoadingSpinner";
 import { usePreferences } from "../context/PreferencesContext";
 import { useToast } from "../context/ToastContext";
+import { WhatsAppSupportButton } from "./WhatsAppSupportButton";
 import { daysUntil } from "../utils";
 
 const navItems = [
@@ -80,6 +81,7 @@ export function Layout() {
         <div><strong>PriceYard</strong> by NGU TOP PRODUCTS AND SERVICES</div>
         <div>Market information only — no guaranteed profit or prediction.</div>
       </footer>
+      <WhatsAppSupportButton />
     </div>
   );
 }
