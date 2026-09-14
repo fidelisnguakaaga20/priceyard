@@ -381,3 +381,50 @@ Scope boundary: no marketplace, payment, AI prediction, alert, logistics, or oth
 - Reset tokens are random, stored only as SHA-256 hashes, expire after 15 minutes, and are single-use.
 - Responses do not disclose whether an email address is registered.
 - Existing login, registration, JWT, roles, subscriptions, and admin features remain unchanged.
+
+## 2026-08-29 — FIX-02 pending-visibility and history-access split
+
+- Problem found: Admin's price-update history query was dropping pending records on refresh, so newly submitted updates could be lost before approval; complete Price History also needed stronger enforcement than "logged in."
+- Decision: keep all statuses (pending/approved/rejected) in the admin history read so nothing is lost, while gating the separate complete-history endpoint behind Trial/Paid/Admin access specifically — two different fixes for two different problems, not one combined change.
+- Reason: conflating "admin needs to see everything" with "public needs to see less" would have either hidden pending work from admin or over-exposed history to free/guest users.
+- Scope: backend query/authorization only; no schema change.
+
+## 2026-08 — NAV-06 three-row mobile navigation (replacing a hidden menu button)
+
+- An earlier attempt (`fix/mobile-inline-navigation`, abandoned) tried to expose icons inline and hit CSS cascade problems.
+- Decision: replace the hidden hamburger-menu pattern entirely with three always-visible rows (brand / primary links / account links) rather than fixing the hidden menu.
+- Reason: a menu the user has to discover and tap costs an extra step on every visit; showing links directly costs vertical space but removes that friction, which matters more on a page people check daily for prices.
+
+## 2026-08 — DATA-EDIT-01: correction vs new record as two distinct workflows
+
+- Decision: a price-history record with a genuine data-entry mistake (e.g. wrong Movement value) gets corrected in place via a new "Correct existing price record" form; a genuinely new market price gets a brand-new record, never an edit of an old one.
+- Reason: PriceYard's price history is only trustworthy if past records reflect what the market actually did at that time. Silently editing an old price to match a new market reality would erase real history; not being able to fix a typo at all would leave permanent noise in the data. Both needed a distinct, clearly-labeled path so an admin (or a future AI) doesn't reach for the wrong one.
+
+## 2026-09-13 — Stage 30: guard the last active admin instead of just warning
+
+- Trigger: mid-session, the only active admin account was found deactivated with no other active admin able to reactivate it through the UI — required a direct one-off database fix to recover.
+- Decision: add a hard backend guard (`409`) that refuses to deactivate or demote the last active admin, rather than just documenting "don't do this."
+- Reason: a warning doesn't prevent an accidental click, a bad bulk edit, or a future AI session doing it unknowingly. A structural guard makes the lockout scenario unreachable through the normal app, which is cheaper than ever needing the manual DB recovery again.
+
+## 2026-09-13 — Stage 30/32: `bag_size` required, but `is_upcoming` display not date-filtered
+
+- `bag_size` was optional and several real price records had been saved without it, leaving users unable to see how much a bag actually weighs. Made required at the backend schema level (not just the form) going forward, and added it to the correction form so existing gaps could be fixed retroactively.
+- Separately, the "Coming Soon" (upcoming-product) feature was built to display immediately regardless of `valid_from`/`valid_to` — there is no date-based filtering on it. This was a deliberate scope cut for Stage 32 (out of scope: "notifications, ranking/ordering logic"), not an oversight, but it has a consequence: a Buying Zone entry has the same lack of date filtering, so a future/anticipated buying zone must never be entered before its window actually opens — it would display as active immediately. Documented here so a future AI doesn't "helpfully" schedule one early.
+
+## 2026-09-13 — Tawk.to replaced with a WhatsApp support button
+
+- Tawk.to (free live-chat widget) was built and shipped first, per owner request.
+- Owner then asked to switch to a WhatsApp-based support button instead, and asked whether running both together was wise.
+- Decision/reasoning given: recommended against running both. The real risk of two support channels isn't UI clutter, it's staffing — PriceYard is currently a one-person operation, and an unanswered second inbox looks worse to users than not offering it at all. WhatsApp was already the channel being reliably staffed, so it became the sole channel.
+- Implementation choice: the Tawk.to `<script>` block was commented out in `index.html`, not deleted, specifically so it can be restored in one line if the calculus changes later (e.g. a support hire).
+
+## 2026-09-13/14 — Commodity/market intelligence: real data only, verified before publishing
+
+- When asked to fill in blank "Market signals / Quality readiness / Buying zone / Sell-watch window / Storage suitability" sections for Honey Beans, the request was to enter real, owner-supplied observations transcribed into the correct admin forms — not to fabricate plausible-sounding content to make the page look complete.
+- Reason: PriceYard's reference document explicitly treats fabricated or unverified market intelligence as a core product risk ("Do not publish paid group content... without independent verification"). An AI assistant filling gaps with invented numbers would violate that rule as surely as a human reporter would.
+- Applied consequence: a cost-breakdown entry was initially created referencing the current (September) market price alongside a packaging cost that only applies at the November-December buying time; the owner caught the mismatch and it was corrected to reference the actual buy-time price. Recorded here because it's a useful pattern: cost/price fields must stay internally time-consistent, not just individually plausible.
+
+## 2026-09-13 — Google OAuth: existing Cloud project reused, not a dedicated one
+
+- The Google OAuth Client ID for Sign-in with Google was created under the owner's existing `stripe-revenue-copilot` Google Cloud project, not a new dedicated PriceYard project.
+- Reason: no functional requirement for a separate project at MVP scale; OAuth Client IDs are project-scoped credentials, not data-scoped, so this carries no data-mixing risk. Noted here only so a future cleanup pass isn't surprised by the project name.
