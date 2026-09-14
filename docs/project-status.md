@@ -422,4 +422,8 @@ Ten FAQ entries were drafted from the owner's reference document (Section 27 top
 
 ## Current stage — 2026-09-14
 
-Enhancement Stages 25-38 plus the items above are complete and confirmed on live production (`https://priceyard.onrender.com`) through commit `5c3fd2e`. Stages 20-21 (full access-control correction, full security review) remain owner-deferred from the original execution plan and are unrelated to this work. Open items: unverified account `id=53` (johnadenyumaigiri@gmail.com) not yet confirmed as a real signup; Render environment variables `GOOGLE_CLIENT_ID`/`VITE_GOOGLE_CLIENT_ID` set via dashboard, not independently verified from code; rate limiting is in-memory and would need a Redis-backed store if scaled to multiple instances.
+Enhancement Stages 25-38 plus the items above are complete and confirmed on live production (`https://priceyard.onrender.com`) through commit `5c3fd2e`. Stages 20-21 (full access-control correction, full security review) remain owner-deferred from the original execution plan and are unrelated to this work. Remaining open item: rate limiting is in-memory and would need a Redis-backed store if scaled to multiple instances; not a current blocker on a single Render instance.
+
+## Open items closed — 2026-09-14
+
+Account `id=53` (johnadenyumaigiri@gmail.com) confirmed by the owner as a real user, not a test account — no action needed. Render environment variables `GOOGLE_CLIENT_ID` (backend) and `VITE_GOOGLE_CLIENT_ID` (frontend) confirmed present in Render's dashboard by the owner.
