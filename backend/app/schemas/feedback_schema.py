@@ -31,6 +31,8 @@ class FeedbackResponse(BaseModel):
     complaint_or_suggestion: str | None
     continue_using_feedback: bool | None
     willingness_to_pay_feedback: bool | None
+    is_public_testimonial: bool
+    testimonial_display_name: str | None
     created_at: datetime
     updated_at: datetime
 
@@ -40,3 +42,19 @@ class FeedbackResponse(BaseModel):
 class FeedbackSummaryResponse(BaseModel):
     count: int
     average_rating: float | None
+
+
+class TestimonialPublishRequest(BaseModel):
+    display_name: str = Field(min_length=1, max_length=100)
+
+    model_config = ConfigDict(str_strip_whitespace=True, extra="forbid")
+
+
+class TestimonialResponse(BaseModel):
+    id: int
+    rating: int
+    quote: str
+    display_name: str
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)

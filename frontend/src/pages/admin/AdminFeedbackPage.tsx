@@ -12,6 +12,8 @@ type Feedback = {
   missing_market_request: string | null;
   missing_commodity_request: string | null;
   continue_using_feedback: boolean | null;
+  is_public_testimonial: boolean;
+  testimonial_display_name: string | null;
   created_at: string;
 };
 type Summary = { count: number; average_rating: number | null };
@@ -25,6 +27,8 @@ export function AdminFeedbackPage() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [removingId, setRemovingId] = useState<number | null>(null);
+  const [testimonialBusyId, setTestimonialBusyId] = useState<number | null>(null);
+  const [displayNames, setDisplayNames] = useState<Record<number, string>>({});
 
   const load = useCallback(async (showLoader = true) => {
     if (!token) return;
@@ -61,6 +65,41 @@ export function AdminFeedbackPage() {
     }
   }
 
+  async function publishTestimonial(id: number) {
+    if (!token || testimonialBusyId !== null) return;
+    const displayName = (displayNames[id] || "").trim();
+    if (!displayName) {
+      setError("Enter a display name before featuring this feedback as a testimonial.");
+      return;
+    }
+    setTestimonialBusyId(id);
+    try {
+      await apiFetch(`/feedback/${id}/testimonial/publish`, { method: "PATCH", body: JSON.stringify({ display_name: displayName }) }, token);
+      setMessage(`Feedback #${id} is now a public testimonial.`);
+      setError("");
+      await load(false);
+    } catch (err) {
+      setError(errorText(err));
+    } finally {
+      setTestimonialBusyId(null);
+    }
+  }
+
+  async function hideTestimonial(id: number) {
+    if (!token || testimonialBusyId !== null) return;
+    setTestimonialBusyId(id);
+    try {
+      await apiFetch(`/feedback/${id}/testimonial/hide`, { method: "PATCH" }, token);
+      setMessage(`Feedback #${id} removed from public testimonials.`);
+      setError("");
+      await load(false);
+    } catch (err) {
+      setError(errorText(err));
+    } finally {
+      setTestimonialBusyId(null);
+    }
+  }
+
   return <div>
     <h2>Feedback</h2>
     <div className="admin-metric-grid">
@@ -69,7 +108,28 @@ export function AdminFeedbackPage() {
     </div>
     <label className="admin-inline-filter">Filter rating<select value={rating} disabled={loading || removingId !== null} onChange={(e) => setRating(e.target.value)}><option value="">All</option>{[1, 2, 3, 4, 5].map((x) => <option key={x}>{x}</option>)}</select></label>
     <AdminStatus error={error} success={message} />
-    {loading ? <AdminLoading label="Loading feedback…"/> : <div className="admin-card-list">{items.map((item) => <article className="card" key={item.id}><div className="card-row"><div><span className="eyebrow">#{item.id} · {item.rating}/5 · user #{item.user_id}</span><h3>{item.comment || "Feedback"}</h3><p>{item.complaint_or_suggestion || "No complaint/suggestion"}</p><small>Continue using: {item.continue_using_feedback === null ? "No answer" : item.continue_using_feedback ? "Yes" : "No"}</small><small>{item.missing_market_request ? `Market request: ${item.missing_market_request}` : ""} {item.missing_commodity_request ? `Commodity request: ${item.missing_commodity_request}` : ""}</small></div><AdminActionButton className="button button-small button-danger" busy={removingId === item.id} disabled={removingId !== null && removingId !== item.id} onClick={() => void remove(item.id)}>Delete</AdminActionButton></div></article>)}</div>}
+    {loading ? <AdminLoading label="Loading feedback…"/> : <div className="admin-card-list">{items.map((item) => <article className="card" key={item.id}><div className="card-row"><div><span className="eyebrow">#{item.id} · {item.rating}/5 · user #{item.user_id}</span><h3>{item.comment || "Feedback"}</h3><p>{item.complaint_or_suggestion || "No complaint/suggestion"}</p><small>Continue using: {item.continue_using_feedback === null ? "No answer" : item.continue_using_feedback ? "Yes" : "No"}</small><small>{item.missing_market_request ? `Market request: ${item.missing_market_request}` : ""} {item.missing_commodity_request ? `Commodity request: ${item.missing_commodity_request}` : ""}</small></div><AdminActionButton className="button button-small button-danger" busy={removingId === item.id} disabled={removingId !== null && removingId !== item.id} onClick={() => void remove(item.id)}>Delete</AdminActionButton></div>
+      <div className="admin-testimonial-row">
+        {item.is_public_testimonial ? (
+          <>
+            <span className="badge badge-success">Public testimonial as "{item.testimonial_display_name}"</span>
+            <AdminActionButton className="button button-small button-secondary" busy={testimonialBusyId === item.id} disabled={testimonialBusyId !== null && testimonialBusyId !== item.id} onClick={() => void hideTestimonial(item.id)}>Remove from testimonials</AdminActionButton>
+          </>
+        ) : (
+          <>
+            <input
+              type="text"
+              placeholder="Display name (e.g. Mvendaga N.)"
+              maxLength={100}
+              value={displayNames[item.id] || ""}
+              disabled={testimonialBusyId !== null}
+              onChange={(e) => setDisplayNames((prev) => ({ ...prev, [item.id]: e.target.value }))}
+            />
+            <AdminActionButton className="button button-small" busy={testimonialBusyId === item.id} disabled={testimonialBusyId !== null && testimonialBusyId !== item.id} onClick={() => void publishTestimonial(item.id)}>Feature as public testimonial</AdminActionButton>
+          </>
+        )}
+      </div>
+    </article>)}</div>}
   </div>;
 }
 

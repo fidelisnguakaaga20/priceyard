@@ -6,7 +6,13 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.feedback import Feedback
 from app.models.user import User
-from app.schemas.feedback_schema import FeedbackCreate, FeedbackResponse, FeedbackSummaryResponse
+from app.schemas.feedback_schema import (
+    FeedbackCreate,
+    FeedbackResponse,
+    FeedbackSummaryResponse,
+    TestimonialPublishRequest,
+    TestimonialResponse,
+)
 from app.services.audit_service import create_audit_log, snapshot_model
 from app.services.feedback_service import (
     create_feedback,
@@ -14,10 +20,18 @@ from app.services.feedback_service import (
     feedback_summary,
     get_feedback,
     list_feedback,
+    list_public_testimonials,
+    set_testimonial_publication,
 )
 from app.utils.permissions import get_current_user, require_roles
 
 router = APIRouter(prefix="/feedback", tags=["feedback"])
+testimonials_router = APIRouter(prefix="/testimonials", tags=["testimonials"])
+
+
+@testimonials_router.get("", response_model=list[TestimonialResponse])
+def get_public_testimonials(db: Session = Depends(get_db)) -> list[TestimonialResponse]:
+    return list_public_testimonials(db)
 
 
 @router.post("", response_model=FeedbackResponse, status_code=status.HTTP_201_CREATED)
@@ -53,6 +67,33 @@ def get_feedback_item(
     _admin: User = Depends(require_roles("admin")),
 ) -> Feedback:
     return get_feedback(db, feedback_id)
+
+
+@router.patch("/{feedback_id}/testimonial/publish", response_model=FeedbackResponse)
+def publish_testimonial(
+    feedback_id: int,
+    payload: TestimonialPublishRequest,
+    db: Session = Depends(get_db),
+    admin: User = Depends(require_roles("admin")),
+) -> Feedback:
+    item = get_feedback(db, feedback_id)
+    old_value = snapshot_model(item)
+    item = set_testimonial_publication(db, item, is_public=True, display_name=payload.display_name)
+    create_audit_log(db, actor=admin, action="feedback.testimonial_publish", table_name="feedback", record_id=item.id, old_value=old_value, new_value=snapshot_model(item))
+    return item
+
+
+@router.patch("/{feedback_id}/testimonial/hide", response_model=FeedbackResponse)
+def hide_testimonial(
+    feedback_id: int,
+    db: Session = Depends(get_db),
+    admin: User = Depends(require_roles("admin")),
+) -> Feedback:
+    item = get_feedback(db, feedback_id)
+    old_value = snapshot_model(item)
+    item = set_testimonial_publication(db, item, is_public=False, display_name=item.testimonial_display_name)
+    create_audit_log(db, actor=admin, action="feedback.testimonial_hide", table_name="feedback", record_id=item.id, old_value=old_value, new_value=snapshot_model(item))
+    return item
 
 
 @router.delete("/{feedback_id}", status_code=status.HTTP_204_NO_CONTENT)

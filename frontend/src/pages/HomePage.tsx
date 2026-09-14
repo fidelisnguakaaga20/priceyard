@@ -6,7 +6,7 @@ import { LoadingSpinner } from "../components/LoadingSpinner";
 import { PriceCard } from "../components/PriceCard";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { apiFetch } from "../services/api";
-import type { Commodity, Market, PriceUpdate } from "../types/api";
+import type { Commodity, Market, PriceUpdate, Testimonial } from "../types/api";
 import { dateOnly, WHATSAPP_COMMUNITY_URL } from "../utils";
 
 export function HomePage() {
@@ -18,6 +18,7 @@ export function HomePage() {
   const [commodityCount, setCommodityCount] = useState<number | null>(null);
   const [marketCount, setMarketCount] = useState<number | null>(null);
   const [recordCount, setRecordCount] = useState<number | null>(null);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
 
   useEffect(() => {
     apiFetch<PriceUpdate[]>("/price-updates")
@@ -32,6 +33,9 @@ export function HomePage() {
       .catch(() => undefined);
     apiFetch<Market[]>("/markets")
       .then((items) => setMarketCount(items.length))
+      .catch(() => undefined);
+    apiFetch<Testimonial[]>("/testimonials")
+      .then(setTestimonials)
       .catch(() => undefined);
   }, []);
 
@@ -88,6 +92,21 @@ export function HomePage() {
         <div className="section-heading"><div><span className="eyebrow">Latest intelligence</span><h2>Current approved price updates</h2></div><Link className="text-link" to="/prices">See all prices →</Link></div>
         {loading ? <LoadingSpinner label="Loading approved prices…" /> : error ? <div className="status-box error">Could not load prices: {error}</div> : prices.length ? <div className="card-grid">{prices.map((item) => <PriceCard key={item.id} item={item} />)}</div> : <div className="status-box">No approved current price updates are available yet. Check back soon.</div>}
       </section>
+
+      {testimonials.length > 0 && (
+        <section className="page section-block">
+          <div className="section-heading"><div><span className="eyebrow">From real users</span><h2>What traders are saying</h2></div></div>
+          <div className="card-grid">
+            {testimonials.map((item) => (
+              <article className="card testimonial-card" key={item.id}>
+                <span className="testimonial-stars" aria-label={`${item.rating} out of 5 stars`}>{"★".repeat(item.rating)}{"☆".repeat(5 - item.rating)}</span>
+                <p>&ldquo;{item.quote}&rdquo;</p>
+                <strong>— {item.display_name}</strong>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="page section-block three-column">
         <article className="info-tile"><span>01</span><h3>Compare ranges</h3><p>See current and previous ranges without pretending every market transaction has one exact price.</p></article>
