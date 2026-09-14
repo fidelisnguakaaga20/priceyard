@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { ButtonSpinner } from "./LoadingSpinner";
+import { usePreferences } from "../context/PreferencesContext";
 import { useToast } from "../context/ToastContext";
 import { daysUntil } from "../utils";
 
@@ -15,6 +16,7 @@ const navItems = [
 export function Layout() {
   const { user, accessLabel, subscription, logout } = useAuth();
   const trialDaysLeft = accessLabel === "Trial" ? daysUntil(subscription?.trial_ends_at) : null;
+  const { dataSaver, toggleDataSaver, easyReading, toggleEasyReading } = usePreferences();
   const { showToast } = useToast();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -60,7 +62,13 @@ export function Layout() {
             </div>
           </nav>
         </div>
-        <div className="access-strip"><span>Access: <strong>{accessLabel}</strong></span>{user && <span>{user.full_name}</span>}</div>
+        <div className="access-strip">
+          <span>Access: <strong>{accessLabel}</strong></span>{user && <span>{user.full_name}</span>}
+          <span className="display-toggles">
+            <button type="button" className={dataSaver ? "toggle-pill on" : "toggle-pill"} aria-pressed={dataSaver} onClick={toggleDataSaver}>Data saver: {dataSaver ? "On" : "Off"}</button>
+            <button type="button" className={easyReading ? "toggle-pill on" : "toggle-pill"} aria-pressed={easyReading} onClick={toggleEasyReading}>Easy reading: {easyReading ? "On" : "Off"}</button>
+          </span>
+        </div>
       </header>
       {trialDaysLeft !== null && trialDaysLeft >= 0 && (
         <div className="trial-banner">
