@@ -427,3 +427,7 @@ Enhancement Stages 25-38 plus the items above are complete and confirmed on live
 ## Open items closed — 2026-09-14
 
 Account `id=53` (johnadenyumaigiri@gmail.com) confirmed by the owner as a real user, not a test account — no action needed. Render environment variables `GOOGLE_CLIENT_ID` (backend) and `VITE_GOOGLE_CLIENT_ID` (frontend) confirmed present in Render's dashboard by the owner.
+
+## Full live regression pass — PASS — 2026-09-14
+
+Backend checks against `https://priceyard-api.onrender.com`: `/health`, `/commodities`, `/markets`, `/price-updates`, `/faq` all returned `200`. Frontend `https://priceyard.onrender.com` confirmed serving the latest build (`manifest.json` and icons present; Tawk.to script confirmed inactive inside its HTML comment). Owner walked through the live site and confirmed: email/password login, Google sign-in, Data saver/Easy reading toggles, the WhatsApp support button, price-card images/movement icons/confidence badges/WhatsApp share, admin action popups, and mobile admin-nav/Price-History layout all working correctly. No regressions found through commit `5c3fd2e`.
