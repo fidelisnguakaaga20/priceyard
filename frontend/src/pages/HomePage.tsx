@@ -6,7 +6,7 @@ import { LoadingSpinner } from "../components/LoadingSpinner";
 import { PriceCard } from "../components/PriceCard";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { apiFetch } from "../services/api";
-import type { Commodity, PriceUpdate } from "../types/api";
+import type { Commodity, Market, PriceUpdate } from "../types/api";
 import { dateOnly } from "../utils";
 
 export function HomePage() {
@@ -15,14 +15,23 @@ export function HomePage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [upcoming, setUpcoming] = useState<Commodity[]>([]);
+  const [commodityCount, setCommodityCount] = useState<number | null>(null);
+  const [marketCount, setMarketCount] = useState<number | null>(null);
+  const [recordCount, setRecordCount] = useState<number | null>(null);
 
   useEffect(() => {
     apiFetch<PriceUpdate[]>("/price-updates")
-      .then((items) => setPrices(items.slice(0, 3)))
+      .then((items) => { setPrices(items.slice(0, 3)); setRecordCount(items.length); })
       .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false));
     apiFetch<Commodity[]>("/commodities")
-      .then((items) => setUpcoming(items.filter((item) => item.is_upcoming)))
+      .then((items) => {
+        setUpcoming(items.filter((item) => item.is_upcoming));
+        setCommodityCount(items.filter((item) => !item.is_upcoming).length);
+      })
+      .catch(() => undefined);
+    apiFetch<Market[]>("/markets")
+      .then((items) => setMarketCount(items.length))
       .catch(() => undefined);
   }, []);
 
@@ -48,6 +57,14 @@ export function HomePage() {
           </ul>
         </div>
       </section>
+
+      {commodityCount !== null && marketCount !== null && recordCount !== null && (
+        <div className="page stats-strip">
+          <span><strong>{commodityCount}</strong> commodit{commodityCount === 1 ? "y" : "ies"} tracked</span>
+          <span><strong>{marketCount}</strong> market{marketCount === 1 ? "" : "s"} covered</span>
+          <span><strong>{recordCount}</strong> approved price record{recordCount === 1 ? "" : "s"}</span>
+        </div>
+      )}
 
       {upcoming.length > 0 && (
         <section className="page section-block">

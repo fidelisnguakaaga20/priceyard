@@ -1,11 +1,36 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { dateOnly } from "../utils";
 
+const ONBOARDING_KEY = "priceyard_onboarding_dismissed";
+
+function readOnboardingDismissed(): boolean {
+  try { return localStorage.getItem(ONBOARDING_KEY) === "1"; } catch { return false; }
+}
+
 export function DashboardPage() {
   const { user, subscription, accessLabel, hasFullAccess } = useAuth();
+  const [onboardingDismissed, setOnboardingDismissed] = useState(readOnboardingDismissed);
+  const dismissOnboarding = () => {
+    try { localStorage.setItem(ONBOARDING_KEY, "1"); } catch { /* ignore storage failures */ }
+    setOnboardingDismissed(true);
+  };
   if (!user) return null;
   return <section className="page page-section"><div className="page-title"><span className="eyebrow">User dashboard</span><h1>Welcome, {user.full_name}</h1><p>Your account, access level and shortcuts to PriceYard tools.</p></div>
+    {user.role !== "admin" && !onboardingDismissed && (
+      <article className="card onboarding-card">
+        <div className="card-row">
+          <div><span className="eyebrow">New here?</span><h2>Get started with PriceYard</h2></div>
+          <button className="button button-small button-secondary" type="button" onClick={dismissOnboarding}>Dismiss</button>
+        </div>
+        <ul className="onboarding-list">
+          <li><Link to="/prices">Check current prices →</Link> See today's approved ranges for Egusi and more.</li>
+          <li><Link to="/watchlist">Save your first watchlist item →</Link> Build a personal shortlist of what you track.</li>
+          <li><Link to="/faq">Read the FAQ →</Link> Understand confidence levels, disclaimers and how prices are verified.</li>
+        </ul>
+      </article>
+    )}
     <div className="dashboard-grid">
       <article className="card"><span className="eyebrow">Current access</span><h2>{accessLabel}</h2><p>{hasFullAccess ? "Full approved market-intelligence viewing is available." : "Limited viewing is active. Full intelligence requires an active trial or paid status."}</p>{user.role !== "admin" && subscription && <dl className="data-list compact"><div><dt>Status</dt><dd>{subscription.status}</dd></div><div><dt>Trial ends</dt><dd>{dateOnly(subscription.trial_ends_at)}</dd></div><div><dt>Plan</dt><dd>{subscription.plan_name}</dd></div></dl>}</article>
       <article className="card"><span className="eyebrow">Account</span><h2>{user.email}</h2><p>Role: {user.role.replace(/_/g, " ")}</p><p className="muted">PriceYard backend authorization remains the authority for protected actions.</p></article>

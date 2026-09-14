@@ -138,6 +138,16 @@ html.easy-reading .confidence-badge, html.easy-reading .movement { font-weight: 
 .confidence-info-close { font-size: .75rem; background: none; border: 0; padding: 0; }
 @media (max-width: 640px) { .confidence-info-popover { position: fixed; left: 12px; right: 12px; bottom: 16px; top: auto; width: auto; max-width: none; max-height: 70vh; overflow-y: auto; } }
 
+/* Onboarding checklist */
+.onboarding-card { margin-bottom: 22px; border-color: #b8d5b4; background: #f2faf0; }
+.onboarding-list { display: grid; gap: 10px; margin: 16px 0 0; padding: 0; list-style: none; }
+.onboarding-list li { padding: 10px 12px; background: white; border-radius: 10px; border: 1px solid #dfe5db; }
+.onboarding-list a { font-weight: 700; margin-right: 4px; }
+
+/* Homepage live stats */
+.stats-strip { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px 28px; padding: 16px 0; color: #435047; font-size: .92rem; }
+.stats-strip strong { color: #173d28; font-size: 1.1rem; }
+
 /* WhatsApp support button */
 .whatsapp-support-button { position: fixed; right: 20px; bottom: 20px; width: 56px; height: 56px; border-radius: 999px; background: #25D366; color: white; display: grid; place-items: center; box-shadow: 0 10px 26px rgba(20,40,25,.28); z-index: 40; }
 .whatsapp-support-button:hover { background: #1ebe5b; }
