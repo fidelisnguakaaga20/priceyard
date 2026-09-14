@@ -431,3 +431,31 @@ Account `id=53` (johnadenyumaigiri@gmail.com) confirmed by the owner as a real u
 ## Full live regression pass — PASS — 2026-09-14
 
 Backend checks against `https://priceyard-api.onrender.com`: `/health`, `/commodities`, `/markets`, `/price-updates`, `/faq` all returned `200`. Frontend `https://priceyard.onrender.com` confirmed serving the latest build (`manifest.json` and icons present; Tawk.to script confirmed inactive inside its HTML comment). Owner walked through the live site and confirmed: email/password login, Google sign-in, Data saver/Easy reading toggles, the WhatsApp support button, price-card images/movement icons/confidence badges/WhatsApp share, admin action popups, and mobile admin-nav/Price-History layout all working correctly. No regressions found through commit `5c3fd2e`.
+
+## Stage 39 — Trial-expiry email reminders — 2026-09-14
+
+An admin-triggered action (`POST /subscriptions/send-trial-reminders`, button on Admin > Subscriptions) emails any trial user whose trial ends within 3 days, once per user (`trial_reminder_sent_at` guards against duplicates). Migration `0012_add_trial_reminder`. Commit `3199a8c`.
+
+## Stage 40 — WhatsApp community link — 2026-09-14
+
+A link to the owner's free WhatsApp updates group was added to the Home hero panel and site footer (`WHATSAPP_COMMUNITY_URL` in `frontend/src/utils.ts`). The link was revoked and replaced once mid-stage; the current live link is `https://chat.whatsapp.com/IbDqdO8xhYA9N0fgiP3213?...`. Commit `c14aba4`.
+
+## Infrastructure fix — Supabase connection pool exhaustion — 2026-09-14
+
+While checking the `feedback` table via a local diagnostic script, every attempt failed with `psycopg.OperationalError: FATAL: (EMAXCONNSESSION) max clients reached in session mode - max clients are limited to pool_size: 15`, even after waiting and retrying. The live production site was confirmed unaffected throughout (`/commodities`, `/price-updates` both returned `200`).
+
+Root cause: `backend/app/database.py`'s `create_engine()` call had no explicit `pool_size`/`max_overflow`, so SQLAlchemy applied its defaults (5 + 10 = 15) — exactly Supabase's free-tier session-mode connection cap. With one Render web service running, that single engine could legitimately claim all 15 slots on its own, leaving zero headroom for anything else (migrations, admin scripts, the Supabase SQL editor).
+
+Fix: explicitly capped the engine to `pool_size=3, max_overflow=2, pool_recycle=300` (backend/app/database.py). Verified live: after the change, a fresh diagnostic connection succeeded on the first attempt. See decision log for the considered alternative (switching to Supabase's transaction-mode pooler) and why the in-code cap was chosen instead.
+
+## Stage 41 — Real user testimonials — 2026-09-14
+
+The connection-pool fix above unblocked a re-check of the `feedback` table, which turned up 5 genuine submissions (rating 5/5 each) from 4 distinct real users (ids 53, 54, 55, 56) — the first real feedback since launch. Built a curation workflow rather than auto-publishing:
+
+- `feedback` table gained `is_public_testimonial` (bool, default false) and `testimonial_display_name` (text, nullable) — migration `0013_add_testimonial`.
+- Admin-only `PATCH /feedback/{id}/testimonial/publish` (body: `display_name`) and `/testimonial/hide`, both audit-logged; publish is rejected with `400` if the feedback record has no comment/complaint text to show.
+- Public, unauthenticated `GET /testimonials` returns only `{id, rating, quote, display_name, created_at}` for records marked public — never the underlying user id or email.
+- Admin > Feedback page: each feedback card now has a display-name input and a "Feature as public testimonial" / "Remove from testimonials" control.
+- Home page: a "What traders are saying" section renders published testimonials (star rating, quote, display name); the section is hidden entirely when there are none.
+
+Nothing is public yet — the feature ships with all real feedback still unpublished, awaiting the owner's selection of which to feature and what display name to use for each (e.g. first name + initial, per privacy practice already used elsewhere in this doc).

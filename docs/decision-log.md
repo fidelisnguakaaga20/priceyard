@@ -424,6 +424,21 @@ Scope boundary: no marketplace, payment, AI prediction, alert, logistics, or oth
 - Reason: PriceYard's reference document explicitly treats fabricated or unverified market intelligence as a core product risk ("Do not publish paid group content... without independent verification"). An AI assistant filling gaps with invented numbers would violate that rule as surely as a human reporter would.
 - Applied consequence: a cost-breakdown entry was initially created referencing the current (September) market price alongside a packaging cost that only applies at the November-December buying time; the owner caught the mismatch and it was corrected to reference the actual buy-time price. Recorded here because it's a useful pattern: cost/price fields must stay internally time-consistent, not just individually plausible.
 
+## 2026-09-14 — Supabase session-mode pool: capped app engine instead of switching pooler port
+
+- Problem: local diagnostic scripts repeatedly hit `EMAXCONNSESSION` (max 15 clients) against Supabase's session-mode pooler, even after waiting for connections to clear. Root cause: SQLAlchemy's `create_engine()` was called with no `pool_size`/`max_overflow`, defaulting to 5+10=15 — the app's single Render instance could legitimately hold every one of Supabase's 15 free-tier session-mode slots by itself.
+- Alternative considered: switch `DATABASE_URL` from the session-mode pooler port (5432) to Supabase's transaction-mode pooler port (6543) on the same host, which is Supabase's standard recommendation for many short-lived app connections.
+- Why rejected for now: transaction-mode pgbouncer has real caveats (no session-level `SET`, no `LISTEN/NOTIFY`, prepared-statement handling differs) that would need separate testing, and the same `DATABASE_URL` is also used by Alembic migrations, which behave best against a direct/session connection, not a transaction-mode one. Changing it would touch both the app and the migration path at once for a problem that a much smaller, purely local change already solves.
+- Decision: cap the existing engine explicitly (`pool_size=3, max_overflow=2, pool_recycle=300`) instead. This leaves 10 of the 15 slots permanently free for migrations, admin scripts, and the Supabase dashboard, with no change to the connection string, no pgbouncer-mode caveats, and no effect on Alembic.
+- Revisit trigger: if PriceYard ever runs more than one backend instance/worker, or genuinely needs more than 5 concurrent app connections, revisit the transaction-mode pooler move at that point rather than just raising this cap (raising it alone would just recreate the same exhaustion at a higher user count).
+
+## 2026-09-14 — Stage 41 testimonials: curation gate, not auto-publish
+
+- Real feedback from real users (ids 53-56) became visible once the connection-pool issue above was fixed — the first genuine feedback since launch, and the trigger for finally building Stage 41.
+- Decision: even though the feedback is real and not fabricated, it was not auto-published. Users submitted it through a feedback form, not a "you may quote me publicly" consent flow, so publishing their name/comment without a deliberate step would outrun what they agreed to.
+- Implementation: publishing is a separate, explicit admin action per feedback item (`PATCH /feedback/{id}/testimonial/publish`) that also requires typing a display name — nothing goes live from a migration or a default. The public endpoint (`GET /testimonials`) exposes only `{rating, quote, display_name, created_at}`, never `user_id` or email.
+- Consequence: this ships as complete, tested infrastructure with zero testimonials actually live. Selecting which feedback to feature and choosing a privacy-appropriate display name (e.g. first name + initial, matching how this project already avoids exposing full identities elsewhere) is an owner decision, not one to make unilaterally on their behalf.
+
 ## 2026-09-13 — Google OAuth: existing Cloud project reused, not a dedicated one
 
 - The Google OAuth Client ID for Sign-in with Google was created under the owner's existing `stripe-revenue-copilot` Google Cloud project, not a new dedicated PriceYard project.
