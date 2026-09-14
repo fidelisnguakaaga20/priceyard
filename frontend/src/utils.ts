@@ -1,3 +1,5 @@
+export const WHATSAPP_COMMUNITY_URL = "https://chat.whatsapp.com/IbDqdO8xhYA9N0fgiP3213?s=cl&p=a&mlu=4&ilr=4";
+
 export function money(value: string | number | null | undefined): string {
   if (value === null || value === undefined || value === "") return "—";
   const amount = Number(value);

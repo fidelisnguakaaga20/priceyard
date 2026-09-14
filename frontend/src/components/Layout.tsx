@@ -5,7 +5,7 @@ import { ButtonSpinner } from "./LoadingSpinner";
 import { usePreferences } from "../context/PreferencesContext";
 import { useToast } from "../context/ToastContext";
 import { WhatsAppSupportButton } from "./WhatsAppSupportButton";
-import { daysUntil } from "../utils";
+import { daysUntil, WHATSAPP_COMMUNITY_URL } from "../utils";
 
 const navItems = [
   ["/prices", "Current Prices"],
@@ -80,6 +80,7 @@ export function Layout() {
       <footer className="site-footer">
         <div><strong>PriceYard</strong> by NGU TOP PRODUCTS AND SERVICES</div>
         <div>Market information only — no guaranteed profit or prediction.</div>
+        <a className="text-link" href={WHATSAPP_COMMUNITY_URL} target="_blank" rel="noopener noreferrer">Join our free WhatsApp updates →</a>
       </footer>
       <WhatsAppSupportButton />
     </div>

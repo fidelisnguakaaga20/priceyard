@@ -7,7 +7,7 @@ import { PriceCard } from "../components/PriceCard";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { apiFetch } from "../services/api";
 import type { Commodity, Market, PriceUpdate } from "../types/api";
-import { dateOnly } from "../utils";
+import { dateOnly, WHATSAPP_COMMUNITY_URL } from "../utils";
 
 export function HomePage() {
   useDocumentTitle("Know the market before you buy or sell");
@@ -55,6 +55,7 @@ export function HomePage() {
             <li>Price ranges — not false precision</li>
             <li>Confidence labels and last updated time</li>
           </ul>
+          <a className="text-link" href={WHATSAPP_COMMUNITY_URL} target="_blank" rel="noopener noreferrer">Join our free WhatsApp updates →</a>
         </div>
       </section>
 
