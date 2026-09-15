@@ -22,7 +22,7 @@ export function PriceCard({ item }: { item: PriceUpdate }) {
         <span><strong>Updated</strong>{relativeTime(item.update_date_time)}</span>
       </div>
       <div className="card-actions">
-        <Link className="text-link" to={`/commodities/${encodeURIComponent(item.commodity.name)}`}>See full price details →</Link>
+        <Link className="text-link" to={`/commodities/${encodeURIComponent(item.commodity.name)}`}>See what this price means →</Link>
         <a className="text-link" href={whatsAppShareUrl(item)} target="_blank" rel="noopener noreferrer">Share on WhatsApp</a>
       </div>
     </article>
