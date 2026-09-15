@@ -48,8 +48,8 @@ export function DashboardPage() {
       </article>
     )}
     <div className="dashboard-grid">
-      <article className="card"><span className="eyebrow">Current access</span><h2>{accessLabel}</h2><p>{hasFullAccess ? "Full approved market-intelligence viewing is available." : "Limited viewing is active. Full intelligence requires an active trial or paid status."}</p>{user.role !== "admin" && subscription && <dl className="data-list compact"><div><dt>Status</dt><dd>{subscription.status}</dd></div><div><dt>Trial ends</dt><dd>{dateOnly(subscription.trial_ends_at)}</dd></div><div><dt>Plan</dt><dd>{subscription.plan_name}</dd></div></dl>}</article>
-      <article className="card"><span className="eyebrow">Account</span><h2>{user.email}</h2><p>Role: {user.role.replace(/_/g, " ")}</p><p className="muted">PriceYard backend authorization remains the authority for protected actions.</p></article>
+      <article className="card"><span className="eyebrow">Current access</span><h2>{accessLabel}</h2><p>{hasFullAccess ? "You can see full price details." : "You have limited access. Start a trial or upgrade to see everything."}</p>{user.role !== "admin" && subscription && <dl className="data-list compact"><div><dt>Status</dt><dd>{subscription.status}</dd></div><div><dt>Trial ends</dt><dd>{dateOnly(subscription.trial_ends_at)}</dd></div><div><dt>Plan</dt><dd>{subscription.plan_name}</dd></div></dl>}</article>
+      <article className="card"><span className="eyebrow">Account</span><h2>{user.email}</h2><p>Role: {user.role.replace(/_/g, " ")}</p></article>
     </div>
     {referral && (
       <article className="card">
