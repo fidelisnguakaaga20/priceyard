@@ -459,3 +459,16 @@ The connection-pool fix above unblocked a re-check of the `feedback` table, whic
 - Home page: a "What traders are saying" section renders published testimonials (star rating, quote, display name); the section is hidden entirely when there are none.
 
 Nothing is public yet — the feature ships with all real feedback still unpublished, awaiting the owner's selection of which to feature and what display name to use for each (e.g. first name + initial, per privacy practice already used elsewhere in this doc).
+
+Note: since this stage's initial commit, the owner curated the queue directly against the live database — deleting the test/mismatched entries and keeping one correctly-attributed real testimonial (feedback id changes accordingly; the mechanism above is unchanged).
+
+## Stage 42 — Referral mechanic — 2026-09-15
+
+Every user now gets a unique 8-character referral code (existing users backfilled by migration `0014_add_referral`). Registering with `?ref=CODE` on `/register` (or `referral_code` in the register payload) links the new account to the referrer (`users.referred_by_id`) and immediately rewards the referrer with 7 extra trial days (`subscription_service.apply_referral_reward`, audit-logged against the referrer):
+
+- Trial-status referrers: `trial_ends_at` extended by 7 days from its current value (stacks across multiple referrals).
+- Free-status referrers: converted to a fresh 7-day trial.
+- Active/expired/cancelled referrers: no reward applied — extra "trial days" has no meaning for those states, so nothing happens rather than doing something arbitrary.
+- Invalid referral codes reject registration with `400`, rather than silently ignoring a typo.
+
+`GET /auth/referral-summary` (authenticated) returns the caller's own code, referred-count, and reward-days. Dashboard shows a "Get 7 extra trial days per referral" card with a copy-link button and a WhatsApp share button (reusing the existing `wa.me` share pattern from price sharing). No admin work needed to use this — it runs automatically off existing registration and subscription logic.
