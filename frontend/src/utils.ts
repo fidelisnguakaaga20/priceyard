@@ -1,4 +1,4 @@
-export const WHATSAPP_COMMUNITY_URL = "https://chat.whatsapp.com/IbDqdO8xhYA9N0fgiP3213?s=cl&p=a&mlu=4&ilr=4";
+export const WHATSAPP_COMMUNITY_URL = "https://chat.whatsapp.com/FszfMQ2sjLf9EyvCaCNh5y";
 
 export function money(value: string | number | null | undefined): string {
   if (value === null || value === undefined || value === "") return "—";
