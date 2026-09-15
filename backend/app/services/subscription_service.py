@@ -137,6 +137,36 @@ def update_subscription_status(db: Session, subscription: Subscription, new_stat
     return subscription
 
 
+REFERRAL_REWARD_DAYS = 7
+
+
+def apply_referral_reward(db: Session, referrer: User) -> bool:
+    """Extend the referrer's trial when someone they referred registers. Only applies
+    to trial/free accounts - active/expired/cancelled subscriptions are left untouched
+    since extra "trial days" has no meaning for them."""
+    subscription = find_subscription_for_user(db, referrer.id)
+    if subscription is None:
+        return False
+
+    now = utc_now()
+    if subscription.status == "trial":
+        current_end = subscription.trial_ends_at or now
+        if current_end.tzinfo is None:
+            current_end = current_end.replace(tzinfo=timezone.utc)
+        subscription.trial_ends_at = max(current_end, now) + timedelta(days=REFERRAL_REWARD_DAYS)
+    elif subscription.status == "free":
+        subscription.plan_name = "trial"
+        subscription.status = "trial"
+        subscription.trial_started_at = now
+        subscription.trial_ends_at = now + timedelta(days=REFERRAL_REWARD_DAYS)
+    else:
+        return False
+
+    db.commit()
+    db.refresh(subscription)
+    return True
+
+
 TRIAL_REMINDER_WINDOW_DAYS = 3
 
 

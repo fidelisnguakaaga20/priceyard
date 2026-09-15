@@ -6,6 +6,7 @@ class RegisterRequest(BaseModel):
     email: EmailStr
     phone: str | None = Field(default=None, max_length=30)
     password: str = Field(min_length=8, max_length=72)
+    referral_code: str | None = Field(default=None, max_length=20)
 
 
 class LoginRequest(BaseModel):
@@ -33,3 +34,9 @@ class ResetPasswordRequest(BaseModel):
 
 class MessageResponse(BaseModel):
     message: str
+
+
+class ReferralSummaryResponse(BaseModel):
+    referral_code: str
+    referred_count: int
+    reward_days: int

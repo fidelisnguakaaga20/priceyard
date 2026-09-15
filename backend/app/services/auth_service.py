@@ -1,4 +1,5 @@
 import secrets
+import string
 
 from fastapi import HTTPException, status
 from google.auth.transport import requests as google_requests
@@ -9,13 +10,24 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.models.user import User
-from app.services.subscription_service import build_trial_subscription
+from app.services.audit_service import create_audit_log, snapshot_model
+from app.services.subscription_service import apply_referral_reward, build_trial_subscription
 from app.schemas.auth_schema import RegisterRequest
 from app.utils.password import hash_password, verify_password
+
+REFERRAL_CODE_ALPHABET = "".join(c for c in string.ascii_uppercase + string.digits if c not in "0O1I")
 
 
 def normalize_email(email: str) -> str:
     return email.strip().lower()
+
+
+def generate_referral_code(db: Session) -> str:
+    for _ in range(20):
+        code = "".join(secrets.choice(REFERRAL_CODE_ALPHABET) for _ in range(8))
+        if db.scalar(select(User).where(User.referral_code == code)) is None:
+            return code
+    raise RuntimeError("Could not generate a unique referral code")
 
 
 def register_user(db: Session, payload: RegisterRequest) -> User:
@@ -45,6 +57,16 @@ def register_user(db: Session, payload: RegisterRequest) -> User:
             detail=str(exc),
         ) from exc
 
+    referrer: User | None = None
+    if payload.referral_code:
+        code = payload.referral_code.strip().upper()
+        referrer = db.scalar(select(User).where(User.referral_code == code))
+        if referrer is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid referral code",
+            )
+
     user = User(
         full_name=payload.full_name.strip(),
         email=email,
@@ -52,6 +74,8 @@ def register_user(db: Session, payload: RegisterRequest) -> User:
         password_hash=password_hash,
         role="free_user",
         is_active=True,
+        referral_code=generate_referral_code(db),
+        referred_by_id=referrer.id if referrer else None,
     )
     user.subscription = build_trial_subscription(user=user)
     db.add(user)
@@ -64,6 +88,14 @@ def register_user(db: Session, payload: RegisterRequest) -> User:
             status_code=status.HTTP_409_CONFLICT,
             detail="User account already exists",
         ) from exc
+
+    if referrer is not None:
+        old_value = snapshot_model(referrer.subscription) if referrer.subscription else None
+        if apply_referral_reward(db, referrer):
+            create_audit_log(
+                db, actor=referrer, action="referral.reward_granted", table_name="subscriptions",
+                record_id=referrer.subscription.id, old_value=old_value, new_value=snapshot_model(referrer.subscription),
+            )
 
     # SessionLocal uses expire_on_commit=False and PostgreSQL/SQLAlchemy returns
     # generated fields during INSERT, so avoid a second database round trip after
@@ -136,6 +168,7 @@ def authenticate_or_create_google_user(db: Session, token: str) -> User:
                 is_active=True,
                 google_id=google_sub,
                 auth_provider="google",
+                referral_code=generate_referral_code(db),
             )
             user.subscription = build_trial_subscription(user=user)
             db.add(user)

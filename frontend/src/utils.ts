@@ -67,6 +67,15 @@ export function whatsAppShareUrl(item: ShareablePrice): string {
   return `https://wa.me/?text=${encodeURIComponent(text)}`;
 }
 
+export function referralLink(code: string): string {
+  return `${window.location.origin}/register?ref=${encodeURIComponent(code)}`;
+}
+
+export function referralWhatsAppShareUrl(code: string, rewardDays: number): string {
+  const text = `Track real agricultural commodity prices with PriceYard — sign up with my link and I get ${rewardDays} extra trial days:\n${referralLink(code)}`;
+  return `https://wa.me/?text=${encodeURIComponent(text)}`;
+}
+
 export function dateOnly(value: string | null | undefined): string {
   if (!value) return "—";
   const date = new Date(value);

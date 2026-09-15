@@ -13,7 +13,7 @@ type AuthContextValue = {
   hasFullAccess: boolean;
   login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: (idToken: string) => Promise<void>;
-  register: (payload: { full_name: string; email: string; phone?: string; password: string }) => Promise<void>;
+  register: (payload: { full_name: string; email: string; phone?: string; password: string; referral_code?: string }) => Promise<void>;
   logout: () => void;
   refresh: () => Promise<void>;
 };
@@ -88,7 +88,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await refreshWithToken(response.access_token);
   };
 
-  const register = async (payload: { full_name: string; email: string; phone?: string; password: string }) => {
+  const register = async (payload: { full_name: string; email: string; phone?: string; password: string; referral_code?: string }) => {
     await apiFetch<User>("/auth/register", { method: "POST", body: JSON.stringify(payload) });
     await login(payload.email, payload.password);
   };

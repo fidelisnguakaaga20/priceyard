@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends, Request, status
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.user import User
 from app.rate_limit import limiter
-from app.schemas.auth_schema import ForgotPasswordRequest, GoogleLoginRequest, LoginRequest, MessageResponse, RegisterRequest, ResetPasswordRequest, TokenResponse
+from app.services.subscription_service import REFERRAL_REWARD_DAYS
+from app.schemas.auth_schema import ForgotPasswordRequest, GoogleLoginRequest, LoginRequest, MessageResponse, ReferralSummaryResponse, RegisterRequest, ResetPasswordRequest, TokenResponse
 from app.schemas.user_schema import UserResponse
 from app.security import create_access_token
 from app.services.auth_service import authenticate_or_create_google_user, authenticate_user, register_user
@@ -37,6 +39,21 @@ def login_with_google(request: Request, payload: GoogleLoginRequest, db: Session
 @router.get("/me", response_model=UserResponse)
 def me(current_user: User = Depends(get_current_user)) -> User:
     return current_user
+
+
+@router.get("/referral-summary", response_model=ReferralSummaryResponse)
+def referral_summary(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> ReferralSummaryResponse:
+    referred_count = db.scalar(
+        select(func.count()).select_from(User).where(User.referred_by_id == current_user.id)
+    )
+    return ReferralSummaryResponse(
+        referral_code=current_user.referral_code,
+        referred_count=referred_count or 0,
+        reward_days=REFERRAL_REWARD_DAYS,
+    )
 
 
 @router.post("/forgot-password", response_model=MessageResponse)
