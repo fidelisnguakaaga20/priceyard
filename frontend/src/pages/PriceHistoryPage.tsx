@@ -52,7 +52,7 @@ export function PriceHistoryPage() {
 
   return <section className="page page-section">
     <div className="page-title">
-      <span className="eyebrow">Chronological records</span>
+      <span className="eyebrow">All price records</span>
       <h1>Price history</h1>
       <p>Review approved historical ranges, movement and same-day market timing.</p>
     </div>

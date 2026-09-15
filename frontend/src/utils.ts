@@ -11,7 +11,7 @@ export function shortDate(value: string | null | undefined): string {
   if (!value) return "—";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat("en-NG", { dateStyle: "medium", timeStyle: "short" }).format(date);
+  return new Intl.DateTimeFormat("en-NG", { dateStyle: "medium", timeStyle: "short", hour12: true }).format(date);
 }
 
 export function relativeTime(value: string | null | undefined): string {

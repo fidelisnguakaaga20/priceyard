@@ -33,7 +33,7 @@ export function DashboardPage() {
     } catch { /* clipboard unavailable */ }
   };
   if (!user) return null;
-  return <section className="page page-section"><div className="page-title"><span className="eyebrow">User dashboard</span><h1>Welcome, {user.full_name}</h1><p>Your account, access level and shortcuts to PriceYard tools.</p></div>
+  return <section className="page page-section"><div className="page-title"><span className="eyebrow">User dashboard</span><h1>Welcome, {user.full_name}</h1><p>Your account and quick links to PriceYard tools.</p></div>
     {user.role !== "admin" && !onboardingDismissed && (
       <article className="card onboarding-card">
         <div className="card-row">
@@ -63,6 +63,6 @@ export function DashboardPage() {
         </div>
       </article>
     )}
-    <div className="shortcut-grid"><Link className="shortcut" to="/prices"><strong>Prices</strong><span>Check current approved ranges →</span></Link><Link className="shortcut" to="/watchlist"><strong>Watchlist</strong><span>Review saved commodities and markets →</span></Link><Link className="shortcut" to="/feedback"><strong>Feedback</strong><span>Rate PriceYard and suggest improvements →</span></Link><Link className="shortcut" to="/history"><strong>History</strong><span>Review chronological price records →</span></Link>{user.role === "admin" && <Link className="shortcut" to="/admin"><strong>Admin</strong><span>Manage PriceYard MVP records →</span></Link>}</div>
+    <div className="shortcut-grid"><Link className="shortcut" to="/prices"><strong>Prices</strong><span>See today's prices →</span></Link><Link className="shortcut" to="/watchlist"><strong>Watchlist</strong><span>See what you saved →</span></Link><Link className="shortcut" to="/feedback"><strong>Feedback</strong><span>Tell us what you think →</span></Link><Link className="shortcut" to="/history"><strong>History</strong><span>See past prices →</span></Link>{user.role === "admin" && <Link className="shortcut" to="/admin"><strong>Admin</strong><span>Manage PriceYard MVP records →</span></Link>}</div>
   </section>;
 }

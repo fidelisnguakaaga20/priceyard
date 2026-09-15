@@ -49,7 +49,7 @@ class PriceUpdateWriteBase(BaseModel):
     source_2: str | None = Field(default=None, max_length=255)
     update_date_time: datetime
     is_outdated: bool = False
-    possible_meaning: str = Field(min_length=1)
+    possible_meaning: str | None = Field(default=None, min_length=1)
     suggested_action: SuggestedAction
     notes: str | None = None
 
@@ -57,7 +57,9 @@ class PriceUpdateWriteBase(BaseModel):
 
     @field_validator("possible_meaning")
     @classmethod
-    def possible_meaning_must_remain_observational(cls, value: str) -> str:
+    def possible_meaning_must_remain_observational(cls, value: str | None) -> str | None:
+        if value is None:
+            return value
         lowered = value.lower()
         if any(phrase in lowered for phrase in _FORBIDDEN_CLAIM_PHRASES):
             raise ValueError("Possible meaning must remain observational and non-guaranteed")

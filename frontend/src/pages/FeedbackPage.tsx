@@ -18,6 +18,12 @@ export function FeedbackPage() {
     event.preventDefault();
     if (!token || busy) return;
 
+    if (continueUsing === null) {
+      setError("Please choose Yes or No for \"Continue using?\" before submitting.");
+      setMessage("");
+      return;
+    }
+
     setBusy(true);
     setError("");
     setMessage("");

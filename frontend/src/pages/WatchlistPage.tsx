@@ -86,7 +86,7 @@ export function WatchlistPage() {
   };
 
   return <section className="page page-section">
-    <div className="page-title"><span className="eyebrow">Your saved interests</span><h1>Watchlist</h1><p>Save a commodity, a market, or both. Target-price alerts remain deferred.</p></div>
+    <div className="page-title"><span className="eyebrow">Your saved interests</span><h1>Watchlist</h1><p>Save a product, a market, or both, to check them quickly later.</p></div>
     <form className="filter-bar" onSubmit={submit}>
       <label>Commodity<select value={commodityId} onChange={(e) => setCommodityId(e.target.value)}><option value="">No commodity</option>{commodities.filter((x) => x.is_active).map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</select></label>
       <label>Market<select value={marketId} onChange={(e) => setMarketId(e.target.value)}><option value="">No market</option>{markets.filter((x) => x.is_active).map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</select></label>
