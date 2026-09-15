@@ -18,7 +18,7 @@ export function PriceCard({ item }: { item: PriceUpdate }) {
       <p className="price-range">{money(item.price_low)} – {money(item.price_high)}</p>
       <p className="muted">{item.unit}{item.bag_size ? ` · ${item.bag_size}` : ""}</p>
       <div className="mini-grid">
-        <span><strong>Confidence</strong><span className={`confidence-badge ${confidenceClass(item.confidence_level)}`}>{item.confidence_level}</span><ConfidenceInfo /></span>
+        <span><strong>Status</strong><span className={`confidence-badge ${confidenceClass(item.confidence_level)}`}>{item.confidence_level}</span><ConfidenceInfo /></span>
         <span><strong>Updated</strong>{relativeTime(item.update_date_time)}</span>
       </div>
       <div className="card-actions">

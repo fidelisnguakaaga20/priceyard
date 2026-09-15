@@ -68,7 +68,7 @@ export function PriceHistoryPage() {
       {loading ? <LoadingSpinner label="Loading price history…" /> : error ? <div className="status-box error">{error}</div> : <>
         <div className="table-wrap history-table-view">
           <table>
-            <thead><tr><th>Date/time</th><th>Commodity</th><th>Market</th><th>Range</th><th>Previous</th><th>Movement</th><th>Confidence</th><th>Meaning / action</th></tr></thead>
+            <thead><tr><th>Date/time</th><th>Commodity</th><th>Market</th><th>Range</th><th>Previous</th><th>Movement</th><th>Status</th><th>Meaning / action</th></tr></thead>
             <tbody>{items.map((item) => <tr key={item.id}>
               <td>{shortDate(item.update_date_time)}<small>{item.time_of_day || ""}</small></td>
               <td>{item.commodity.name}</td>
@@ -87,7 +87,7 @@ export function PriceHistoryPage() {
             <p className="price-range">{money(item.price_low)} – {money(item.price_high)}</p>
             <p className="muted">Previous: {item.previous_price_low !== null ? `${money(item.previous_price_low)} – ${money(item.previous_price_high)}` : "Not confirmed"}</p>
             <div className="mini-grid">
-              <span><strong>Confidence</strong><span className={`confidence-badge ${confidenceClass(item.confidence_level)}`}>{item.confidence_level}</span></span>
+              <span><strong>Status</strong><span className={`confidence-badge ${confidenceClass(item.confidence_level)}`}>{item.confidence_level}</span></span>
               <span><strong>Date/time</strong>{shortDate(item.update_date_time)}{item.time_of_day ? ` · ${item.time_of_day}` : ""}</span>
             </div>
             <div className="guidance"><div><span>Possible Meaning</span><p>{item.possible_meaning || "No observation supplied."}</p></div><div><span>Suggested Action</span><strong>{item.suggested_action || "Watch"}</strong></div></div>

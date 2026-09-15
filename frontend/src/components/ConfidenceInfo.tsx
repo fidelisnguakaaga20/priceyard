@@ -1,12 +1,12 @@
 import { useState } from "react";
 
 const CONFIDENCE_DEFINITIONS: [string, string][] = [
-  ["Reporter submitted", "A community reporter shared this price. Not yet independently verified."],
-  ["Verified by 2 sources", "Two independent sources reported a similar price."],
-  ["Admin confirmed", "A PriceYard admin personally confirmed this price."],
-  ["Market visit confirmed", "Confirmed by an in-person market visit."],
-  ["Low confidence", "Limited or conflicting information. Treat with extra caution."],
-  ["Price outdated", "This price may no longer reflect current market conditions."],
+  ["Reporter submitted", "One person sent this price. Not checked yet."],
+  ["Verified by 2 sources", "Two people said the same price."],
+  ["Admin confirmed", "PriceYard staff checked this price."],
+  ["Market visit confirmed", "Someone visited the market to check this price."],
+  ["Low confidence", "Not sure about this price. Be careful."],
+  ["Price outdated", "This price may be old now."],
 ];
 
 export function ConfidenceInfo() {

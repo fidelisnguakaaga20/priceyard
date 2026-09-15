@@ -45,16 +45,16 @@ export function HomePage() {
         <div className="hero-copy">
           <span className="eyebrow">Market price information</span>
           <h1>Know the market before you buy or sell.</h1>
-          <p>See today's and past prices, price changes, and real market updates for Egusi, Beans and Palm oil.</p>
+          <p>See today's and past prices, price changes, and real market updates for Egusi, Honey Beans and Palm oil.</p>
           <div className="button-row">
             <Link className="button" to="/prices">Check prices</Link>
-            <Link className="button button-secondary" to="/market-days">View market days</Link>
+            <Link className="button button-secondary" to="/market-days">See market days</Link>
           </div>
         </div>
         <div className="hero-panel">
           <strong>PriceYard starts focused.</strong>
           <ul>
-            <li>Egusi, Beans, Palm oil</li>
+            <li>PriceYard covers Egusi, Honey Beans, Palm oil</li>
             <li>Abuja/FCT, Kwali, Nasarawa, Benue</li>
             <li>Real price range, not one fixed number</li>
             <li>How sure we are about the price, and when it was last checked</li>
@@ -89,7 +89,7 @@ export function HomePage() {
       )}
 
       <section className="page section-block">
-        <div className="section-heading"><div><span className="eyebrow">Latest intelligence</span><h2>Today's prices</h2></div><Link className="text-link" to="/prices">See all prices →</Link></div>
+        <div className="section-heading"><div><span className="eyebrow">Latest market information</span><h2>Today's prices</h2></div><Link className="text-link" to="/prices">See all prices →</Link></div>
         {loading ? <LoadingSpinner label="Loading approved prices…" /> : error ? <div className="status-box error">Could not load prices: {error}</div> : prices.length ? <div className="card-grid">{prices.map((item) => <PriceCard key={item.id} item={item} />)}</div> : <div className="status-box">No approved current price updates are available yet. Check back soon.</div>}
       </section>
 
