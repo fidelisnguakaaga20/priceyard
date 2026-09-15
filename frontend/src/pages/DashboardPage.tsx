@@ -63,6 +63,6 @@ export function DashboardPage() {
         </div>
       </article>
     )}
-    <div className="shortcut-grid"><Link className="shortcut" to="/prices"><strong>Prices</strong><span>See today's prices →</span></Link><Link className="shortcut" to="/watchlist"><strong>Watchlist</strong><span>See what you saved →</span></Link><Link className="shortcut" to="/feedback"><strong>Feedback</strong><span>Tell us what you think →</span></Link><Link className="shortcut" to="/history"><strong>History</strong><span>See past prices →</span></Link>{user.role === "admin" && <Link className="shortcut" to="/admin"><strong>Admin</strong><span>Manage PriceYard MVP records →</span></Link>}</div>
+    <div className="shortcut-grid"><Link className="shortcut" to="/prices"><strong>Prices</strong><span>See latest prices →</span></Link><Link className="shortcut" to="/watchlist"><strong>Watchlist</strong><span>See what you saved →</span></Link><Link className="shortcut" to="/feedback"><strong>Feedback</strong><span>Tell us what you think →</span></Link><Link className="shortcut" to="/history"><strong>History</strong><span>See past prices →</span></Link>{user.role === "admin" && <Link className="shortcut" to="/admin"><strong>Admin</strong><span>Manage PriceYard MVP records →</span></Link>}</div>
   </section>;
 }

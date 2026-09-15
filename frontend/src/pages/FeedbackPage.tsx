@@ -19,7 +19,7 @@ export function FeedbackPage() {
     if (!token || busy) return;
 
     if (continueUsing === null) {
-      setError("Please choose Yes or No for \"Continue using?\" before submitting.");
+      setError("Please choose Yes or No");
       setMessage("");
       return;
     }
