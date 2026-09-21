@@ -15,6 +15,7 @@ from app.routes.feedback_routes import router as feedback_router
 from app.routes.feedback_routes import testimonials_router
 from app.routes.market_routes import router as market_router
 from app.routes.market_signal_routes import router as market_signal_router
+from app.routes.payment_routes import router as payment_router
 from app.routes.price_update_routes import router as price_update_router
 from app.routes.quality_signal_routes import router as quality_signal_router
 from app.routes.report_export_routes import router as report_export_router
@@ -66,6 +67,7 @@ app.include_router(faq_router)
 app.include_router(feedback_router)
 app.include_router(testimonials_router)
 app.include_router(watchlist_router)
+app.include_router(payment_router)
 
 
 @app.get("/health")

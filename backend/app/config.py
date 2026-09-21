@@ -28,6 +28,8 @@ class Settings(BaseSettings):
     smtp_from_name: str = "PriceYard"
     smtp_use_tls: bool = True
     smtp_use_ssl: bool = False
+    paystack_secret_key: str | None = None
+    paystack_public_key: str | None = None
 
     model_config = SettingsConfigDict(
         env_file=".env",

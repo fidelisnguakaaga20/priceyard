@@ -28,6 +28,7 @@ class PasswordResetTests(unittest.TestCase):
             password_hash=hash_password("OldPassword1"),
             role="free_user",
             is_active=True,
+            referral_code="RESETTEST",
         )
         self.db.add(self.user)
         self.db.commit()

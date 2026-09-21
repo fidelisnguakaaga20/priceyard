@@ -204,4 +204,6 @@ export type FeedbackItem = {
 export type FeedbackSummary = { count: number; average_rating: number | null };
 export type Testimonial = { id: number; rating: number; quote: string; display_name: string; created_at: string };
 export type ReferralSummary = { referral_code: string; referred_count: number; reward_days: number };
+export type PaymentPlan = "monthly" | "seasonal";
+export type PaymentInitiateResponse = { authorization_url: string; reference: string };
 export type AuditLog = { id: number; user_id: number; action: string; table_name: string; record_id: number | null; old_value: unknown; new_value: unknown; created_at: string };

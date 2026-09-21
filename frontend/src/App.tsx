@@ -11,6 +11,7 @@ import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
 import { HomePage } from "./pages/HomePage";
 import { LoginPage } from "./pages/LoginPage";
 import { MarketDaysPage } from "./pages/MarketDaysPage";
+import { PaymentCallbackPage } from "./pages/PaymentCallbackPage";
 import { PriceHistoryPage } from "./pages/PriceHistoryPage";
 import { PricesPage } from "./pages/PricesPage";
 import { RegisterPage } from "./pages/RegisterPage";
@@ -26,6 +27,7 @@ import { AdminBuyingZonesPage, AdminCostBreakdownPage, AdminSellWatchPage, Admin
 import { AdminMarketsPage } from "./pages/admin/AdminMarketsPage";
 import { AdminPriceUpdatesPage } from "./pages/admin/AdminPriceUpdatesPage";
 import { AdminMarketSignalsPage, AdminQualitySignalsPage } from "./pages/admin/AdminSignalsPage";
+import { AdminPaymentsPage } from "./pages/admin/AdminPaymentsPage";
 import { AdminSubscriptionsPage } from "./pages/admin/AdminSubscriptionsPage";
 import { AdminUsersPage } from "./pages/admin/AdminUsersPage";
 
@@ -44,6 +46,7 @@ export default function App() {
         <Route path="forgot-password" element={<ForgotPasswordPage />} />
         <Route path="reset-password" element={<ResetPasswordPage />} />
         <Route path="dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+        <Route path="payment/callback" element={<ProtectedRoute><PaymentCallbackPage /></ProtectedRoute>} />
         <Route path="watchlist" element={<ProtectedRoute><WatchlistPage /></ProtectedRoute>} />
         <Route path="feedback" element={<ProtectedRoute><FeedbackPage /></ProtectedRoute>} />
         <Route path="admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
@@ -60,6 +63,7 @@ export default function App() {
           <Route path="costs" element={<AdminCostBreakdownPage />} />
           <Route path="faq" element={<AdminFAQPage />} />
           <Route path="subscriptions" element={<AdminSubscriptionsPage />} />
+          <Route path="payments" element={<AdminPaymentsPage />} />
           <Route path="feedback" element={<AdminFeedbackPage />} />
           <Route path="audit" element={<AdminAuditLogsPage />} />
           <Route path="export" element={<AdminExportPage />} />

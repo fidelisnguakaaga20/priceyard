@@ -42,8 +42,27 @@ def apply_trial_expiry(subscription: Subscription, *, now: datetime | None = Non
     return True
 
 
+def apply_paid_expiry(subscription: Subscription, *, now: datetime | None = None) -> bool:
+    """Expire a paid subscription once its end_date passes. A manually-activated
+    (admin) subscription has end_date=None and never expires this way - only
+    payment-driven activations (which set a real end_date) are affected."""
+    if subscription.status != "active" or subscription.end_date is None:
+        return False
+
+    current_date = (now or utc_now()).date()
+    if current_date <= subscription.end_date:
+        return False
+
+    subscription.status = "expired"
+    if subscription.user.role != "admin":
+        subscription.user.role = "free_user"
+    return True
+
+
 def expire_trial_if_needed(db: Session, subscription: Subscription, *, now: datetime | None = None) -> Subscription:
-    if apply_trial_expiry(subscription, now=now):
+    trial_changed = apply_trial_expiry(subscription, now=now)
+    paid_changed = apply_paid_expiry(subscription, now=now)
+    if trial_changed or paid_changed:
         db.commit()
         db.refresh(subscription)
     return subscription
@@ -51,7 +70,10 @@ def expire_trial_if_needed(db: Session, subscription: Subscription, *, now: date
 
 def has_full_access(subscription: Subscription, *, now: datetime | None = None) -> bool:
     if subscription.status == "active":
-        return True
+        if subscription.end_date is None:
+            return True
+        current_date = (now or utc_now()).date()
+        return current_date <= subscription.end_date
     if subscription.status != "trial" or subscription.trial_ends_at is None:
         return False
 
@@ -82,7 +104,7 @@ def find_subscription_for_user(db: Session, user_id: int) -> Subscription | None
 def list_subscriptions(db: Session) -> list[Subscription]:
     subscriptions = list(db.scalars(select(Subscription).order_by(Subscription.id)).all())
     now = utc_now()
-    changed = any(apply_trial_expiry(item, now=now) for item in subscriptions)
+    changed = any(apply_trial_expiry(item, now=now) | apply_paid_expiry(item, now=now) for item in subscriptions)
     if changed:
         db.commit()
         for item in subscriptions:
@@ -132,6 +154,27 @@ def update_subscription_status(db: Session, subscription: Subscription, new_stat
             detail="Invalid subscription status",
         )
 
+    db.commit()
+    db.refresh(subscription)
+    return subscription
+
+
+PAID_PLAN_DURATIONS_DAYS = {"monthly": 30, "seasonal": 90}
+
+
+def activate_paid_subscription(db: Session, subscription: Subscription, *, plan: str, now: datetime | None = None) -> Subscription:
+    """Activate paid access for a completed payment. Distinct from
+    update_subscription_status's "active" branch (used for manual admin grants,
+    which stay indefinite/end_date=None) - a payment always has a real
+    end_date matching what was actually paid for."""
+    current_time = now or utc_now()
+    duration_days = PAID_PLAN_DURATIONS_DAYS[plan]
+    subscription.plan_name = f"paid_{plan}"
+    subscription.status = "active"
+    subscription.start_date = current_time.date()
+    subscription.end_date = current_time.date() + timedelta(days=duration_days)
+    if subscription.user.role != "admin":
+        subscription.user.role = "paid_user"
     db.commit()
     db.refresh(subscription)
     return subscription

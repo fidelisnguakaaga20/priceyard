@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import { apiFetch } from "../services/api";
-import type { ReferralSummary } from "../types/api";
+import type { PaymentInitiateResponse, PaymentPlan, ReferralSummary } from "../types/api";
 import { dateOnly, referralLink, referralWhatsAppShareUrl } from "../utils";
 
 const ONBOARDING_KEY = "priceyard_onboarding_dismissed";
@@ -13,9 +14,11 @@ function readOnboardingDismissed(): boolean {
 
 export function DashboardPage() {
   const { user, subscription, accessLabel, hasFullAccess, token } = useAuth();
+  const { showToast } = useToast();
   const [onboardingDismissed, setOnboardingDismissed] = useState(readOnboardingDismissed);
   const [referral, setReferral] = useState<ReferralSummary | null>(null);
   const [copied, setCopied] = useState(false);
+  const [upgrading, setUpgrading] = useState<PaymentPlan | null>(null);
   const dismissOnboarding = () => {
     try { localStorage.setItem(ONBOARDING_KEY, "1"); } catch { /* ignore storage failures */ }
     setOnboardingDismissed(true);
@@ -32,7 +35,19 @@ export function DashboardPage() {
       setTimeout(() => setCopied(false), 2000);
     } catch { /* clipboard unavailable */ }
   };
+  const startUpgrade = async (plan: PaymentPlan) => {
+    if (!token || upgrading) return;
+    setUpgrading(plan);
+    try {
+      const result = await apiFetch<PaymentInitiateResponse>("/payments/initiate", { method: "POST", body: JSON.stringify({ plan }) }, token);
+      window.location.href = result.authorization_url;
+    } catch (err) {
+      showToast((err as Error).message || "Could not start payment.", "error");
+      setUpgrading(null);
+    }
+  };
   if (!user) return null;
+  const showUpgrade = user.role !== "admin" && subscription?.status !== "active";
   return <section className="page page-section"><div className="page-title"><span className="eyebrow">User dashboard</span><h1>Welcome, {user.full_name}</h1><p>Your account and quick links to PriceYard tools.</p></div>
     {user.role !== "admin" && !onboardingDismissed && (
       <article className="card onboarding-card">
@@ -51,6 +66,17 @@ export function DashboardPage() {
       <article className="card"><span className="eyebrow">Current access</span><h2>{accessLabel}</h2><p>{hasFullAccess ? "You can see full price details." : "You have limited access. Start a trial or upgrade to see everything."}</p>{user.role !== "admin" && subscription && <dl className="data-list compact"><div><dt>Status</dt><dd>{subscription.status}</dd></div><div><dt>Trial ends</dt><dd>{dateOnly(subscription.trial_ends_at)}</dd></div><div><dt>Plan</dt><dd>{subscription.plan_name}</dd></div></dl>}</article>
       <article className="card"><span className="eyebrow">Account</span><h2>{user.email}</h2><p>Role: {user.role.replace(/_/g, " ")}</p></article>
     </div>
+    {showUpgrade && (
+      <article className="card">
+        <span className="eyebrow">Upgrade</span>
+        <h2>Get full access</h2>
+        <p>See buying zones, sell-watch windows, storage suitability and cost breakdowns for every commodity, with no trial limits.</p>
+        <div className="button-row">
+          <button type="button" className="button" disabled={upgrading !== null} onClick={() => void startUpgrade("monthly")}>{upgrading === "monthly" ? "Please wait…" : "₦2,500 / month"}</button>
+          <button type="button" className="button button-secondary" disabled={upgrading !== null} onClick={() => void startUpgrade("seasonal")}>{upgrading === "seasonal" ? "Please wait…" : "₦6,000 / 3 months"}</button>
+        </div>
+      </article>
+    )}
     {referral && (
       <article className="card">
         <span className="eyebrow">Invite a friend</span>

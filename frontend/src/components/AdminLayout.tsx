@@ -14,6 +14,7 @@ const adminLinks = [
   ["/admin/costs", "Costs"],
   ["/admin/faq", "FAQ"],
   ["/admin/subscriptions", "Subscriptions"],
+  ["/admin/payments", "Payments"],
   ["/admin/feedback", "Feedback"],
   ["/admin/audit", "Audit logs"],
   ["/admin/export", "CSV export"],
