@@ -1,13 +1,24 @@
+import { useEffect, useState } from "react";
+
 type LoadingSpinnerProps = {
   label?: string;
   size?: "small" | "medium" | "large";
 };
 
+const SLOW_LOAD_DELAY_MS = 4000;
+const SLOW_LOAD_HINT = "Still loading — the server may be waking up, please wait…";
+
 export function LoadingSpinner({ label = "Loading…", size = "medium" }: LoadingSpinnerProps) {
+  const [slow, setSlow] = useState(false);
+  useEffect(() => {
+    setSlow(false);
+    const timer = setTimeout(() => setSlow(true), SLOW_LOAD_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [label]);
   return (
     <div className="loading-indicator" role="status" aria-live="polite">
       <span className={`loading-spinner loading-spinner-${size}`} aria-hidden="true" />
-      {label && <span className="loading-label">{label}</span>}
+      {label && <span className="loading-label">{slow ? SLOW_LOAD_HINT : label}</span>}
     </div>
   );
 }

@@ -7,7 +7,7 @@ import { PriceCard } from "../components/PriceCard";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { apiFetch } from "../services/api";
 import type { Commodity, Market, PriceUpdate, Testimonial } from "../types/api";
-import { dateOnly, WHATSAPP_COMMUNITY_URL } from "../utils";
+import { comingSoonShareUrl, dateOnly, WHATSAPP_COMMUNITY_URL } from "../utils";
 
 export function HomePage() {
   useDocumentTitle("Know the market before you buy or sell");
@@ -82,6 +82,7 @@ export function HomePage() {
                 <h3>{item.name}</h3>
                 {item.description && <p className="muted">{item.description}</p>}
                 {item.expected_available_date && <p className="muted"><strong>Expected:</strong> {dateOnly(item.expected_available_date)}</p>}
+                <a className="text-link" href={comingSoonShareUrl(item.name)} target="_blank" rel="noopener noreferrer">Tell a friend on WhatsApp →</a>
               </article>
             ))}
           </div>

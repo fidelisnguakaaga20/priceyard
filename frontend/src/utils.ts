@@ -71,6 +71,11 @@ export function referralLink(code: string): string {
   return `${window.location.origin}/register?ref=${encodeURIComponent(code)}`;
 }
 
+export function comingSoonShareUrl(commodityName: string): string {
+  const text = `${commodityName} is coming soon to PriceYard — real market prices for Egusi, Honey Beans, Palm oil and more.\n${window.location.origin}`;
+  return `https://wa.me/?text=${encodeURIComponent(text)}`;
+}
+
 export function referralWhatsAppShareUrl(code: string, rewardDays: number): string {
   const text = `Track real agricultural commodity prices with PriceYard — sign up with my link and I get ${rewardDays} extra trial days:\n${referralLink(code)}`;
   return `https://wa.me/?text=${encodeURIComponent(text)}`;
