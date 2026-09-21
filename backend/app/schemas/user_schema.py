@@ -11,6 +11,7 @@ class UserResponse(BaseModel):
     phone: str | None
     role: str
     is_active: bool
+    referred_by_id: int | None = None
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

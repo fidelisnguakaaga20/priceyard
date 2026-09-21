@@ -5,6 +5,7 @@ export type User = {
   phone: string | null;
   role: "admin" | "free_user" | "paid_user" | string;
   is_active: boolean;
+  referred_by_id: number | null;
   created_at: string;
 };
 
