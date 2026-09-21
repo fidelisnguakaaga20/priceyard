@@ -171,6 +171,7 @@ html.easy-reading .confidence-badge, html.easy-reading .movement { font-weight: 
 .confidence-badge.confidence-high { background: #e4f0df; color: #27622f; }
 .confidence-badge.confidence-medium { background: #fdf3d9; color: #8a6a12; }
 .confidence-badge.confidence-low { background: #f5e6e3; color: #914238; }
+.stale-badge { display: inline-block; margin-top: 6px; padding: 3px 9px; border-radius: 999px; background: #f5e6e3; color: #914238; font-size: .78rem; font-weight: 750; }
 
 /* Stage 27 trial countdown banner */
 .trial-banner { background: #173d28; color: white; text-align: center; padding: 10px 12px; font-size: .86rem; font-weight: 650; }

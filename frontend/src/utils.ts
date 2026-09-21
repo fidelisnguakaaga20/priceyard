@@ -53,6 +53,20 @@ export function daysUntil(value: string | null | undefined): number | null {
   return Math.ceil((date.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
 }
 
+export const STALE_INTELLIGENCE_DAYS = 14;
+
+export function daysSince(value: string | null | undefined): number | null {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+export function isStale(value: string | null | undefined): boolean {
+  const days = daysSince(value);
+  return days !== null && days >= STALE_INTELLIGENCE_DAYS;
+}
+
 type ShareablePrice = {
   commodity: { name: string };
   market: { name: string };

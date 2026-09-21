@@ -117,6 +117,9 @@ export type BuyingZone = {
   valid_from: string | null;
   valid_to: string | null;
   confidence: string;
+  created_by: number;
+  created_at: string;
+  updated_at: string;
   disclaimer: string;
 };
 
@@ -128,6 +131,9 @@ export type SellWatchWindow = {
   end_period: string | null;
   observation: string;
   confidence: string;
+  created_by: number;
+  created_at: string;
+  updated_at: string;
   disclaimer: string;
 };
 
