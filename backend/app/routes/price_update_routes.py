@@ -29,6 +29,7 @@ from app.services.price_update_service import (
     reject_price_update,
     update_price_update,
 )
+from app.services.watchlist_alert_service import notify_watchlist_subscribers
 from app.utils.permissions import require_full_access, require_roles
 
 router = APIRouter(prefix="/price-updates", tags=["price-updates"])
@@ -141,6 +142,7 @@ def approve_update(
         db, actor=current_admin, action="price_update.approve", table_name="price_updates",
         record_id=item.id, old_value=old_value, new_value=snapshot_model(item),
     )
+    notify_watchlist_subscribers(db, item)
     return item
 
 
