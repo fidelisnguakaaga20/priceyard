@@ -23,7 +23,7 @@ export function PriceCard({ item }: { item: PriceUpdate }) {
         body: JSON.stringify({ commodity_id: item.commodity_id, market_id: item.market_id }),
       }, token);
       setWatched(true);
-      showToast("Added to your watchlist.", "success", { label: "Invite a friend for extra trial days →", to: "/dashboard" });
+      showToast("Added to your watchlist — we'll email you when this price changes.", "success", { label: "Invite a friend for extra trial days →", to: "/dashboard" });
     } catch (err) {
       if (err instanceof ApiError && err.status === 409) {
         setWatched(true);

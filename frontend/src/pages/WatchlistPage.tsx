@@ -103,7 +103,7 @@ export function WatchlistPage() {
   };
 
   return <section className="page page-section">
-    <div className="page-title"><span className="eyebrow">Your saved interests</span><h1>Watchlist</h1><p>Save a product, a market, or both, to check them quickly later.</p></div>
+    <div className="page-title"><span className="eyebrow">Your saved interests</span><h1>Watchlist</h1><p>Save a product, a market, or both — we'll email you whenever a new price is approved for it, so you don't have to keep checking back.</p></div>
     {showFeedbackPrompt && (
       <div className="feedback-prompt">
         <span>Enjoying PriceYard so far? We'd love to hear from you.</span>
