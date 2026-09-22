@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { Disclaimer, PRICE_DISCLAIMER } from "../components/Disclaimer";
 import { ButtonSpinner, LoadingSpinner } from "../components/LoadingSpinner";
 import { PremiumGate } from "../components/PremiumGate";
+import { PriceTrendChart } from "../components/PriceTrendChart";
 import { useAuth } from "../context/AuthContext";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { apiFetch } from "../services/api";
@@ -66,6 +67,7 @@ export function PriceHistoryPage() {
       </form>
 
       {loading ? <LoadingSpinner label="Loading price history…" /> : error ? <div className="status-box error">{error}</div> : <>
+        <PriceTrendChart items={items} />
         <div className="table-wrap history-table-view">
           <table>
             <thead><tr><th>Date/time</th><th>Commodity</th><th>Market</th><th>Range</th><th>Previous</th><th>Movement</th><th>Status</th><th>Meaning / action</th></tr></thead>

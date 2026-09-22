@@ -189,6 +189,14 @@ html.easy-reading .confidence-badge, html.easy-reading .movement { font-weight: 
 .install-banner .text-link-button { color: white; text-decoration: underline; font-weight: 800; }
 .feedback-prompt { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 18px; border: 1px solid #d4dfce; background: #e6eddf; border-radius: 14px; padding: 16px 20px; margin: 0 0 24px; color: #173d28; font-weight: 650; }
 .feedback-prompt-actions { display: flex; align-items: center; gap: 14px; }
+.trend-chart { background: white; border: 1px solid #dfe5db; border-radius: 16px; padding: 18px 20px 14px; margin: 0 0 22px; box-shadow: 0 8px 30px rgba(34, 56, 38, .045); }
+.trend-chart svg { width: 100%; height: auto; display: block; }
+.trend-band { fill: #d9ead1; opacity: .6; stroke: none; }
+.trend-line { stroke: #214e34; stroke-width: 2.5; }
+.trend-dot { fill: #214e34; }
+.trend-chart-labels { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px; font-size: .78rem; color: #6d796e; }
+.trend-chart-labels .muted { flex: 1; text-align: center; }
+@media (max-width: 640px) { .trend-chart-labels .muted { display: none; } }
 
 /* Stage 26 commodity images */
 .commodity-image { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 12px; margin-bottom: 16px; background: #eef1ec; display: block; }
