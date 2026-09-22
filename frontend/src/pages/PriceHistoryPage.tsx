@@ -6,13 +6,15 @@ import { PriceTrendChart } from "../components/PriceTrendChart";
 import { useAuth } from "../context/AuthContext";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { apiFetch } from "../services/api";
-import type { PriceUpdate } from "../types/api";
+import type { Commodity, Market, PriceUpdate } from "../types/api";
 import { confidenceClass, money, movementIcon, shortDate } from "../utils";
 
 export function PriceHistoryPage() {
   useDocumentTitle("Price History");
   const { token, hasFullAccess, loading: authLoading } = useAuth();
   const [items, setItems] = useState<PriceUpdate[]>([]);
+  const [commodities, setCommodities] = useState<Commodity[]>([]);
+  const [markets, setMarkets] = useState<Market[]>([]);
   const [commodity, setCommodity] = useState("Egusi");
   const [market, setMarket] = useState("");
   const [timeOfDay, setTimeOfDay] = useState("");
@@ -43,7 +45,16 @@ export function PriceHistoryPage() {
   };
 
   useEffect(() => {
-    if (!authLoading && hasFullAccess) void load();
+    if (!authLoading && hasFullAccess) {
+      void load();
+      void Promise.all([
+        apiFetch<Commodity[]>("/commodities"),
+        apiFetch<Market[]>("/markets"),
+      ]).then(([commodityItems, marketItems]) => {
+        setCommodities(commodityItems);
+        setMarkets(marketItems);
+      }).catch(() => undefined);
+    }
   }, [authLoading, hasFullAccess, token]);
 
   const submit = (event: FormEvent) => {
@@ -60,8 +71,8 @@ export function PriceHistoryPage() {
 
     {authLoading ? <LoadingSpinner label="Checking price-history access…" /> : !hasFullAccess ? <PremiumGate><></></PremiumGate> : <>
       <form className="filter-bar" onSubmit={submit}>
-        <label>Commodity<input value={commodity} onChange={(e) => setCommodity(e.target.value)} /></label>
-        <label>Market<input value={market} onChange={(e) => setMarket(e.target.value)} placeholder="Optional" /></label>
+        <label>Commodity<select value={commodity} onChange={(e) => setCommodity(e.target.value)}><option value="">All commodities</option>{commodities.map((item) => <option key={item.id}>{item.name}</option>)}</select></label>
+        <label>Market<select value={market} onChange={(e) => setMarket(e.target.value)}><option value="">All markets</option>{markets.map((item) => <option key={item.id}>{item.name}</option>)}</select></label>
         <label>Time of day<select value={timeOfDay} onChange={(e) => setTimeOfDay(e.target.value)}><option value="">Any time</option><option>morning</option><option>afternoon</option><option>evening</option><option>closing</option></select></label>
         <div className="filter-actions"><button className="button button-small" disabled={loading}>{loading ? <ButtonSpinner label="Please wait…" /> : "Search history"}</button></div>
       </form>
