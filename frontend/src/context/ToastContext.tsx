@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 import { Toast } from "../components/Toast";
 import type { ToastKind } from "../components/Toast";
 
@@ -18,25 +18,11 @@ const ToastContext = createContext<ToastContextValue | undefined>(undefined);
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toast, setToast] = useState<ToastState | null>(null);
-  const timeoutRef = useRef<number | null>(null);
 
-  const dismissToast = useCallback(() => {
-    if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current);
-    timeoutRef.current = null;
-    setToast(null);
-  }, []);
+  const dismissToast = useCallback(() => setToast(null), []);
 
   const showToast = useCallback((message: string, kind: ToastKind = "success", action?: ToastAction) => {
-    if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current);
     setToast({ message, kind, action });
-    timeoutRef.current = window.setTimeout(() => {
-      setToast(null);
-      timeoutRef.current = null;
-    }, 4500);
-  }, []);
-
-  useEffect(() => () => {
-    if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current);
   }, []);
 
   return (
