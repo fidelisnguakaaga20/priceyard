@@ -1,9 +1,12 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { ButtonSpinner, LoadingSpinner } from "../components/LoadingSpinner";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { apiFetch } from "../services/api";
 import type { Commodity, Market, WatchlistItem } from "../types/api";
+
+const FEEDBACK_PROMPT_KEY = "priceyard_feedback_prompted";
 
 export function WatchlistPage() {
   const { token } = useAuth();
@@ -17,6 +20,7 @@ export function WatchlistPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [removingId, setRemovingId] = useState<number | null>(null);
+  const [showFeedbackPrompt, setShowFeedbackPrompt] = useState(false);
 
   const load = async (showLoader = true) => {
     if (!token) return;
@@ -39,6 +43,19 @@ export function WatchlistPage() {
   };
 
   useEffect(() => { void load(); }, [token]);
+
+  useEffect(() => {
+    if (items.length < 2) return;
+    try {
+      if (localStorage.getItem(FEEDBACK_PROMPT_KEY) === "1") return;
+    } catch { /* ignore */ }
+    setShowFeedbackPrompt(true);
+  }, [items.length]);
+
+  const dismissFeedbackPrompt = () => {
+    setShowFeedbackPrompt(false);
+    try { localStorage.setItem(FEEDBACK_PROMPT_KEY, "1"); } catch { /* ignore */ }
+  };
 
   const commodityMap = useMemo(() => new Map(commodities.map((x) => [x.id, x.name])), [commodities]);
   const marketMap = useMemo(() => new Map(markets.map((x) => [x.id, x.name])), [markets]);
@@ -87,6 +104,15 @@ export function WatchlistPage() {
 
   return <section className="page page-section">
     <div className="page-title"><span className="eyebrow">Your saved interests</span><h1>Watchlist</h1><p>Save a product, a market, or both, to check them quickly later.</p></div>
+    {showFeedbackPrompt && (
+      <div className="feedback-prompt">
+        <span>Enjoying PriceYard so far? We'd love to hear from you.</span>
+        <div className="feedback-prompt-actions">
+          <Link className="button button-small" to="/feedback" onClick={dismissFeedbackPrompt}>Leave feedback</Link>
+          <button type="button" className="text-link text-link-button" onClick={dismissFeedbackPrompt}>Not now</button>
+        </div>
+      </div>
+    )}
     <form className="filter-bar" onSubmit={submit}>
       <label>Commodity<select value={commodityId} onChange={(e) => setCommodityId(e.target.value)}><option value="">No commodity</option>{commodities.filter((x) => x.is_active).map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</select></label>
       <label>Market<select value={marketId} onChange={(e) => setMarketId(e.target.value)}><option value="">No market</option>{markets.filter((x) => x.is_active).map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</select></label>
