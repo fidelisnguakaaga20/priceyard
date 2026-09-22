@@ -56,11 +56,11 @@ export function PriceCard({ item }: { item: PriceUpdate }) {
         <Link className="text-link-cta" to={`/commodities/${encodeURIComponent(item.commodity.name)}`}>See what this price means →</Link>
         <a className="text-link" href={whatsAppShareUrl(item)} target="_blank" rel="noopener noreferrer">Share on WhatsApp</a>
         {token ? (
-          <button type="button" className="text-link text-link-button" onClick={() => void watchThis()} disabled={saving || watched}>
+          <button type="button" className={watched ? "button button-secondary button-small" : "button button-small"} onClick={() => void watchThis()} disabled={saving || watched}>
             {watched ? "★ Watching" : saving ? "Saving…" : "★ Watch this"}
           </button>
         ) : (
-          <Link className="text-link" to="/login">Log in to watch this →</Link>
+          <Link className="button button-ghost button-small" to="/login">Log in to watch this →</Link>
         )}
       </div>
     </article>
