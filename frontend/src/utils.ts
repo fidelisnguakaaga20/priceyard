@@ -73,11 +73,13 @@ type ShareablePrice = {
   price_low: string | number;
   price_high: string | number;
   unit: string;
+  bag_size?: string | null;
 };
 
 export function whatsAppShareUrl(item: ShareablePrice): string {
   const link = `${window.location.origin}/commodities/${encodeURIComponent(item.commodity.name)}`;
-  const text = `${item.commodity.name} @ ${item.market.name}: ${money(item.price_low)} – ${money(item.price_high)} (${item.unit}) — via PriceYard\n${link}`;
+  const measure = item.bag_size || item.unit;
+  const text = `${item.commodity.name} @ ${item.market.name}: ${money(item.price_low)} – ${money(item.price_high)} (${measure}) — via PriceYard\n${link}`;
   return `https://wa.me/?text=${encodeURIComponent(text)}`;
 }
 
