@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { InstallPrompt } from "./InstallPrompt";
 import { ButtonSpinner } from "./LoadingSpinner";
 import { usePreferences } from "../context/PreferencesContext";
 import { useToast } from "../context/ToastContext";
@@ -76,6 +77,7 @@ export function Layout() {
           {trialDaysLeft === 0 ? "Your trial ends today." : <>Your trial ends in <strong>{trialDaysLeft} day{trialDaysLeft === 1 ? "" : "s"}</strong>.</>}
         </div>
       )}
+      <InstallPrompt />
       <main><Outlet /></main>
       <footer className="site-footer">
         <div><strong>PriceYard</strong> by NGU TOP PRODUCTS AND SERVICES</div>
