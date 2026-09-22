@@ -1,4 +1,11 @@
+import { getApiBase } from "./services/api";
+
 export const WHATSAPP_COMMUNITY_URL = "https://chat.whatsapp.com/FszfMQ2sjLf9EyvCaCNh5y";
+
+function shareBaseUrl(): string {
+  const apiBase = getApiBase();
+  return apiBase.startsWith("http") ? apiBase : `${window.location.origin}${apiBase}`;
+}
 
 export function money(value: string | number | null | undefined): string {
   if (value === null || value === undefined || value === "") return "—";
@@ -77,7 +84,7 @@ type ShareablePrice = {
 };
 
 export function whatsAppShareUrl(item: ShareablePrice): string {
-  const link = `${window.location.origin}/commodities/${encodeURIComponent(item.commodity.name)}`;
+  const link = `${shareBaseUrl()}/share/commodities/${encodeURIComponent(item.commodity.name)}`;
   const measure = item.bag_size || item.unit;
   const text = `${item.commodity.name} @ ${item.market.name}: ${money(item.price_low)} – ${money(item.price_high)} (${measure}) — via PriceYard\n${link}`;
   return `https://wa.me/?text=${encodeURIComponent(text)}`;

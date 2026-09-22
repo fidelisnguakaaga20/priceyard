@@ -20,6 +20,7 @@ from app.routes.price_update_routes import router as price_update_router
 from app.routes.quality_signal_routes import router as quality_signal_router
 from app.routes.report_export_routes import router as report_export_router
 from app.routes.sell_watch_window_routes import router as sell_watch_window_router
+from app.routes.share_routes import router as share_router
 from app.routes.storage_suitability_routes import router as storage_suitability_router
 from app.routes.subscription_routes import router as subscription_router
 from app.routes.user_routes import router as user_router
@@ -68,6 +69,7 @@ app.include_router(feedback_router)
 app.include_router(testimonials_router)
 app.include_router(watchlist_router)
 app.include_router(payment_router)
+app.include_router(share_router)
 
 
 @app.get("/health")
