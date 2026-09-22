@@ -7,7 +7,7 @@ import { PriceCard } from "../components/PriceCard";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { apiFetch } from "../services/api";
 import type { Commodity, Market, PriceUpdate, Testimonial } from "../types/api";
-import { comingSoonShareUrl, dateOnly, WHATSAPP_COMMUNITY_URL } from "../utils";
+import { comingSoonShareUrl, dateOnly, money, relativeTime, WHATSAPP_COMMUNITY_URL } from "../utils";
 
 export function HomePage() {
   useDocumentTitle("Know the market before you buy or sell");
@@ -46,6 +46,13 @@ export function HomePage() {
           <span className="eyebrow">Market price information</span>
           <h1>Know the market before you buy or sell.</h1>
           <p>See today's and past prices, price changes, and real market updates for Egusi, Honey Beans and Palm oil.</p>
+          {!loading && prices[0] && (
+            <div className="hero-price-preview">
+              <span className="eyebrow">Live now</span>
+              <p className="price-range">{prices[0].commodity.name}: {money(prices[0].price_low)} – {money(prices[0].price_high)}</p>
+              <span className="muted">{prices[0].market.name} · updated {relativeTime(prices[0].update_date_time)}</span>
+            </div>
+          )}
           <div className="button-row">
             <Link className="button" to="/prices">Check prices</Link>
             <Link className="button button-secondary" to="/market-days">See market days</Link>
