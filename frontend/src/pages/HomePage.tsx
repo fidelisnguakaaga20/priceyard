@@ -7,7 +7,7 @@ import { PriceCard } from "../components/PriceCard";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { apiFetch } from "../services/api";
 import type { Commodity, Market, PriceUpdate, Testimonial } from "../types/api";
-import { comingSoonShareUrl, dateOnly, money, relativeTime, WHATSAPP_COMMUNITY_URL } from "../utils";
+import { comingSoonShareUrl, dateOnly, money, relativeTime, whatsAppShareUrl, WHATSAPP_COMMUNITY_URL } from "../utils";
 
 export function HomePage() {
   useDocumentTitle("Know the market before you buy or sell");
@@ -51,6 +51,7 @@ export function HomePage() {
               <span className="eyebrow">Live now</span>
               <p className="price-range">{prices[0].commodity.name}: {money(prices[0].price_low)} – {money(prices[0].price_high)}</p>
               <span className="muted">{prices[0].market.name} · updated {relativeTime(prices[0].update_date_time)}</span>
+              <a className="text-link" href={whatsAppShareUrl(prices[0])} target="_blank" rel="noopener noreferrer">Share on WhatsApp →</a>
             </div>
           )}
           <div className="button-row">
