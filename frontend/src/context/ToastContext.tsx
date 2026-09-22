@@ -2,13 +2,16 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState } f
 import { Toast } from "../components/Toast";
 import type { ToastKind } from "../components/Toast";
 
+export type ToastAction = { label: string; to: string };
+
 type ToastState = {
   kind: ToastKind;
   message: string;
+  action?: ToastAction;
 };
 
 type ToastContextValue = {
-  showToast: (message: string, kind?: ToastKind) => void;
+  showToast: (message: string, kind?: ToastKind, action?: ToastAction) => void;
 };
 
 const ToastContext = createContext<ToastContextValue | undefined>(undefined);
@@ -23,9 +26,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     setToast(null);
   }, []);
 
-  const showToast = useCallback((message: string, kind: ToastKind = "success") => {
+  const showToast = useCallback((message: string, kind: ToastKind = "success", action?: ToastAction) => {
     if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current);
-    setToast({ message, kind });
+    setToast({ message, kind, action });
     timeoutRef.current = window.setTimeout(() => {
       setToast(null);
       timeoutRef.current = null;
@@ -39,7 +42,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={{ showToast }}>
       {children}
-      {toast && <Toast kind={toast.kind} message={toast.message} onDismiss={dismissToast} />}
+      {toast && <Toast kind={toast.kind} message={toast.message} action={toast.action} onDismiss={dismissToast} />}
     </ToastContext.Provider>
   );
 }
