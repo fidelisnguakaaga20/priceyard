@@ -4,6 +4,7 @@ import { ButtonSpinner, LoadingSpinner } from "../components/LoadingSpinner";
 import { PremiumGate } from "../components/PremiumGate";
 import { PriceTrendChart } from "../components/PriceTrendChart";
 import { useAuth } from "../context/AuthContext";
+import { useCommodityMarketPairs } from "../hooks/useCommodityMarketPairs";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { apiFetch } from "../services/api";
 import type { Commodity, Market, PriceUpdate } from "../types/api";
@@ -17,6 +18,10 @@ export function PriceHistoryPage() {
   const [markets, setMarkets] = useState<Market[]>([]);
   const [commodity, setCommodity] = useState("Egusi");
   const [market, setMarket] = useState("");
+  const commodityMarketPairs = useCommodityMarketPairs();
+  const availableMarkets = commodity && commodityMarketPairs.has(commodity)
+    ? markets.filter((item) => commodityMarketPairs.get(commodity)!.has(item.name))
+    : markets;
   const [timeOfDay, setTimeOfDay] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -62,6 +67,11 @@ export function PriceHistoryPage() {
     void load();
   };
 
+  const changeCommodity = (value: string) => {
+    setCommodity(value);
+    if (market && value && commodityMarketPairs.has(value) && !commodityMarketPairs.get(value)!.has(market)) setMarket("");
+  };
+
   return <section className="page page-section">
     <div className="page-title">
       <span className="eyebrow">All price records</span>
@@ -71,8 +81,8 @@ export function PriceHistoryPage() {
 
     {authLoading ? <LoadingSpinner label="Checking price-history access…" /> : !hasFullAccess ? <PremiumGate><></></PremiumGate> : <>
       <form className="filter-bar" onSubmit={submit}>
-        <label>Commodity<select value={commodity} onChange={(e) => setCommodity(e.target.value)}><option value="">All commodities</option>{commodities.map((item) => <option key={item.id}>{item.name}</option>)}</select></label>
-        <label>Market<select value={market} onChange={(e) => setMarket(e.target.value)}><option value="">All markets</option>{markets.map((item) => <option key={item.id}>{item.name}</option>)}</select></label>
+        <label>Commodity<select value={commodity} onChange={(e) => changeCommodity(e.target.value)}><option value="">All commodities</option>{commodities.map((item) => <option key={item.id}>{item.name}</option>)}</select></label>
+        <label>Market<select value={market} onChange={(e) => setMarket(e.target.value)}><option value="">All markets</option>{availableMarkets.map((item) => <option key={item.id}>{item.name}</option>)}</select>{commodity && availableMarkets.length < markets.length && <small className="muted">{commodity} is only tracked at {availableMarkets.length} market{availableMarkets.length === 1 ? "" : "s"} here.</small>}</label>
         <label>Time of day<select value={timeOfDay} onChange={(e) => setTimeOfDay(e.target.value)}><option value="">Any time</option><option>morning</option><option>afternoon</option><option>evening</option><option>closing</option></select></label>
         <div className="filter-actions"><button className="button button-small" disabled={loading}>{loading ? <ButtonSpinner label="Please wait…" /> : "Search history"}</button></div>
       </form>
@@ -106,7 +116,7 @@ export function PriceHistoryPage() {
             <div className="guidance"><div><span>Possible Meaning</span><p>{item.possible_meaning || "No observation supplied."}</p></div><div><span>Suggested Action</span><strong>{item.suggested_action || "Watch"}</strong></div></div>
           </article>)}
         </div>
-        {!items.length && <div className="status-box">No history records match the current filters.</div>}
+        {!items.length && <div className="status-box">No history records found{commodity ? ` for ${commodity}` : ""}{market ? ` at ${market}` : ""}. Try a different market, commodity, or time of day.</div>}
       </>}
     </>}
 

@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { Disclaimer, PRICE_DISCLAIMER } from "../components/Disclaimer";
 import { ButtonSpinner, LoadingSpinner } from "../components/LoadingSpinner";
 import { PriceCard } from "../components/PriceCard";
+import { useCommodityMarketPairs } from "../hooks/useCommodityMarketPairs";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { apiFetch } from "../services/api";
 import type { Commodity, Market, PriceUpdate } from "../types/api";
@@ -13,6 +14,10 @@ export function PricesPage() {
   const [markets, setMarkets] = useState<Market[]>([]);
   const [commodity, setCommodity] = useState("");
   const [market, setMarket] = useState("");
+  const commodityMarketPairs = useCommodityMarketPairs();
+  const availableMarkets = commodity && commodityMarketPairs.has(commodity)
+    ? markets.filter((item) => commodityMarketPairs.get(commodity)!.has(item.name))
+    : markets;
   const [movement, setMovement] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -42,17 +47,21 @@ export function PricesPage() {
 
   const submit = (event: FormEvent) => { event.preventDefault(); void load({ commodity, market, movement }); };
   const clear = () => { setCommodity(""); setMarket(""); setMovement(""); void load(); };
+  const changeCommodity = (value: string) => {
+    setCommodity(value);
+    if (market && value && commodityMarketPairs.has(value) && !commodityMarketPairs.get(value)!.has(market)) setMarket("");
+  };
 
   return <section className="page page-section">
     <div className="page-title"><span className="eyebrow">Latest approved records</span><h1>Prices</h1><p>Search current commodity price ranges by commodity, market and movement.</p></div>
     <form className="filter-bar" onSubmit={submit}>
-      <label>Commodity<select value={commodity} onChange={(e) => setCommodity(e.target.value)}><option value="">All commodities</option>{commodities.map((item) => <option key={item.id}>{item.name}</option>)}</select></label>
-      <label>Market<select value={market} onChange={(e) => setMarket(e.target.value)}><option value="">All markets</option>{markets.map((item) => <option key={item.id}>{item.name}</option>)}</select></label>
+      <label>Commodity<select value={commodity} onChange={(e) => changeCommodity(e.target.value)}><option value="">All commodities</option>{commodities.map((item) => <option key={item.id}>{item.name}</option>)}</select></label>
+      <label>Market<select value={market} onChange={(e) => setMarket(e.target.value)}><option value="">All markets</option>{availableMarkets.map((item) => <option key={item.id}>{item.name}</option>)}</select>{commodity && availableMarkets.length < markets.length && <small className="muted">{commodity} is only tracked at {availableMarkets.length} market{availableMarkets.length === 1 ? "" : "s"} here.</small>}</label>
       <label>Movement<select value={movement} onChange={(e) => setMovement(e.target.value)}><option value="">Any movement</option><option value="up">Up</option><option value="down">Down</option><option value="stable">Stable</option><option value="unknown">Unknown</option></select></label>
       <div className="filter-actions"><button className="button button-small" type="submit" disabled={loading}>{loading ? <ButtonSpinner label="Please wait…" /> : "Apply"}</button><button className="button button-ghost button-small" type="button" onClick={clear} disabled={loading}>Clear</button></div>
     </form>
     {error && <div className="status-box error">{error}</div>}
-    {loading || filtersLoading ? <LoadingSpinner label="Loading approved prices…" /> : items.length ? <div className="card-grid">{items.map((item) => <PriceCard key={item.id} item={item} />)}</div> : <div className="status-box">No approved price updates match these filters. Try clearing the filters or check back soon for new records.</div>}
+    {loading || filtersLoading ? <LoadingSpinner label="Loading approved prices…" /> : items.length ? <div className="card-grid">{items.map((item) => <PriceCard key={item.id} item={item} />)}</div> : <div className="status-box">No current prices found{commodity ? ` for ${commodity}` : ""}{market ? ` at ${market}` : ""}. Try clearing the filters or check back soon for new records.</div>}
     <Disclaimer>{PRICE_DISCLAIMER}</Disclaimer>
   </section>;
 }
