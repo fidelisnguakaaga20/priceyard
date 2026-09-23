@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ButtonSpinner, LoadingSpinner } from "../components/LoadingSpinner";
 import { useAuth } from "../context/AuthContext";
+import { useCommodityMarketPairs } from "../hooks/useCommodityMarketPairs";
 import { useToast } from "../context/ToastContext";
 import { apiFetch } from "../services/api";
 import type { Commodity, Market, WatchlistItem } from "../types/api";
@@ -21,6 +22,7 @@ export function WatchlistPage() {
   const [saving, setSaving] = useState(false);
   const [removingId, setRemovingId] = useState<number | null>(null);
   const [showFeedbackPrompt, setShowFeedbackPrompt] = useState(false);
+  const commodityMarketPairs = useCommodityMarketPairs();
 
   const load = async (showLoader = true) => {
     if (!token) return;
@@ -59,6 +61,21 @@ export function WatchlistPage() {
 
   const commodityMap = useMemo(() => new Map(commodities.map((x) => [x.id, x.name])), [commodities]);
   const marketMap = useMemo(() => new Map(markets.map((x) => [x.id, x.name])), [markets]);
+
+  const selectedCommodityName = commodityId ? commodityMap.get(Number(commodityId)) : undefined;
+  const activeMarkets = markets.filter((x) => x.is_active);
+  const availableMarkets = selectedCommodityName && commodityMarketPairs.has(selectedCommodityName)
+    ? activeMarkets.filter((x) => commodityMarketPairs.get(selectedCommodityName)!.has(x.name))
+    : activeMarkets;
+
+  const changeCommodity = (value: string) => {
+    setCommodityId(value);
+    const name = value ? commodityMap.get(Number(value)) : undefined;
+    const currentMarketName = marketId ? marketMap.get(Number(marketId)) : undefined;
+    if (currentMarketName && name && commodityMarketPairs.has(name) && !commodityMarketPairs.get(name)!.has(currentMarketName)) {
+      setMarketId("");
+    }
+  };
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -114,8 +131,8 @@ export function WatchlistPage() {
       </div>
     )}
     <form className="filter-bar" onSubmit={submit}>
-      <label>Commodity<select value={commodityId} onChange={(e) => setCommodityId(e.target.value)}><option value="">No commodity</option>{commodities.filter((x) => x.is_active).map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</select></label>
-      <label>Market<select value={marketId} onChange={(e) => setMarketId(e.target.value)}><option value="">No market</option>{markets.filter((x) => x.is_active).map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</select></label>
+      <label>Commodity<select value={commodityId} onChange={(e) => changeCommodity(e.target.value)}><option value="">No commodity</option>{commodities.filter((x) => x.is_active).map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</select></label>
+      <label>Market<select value={marketId} onChange={(e) => setMarketId(e.target.value)}><option value="">No market</option>{availableMarkets.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</select>{selectedCommodityName && availableMarkets.length < activeMarkets.length && <small className="muted">{selectedCommodityName} is only tracked at {availableMarkets.length} market{availableMarkets.length === 1 ? "" : "s"} here.</small>}</label>
       <div className="filter-actions"><button className="button button-small" disabled={saving || loading}>{saving ? <ButtonSpinner label="Please wait…" /> : "Save item"}</button></div>
     </form>
     {error && <div className="status-box error">{error}</div>}

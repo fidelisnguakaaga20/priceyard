@@ -121,11 +121,14 @@ def edit_price_update(
 ) -> PriceUpdate:
     item = get_price_update_for_admin(db, price_update_id)
     old_value = snapshot_model(item)
+    price_fields_touched = bool({"price_low", "price_high", "average_price"} & payload.model_dump(exclude_unset=True).keys())
     item = update_price_update(db, item, payload)
     create_audit_log(
         db, actor=current_admin, action="price_update.edit", table_name="price_updates",
         record_id=item.id, old_value=old_value, new_value=snapshot_model(item),
     )
+    if price_fields_touched and item.status == "approved":
+        notify_watchlist_subscribers(db, item)
     return item
 
 

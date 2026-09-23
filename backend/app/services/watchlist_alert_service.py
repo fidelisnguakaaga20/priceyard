@@ -36,7 +36,7 @@ def notify_watchlist_subscribers(db: Session, price_update: PriceUpdate) -> int:
         subject = f"{price_update.commodity.name} price update on PriceYard"
         body = (
             f"Hi {user.full_name},\n\n"
-            f"A new price was just approved for {price_update.commodity.name} "
+            f"A price update was just published for {price_update.commodity.name} "
             f"at {price_update.market.name}:\n"
             f"NGN {price_update.price_low:,.0f} - NGN {price_update.price_high:,.0f} "
             f"({price_update.unit})\n\n"
