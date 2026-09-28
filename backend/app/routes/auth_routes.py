@@ -9,6 +9,7 @@ from app.services.subscription_service import REFERRAL_REWARD_DAYS
 from app.schemas.auth_schema import ForgotPasswordRequest, GoogleLoginRequest, LoginRequest, MessageResponse, ReferralSummaryResponse, RegisterRequest, ResetPasswordRequest, TokenResponse
 from app.schemas.user_schema import UserResponse
 from app.security import create_access_token
+from app.services.admin_alert_service import notify_admins
 from app.services.auth_service import authenticate_or_create_google_user, authenticate_user, register_user
 from app.services.password_reset_service import request_password_reset, reset_password
 from app.utils.permissions import get_current_user
@@ -19,7 +20,13 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 @limiter.limit("5/minute")
 def register(request: Request, payload: RegisterRequest, db: Session = Depends(get_db)) -> User:
-    return register_user(db, payload)
+    user = register_user(db, payload)
+    notify_admins(
+        db,
+        subject="New PriceYard signup",
+        body=f"A new user just registered on PriceYard:\n\nName: {user.full_name}\nEmail: {user.email}\nPhone: {user.phone or '-'}",
+    )
+    return user
 
 
 @router.post("/login", response_model=TokenResponse)

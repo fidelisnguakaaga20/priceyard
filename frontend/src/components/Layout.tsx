@@ -5,7 +5,7 @@ import { InstallPrompt } from "./InstallPrompt";
 import { ButtonSpinner } from "./LoadingSpinner";
 import { usePreferences } from "../context/PreferencesContext";
 import { useToast } from "../context/ToastContext";
-import { WhatsAppSupportButton } from "./WhatsAppSupportButton";
+import { SUPPORT_WHATSAPP_NUMBER, WhatsAppSupportButton } from "./WhatsAppSupportButton";
 import { daysUntil, WHATSAPP_COMMUNITY_URL } from "../utils";
 
 const navItems = [
@@ -83,6 +83,7 @@ export function Layout() {
         <div><strong>PriceYard</strong> by NGU TOP PRODUCTS AND SERVICES</div>
         <div>Market information only — no guaranteed profit or prediction.</div>
         <a className="text-link" href={WHATSAPP_COMMUNITY_URL} target="_blank" rel="noopener noreferrer">Join our free WhatsApp updates →</a>
+        <a className="text-link" href={`https://wa.me/${SUPPORT_WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi PriceYard, I'm interested in exploring a partnership.")}`} target="_blank" rel="noopener noreferrer">Partner with us →</a>
       </footer>
       <WhatsAppSupportButton />
     </div>

@@ -14,6 +14,7 @@ from app.config import get_settings
 from app.models.payment import Payment
 from app.models.user import User
 from app.schemas.payment_schema import PaymentInitiateResponse, PaymentPlan
+from app.services.admin_alert_service import notify_admins
 from app.services.audit_service import create_audit_log, snapshot_model
 from app.services.subscription_service import activate_paid_subscription, find_subscription_for_user
 
@@ -121,6 +122,15 @@ def handle_webhook_event(db: Session, payload: dict) -> None:
     create_audit_log(
         db, actor=payment.user, action="payment.success", table_name="subscriptions",
         record_id=subscription.id, old_value=old_value, new_value=snapshot_model(subscription),
+    )
+    notify_admins(
+        db,
+        subject="New PriceYard payment received",
+        body=(
+            f"A payment was just confirmed on PriceYard:\n\n"
+            f"User: {payment.user.full_name} ({payment.user.email})\n"
+            f"Plan: {payment.plan}\nAmount: NGN {payment.amount:,.2f}\nReference: {payment.reference}"
+        ),
     )
 
 

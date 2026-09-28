@@ -83,10 +83,20 @@ type ShareablePrice = {
   bag_size?: string | null;
 };
 
+const COMMODITY_EMOJI: Record<string, string> = {
+  egusi: "🟡",
+  "honey beans": "🟤",
+  "palm oil": "🟠",
+};
+
+function commodityEmoji(name: string): string {
+  return COMMODITY_EMOJI[name.trim().toLowerCase()] || "🌾";
+}
+
 export function whatsAppShareUrl(item: ShareablePrice): string {
   const link = `${shareBaseUrl()}/share/commodities/${encodeURIComponent(item.commodity.name)}`;
   const measure = item.bag_size || item.unit;
-  const text = `${item.commodity.name} @ ${item.market.name}: ${money(item.price_low)} – ${money(item.price_high)} (${measure}) — via PriceYard\n${link}`;
+  const text = `${commodityEmoji(item.commodity.name)} ${item.commodity.name} @ ${item.market.name}: ${money(item.price_low)} – ${money(item.price_high)} (${measure}) — via PriceYard\n${link}`;
   return `https://wa.me/?text=${encodeURIComponent(text)}`;
 }
 

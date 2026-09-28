@@ -1,4 +1,4 @@
-const SUPPORT_WHATSAPP_NUMBER = "2347031128081";
+export const SUPPORT_WHATSAPP_NUMBER = "2347031128081";
 
 export function WhatsAppSupportButton() {
   const text = encodeURIComponent("Hi PriceYard, I need help with...");
