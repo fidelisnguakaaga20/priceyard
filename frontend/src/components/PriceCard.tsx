@@ -6,7 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { apiFetch, ApiError } from "../services/api";
 import type { PriceUpdate } from "../types/api";
-import { confidenceClass, money, movementIcon, relativeTime, whatsAppShareUrl } from "../utils";
+import { commodityTitleColor, confidenceClass, money, movementIcon, relativeTime, whatsAppShareUrl } from "../utils";
 
 export function PriceCard({ item }: { item: PriceUpdate }) {
   const { token } = useAuth();
@@ -42,7 +42,7 @@ export function PriceCard({ item }: { item: PriceUpdate }) {
       <div className="card-row">
         <div>
           <span className="eyebrow">{item.market.name}</span>
-          <h3>{item.commodity.name}</h3>
+          <h3 style={{ color: commodityTitleColor(item.commodity.name) }}>{item.commodity.name}</h3>
         </div>
         <span className={`movement movement-${item.movement}`}>{movementIcon(item.movement)} {item.movement}</span>
       </div>
@@ -52,6 +52,7 @@ export function PriceCard({ item }: { item: PriceUpdate }) {
         <span><strong>Status</strong><span className={`confidence-badge ${confidenceClass(item.confidence_level)}`}>{item.confidence_level}</span><ConfidenceInfo /></span>
         <span><strong>Updated</strong>{relativeTime(item.update_date_time)}</span>
       </div>
+      {item.notes && <p className="price-card-note"><strong>Note from PriceYard:</strong> {item.notes}</p>}
       <div className="card-actions">
         <Link className="text-link-cta" to={`/commodities/${encodeURIComponent(item.commodity.name)}`}>See what this price means →</Link>
         <a className="text-link" href={whatsAppShareUrl(item)} target="_blank" rel="noopener noreferrer">Share on WhatsApp</a>

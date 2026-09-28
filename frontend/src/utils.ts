@@ -93,6 +93,16 @@ function commodityEmoji(name: string): string {
   return COMMODITY_EMOJI[name.trim().toLowerCase()] || "🌾";
 }
 
+const COMMODITY_TITLE_COLOR: Record<string, string> = {
+  egusi: "#9c7a1f",
+  "honey beans": "#6b4226",
+  "palm oil": "#c2570c",
+};
+
+export function commodityTitleColor(name: string): string | undefined {
+  return COMMODITY_TITLE_COLOR[name.trim().toLowerCase()];
+}
+
 export function whatsAppShareUrl(item: ShareablePrice): string {
   const link = `${shareBaseUrl()}/share/commodities/${encodeURIComponent(item.commodity.name)}`;
   const measure = item.bag_size || item.unit;
