@@ -1,5 +1,7 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { apiFetch } from "../services/api";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { apiFetch, setUnauthorizedHandler } from "../services/api";
+import { useToast } from "./ToastContext";
 import type { Subscription, User } from "../types/api";
 
 type AccessLabel = "Guest" | "Free" | "Trial" | "Active Paid" | "Admin";
@@ -33,10 +35,13 @@ function computeAccess(user: User | null, subscription: Subscription | null): { 
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const navigate = useNavigate();
+  const { showToast } = useToast();
   const [token, setToken] = useState<string | null>(() => localStorage.getItem(STORAGE_KEY));
   const [user, setUser] = useState<User | null>(null);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(Boolean(token));
+  const expiredHandledRef = useRef(false);
 
   const clearAuth = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY);
@@ -45,6 +50,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setSubscription(null);
     setLoading(false);
   }, []);
+
+  useEffect(() => {
+    if (token) expiredHandledRef.current = false;
+  }, [token]);
+
+  useEffect(() => {
+    setUnauthorizedHandler(() => {
+      if (expiredHandledRef.current) return;
+      expiredHandledRef.current = true;
+      clearAuth();
+      showToast("Your session expired — please log in again.", "error");
+      navigate("/login");
+    });
+    return () => setUnauthorizedHandler(null);
+  }, [clearAuth, navigate, showToast]);
 
   const refreshWithToken = useCallback(async (activeToken: string) => {
     setLoading(true);

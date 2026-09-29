@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { InstallPrompt } from "./InstallPrompt";
 import { ButtonSpinner } from "./LoadingSpinner";
+import { OnboardingTour } from "./OnboardingTour";
 import { usePreferences } from "../context/PreferencesContext";
 import { useToast } from "../context/ToastContext";
 import { SUPPORT_WHATSAPP_NUMBER, WhatsAppSupportButton } from "./WhatsAppSupportButton";
@@ -21,6 +22,7 @@ export function Layout() {
   const { dataSaver, toggleDataSaver, easyReading, toggleEasyReading } = usePreferences();
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
   const [open, setOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
 
@@ -79,6 +81,9 @@ export function Layout() {
       )}
       <InstallPrompt />
       <main><Outlet /></main>
+      {location.pathname !== "/" && (
+        <div className="back-to-app"><Link className="text-link" to="/prices">← Back to Current Prices</Link></div>
+      )}
       <footer className="site-footer">
         <div><strong>PriceYard</strong> by NGU TOP PRODUCTS AND SERVICES</div>
         <div>Market information only — no guaranteed profit or prediction.</div>
@@ -86,6 +91,7 @@ export function Layout() {
         <a className="text-link" href={`https://wa.me/${SUPPORT_WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi PriceYard, I'm interested in exploring a partnership.")}`} target="_blank" rel="noopener noreferrer">Partner with us →</a>
       </footer>
       <WhatsAppSupportButton />
+      <OnboardingTour />
     </div>
   );
 }
