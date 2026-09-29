@@ -3,10 +3,10 @@ import { useState } from "react";
 const SEEN_KEY = "priceyard_onboarding_seen";
 
 const STEPS = [
-  "PriceYard shows real market prices as a range, not one fixed number — because real markets don't work with a single price.",
-  "Confidence labels tell you how sure we are about a price, from \"Reporter submitted\" to \"Market visit confirmed\".",
-  "Free access shows today's prices. Trial and Paid unlock price history, buying zones, sell-watch windows, and storage advice.",
-  "Save any commodity or market to your Watchlist and we'll email you when the price changes — no need to keep checking back.",
+  "We show you a low price and a high price, not just one price — because that is how the real market works.",
+  "Every price has a label that tells you how sure we are. Some are just reported. Some are confirmed by someone who visited the market.",
+  "Free users see today's prices. Trial and Paid users also see old prices, best time to buy, best time to sell, and storage tips.",
+  "Save any product or market you like. We will email you when the price changes, so you don't have to keep checking.",
 ];
 
 export function OnboardingTour() {
@@ -23,6 +23,7 @@ export function OnboardingTour() {
   if (dismissed) return null;
 
   const isLast = step === STEPS.length - 1;
+  const isFirst = step === 0;
 
   return (
     <div className="onboarding-overlay" role="dialog" aria-modal="true" aria-label="Welcome to PriceYard">
@@ -31,7 +32,10 @@ export function OnboardingTour() {
         <p>{STEPS[step]}</p>
         <div className="onboarding-actions">
           <button type="button" className="text-link text-link-button" onClick={finish}>Skip</button>
-          <button type="button" className="button button-small" onClick={() => (isLast ? finish() : setStep((s) => s + 1))}>{isLast ? "Got it" : "Next"}</button>
+          <div className="onboarding-nav-buttons">
+            {!isFirst && <button type="button" className="button button-secondary button-small" onClick={() => setStep((s) => s - 1)}>Back</button>}
+            <button type="button" className="button button-small" onClick={() => (isLast ? finish() : setStep((s) => s + 1))}>{isLast ? "Got it" : "Next"}</button>
+          </div>
         </div>
       </div>
     </div>
