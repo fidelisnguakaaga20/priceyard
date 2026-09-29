@@ -4,7 +4,7 @@ import { ButtonSpinner, LoadingSpinner } from "../components/LoadingSpinner";
 import { PremiumGate } from "../components/PremiumGate";
 import { PriceTrendChart } from "../components/PriceTrendChart";
 import { useAuth } from "../context/AuthContext";
-import { useCommodityMarketPairs } from "../hooks/useCommodityMarketPairs";
+import { useHistoricalCommodityMarketPairs } from "../hooks/useCommodityMarketPairs";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { apiFetch } from "../services/api";
 import type { Commodity, Market, PriceUpdate } from "../types/api";
@@ -18,7 +18,7 @@ export function PriceHistoryPage() {
   const [markets, setMarkets] = useState<Market[]>([]);
   const [commodity, setCommodity] = useState("Egusi");
   const [market, setMarket] = useState("");
-  const commodityMarketPairs = useCommodityMarketPairs();
+  const commodityMarketPairs = useHistoricalCommodityMarketPairs(token);
   const availableMarkets = commodity && commodityMarketPairs.has(commodity)
     ? markets.filter((item) => commodityMarketPairs.get(commodity)!.has(item.name))
     : markets;
