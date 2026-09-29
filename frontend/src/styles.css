@@ -15,7 +15,8 @@ button:disabled { cursor: not-allowed; opacity: .72; }
 .top-gap { margin-top: 52px; }
 .site-header { position: sticky; top: 0; z-index: 100; isolation: isolate; background: rgba(248, 249, 244, .96); border-bottom: 1px solid #dfe5db; backdrop-filter: blur(12px); }
 .header-inner { width: min(1180px, calc(100% - 40px)); min-width: 0; max-width: 100%; min-height: 72px; margin: auto; display: flex; align-items: center; gap: 24px; }
-.brand { display: flex; min-width: 0; max-width: 100%; align-items: center; gap: 10px; text-decoration: none; margin-right: auto; }
+.brand { display: flex; min-width: 0; max-width: 100%; align-items: center; gap: 10px; text-decoration: none; margin-right: auto; border-radius: 10px; padding: 6px 8px; margin-left: -8px; }
+.brand:hover { background: #e9eee5; }
 .brand > span:last-child { min-width: 0; max-width: 100%; }
 .brand-mark { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 11px; background: #214e34; color: white; font-weight: 800; }
 .brand strong { display: block; font-size: 1.06rem; }.brand small { display: block; color: #657267; font-size: .72rem; margin-top: 2px; }
