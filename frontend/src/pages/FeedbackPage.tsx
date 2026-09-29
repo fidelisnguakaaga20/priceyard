@@ -71,8 +71,8 @@ export function FeedbackPage() {
         </div>
       </fieldset>
       <label>
-        Complaint or suggestion
-        <textarea rows={4} value={suggestion} onChange={(e) => setSuggestion(e.target.value)} />
+        {rating >= 4 ? "What do you like about PriceYard? Your comment might be featured on our homepage." : "Complaint or suggestion"}
+        <textarea rows={4} value={suggestion} onChange={(e) => setSuggestion(e.target.value)} placeholder={rating >= 4 ? "e.g. it helped me buy or sell at a better price…" : "Tell us what went wrong or what we could do better…"} />
       </label>
       <label>
         Continue using?
