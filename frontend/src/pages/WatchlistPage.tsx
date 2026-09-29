@@ -5,7 +5,8 @@ import { useAuth } from "../context/AuthContext";
 import { useCommodityMarketPairs } from "../hooks/useCommodityMarketPairs";
 import { useToast } from "../context/ToastContext";
 import { apiFetch } from "../services/api";
-import type { Commodity, Market, WatchlistItem } from "../types/api";
+import type { Commodity, Market, PriceUpdate, WatchlistItem } from "../types/api";
+import { agingClass, money, movementIcon, relativeTime } from "../utils";
 
 const FEEDBACK_PROMPT_KEY = "priceyard_feedback_prompted";
 
@@ -15,6 +16,7 @@ export function WatchlistPage() {
   const [items, setItems] = useState<WatchlistItem[]>([]);
   const [commodities, setCommodities] = useState<Commodity[]>([]);
   const [markets, setMarkets] = useState<Market[]>([]);
+  const [prices, setPrices] = useState<PriceUpdate[]>([]);
   const [commodityId, setCommodityId] = useState("");
   const [marketId, setMarketId] = useState("");
   const [error, setError] = useState("");
@@ -28,14 +30,16 @@ export function WatchlistPage() {
     if (!token) return;
     if (showLoader) setLoading(true);
     try {
-      const [watchlistItems, commodityItems, marketItems] = await Promise.all([
+      const [watchlistItems, commodityItems, marketItems, priceItems] = await Promise.all([
         apiFetch<WatchlistItem[]>("/watchlist", {}, token),
         apiFetch<Commodity[]>("/commodities"),
         apiFetch<Market[]>("/markets"),
+        apiFetch<PriceUpdate[]>("/price-updates"),
       ]);
       setItems(watchlistItems);
       setCommodities(commodityItems);
       setMarkets(marketItems);
+      setPrices(priceItems);
       setError("");
     } catch (err) {
       setError((err as Error).message);
@@ -61,6 +65,15 @@ export function WatchlistPage() {
 
   const commodityMap = useMemo(() => new Map(commodities.map((x) => [x.id, x.name])), [commodities]);
   const marketMap = useMemo(() => new Map(markets.map((x) => [x.id, x.name])), [markets]);
+
+  const findPriceFor = (item: WatchlistItem): PriceUpdate | undefined => {
+    if (item.commodity_id && item.market_id) {
+      return prices.find((p) => p.commodity_id === item.commodity_id && p.market_id === item.market_id);
+    }
+    if (item.commodity_id) return prices.find((p) => p.commodity_id === item.commodity_id);
+    if (item.market_id) return prices.find((p) => p.market_id === item.market_id);
+    return undefined;
+  };
 
   const selectedCommodityName = commodityId ? commodityMap.get(Number(commodityId)) : undefined;
   const activeMarkets = markets.filter((x) => x.is_active);
@@ -137,7 +150,26 @@ export function WatchlistPage() {
     </form>
     {error && <div className="status-box error">{error}</div>}
     {loading ? <LoadingSpinner label="Loading your watchlist…" /> : <>
-      <div className="watchlist-grid">{items.map((item) => <article className="card" key={item.id}><span className="eyebrow">Saved item</span><h3>{item.commodity_id ? commodityMap.get(item.commodity_id) || `Commodity #${item.commodity_id}` : "All commodities"}</h3><p>{item.market_id ? marketMap.get(item.market_id) || `Market #${item.market_id}` : "No market restriction"}</p><button className="button button-danger button-small" disabled={removingId !== null} onClick={() => void remove(item.id)}>{removingId === item.id ? <ButtonSpinner label="Please wait…" /> : "Remove"}</button></article>)}</div>
+      <div className="watchlist-grid">{items.map((item) => {
+        const match = findPriceFor(item);
+        return <article className="card" key={item.id}>
+          <span className="eyebrow">Saved item</span>
+          <h3>{item.commodity_id ? commodityMap.get(item.commodity_id) || `Commodity #${item.commodity_id}` : "All commodities"}</h3>
+          <p className="muted">{item.market_id ? marketMap.get(item.market_id) || `Market #${item.market_id}` : "No market restriction"}</p>
+          {match ? (
+            <>
+              <p className="price-range">{money(match.price_low)} – {money(match.price_high)}</p>
+              <div className="mini-grid">
+                <span><strong>Movement</strong><span className={`movement movement-${match.movement}`}>{movementIcon(match.movement)} {match.movement}</span></span>
+                <span><strong>Updated</strong><span className={agingClass(match.update_date_time)}>{relativeTime(match.update_date_time)}</span></span>
+              </div>
+            </>
+          ) : (
+            <p className="muted">No current price yet.</p>
+          )}
+          <button className="button button-danger button-small" disabled={removingId !== null} onClick={() => void remove(item.id)}>{removingId === item.id ? <ButtonSpinner label="Please wait…" /> : "Remove"}</button>
+        </article>;
+      })}</div>
       {!items.length && !error && <div className="status-box">Your watchlist is empty. Save a commodity or market above to keep an eye on it here.</div>}
     </>}
   </section>;
