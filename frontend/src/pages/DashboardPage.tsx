@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { ONBOARDING_TOUR_SEEN_EVENT, ONBOARDING_TOUR_SEEN_KEY } from "../components/OnboardingTour";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { apiFetch } from "../services/api";
@@ -12,10 +13,15 @@ function readOnboardingDismissed(): boolean {
   try { return localStorage.getItem(ONBOARDING_KEY) === "1"; } catch { return false; }
 }
 
+function readTourSeen(): boolean {
+  try { return localStorage.getItem(ONBOARDING_TOUR_SEEN_KEY) === "1"; } catch { return false; }
+}
+
 export function DashboardPage() {
   const { user, subscription, accessLabel, hasFullAccess, token } = useAuth();
   const { showToast } = useToast();
   const [onboardingDismissed, setOnboardingDismissed] = useState(readOnboardingDismissed);
+  const [tourSeen, setTourSeen] = useState(readTourSeen);
   const [referral, setReferral] = useState<ReferralSummary | null>(null);
   const [copied, setCopied] = useState(false);
   const [upgrading, setUpgrading] = useState<PaymentPlan | null>(null);
@@ -23,6 +29,12 @@ export function DashboardPage() {
     try { localStorage.setItem(ONBOARDING_KEY, "1"); } catch { /* ignore storage failures */ }
     setOnboardingDismissed(true);
   };
+  useEffect(() => {
+    if (tourSeen) return;
+    const onSeen = () => setTourSeen(true);
+    window.addEventListener(ONBOARDING_TOUR_SEEN_EVENT, onSeen);
+    return () => window.removeEventListener(ONBOARDING_TOUR_SEEN_EVENT, onSeen);
+  }, [tourSeen]);
   useEffect(() => {
     if (!token || user?.role === "admin") return;
     apiFetch<ReferralSummary>("/auth/referral-summary", {}, token).then(setReferral).catch(() => undefined);
@@ -49,7 +61,7 @@ export function DashboardPage() {
   if (!user) return null;
   const showUpgrade = user.role !== "admin" && subscription?.status !== "active";
   return <section className="page page-section"><div className="page-title"><span className="eyebrow">User dashboard</span><h1>Welcome, {user.full_name}</h1><p>Your account and quick links to PriceYard tools.</p></div>
-    {user.role !== "admin" && !onboardingDismissed && (
+    {user.role !== "admin" && !onboardingDismissed && tourSeen && (
       <article className="card onboarding-card">
         <div className="card-row">
           <div><span className="eyebrow">New here?</span><h2>Get started with PriceYard</h2></div>

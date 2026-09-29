@@ -1,6 +1,8 @@
 import { useState } from "react";
 
-const SEEN_KEY = "priceyard_onboarding_seen";
+export const ONBOARDING_TOUR_SEEN_KEY = "priceyard_onboarding_seen";
+export const ONBOARDING_TOUR_SEEN_EVENT = "priceyard-onboarding-seen";
+const SEEN_KEY = ONBOARDING_TOUR_SEEN_KEY;
 
 const STEPS = [
   "We show you a low price and a high price, not just one price — because that is how the real market works.",
@@ -18,6 +20,7 @@ export function OnboardingTour() {
   const finish = () => {
     setDismissed(true);
     try { localStorage.setItem(SEEN_KEY, "1"); } catch { /* ignore */ }
+    window.dispatchEvent(new Event(ONBOARDING_TOUR_SEEN_EVENT));
   };
 
   if (dismissed) return null;
