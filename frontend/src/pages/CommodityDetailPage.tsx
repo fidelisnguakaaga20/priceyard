@@ -8,7 +8,7 @@ import { PremiumGate } from "../components/PremiumGate";
 import { useAuth } from "../context/AuthContext";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { apiFetch } from "../services/api";
-import type { BuyingZone, CostBreakdown, MarketSignal, PriceUpdate, QualitySignal, SellWatchWindow, StorageSuitability } from "../types/api";
+import type { BuyingZone, CostBreakdown, Market, MarketSignal, PriceUpdate, QualitySignal, SellWatchWindow, StorageSuitability } from "../types/api";
 import { commodityTitleColor, confidenceClass, money, movementIcon, relativeTime, whatsAppShareUrl } from "../utils";
 
 export function CommodityDetailPage() {
@@ -23,9 +23,12 @@ export function CommodityDetailPage() {
   const [sellWatch, setSellWatch] = useState<SellWatchWindow[]>([]);
   const [storage, setStorage] = useState<StorageSuitability[]>([]);
   const [costs, setCosts] = useState<CostBreakdown[]>([]);
+  const [markets, setMarkets] = useState<Market[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [intelligenceLoading, setIntelligenceLoading] = useState(false);
+  const marketMap = useMemo(() => new Map(markets.map((m) => [m.id, m.name])), [markets]);
+  const marketLabel = (marketId: number) => marketMap.get(marketId) || `Market #${marketId}`;
 
   useEffect(() => {
     setError("");
@@ -35,6 +38,10 @@ export function CommodityDetailPage() {
       .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false));
   }, [name]);
+
+  useEffect(() => {
+    apiFetch<Market[]>("/markets").then(setMarkets).catch(() => undefined);
+  }, []);
 
   const commodityId = prices[0]?.commodity_id;
   const priceIds = useMemo(() => new Set(prices.map((p) => p.id)), [prices]);
@@ -80,11 +87,11 @@ export function CommodityDetailPage() {
     <div className="section-heading top-gap"><div><span className="eyebrow">Full-access intelligence</span><h2>Signals, quality, storage and decision support</h2></div></div>
     <PremiumGate>
       {intelligenceLoading ? <LoadingSpinner label="Loading full market intelligence…" /> : <div className="intelligence-grid">
-        <article className="card"><h3>Market signals</h3>{signals.length ? signals.map((x) => <div className="stack-item" key={x.id}><strong>{x.signal_type}</strong><p>{x.signal_description}</p>{x.possible_meaning && <small>{x.possible_meaning}</small>}</div>) : <p className="muted">No linked market signals currently available.</p>}<Disclaimer>{MARKET_DISCLAIMER}</Disclaimer></article>
-        <article className="card"><h3>Quality readiness</h3>{quality.length ? quality.map((x) => <div className="stack-item" key={x.id}><strong>{x.quality_status || "Quality observation"}</strong><p>Moisture: {x.moisture_status || "—"} · Storage readiness: {x.storage_readiness || "—"}</p>{x.risk_note && <small>{x.risk_note}</small>}</div>) : <p className="muted">No quality observation currently available.</p>}</article>
-        <article className="card"><h3>Buying zone</h3>{zones.length ? zones.map((x) => <div className="stack-item" key={x.id}><strong>{money(x.price_low)} – {money(x.price_high)}</strong><p>{x.reason}</p><small>Confidence: {x.confidence}</small></div>) : <p className="muted">No buying-zone observation currently available.</p>}</article>
-        <article className="card"><h3>Sell-watch window</h3>{sellWatch.length ? sellWatch.map((x) => <div className="stack-item" key={x.id}><strong>{x.start_period}{x.end_period ? ` – ${x.end_period}` : ""}</strong><p>{x.observation}</p><small>Confidence: {x.confidence}</small></div>) : <p className="muted">No sell-watch observation currently available.</p>}</article>
-        <article className="card"><h3>Storage suitability</h3>{storage.length ? storage.map((x) => <div className="stack-item" key={x.id}><strong>{x.suitability_status.replace(/_/g, " ")}</strong><p>{x.summary || x.quality_storage_notes || "No summary supplied."}</p><small>Spoilage risk: {x.spoilage_risk || "—"} · Buyer availability: {x.buyer_availability || "—"}</small></div>) : <p className="muted">No storage-suitability observation currently available.</p>}<Disclaimer>{STORAGE_DISCLAIMER}</Disclaimer></article>
+        <article className="card"><h3>Market signals</h3>{signals.length ? signals.map((x) => <div className="stack-item" key={x.id}><span className="eyebrow">{marketLabel(x.market_id)}</span><strong>{x.signal_type}</strong><p>{x.signal_description}</p>{x.possible_meaning && <small>{x.possible_meaning}</small>}</div>) : <p className="muted">No linked market signals currently available.</p>}<Disclaimer>{MARKET_DISCLAIMER}</Disclaimer></article>
+        <article className="card"><h3>Quality readiness</h3>{quality.length ? quality.map((x) => <div className="stack-item" key={x.id}><span className="eyebrow">{marketLabel(x.market_id)}</span><strong>{x.quality_status || "Quality observation"}</strong><p>Moisture: {x.moisture_status || "—"} · Storage readiness: {x.storage_readiness || "—"}</p>{x.risk_note && <small>{x.risk_note}</small>}</div>) : <p className="muted">No quality observation currently available.</p>}</article>
+        <article className="card"><h3>Buying zone</h3>{zones.length ? zones.map((x) => <div className="stack-item" key={x.id}><span className="eyebrow">{marketLabel(x.market_id)}</span><strong>{money(x.price_low)} – {money(x.price_high)}</strong><p>{x.reason}</p><small>Confidence: {x.confidence}</small></div>) : <p className="muted">No buying-zone observation currently available.</p>}</article>
+        <article className="card"><h3>Sell-watch window</h3>{sellWatch.length ? sellWatch.map((x) => <div className="stack-item" key={x.id}><span className="eyebrow">{marketLabel(x.market_id)}</span><strong>{x.start_period}{x.end_period ? ` – ${x.end_period}` : ""}</strong><p>{x.observation}</p><small>Confidence: {x.confidence}</small></div>) : <p className="muted">No sell-watch observation currently available.</p>}</article>
+        <article className="card"><h3>Storage suitability</h3>{storage.length ? storage.map((x) => <div className="stack-item" key={x.id}><span className="eyebrow">{marketLabel(x.market_id)}</span><strong>{x.suitability_status.replace(/_/g, " ")}</strong><p>{x.summary || x.quality_storage_notes || "No summary supplied."}</p><small>Spoilage risk: {x.spoilage_risk || "—"} · Buyer availability: {x.buyer_availability || "—"}</small></div>) : <p className="muted">No storage-suitability observation currently available.</p>}<Disclaimer>{STORAGE_DISCLAIMER}</Disclaimer></article>
         <article className="card"><h3>Cost breakdown</h3>{costs.length ? costs.map((x) => <div className="stack-item" key={x.id}><strong>Estimated landing/storage: {money(x.total_estimated_landing_storage_cost)}</strong><p>Purchase reference: {money(x.purchase_price_reference)} · Additional costs: {money(x.total_additional_cost)}</p><small>Transport {money(x.transport)} · Warehouse {money(x.warehouse)} · Market charges {money(x.market_charges)}</small></div>) : <p className="muted">No cost breakdown currently linked to these current price records.</p>}</article>
       </div>}
     </PremiumGate>
