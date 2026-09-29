@@ -6,7 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { apiFetch, ApiError } from "../services/api";
 import type { PriceUpdate } from "../types/api";
-import { commodityTitleColor, confidenceClass, money, movementIcon, relativeTime, whatsAppShareUrl } from "../utils";
+import { agingClass, commodityTitleColor, confidenceClass, money, movementIcon, relativeTime, whatsAppShareUrl } from "../utils";
 
 export function PriceCard({ item }: { item: PriceUpdate }) {
   const { token } = useAuth();
@@ -50,7 +50,7 @@ export function PriceCard({ item }: { item: PriceUpdate }) {
       <p className="muted">{item.unit}{item.bag_size ? ` · ${item.bag_size}` : ""}</p>
       <div className="mini-grid">
         <span><strong>Status</strong><span className={`confidence-badge ${confidenceClass(item.confidence_level)}`}>{item.confidence_level}</span><ConfidenceInfo /></span>
-        <span><strong>Updated</strong>{relativeTime(item.update_date_time)}</span>
+        <span><strong>Updated</strong><span className={agingClass(item.update_date_time)}>{relativeTime(item.update_date_time)}</span></span>
       </div>
       {item.notes && <p className="price-card-note"><strong>Note from PriceYard:</strong> {item.notes}</p>}
       <div className="card-actions">

@@ -191,6 +191,9 @@ html.easy-reading .confidence-badge, html.easy-reading .movement { font-weight: 
 .feedback-prompt-actions { display: flex; align-items: center; gap: 14px; }
 .price-card-note { background: #fbf6ec; border: 1px solid #ecdfc4; border-radius: 10px; padding: 10px 13px; margin: 14px 0 0; font-size: .85rem; color: #5c4b1f; }
 .price-card-note strong { color: #4a3c17; }
+.aging-warn { color: #a8720a; font-weight: 700; }
+.aging-stale { color: #b3401f; font-weight: 700; }
+.season-note { display: block; margin-top: 6px; color: #a8720a; font-weight: 700; }
 .trend-chart { background: white; border: 1px solid #dfe5db; border-radius: 16px; padding: 18px 20px 14px; margin: 0 0 22px; box-shadow: 0 8px 30px rgba(34, 56, 38, .045); }
 .trend-chart svg { width: 100%; height: auto; display: block; }
 .trend-band { fill: #d9ead1; opacity: .6; stroke: none; }

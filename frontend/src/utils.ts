@@ -21,6 +21,32 @@ export function shortDate(value: string | null | undefined): string {
   return new Intl.DateTimeFormat("en-NG", { dateStyle: "medium", timeStyle: "short", hour12: true }).format(date);
 }
 
+export function agingClass(value: string | null | undefined): string {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  const days = (Date.now() - date.getTime()) / (1000 * 60 * 60 * 24);
+  if (days >= 60) return "aging-stale";
+  if (days >= 30) return "aging-warn";
+  return "";
+}
+
+const MONTH_NAMES = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+
+function monthIndex(name: string): number {
+  return MONTH_NAMES.indexOf(name.trim().toLowerCase());
+}
+
+/** Best-effort: returns true/false when both periods are recognizable month names, undefined otherwise (unknown, don't show a badge). */
+export function isWithinSeasonalMonths(startPeriod: string, endPeriod: string | null): boolean | undefined {
+  const start = monthIndex(startPeriod);
+  const end = endPeriod ? monthIndex(endPeriod) : start;
+  if (start === -1 || end === -1) return undefined;
+  const current = new Date().getMonth();
+  if (start <= end) return current >= start && current <= end;
+  return current >= start || current <= end;
+}
+
 export function relativeTime(value: string | null | undefined): string {
   if (!value) return "—";
   const date = new Date(value);
