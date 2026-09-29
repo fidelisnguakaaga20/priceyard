@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Disclaimer, PRICE_DISCLAIMER } from "../components/Disclaimer";
 import { ButtonSpinner, LoadingSpinner } from "../components/LoadingSpinner";
 import { PriceCard } from "../components/PriceCard";
@@ -9,11 +10,12 @@ import type { Commodity, Market, PriceUpdate } from "../types/api";
 
 export function PricesPage() {
   useDocumentTitle("Current Prices");
+  const [searchParams] = useSearchParams();
   const [items, setItems] = useState<PriceUpdate[]>([]);
   const [commodities, setCommodities] = useState<Commodity[]>([]);
   const [markets, setMarkets] = useState<Market[]>([]);
-  const [commodity, setCommodity] = useState("");
-  const [market, setMarket] = useState("");
+  const [commodity, setCommodity] = useState(() => searchParams.get("commodity") || "");
+  const [market, setMarket] = useState(() => searchParams.get("market") || "");
   const commodityMarketPairs = useCommodityMarketPairs();
   const availableMarkets = commodity && commodityMarketPairs.has(commodity)
     ? markets.filter((item) => commodityMarketPairs.get(commodity)!.has(item.name))
@@ -35,7 +37,7 @@ export function PricesPage() {
   };
 
   useEffect(() => {
-    void load();
+    void load({ commodity, market });
     void Promise.all([
       apiFetch<Commodity[]>("/commodities"),
       apiFetch<Market[]>("/markets"),
