@@ -131,8 +131,8 @@ export function WatchlistPage() {
       </div>
     )}
     <form className="filter-bar" onSubmit={submit}>
-      <label>Commodity<select value={commodityId} onChange={(e) => changeCommodity(e.target.value)}><option value="">No commodity</option>{commodities.filter((x) => x.is_active).map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</select></label>
-      <label>Market<select value={marketId} onChange={(e) => setMarketId(e.target.value)}><option value="">No market</option>{availableMarkets.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</select>{selectedCommodityName && availableMarkets.length < activeMarkets.length && <small className="muted">{selectedCommodityName} is only tracked at {availableMarkets.length} market{availableMarkets.length === 1 ? "" : "s"} here.</small>}</label>
+      <label>Commodity<select value={commodityId} onChange={(e) => changeCommodity(e.target.value)}><option value="">Choose a commodity</option>{commodities.filter((x) => x.is_active).map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</select></label>
+      <label>Market<select value={marketId} onChange={(e) => setMarketId(e.target.value)}><option value="">Choose a market</option>{availableMarkets.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</select>{selectedCommodityName && availableMarkets.length < activeMarkets.length && <small className="muted">{selectedCommodityName} is only tracked at {availableMarkets.length} market{availableMarkets.length === 1 ? "" : "s"} here.</small>}</label>
       <div className="filter-actions"><button className="button button-small" disabled={saving || loading}>{saving ? <ButtonSpinner label="Please wait…" /> : "Save item"}</button></div>
     </form>
     {error && <div className="status-box error">{error}</div>}
