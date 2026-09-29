@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     smtp_use_ssl: bool = False
     paystack_secret_key: str | None = None
     paystack_public_key: str | None = None
+    cron_secret: str | None = None
 
     model_config = SettingsConfigDict(
         env_file=".env",

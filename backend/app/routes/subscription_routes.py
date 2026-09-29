@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, Header, HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.config import get_settings
 from app.database import get_db
 from app.models.subscription import Subscription
 from app.models.user import User
@@ -15,6 +16,12 @@ from app.services.subscription_service import (
 from app.utils.permissions import get_current_user, require_roles
 
 router = APIRouter(prefix="/subscriptions", tags=["subscriptions"])
+
+
+def verify_cron_secret(x_cron_secret: str | None = Header(default=None)) -> None:
+    settings = get_settings()
+    if not settings.cron_secret or x_cron_secret != settings.cron_secret:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or missing cron secret")
 
 
 @router.get("", response_model=list[SubscriptionResponse])
@@ -44,6 +51,18 @@ def trigger_trial_reminders(
     db: Session = Depends(get_db),
     _: User = Depends(require_roles("admin")),
 ) -> dict[str, int]:
+    sent = send_trial_expiry_reminders(db)
+    return {"sent": sent}
+
+
+@router.post("/cron/send-trial-reminders")
+def cron_trigger_trial_reminders(
+    db: Session = Depends(get_db),
+    _: None = Depends(verify_cron_secret),
+) -> dict[str, int]:
+    """Same job as /send-trial-reminders, but unlocked with a shared secret header
+    (X-Cron-Secret) instead of an admin login, so an external scheduler can call it
+    on a daily timer without needing to hold a user session."""
     sent = send_trial_expiry_reminders(db)
     return {"sent": sent}
 
