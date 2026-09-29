@@ -1,8 +1,8 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { apiFetch } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import { useCommodityMarketPairs } from "../../hooks/useCommodityMarketPairs";
-import type { Commodity, Market, PriceUpdate } from "../../types/api";
+import type { Commodity, Market, PriceUpdateAdmin } from "../../types/api";
 import { AdminActionButton, AdminLoading, AdminStatus, errorText, useAdminList } from "./adminUtils";
 
 const actions = ["Watch", "Investigate", "Buy Carefully", "Hold", "Sell Carefully"];
@@ -13,21 +13,51 @@ const timesOfDay = ["morning", "afternoon", "evening", "closing"];
 
 export function AdminPriceUpdatesPage() {
   const { token } = useAuth();
-  const { data: history, loading, error: loadError, reload } = useAdminList<PriceUpdate>("/price-updates/admin/history");
+  const { data: history, loading, error: loadError, reload } = useAdminList<PriceUpdateAdmin>("/price-updates/admin/history");
   const [commodities, setCommodities] = useState<Commodity[]>([]); const [markets, setMarkets] = useState<Market[]>([]);
-  const [created, setCreated] = useState<PriceUpdate[]>([]); const [error, setError] = useState(""); const [message, setMessage] = useState(""); const [targetId, setTargetId] = useState("");
+  const [created, setCreated] = useState<PriceUpdateAdmin[]>([]); const [error, setError] = useState(""); const [message, setMessage] = useState(""); const [targetId, setTargetId] = useState("");
   const [busy, setBusy] = useState(false); const [optionsLoading, setOptionsLoading] = useState(true);
   const commodityMarketPairs = useCommodityMarketPairs();
   const [newCommodityId, setNewCommodityId] = useState("");
   const newCommodityName = commodities.find((c) => String(c.id) === newCommodityId)?.name;
   const knownMarketNames = newCommodityName ? commodityMarketPairs.get(newCommodityName) : undefined;
+  const createFormRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => { if (!token) return; setOptionsLoading(true); void Promise.all([apiFetch<Commodity[]>("/commodities", {}, token), apiFetch<Market[]>("/markets", {}, token)]).then(([c,m]) => { setCommodities(c); setMarkets(m); }).catch((err) => setError(errorText(err))).finally(() => setOptionsLoading(false)); }, [token]);
 
   async function create(e: FormEvent<HTMLFormElement>) { e.preventDefault(); if (!token || busy) return; const f = new FormData(e.currentTarget); const payload = {
     commodity_id: Number(f.get("commodity_id")), market_id: Number(f.get("market_id")), price_low: Number(f.get("price_low")), price_high: Number(f.get("price_high")), average_price: Number(f.get("average_price")), previous_price_low: String(f.get("previous_price_low") || "") ? Number(f.get("previous_price_low")) : null, previous_price_high: String(f.get("previous_price_high") || "") ? Number(f.get("previous_price_high")) : null,
     unit: String(f.get("unit")), bag_size: String(f.get("bag_size") || "") || null, commodity_type: String(f.get("commodity_type") || "") || null, market_day: String(f.get("market_day") || "") || null, time_of_day: String(f.get("time_of_day") || "") || null, movement: String(f.get("movement")), confidence_level: String(f.get("confidence_level")), source_type: String(f.get("source_type") || "") || null, source_1: String(f.get("source_1") || "") || null, source_2: String(f.get("source_2") || "") || null, update_date_time: String(f.get("update_date_time")), is_outdated: false, possible_meaning: String(f.get("possible_meaning") || "") || null, suggested_action: String(f.get("suggested_action")), notes: String(f.get("notes") || "") || null,
-  }; setBusy(true); try { const item = await apiFetch<PriceUpdate>("/price-updates", { method: "POST", body: JSON.stringify(payload) }, token); setCreated((items) => [item, ...items]); setTargetId(String(item.id)); setMessage(`Price update #${item.id} created pending approval.`); setError(""); } catch (err) { setError(errorText(err)); setMessage(""); } finally { setBusy(false); } }
+  }; setBusy(true); try { const item = await apiFetch<PriceUpdateAdmin>("/price-updates", { method: "POST", body: JSON.stringify(payload) }, token); setCreated((items) => [item, ...items]); setTargetId(String(item.id)); setMessage(`Price update #${item.id} created pending approval.`); setError(""); } catch (err) { setError(errorText(err)); setMessage(""); } finally { setBusy(false); } }
+
+  function prefillFromLast() {
+    const form = createFormRef.current;
+    if (!form) return;
+    const marketId = (form.elements.namedItem("market_id") as HTMLSelectElement | null)?.value;
+    if (!newCommodityId || !marketId) { setError("Choose a commodity and market first, then prefill."); return; }
+    const last = [...created, ...history]
+      .filter((r) => String(r.commodity_id) === newCommodityId && String(r.market_id) === marketId)
+      .sort((a, b) => new Date(b.update_date_time).getTime() - new Date(a.update_date_time).getTime())[0];
+    if (!last) { setError(`No previous record found for this commodity/market pair to prefill from.`); return; }
+    const setField = (name: string, value: string) => { const el = form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null; if (el) el.value = value; };
+    setField("unit", last.unit);
+    setField("bag_size", last.bag_size || "");
+    setField("commodity_type", last.commodity_type || "");
+    setField("market_day", last.market_day || "");
+    setField("time_of_day", last.time_of_day || "");
+    setField("movement", last.movement);
+    setField("confidence_level", last.confidence_level);
+    setField("source_type", last.source_type || "");
+    setField("source_1", last.source_1 || "");
+    setField("source_2", last.source_2 || "");
+    setField("suggested_action", last.suggested_action || "Watch");
+    setField("possible_meaning", last.possible_meaning || "");
+    setField("notes", last.notes || "");
+    setField("previous_price_low", String(last.price_low));
+    setField("previous_price_high", String(last.price_high));
+    setError("");
+    setMessage(`Prefilled from record #${last.id} (${last.update_date_time.slice(0, 10)}). Enter the new price and date, then create.`);
+  }
 
   async function act(action: "approve"|"reject"|"mark-outdated"|"delete") { if (!token || !targetId || busy) return; setBusy(true); try { if (action === "delete") await apiFetch(`/price-updates/${targetId}`, { method: "DELETE" }, token); else await apiFetch(`/price-updates/${targetId}/${action}`, { method: "PATCH" }, token); setMessage(`Price update #${targetId}: ${action} completed.`); setError(""); await reload(); } catch (err) { setError(errorText(err)); } finally { setBusy(false); } }
 
@@ -65,7 +95,7 @@ export function AdminPriceUpdatesPage() {
   const rows = [...created, ...history.filter((h) => !created.some((c) => c.id === h.id))];
 
   return <div><h2>Price updates</h2><p className="muted">Create records, correct existing records, approve/reject, mark outdated, or delete by record ID. The admin list below includes pending, approved and rejected records so pending updates remain available for approval after refresh.</p><AdminStatus error={error || loadError} success={message} />
-    <form className="form-stack card admin-form" onSubmit={create}><div className="form-grid"><label>Commodity<select name="commodity_id" required disabled={optionsLoading} onChange={(e) => setNewCommodityId(e.target.value)}><option value="">Choose a commodity</option>{commodities.map((x) => <option value={x.id} key={x.id}>{x.name}</option>)}</select></label><label>Market<select name="market_id" required disabled={optionsLoading}>{knownMarketNames ? <><optgroup label={`Markets with an existing ${newCommodityName} price`}>{markets.filter((x) => knownMarketNames.has(x.name)).map((x) => <option value={x.id} key={x.id}>{x.name}</option>)}</optgroup><optgroup label="Other markets (no price for this commodity yet)">{markets.filter((x) => !knownMarketNames.has(x.name)).map((x) => <option value={x.id} key={x.id}>{x.name}</option>)}</optgroup></> : markets.map((x) => <option value={x.id} key={x.id}>{x.name}</option>)}</select>{newCommodityName && <small className="muted">Markets already carrying {newCommodityName} are listed first.</small>}</label><label>Low<input name="price_low" type="number" min="0" step="0.01" required /></label><label>High<input name="price_high" type="number" min="0" step="0.01" required /></label><label>Average<input name="average_price" type="number" min="0" step="0.01" required /></label><label>Number of bags<input name="unit" defaultValue="1 bag" placeholder="e.g. 1 bag" required /></label><label>Previous low<input name="previous_price_low" type="number" min="0" step="0.01" /></label><label>Previous high<input name="previous_price_high" type="number" min="0" step="0.01" /></label><label>Bag size (kg)<input name="bag_size" placeholder="e.g. 50kg" required /></label><label>Commodity type<input name="commodity_type" /></label><label>Market day<select name="market_day"><option value="">Unknown</option>{marketDays.map((d) => <option key={d}>{d}</option>)}</select></label><label>Time of day<select name="time_of_day"><option value="">Unknown</option>{timesOfDay.map((d) => <option key={d}>{d}</option>)}</select></label><label>Movement<select name="movement" defaultValue="unknown">{movements.map((x) => <option key={x}>{x}</option>)}</select></label><label>Confidence<select name="confidence_level" defaultValue="Reporter submitted">{confidenceLevels.map((x) => <option key={x}>{x}</option>)}</select></label><label>Source type<input name="source_type" /></label><label>Update date/time<input name="update_date_time" type="datetime-local" required /></label><label>Source 1 (private)<input name="source_1" /></label><label>Source 2 (private)<input name="source_2" /></label></div><label>Possible Meaning <small>(optional)</small><textarea name="possible_meaning" placeholder="Leave blank if you have no specific observation" /></label><label>Suggested Action<select name="suggested_action">{actions.map((x) => <option key={x}>{x}</option>)}</select></label><label>Notes<textarea name="notes" /></label><AdminActionButton className="button" type="submit" busy={busy} disabled={optionsLoading}>Create pending update</AdminActionButton></form>
+    <form className="form-stack card admin-form" onSubmit={create} ref={createFormRef}><div className="button-row"><AdminActionButton className="button button-secondary button-small" type="button" busy={busy} disabled={optionsLoading} onClick={prefillFromLast}>Prefill from last entry</AdminActionButton></div><div className="form-grid"><label>Commodity<select name="commodity_id" required disabled={optionsLoading} onChange={(e) => setNewCommodityId(e.target.value)}><option value="">Choose a commodity</option>{commodities.map((x) => <option value={x.id} key={x.id}>{x.name}</option>)}</select></label><label>Market<select name="market_id" required disabled={optionsLoading}>{knownMarketNames ? <><optgroup label={`Markets with an existing ${newCommodityName} price`}>{markets.filter((x) => knownMarketNames.has(x.name)).map((x) => <option value={x.id} key={x.id}>{x.name}</option>)}</optgroup><optgroup label="Other markets (no price for this commodity yet)">{markets.filter((x) => !knownMarketNames.has(x.name)).map((x) => <option value={x.id} key={x.id}>{x.name}</option>)}</optgroup></> : markets.map((x) => <option value={x.id} key={x.id}>{x.name}</option>)}</select>{newCommodityName && <small className="muted">Markets already carrying {newCommodityName} are listed first.</small>}</label><label>Low<input name="price_low" type="number" min="0" step="0.01" required /></label><label>High<input name="price_high" type="number" min="0" step="0.01" required /></label><label>Average<input name="average_price" type="number" min="0" step="0.01" required /></label><label>Number of bags<input name="unit" defaultValue="1 bag" placeholder="e.g. 1 bag" required /></label><label>Previous low<input name="previous_price_low" type="number" min="0" step="0.01" /></label><label>Previous high<input name="previous_price_high" type="number" min="0" step="0.01" /></label><label>Bag size (kg)<input name="bag_size" placeholder="e.g. 50kg" required /></label><label>Commodity type<input name="commodity_type" /></label><label>Market day<select name="market_day"><option value="">Unknown</option>{marketDays.map((d) => <option key={d}>{d}</option>)}</select></label><label>Time of day<select name="time_of_day"><option value="">Unknown</option>{timesOfDay.map((d) => <option key={d}>{d}</option>)}</select></label><label>Movement<select name="movement" defaultValue="unknown">{movements.map((x) => <option key={x}>{x}</option>)}</select></label><label>Confidence<select name="confidence_level" defaultValue="Reporter submitted">{confidenceLevels.map((x) => <option key={x}>{x}</option>)}</select></label><label>Source type<input name="source_type" /></label><label>Update date/time<input name="update_date_time" type="datetime-local" required /></label><label>Source 1 (private)<input name="source_1" /></label><label>Source 2 (private)<input name="source_2" /></label></div><label>Possible Meaning <small>(optional)</small><textarea name="possible_meaning" placeholder="Leave blank if you have no specific observation" /></label><label>Suggested Action<select name="suggested_action">{actions.map((x) => <option key={x}>{x}</option>)}</select></label><label>Notes<textarea name="notes" /></label><AdminActionButton className="button" type="submit" busy={busy} disabled={optionsLoading}>Create pending update</AdminActionButton></form>
 
     <div className="admin-action-panel"><label>Record ID<input value={targetId} disabled={busy} onChange={(e) => setTargetId(e.target.value)} inputMode="numeric" /></label><div className="button-row"><AdminActionButton className="button button-small" busy={busy} onClick={() => void act("approve")}>Approve</AdminActionButton><AdminActionButton className="button button-small button-secondary" busy={busy} onClick={() => void act("reject")}>Reject</AdminActionButton><AdminActionButton className="button button-small button-secondary" busy={busy} onClick={() => void act("mark-outdated")}>Mark outdated</AdminActionButton><AdminActionButton className="button button-small button-danger" busy={busy} onClick={() => void act("delete")}>Delete</AdminActionButton></div></div>
 
