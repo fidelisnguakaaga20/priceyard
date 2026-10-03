@@ -4,6 +4,7 @@ from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.config import get_settings
 from app.models.subscription import Subscription
 from app.models.user import User
 
@@ -217,6 +218,8 @@ def send_trial_expiry_reminders(db: Session) -> int:
     """Email trial users whose trial ends within the reminder window, once each."""
     from app.services.email_service import send_email
 
+    settings = get_settings()
+    dashboard_url = f"{settings.frontend_url.rstrip('/')}/dashboard"
     now = utc_now()
     window_end = now + timedelta(days=TRIAL_REMINDER_WINDOW_DAYS)
     candidates = db.scalars(
@@ -235,15 +238,15 @@ def send_trial_expiry_reminders(db: Session) -> int:
         if not user.is_active:
             continue
         days_left = max((subscription.trial_ends_at - now).days, 0)
-        subject = "Your PriceYard trial is ending soon"
+        subject = f"Your PriceYard trial ends in {days_left} day(s) — keep your full access"
         body = (
             f"Hi {user.full_name},\n\n"
-            f"Your 14-day PriceYard trial ends in {days_left} day(s). "
-            "After it ends, you'll move to limited free access unless an admin "
-            "upgrades your account to Paid.\n\n"
-            "Log in to keep checking current prices, price history, buying zones, "
-            "and storage suitability while your trial is still active:\n"
-            "https://priceyard.onrender.com/login\n\n"
+            f"Your 14-day PriceYard trial ends in {days_left} day(s). After it ends, "
+            "you'll lose access to price history, buying zones, sell-watch windows, "
+            "and storage suitability -- back to limited free access only.\n\n"
+            "To keep full access, upgrade now from your dashboard:\n"
+            f"{dashboard_url}\n\n"
+            "Plans: NGN 2,500/month, or NGN 6,000/3 months.\n\n"
             "PriceYard — Know the market before you buy or sell."
         )
         try:
