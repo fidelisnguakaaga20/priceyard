@@ -5,6 +5,7 @@ from slowapi.errors import RateLimitExceeded
 
 from app.config import get_settings
 from app.rate_limit import limiter
+from app.routes.activity_routes import router as activity_router
 from app.routes.audit_log_routes import router as audit_log_router
 from app.routes.auth_routes import router as auth_router
 from app.routes.buying_zone_routes import router as buying_zone_router
@@ -51,6 +52,7 @@ if allowed_origins:
     )
 
 app.include_router(auth_router)
+app.include_router(activity_router)
 app.include_router(audit_log_router)
 app.include_router(subscription_router)
 app.include_router(user_router)

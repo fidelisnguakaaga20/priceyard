@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { apiFetch } from "../services/api";
 import { InstallPrompt } from "./InstallPrompt";
 import { ButtonSpinner } from "./LoadingSpinner";
 import { OnboardingTour } from "./OnboardingTour";
@@ -8,6 +9,8 @@ import { usePreferences } from "../context/PreferencesContext";
 import { useToast } from "../context/ToastContext";
 import { SUPPORT_WHATSAPP_NUMBER, WhatsAppSupportButton } from "./WhatsAppSupportButton";
 import { daysUntil, WHATSAPP_COMMUNITY_URL } from "../utils";
+
+const VISIT_PING_KEY = "py_visit_pinged";
 
 const navItems = [
   ["/prices", "Current Prices"],
@@ -25,6 +28,17 @@ export function Layout() {
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem(VISIT_PING_KEY)) return;
+      sessionStorage.setItem(VISIT_PING_KEY, "1");
+    } catch {
+      // storage unavailable (private mode, blocked) - ping anyway, just not deduped this session
+    }
+    void apiFetch("/activity/ping", { method: "POST", body: JSON.stringify({ event_type: "app_visit", label: location.pathname }) }).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleLogout = async () => {
     if (loggingOut) return;

@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.database import get_db
+from app.services.activity_service import log_activity_event
 from app.services.price_update_service import list_latest_approved_price_updates
 
 router = APIRouter(prefix="/share", tags=["share"])
@@ -65,6 +66,8 @@ def share_commodity_card(commodity_name: str, db: Session = Depends(get_db)) -> 
     frontend_url = settings.frontend_url.rstrip("/")
     target_url = f"{frontend_url}/commodities/{quote(commodity_name, safe='')}"
     fallback_image = f"{frontend_url}/icons/icon-512.png"
+
+    log_activity_event(db, event_type="share_view", label=commodity_name)
 
     items = list_latest_approved_price_updates(db, commodity_search=commodity_name)
     item = items[0] if items else None

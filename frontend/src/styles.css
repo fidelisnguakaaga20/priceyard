@@ -99,6 +99,7 @@ html.easy-reading .confidence-badge, html.easy-reading .movement { font-weight: 
 .admin-nav { display: flex; flex-wrap: wrap; gap: 7px; padding: 12px; margin-bottom: 24px; border: 1px solid #dfe5db; border-radius: 14px; background: white; }
 .admin-nav a { text-decoration: none; padding: 8px 11px; border-radius: 8px; color: #536158; font-size: .84rem; font-weight: 700; }
 .admin-nav a:hover, .admin-nav a.active { background: #173d28; color: white; }
+.admin-nav-badge { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px; background: #d64545; color: white; font-size: .72rem; font-weight: 800; }
 .admin-content > div > h2 { font-size: 2rem; margin: 5px 0 8px; }
 .admin-form { margin: 18px 0 24px; }
 .admin-form h3 { margin: 0; }

@@ -1,3 +1,4 @@
+from app.models.activity_event import ActivityEvent
 from app.models.audit_log import AuditLog
 from app.models.buying_zone import BuyingZone
 from app.models.commodity import Commodity
@@ -17,6 +18,7 @@ from app.models.user import User
 from app.models.watchlist import Watchlist
 
 __all__ = [
+    "ActivityEvent",
     "AuditLog",
     "BuyingZone",
     "Commodity",

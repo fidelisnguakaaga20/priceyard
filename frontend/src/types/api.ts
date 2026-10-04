@@ -9,6 +9,18 @@ export type User = {
   created_at: string;
 };
 
+export type ActivityEvent = {
+  id: number;
+  event_type: "app_visit" | "share_view" | string;
+  label: string | null;
+  created_at: string;
+};
+
+export type ActivitySummary = {
+  unseen_count: number;
+  recent: ActivityEvent[];
+};
+
 export type SubscriptionStatus = "free" | "trial" | "active" | "expired" | "cancelled";
 
 export type Subscription = {

@@ -17,6 +17,7 @@ import { PricesPage } from "./pages/PricesPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import { WatchlistPage } from "./pages/WatchlistPage";
+import { AdminActivityPage } from "./pages/admin/AdminActivityPage";
 import { AdminAuditLogsPage } from "./pages/admin/AdminAuditLogsPage";
 import { AdminCommoditiesPage } from "./pages/admin/AdminCommoditiesPage";
 import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage";
@@ -51,6 +52,7 @@ export default function App() {
         <Route path="feedback" element={<ProtectedRoute><FeedbackPage /></ProtectedRoute>} />
         <Route path="admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
           <Route index element={<AdminDashboardPage />} />
+          <Route path="activity" element={<AdminActivityPage />} />
           <Route path="users" element={<AdminUsersPage />} />
           <Route path="commodities" element={<AdminCommoditiesPage />} />
           <Route path="markets" element={<AdminMarketsPage />} />
