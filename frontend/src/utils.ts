@@ -101,6 +101,7 @@ export function isStale(value: string | null | undefined): boolean {
 }
 
 type ShareablePrice = {
+  id: number;
   commodity: { name: string };
   market: { name: string };
   price_low: string | number;
@@ -130,7 +131,10 @@ export function commodityTitleColor(name: string): string | undefined {
 }
 
 export function whatsAppShareUrl(item: ShareablePrice): string {
-  const link = `${shareBaseUrl()}/share/commodities/${encodeURIComponent(item.commodity.name)}`;
+  // ?pu=<id> makes the URL unique per price update so WhatsApp's link-preview cache
+  // (which keys purely on URL and can hold a stale title/image for a long time) is
+  // forced to fetch a fresh preview instead of replaying an old cached one.
+  const link = `${shareBaseUrl()}/share/commodities/${encodeURIComponent(item.commodity.name)}?pu=${item.id}`;
   const measure = item.bag_size || item.unit;
   const text = `${commodityEmoji(item.commodity.name)} New price update: ${item.commodity.name} @ ${item.market.name} — ${money(item.price_low)} – ${money(item.price_high)} (${measure})\n👉 See full details (free): ${link}`;
   return `https://wa.me/?text=${encodeURIComponent(text)}`;
