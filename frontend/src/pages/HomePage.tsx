@@ -92,8 +92,8 @@ export function HomePage() {
                 <h3>{item.name}</h3>
                 {item.description && <p className="muted">{item.description}</p>}
                 {item.expected_available_date && <p className="muted"><strong>Expected:</strong> {dateOnly(item.expected_available_date)}</p>}
-                <a className="text-link" href={comingSoonShareUrl(item.name)} target="_blank" rel="noopener noreferrer">Tell a friend on WhatsApp →</a>
-                <NativeShareButton content={comingSoonShareContent(item.name)} />
+                <a className="text-link" href={comingSoonShareUrl(item)} target="_blank" rel="noopener noreferrer">Tell a friend on WhatsApp →</a>
+                <NativeShareButton content={comingSoonShareContent(item)} />
               </article>
             ))}
           </div>

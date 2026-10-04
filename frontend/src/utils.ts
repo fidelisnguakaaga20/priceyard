@@ -151,14 +151,18 @@ export function referralLink(code: string): string {
   return `${window.location.origin}/register?ref=${encodeURIComponent(code)}`;
 }
 
-export function comingSoonShareContent(commodityName: string): ShareContent {
-  const url = `${shareBaseUrl()}/share/commodities/${encodeURIComponent(commodityName)}`;
-  const message = `${commodityName} harvest is coming soon to PriceYard — great for storage businesses. See real market prices for Egusi, Honey Beans, Palm oil and more.`;
+export function comingSoonShareContent(commodity: { name: string; updated_at: string }): ShareContent {
+  // ?v=<updated_at> busts WhatsApp's link-preview cache whenever the commodity record
+  // changes (new photo, new expected date, etc.), same reasoning as ?pu= above. Without
+  // it this link never changes, so a single bad crawler fetch (e.g. a slow deploy) would
+  // stay cached forever since there's no price update to naturally mint a fresh URL.
+  const url = `${shareBaseUrl()}/share/commodities/${encodeURIComponent(commodity.name)}?v=${encodeURIComponent(commodity.updated_at)}`;
+  const message = `${commodity.name} harvest is coming soon to PriceYard — great for storage businesses. See real market prices for Egusi, Honey Beans, Palm oil and more.`;
   return { message, url };
 }
 
-export function comingSoonShareUrl(commodityName: string): string {
-  const { message, url } = comingSoonShareContent(commodityName);
+export function comingSoonShareUrl(commodity: { name: string; updated_at: string }): string {
+  const { message, url } = comingSoonShareContent(commodity);
   return `https://wa.me/?text=${encodeURIComponent(`${message}\n${url}`)}`;
 }
 
