@@ -130,23 +130,36 @@ export function commodityTitleColor(name: string): string | undefined {
   return COMMODITY_TITLE_COLOR[name.trim().toLowerCase()];
 }
 
-export function whatsAppShareUrl(item: ShareablePrice): string {
+export type ShareContent = { message: string; url: string };
+
+export function priceShareContent(item: ShareablePrice): ShareContent {
   // ?pu=<id> makes the URL unique per price update so WhatsApp's link-preview cache
   // (which keys purely on URL and can hold a stale title/image for a long time) is
   // forced to fetch a fresh preview instead of replaying an old cached one.
-  const link = `${shareBaseUrl()}/share/commodities/${encodeURIComponent(item.commodity.name)}?pu=${item.id}`;
+  const url = `${shareBaseUrl()}/share/commodities/${encodeURIComponent(item.commodity.name)}?pu=${item.id}`;
   const measure = item.bag_size || item.unit;
-  const text = `${commodityEmoji(item.commodity.name)} New price update: ${item.commodity.name} @ ${item.market.name} — ${money(item.price_low)} – ${money(item.price_high)} (${measure})\n👉 See full details (free): ${link}`;
-  return `https://wa.me/?text=${encodeURIComponent(text)}`;
+  const message = `${commodityEmoji(item.commodity.name)} New price update: ${item.commodity.name} @ ${item.market.name} — ${money(item.price_low)} – ${money(item.price_high)} (${measure})`;
+  return { message, url };
+}
+
+export function whatsAppShareUrl(item: ShareablePrice): string {
+  const { message, url } = priceShareContent(item);
+  return `https://wa.me/?text=${encodeURIComponent(`${message}\n👉 See full details (free): ${url}`)}`;
 }
 
 export function referralLink(code: string): string {
   return `${window.location.origin}/register?ref=${encodeURIComponent(code)}`;
 }
 
+export function comingSoonShareContent(commodityName: string): ShareContent {
+  const url = `${shareBaseUrl()}/share/commodities/${encodeURIComponent(commodityName)}`;
+  const message = `${commodityName} harvest is coming soon to PriceYard — great for storage businesses. See real market prices for Egusi, Honey Beans, Palm oil and more.`;
+  return { message, url };
+}
+
 export function comingSoonShareUrl(commodityName: string): string {
-  const text = `${commodityName} harvest is coming soon to PriceYard — great for storage businesses. See real market prices for Egusi, Honey Beans, Palm oil and more.\n${window.location.origin}`;
-  return `https://wa.me/?text=${encodeURIComponent(text)}`;
+  const { message, url } = comingSoonShareContent(commodityName);
+  return `https://wa.me/?text=${encodeURIComponent(`${message}\n${url}`)}`;
 }
 
 export function referralWhatsAppShareUrl(code: string, rewardDays: number): string {

@@ -2,11 +2,12 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { CommodityImage } from "./CommodityImage";
 import { ConfidenceInfo } from "./ConfidenceInfo";
+import { NativeShareButton } from "./ShareButtons";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { apiFetch, ApiError } from "../services/api";
 import type { PriceUpdate } from "../types/api";
-import { agingClass, commodityTitleColor, confidenceClass, money, movementIcon, relativeTime, whatsAppShareUrl } from "../utils";
+import { agingClass, commodityTitleColor, confidenceClass, money, movementIcon, priceShareContent, relativeTime, whatsAppShareUrl } from "../utils";
 
 export function PriceCard({ item }: { item: PriceUpdate }) {
   const { token } = useAuth();
@@ -56,6 +57,7 @@ export function PriceCard({ item }: { item: PriceUpdate }) {
       <div className="card-actions">
         <Link className="text-link-cta" to={`/commodities/${encodeURIComponent(item.commodity.name)}`}>See what this price means →</Link>
         <a className="text-link" href={whatsAppShareUrl(item)} target="_blank" rel="noopener noreferrer">Share on WhatsApp</a>
+        <NativeShareButton content={priceShareContent(item)} />
         {token ? (
           <button type="button" className={watched ? "button button-secondary button-small" : "button button-small"} onClick={() => void watchThis()} disabled={saving || watched}>
             {watched ? "★ Watching" : saving ? "Saving…" : "★ Watch this"}

@@ -1,41 +1,30 @@
 import json
-import re
 from datetime import datetime, timezone
 from html import escape as html_escape
 from urllib.parse import quote
 
 from fastapi import APIRouter, Depends
 from fastapi.responses import HTMLResponse
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.database import get_db
+from app.models.commodity import Commodity
 from app.services.activity_service import log_activity_event
 from app.services.price_update_service import list_latest_approved_price_updates
 
 router = APIRouter(prefix="/share", tags=["share"])
 
 
-_WIKIMEDIA_FILE_RE = re.compile(r"^https://upload\.wikimedia\.org/wikipedia/commons/([0-9a-f])/([0-9a-f]{2})/([^/]+)$")
-
-
 def _social_preview_image(url: str) -> str:
-    """WhatsApp's link-preview fetcher is unreliable with large images -- original
-    Wikimedia Commons uploads are often several MB. Request a small, fast-loading
-    thumbnail from Wikimedia's own resizing service when the source is a Commons file,
-    instead of the full-resolution original."""
-    match = _WIKIMEDIA_FILE_RE.match(url)
-    if not match:
-        return url
-    a, ab, filename = match.groups()
-    return f"https://upload.wikimedia.org/wikipedia/commons/thumb/{a}/{ab}/{filename}/500px-{filename}"
-
-
-def _image_mime_type(url: str) -> str:
-    lowered = url.lower()
-    if lowered.endswith(".png"):
-        return "image/png"
-    return "image/jpeg"
+    """WhatsApp's link-preview fetcher is unreliable with large images. Route every
+    preview image through images.weserv.nl for a small, fast-loading JPEG thumbnail,
+    regardless of which host the original commodity photo is hosted on. safe=':/%?='
+    leaves any percent-encoding already present in the stored URL (e.g. Wikimedia
+    filenames with escaped parentheses) untouched instead of double-encoding it,
+    while & and # are still escaped so they can't break out of our own query string."""
+    return f"https://images.weserv.nl/?url={quote(url, safe=':/%?=')}&w=500&q=75&output=jpg"
 
 
 def _format_naira(value: object) -> str:
@@ -82,14 +71,25 @@ def share_commodity_card(commodity_name: str, db: Session = Depends(get_db)) -> 
         )
         image = _social_preview_image(item.commodity.image_url or fallback_image)
     else:
-        title = f"{commodity_name} — PriceYard"
-        description = "See today's market prices, ranges and trends on PriceYard."
-        image = fallback_image
+        commodity = db.scalar(select(Commodity).where(Commodity.name.ilike(commodity_name)))
+        if commodity is not None and commodity.is_upcoming:
+            title = f"{commodity.name} — Coming Soon | PriceYard"
+            when = f" Expected {commodity.expected_available_date:%B %Y}." if commodity.expected_available_date else ""
+            description = f"{commodity.name} is coming soon to PriceYard.{when} Be the first to see verified prices."
+            image = _social_preview_image(commodity.image_url or fallback_image)
+        elif commodity is not None:
+            title = f"{commodity.name} — PriceYard"
+            description = commodity.description or "See today's market prices, ranges and trends on PriceYard."
+            image = _social_preview_image(commodity.image_url or fallback_image)
+        else:
+            title = f"{commodity_name} — PriceYard"
+            description = "See today's market prices, ranges and trends on PriceYard."
+            image = fallback_image
 
     safe_title = html_escape(title)
     safe_description = html_escape(description)
     safe_image = html_escape(image, quote=True)
-    safe_image_type = html_escape(_image_mime_type(image))
+    safe_image_type = "image/jpeg"
     safe_target = html_escape(target_url, quote=True)
     target_json = json.dumps(target_url)
 

@@ -5,11 +5,12 @@ import { ConfidenceInfo } from "../components/ConfidenceInfo";
 import { Disclaimer, MARKET_DISCLAIMER, PRICE_DISCLAIMER, STORAGE_DISCLAIMER } from "../components/Disclaimer";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { PremiumGate } from "../components/PremiumGate";
+import { NativeShareButton } from "../components/ShareButtons";
 import { useAuth } from "../context/AuthContext";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { apiFetch } from "../services/api";
 import type { BuyingZone, CostBreakdown, Market, MarketSignal, PriceUpdate, QualitySignal, SellWatchWindow, StorageSuitability } from "../types/api";
-import { agingClass, commodityTitleColor, confidenceClass, isWithinSeasonalMonths, money, movementIcon, relativeTime, shortDate, whatsAppShareUrl } from "../utils";
+import { agingClass, commodityTitleColor, confidenceClass, isWithinSeasonalMonths, money, movementIcon, priceShareContent, relativeTime, shortDate, whatsAppShareUrl } from "../utils";
 
 export function CommodityDetailPage() {
   const { commodityName = "" } = useParams();
@@ -80,7 +81,7 @@ export function CommodityDetailPage() {
       <dl className="data-list"><div><dt>Previous range</dt><dd>{item.previous_price_low !== null ? `${money(item.previous_price_low)} – ${money(item.previous_price_high)}` : "Not confirmed"}</dd></div><div><dt>Average</dt><dd>{money(item.average_price)}</dd></div><div><dt>Unit / bag</dt><dd>{item.unit}{item.bag_size ? ` / ${item.bag_size}` : ""}</dd></div><div><dt>Market day / time</dt><dd>{item.market_day || item.market.market_day || "—"}{item.time_of_day ? ` · ${item.time_of_day}` : ""}</dd></div><div><dt>Status</dt><dd><span className={`confidence-badge ${confidenceClass(item.confidence_level)}`}>{item.confidence_level}</span><ConfidenceInfo /></dd></div><div><dt>Last updated</dt><dd className={agingClass(item.update_date_time)}>{relativeTime(item.update_date_time)}</dd></div></dl>
       <div className="guidance"><div><span>Possible Meaning</span><p>{item.possible_meaning || "No observation supplied."}</p></div><div><span>Suggested Action</span><strong>{item.suggested_action || "Watch"}</strong><small>Observation, not guaranteed trading instruction.</small></div></div>
       {item.notes && <p className="price-card-note"><strong>Note from PriceYard:</strong> {item.notes}</p>}
-      <div className="card-actions top-gap"><a className="text-link" href={whatsAppShareUrl(item)} target="_blank" rel="noopener noreferrer">Share on WhatsApp</a></div>
+      <div className="card-actions top-gap"><a className="text-link" href={whatsAppShareUrl(item)} target="_blank" rel="noopener noreferrer">Share on WhatsApp</a><NativeShareButton content={priceShareContent(item)} /></div>
     </article>)}</div> : !error && <div className="status-box">No current approved {name} record is available.</div>}
     <Disclaimer>{PRICE_DISCLAIMER}</Disclaimer>
 

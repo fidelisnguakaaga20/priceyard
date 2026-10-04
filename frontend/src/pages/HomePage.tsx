@@ -4,10 +4,11 @@ import { CommodityImage } from "../components/CommodityImage";
 import { Disclaimer, PRICE_DISCLAIMER } from "../components/Disclaimer";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { PriceCard } from "../components/PriceCard";
+import { NativeShareButton } from "../components/ShareButtons";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { apiFetch } from "../services/api";
 import type { Commodity, Market, PriceUpdate, Testimonial } from "../types/api";
-import { comingSoonShareUrl, dateOnly, money, relativeTime, whatsAppShareUrl, WHATSAPP_COMMUNITY_URL } from "../utils";
+import { comingSoonShareContent, comingSoonShareUrl, dateOnly, money, priceShareContent, relativeTime, whatsAppShareUrl, WHATSAPP_COMMUNITY_URL } from "../utils";
 
 export function HomePage() {
   useDocumentTitle("Know the market before you buy or sell");
@@ -52,6 +53,7 @@ export function HomePage() {
               <p className="price-range">{prices[0].commodity.name}: {money(prices[0].price_low)} – {money(prices[0].price_high)}</p>
               <span className="muted">{prices[0].market.name} · updated {relativeTime(prices[0].update_date_time)}</span>
               <a className="text-link" href={whatsAppShareUrl(prices[0])} target="_blank" rel="noopener noreferrer">Share on WhatsApp →</a>
+              <NativeShareButton content={priceShareContent(prices[0])} />
             </div>
           )}
           <div className="button-row">
@@ -91,6 +93,7 @@ export function HomePage() {
                 {item.description && <p className="muted">{item.description}</p>}
                 {item.expected_available_date && <p className="muted"><strong>Expected:</strong> {dateOnly(item.expected_available_date)}</p>}
                 <a className="text-link" href={comingSoonShareUrl(item.name)} target="_blank" rel="noopener noreferrer">Tell a friend on WhatsApp →</a>
+                <NativeShareButton content={comingSoonShareContent(item.name)} />
               </article>
             ))}
           </div>
