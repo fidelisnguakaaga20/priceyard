@@ -20,7 +20,7 @@ const navItems = [
 ] as const;
 
 export function Layout() {
-  const { user, accessLabel, subscription, logout } = useAuth();
+  const { user, accessLabel, subscription, logout, loading: authLoading } = useAuth();
   const trialDaysLeft = accessLabel === "Trial" ? daysUntil(subscription?.trial_ends_at) : null;
   const { dataSaver, toggleDataSaver, easyReading, toggleEasyReading } = usePreferences();
   const { showToast } = useToast();
@@ -30,6 +30,10 @@ export function Layout() {
   const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
+    // Wait for auth to resolve so an already-logged-in admin's own visits never get
+    // counted -- the activity feed exists to show the admin that OTHER people are
+    // using the app, not to notify them about their own browsing.
+    if (authLoading || user?.role === "admin") return;
     try {
       if (sessionStorage.getItem(VISIT_PING_KEY)) return;
       sessionStorage.setItem(VISIT_PING_KEY, "1");
@@ -38,7 +42,7 @@ export function Layout() {
     }
     void apiFetch("/activity/ping", { method: "POST", body: JSON.stringify({ event_type: "app_visit", label: location.pathname }) }).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [authLoading, user]);
 
   const handleLogout = async () => {
     if (loggingOut) return;
