@@ -1,4 +1,5 @@
 import json
+import re
 from datetime import datetime, timezone
 from html import escape as html_escape
 from urllib.parse import quote
@@ -12,6 +13,28 @@ from app.database import get_db
 from app.services.price_update_service import list_latest_approved_price_updates
 
 router = APIRouter(prefix="/share", tags=["share"])
+
+
+_WIKIMEDIA_FILE_RE = re.compile(r"^https://upload\.wikimedia\.org/wikipedia/commons/([0-9a-f])/([0-9a-f]{2})/([^/]+)$")
+
+
+def _social_preview_image(url: str) -> str:
+    """WhatsApp's link-preview fetcher is unreliable with large images -- original
+    Wikimedia Commons uploads are often several MB. Request a small, fast-loading
+    thumbnail from Wikimedia's own resizing service when the source is a Commons file,
+    instead of the full-resolution original."""
+    match = _WIKIMEDIA_FILE_RE.match(url)
+    if not match:
+        return url
+    a, ab, filename = match.groups()
+    return f"https://upload.wikimedia.org/wikipedia/commons/thumb/{a}/{ab}/{filename}/500px-{filename}"
+
+
+def _image_mime_type(url: str) -> str:
+    lowered = url.lower()
+    if lowered.endswith(".png"):
+        return "image/png"
+    return "image/jpeg"
 
 
 def _format_naira(value: object) -> str:
@@ -54,7 +77,7 @@ def share_commodity_card(commodity_name: str, db: Session = Depends(get_db)) -> 
             f"{_format_naira(item.price_low)}–{_format_naira(item.price_high)} per {measure}. "
             f"Updated {_relative_age(item.update_date_time)}."
         )
-        image = item.commodity.image_url or fallback_image
+        image = _social_preview_image(item.commodity.image_url or fallback_image)
     else:
         title = f"{commodity_name} — PriceYard"
         description = "See today's market prices, ranges and trends on PriceYard."
@@ -63,6 +86,7 @@ def share_commodity_card(commodity_name: str, db: Session = Depends(get_db)) -> 
     safe_title = html_escape(title)
     safe_description = html_escape(description)
     safe_image = html_escape(image, quote=True)
+    safe_image_type = html_escape(_image_mime_type(image))
     safe_target = html_escape(target_url, quote=True)
     target_json = json.dumps(target_url)
 
@@ -76,6 +100,9 @@ def share_commodity_card(commodity_name: str, db: Session = Depends(get_db)) -> 
 <meta property="og:title" content="{safe_title}" />
 <meta property="og:description" content="{safe_description}" />
 <meta property="og:image" content="{safe_image}" />
+<meta property="og:image:secure_url" content="{safe_image}" />
+<meta property="og:image:type" content="{safe_image_type}" />
+<meta property="og:image:width" content="500" />
 <meta property="og:url" content="{safe_target}" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="{safe_title}" />

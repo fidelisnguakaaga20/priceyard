@@ -141,7 +141,7 @@ export function referralLink(code: string): string {
 }
 
 export function comingSoonShareUrl(commodityName: string): string {
-  const text = `${commodityName} is coming soon to PriceYard — great for storage businesses. See real market prices for Egusi, Honey Beans, Palm oil and more.\n${window.location.origin}`;
+  const text = `${commodityName} harvest is coming soon to PriceYard — great for storage businesses. See real market prices for Egusi, Honey Beans, Palm oil and more.\n${window.location.origin}`;
   return `https://wa.me/?text=${encodeURIComponent(text)}`;
 }
 
