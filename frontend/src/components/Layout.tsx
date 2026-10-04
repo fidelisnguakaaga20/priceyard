@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { apiFetch } from "../services/api";
 import { InstallPrompt } from "./InstallPrompt";
 import { ButtonSpinner } from "./LoadingSpinner";
+import { OfflineBanner } from "./OfflineBanner";
 import { OnboardingTour } from "./OnboardingTour";
 import { usePreferences } from "../context/PreferencesContext";
 import { useToast } from "../context/ToastContext";
@@ -97,6 +98,7 @@ export function Layout() {
           {trialDaysLeft === 0 ? "Your trial ends today." : <>Your trial ends in <strong>{trialDaysLeft} day{trialDaysLeft === 1 ? "" : "s"}</strong>.</>}
         </div>
       )}
+      <OfflineBanner />
       <InstallPrompt />
       <main><Outlet /></main>
       {location.pathname !== "/" && (
