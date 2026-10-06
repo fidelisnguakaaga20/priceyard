@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     jwt_secret: str | None = None
     jwt_algorithm: str = "HS256"
     google_client_id: str | None = None
-    access_token_expire_minutes: int = 60
+    access_token_expire_minutes: int = 129_600  # 90 days -- users stay logged in until they explicitly log out
     cors_origins: str = ""
     frontend_url: str = "http://127.0.0.1:5173"
     password_reset_expire_minutes: int = 15
