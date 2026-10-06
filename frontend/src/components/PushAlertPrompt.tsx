@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
-import { disablePushAlerts, enablePushAlerts, getExistingPushSubscription, pushSupported } from "../services/push";
+import { disablePushAlerts, enablePushAlerts, isSubscribedAsCurrentUser, pushSupported } from "../services/push";
 
 export function PushAlertPrompt() {
   const { token } = useAuth();
@@ -10,9 +10,9 @@ export function PushAlertPrompt() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!pushSupported()) { setSubscribed(null); return; }
-    void getExistingPushSubscription().then((sub) => setSubscribed(Boolean(sub)));
-  }, []);
+    if (!pushSupported() || !token) { setSubscribed(null); return; }
+    void isSubscribedAsCurrentUser(token).then(setSubscribed);
+  }, [token]);
 
   if (!pushSupported() || !token || subscribed === null) return null;
   if (typeof Notification !== "undefined" && Notification.permission === "denied") return null;

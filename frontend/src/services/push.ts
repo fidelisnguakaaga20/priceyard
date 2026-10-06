@@ -19,6 +19,21 @@ export async function getExistingPushSubscription(): Promise<PushSubscription | 
   return registration.pushManager.getSubscription();
 }
 
+/** A browser only ever holds one push subscription per site, shared by whichever
+ * account last enabled it on this device -- so "a subscription exists" alone doesn't
+ * mean it belongs to the currently logged-in user. Confirms real ownership with the
+ * backend before the UI claims alerts are on. */
+export async function isSubscribedAsCurrentUser(token: string): Promise<boolean> {
+  const subscription = await getExistingPushSubscription();
+  if (!subscription) return false;
+  try {
+    const result = await apiFetch<{ subscribed: boolean }>(`/push/subscribed?endpoint=${encodeURIComponent(subscription.endpoint)}`, {}, token);
+    return result.subscribed;
+  } catch {
+    return false;
+  }
+}
+
 export async function enablePushAlerts(token: string): Promise<void> {
   if (!pushSupported()) throw new Error("Push notifications aren't supported on this device or browser.");
 
