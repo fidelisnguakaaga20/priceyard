@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { CommodityImage } from "./CommodityImage";
 import { ConfidenceInfo } from "./ConfidenceInfo";
+import { FlagPriceButton } from "./FlagPriceButton";
 import { NativeShareButton } from "./ShareButtons";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
@@ -65,6 +66,7 @@ export function PriceCard({ item }: { item: PriceUpdate }) {
         ) : (
           <Link className="button button-ghost button-small" to="/login">Log in to watch this →</Link>
         )}
+        <FlagPriceButton priceUpdateId={item.id} />
       </div>
     </article>
   );

@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.price_update import PriceUpdate
 from app.models.user import User
+from app.schemas.price_flag_schema import FlaggedPriceSummary, PriceFlagCreate
 from app.schemas.price_update_schema import (
     Movement,
     PriceUpdateAdminResponse,
@@ -15,6 +16,7 @@ from app.schemas.price_update_schema import (
     TimeOfDay,
 )
 from app.services.audit_service import create_audit_log, snapshot_model
+from app.services.price_flag_service import flag_price_update, list_flagged_price_updates, resolve_flags
 from app.services.price_update_service import (
     approve_price_update,
     create_price_update,
@@ -30,7 +32,7 @@ from app.services.price_update_service import (
     update_price_update,
 )
 from app.services.watchlist_alert_service import notify_watchlist_subscribers
-from app.utils.permissions import require_full_access, require_roles
+from app.utils.permissions import get_current_user, require_full_access, require_roles
 
 router = APIRouter(prefix="/price-updates", tags=["price-updates"])
 
@@ -91,6 +93,14 @@ def get_admin_price_history(
     _admin: User = Depends(require_roles("admin")),
 ) -> list[PriceUpdate]:
     return list_admin_price_updates(db)
+
+
+@router.get("/admin/flagged", response_model=list[FlaggedPriceSummary])
+def get_flagged_price_updates(
+    db: Session = Depends(get_db),
+    _admin: User = Depends(require_roles("admin")),
+) -> list[FlaggedPriceSummary]:
+    return list_flagged_price_updates(db)
 
 
 @router.get("/{price_update_id}", response_model=PriceUpdatePublicResponse)
@@ -163,6 +173,27 @@ def reject_update(
         record_id=item.id, old_value=old_value, new_value=snapshot_model(item),
     )
     return item
+
+
+@router.post("/{price_update_id}/flag", status_code=status.HTTP_204_NO_CONTENT)
+def flag_price(
+    price_update_id: int,
+    payload: PriceFlagCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> None:
+    item = get_approved_price_update(db, price_update_id)
+    flag_price_update(db, current_user, item, payload.reason)
+
+
+@router.post("/{price_update_id}/flags/resolve", status_code=status.HTTP_204_NO_CONTENT)
+def resolve_price_flags(
+    price_update_id: int,
+    db: Session = Depends(get_db),
+    current_admin: User = Depends(require_roles("admin")),
+) -> None:
+    get_price_update_for_admin(db, price_update_id)
+    resolve_flags(db, price_update_id)
 
 
 @router.patch("/{price_update_id}/mark-outdated", response_model=PriceUpdateAdminResponse)

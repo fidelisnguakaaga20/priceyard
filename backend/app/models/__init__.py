@@ -10,6 +10,7 @@ from app.models.market_signal import MarketSignal
 from app.models.price_update import PriceUpdate
 from app.models.password_reset_token import PasswordResetToken
 from app.models.payment import Payment
+from app.models.price_flag import PriceFlag
 from app.models.push_subscription import PushSubscription
 from app.models.quality_signal import QualitySignal
 from app.models.sell_watch_window import SellWatchWindow
@@ -31,6 +32,7 @@ __all__ = [
     "PriceUpdate",
     "PasswordResetToken",
     "Payment",
+    "PriceFlag",
     "PushSubscription",
     "QualitySignal",
     "SellWatchWindow",

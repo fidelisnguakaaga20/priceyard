@@ -24,6 +24,7 @@ import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage";
 import { AdminExportPage } from "./pages/admin/AdminExportPage";
 import { AdminFAQPage } from "./pages/admin/AdminFAQPage";
 import { AdminFeedbackPage } from "./pages/admin/AdminFeedbackPage";
+import { AdminFlaggedPricesPage } from "./pages/admin/AdminFlaggedPricesPage";
 import { AdminBuyingZonesPage, AdminCostBreakdownPage, AdminSellWatchPage, AdminStoragePage } from "./pages/admin/AdminIntelligencePages";
 import { AdminMarketsPage } from "./pages/admin/AdminMarketsPage";
 import { AdminPriceUpdatesPage } from "./pages/admin/AdminPriceUpdatesPage";
@@ -57,6 +58,7 @@ export default function App() {
           <Route path="commodities" element={<AdminCommoditiesPage />} />
           <Route path="markets" element={<AdminMarketsPage />} />
           <Route path="prices" element={<AdminPriceUpdatesPage />} />
+          <Route path="flagged" element={<AdminFlaggedPricesPage />} />
           <Route path="market-signals" element={<AdminMarketSignalsPage />} />
           <Route path="quality-signals" element={<AdminQualitySignalsPage />} />
           <Route path="buying-zones" element={<AdminBuyingZonesPage />} />
