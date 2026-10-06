@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ButtonSpinner, LoadingSpinner } from "../components/LoadingSpinner";
+import { PushAlertPrompt } from "../components/PushAlertPrompt";
 import { useAuth } from "../context/AuthContext";
 import { useCommodityMarketPairs } from "../hooks/useCommodityMarketPairs";
 import { useToast } from "../context/ToastContext";
@@ -134,6 +135,7 @@ export function WatchlistPage() {
 
   return <section className="page page-section">
     <div className="page-title"><span className="eyebrow">Your saved interests</span><h1>Watchlist</h1><p>Save a product, a market, or both — we'll email you whenever a new price is approved for it, so you don't have to keep checking back.</p></div>
+    <PushAlertPrompt />
     {showFeedbackPrompt && (
       <div className="feedback-prompt">
         <span>Enjoying PriceYard so far? We'd love to hear from you.</span>

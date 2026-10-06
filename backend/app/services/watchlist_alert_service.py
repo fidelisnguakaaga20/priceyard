@@ -8,10 +8,14 @@ from app.models.watchlist import Watchlist
 
 
 def notify_watchlist_subscribers(db: Session, price_update: PriceUpdate) -> int:
-    """Email users whose watchlist matches this newly-approved price update's
-    commodity and/or market. Best-effort only - a failed send for one user must
-    never block approval or affect other users."""
+    """Email and push-notify users whose watchlist matches this newly-approved price
+    update's commodity and/or market. Best-effort only - a failed send for one user
+    must never block approval or affect other users."""
+    from app.config import get_settings
     from app.services.email_service import send_email
+    from app.services.push_service import send_push_to_user
+
+    frontend_url = get_settings().frontend_url.rstrip("/")
 
     statement = (
         select(Watchlist)
@@ -48,6 +52,17 @@ def notify_watchlist_subscribers(db: Session, price_update: PriceUpdate) -> int:
         try:
             send_email(recipient=user.email, subject=subject, body=body)
             sent += 1
+        except Exception:
+            continue
+
+        try:
+            send_push_to_user(
+                db,
+                user.id,
+                title=f"{price_update.commodity.name} price update",
+                body=f"{price_update.market.name}: {price_update.price_low:,.0f}–{price_update.price_high:,.0f} {price_update.unit}",
+                url=f"{frontend_url}/prices",
+            )
         except Exception:
             continue
     return sent

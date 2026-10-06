@@ -18,6 +18,7 @@ from app.routes.market_routes import router as market_router
 from app.routes.market_signal_routes import router as market_signal_router
 from app.routes.payment_routes import router as payment_router
 from app.routes.price_update_routes import router as price_update_router
+from app.routes.push_routes import router as push_router
 from app.routes.quality_signal_routes import router as quality_signal_router
 from app.routes.report_export_routes import router as report_export_router
 from app.routes.sell_watch_window_routes import router as sell_watch_window_router
@@ -59,6 +60,7 @@ app.include_router(user_router)
 app.include_router(commodity_router)
 app.include_router(market_router)
 app.include_router(price_update_router)
+app.include_router(push_router)
 app.include_router(market_signal_router)
 app.include_router(quality_signal_router)
 app.include_router(report_export_router)

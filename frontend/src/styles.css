@@ -199,6 +199,7 @@ html.easy-reading .confidence-badge, html.easy-reading .movement { font-weight: 
 .install-banner .text-link-button { color: white; text-decoration: underline; font-weight: 800; }
 .feedback-prompt { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 18px; border: 1px solid #d4dfce; background: #e6eddf; border-radius: 14px; padding: 16px 20px; margin: 0 0 24px; color: #173d28; font-weight: 650; }
 .feedback-prompt-actions { display: flex; align-items: center; gap: 14px; }
+.push-alert-banner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 18px; border: 1px solid #d4dfce; background: #e6eddf; border-radius: 14px; padding: 16px 20px; margin: 0 0 24px; color: #173d28; font-weight: 650; }
 .price-card-note { background: #fbf6ec; border: 1px solid #ecdfc4; border-radius: 10px; padding: 10px 13px; margin: 14px 0 0; font-size: .85rem; color: #5c4b1f; }
 .price-card-note strong { color: #4a3c17; }
 .aging-warn { color: #a8720a; font-weight: 700; }

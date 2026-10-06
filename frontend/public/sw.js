@@ -85,3 +85,40 @@ self.addEventListener("fetch", (event) => {
     );
   }
 });
+
+// Watchlist price-change alerts: show a real phone/browser notification carrying the
+// title/body/url the backend sent, even if PriceYard isn't open at all.
+self.addEventListener("push", (event) => {
+  let payload = { title: "PriceYard", body: "A watched price changed.", url: "/" };
+  try {
+    if (event.data) payload = { ...payload, ...event.data.json() };
+  } catch {
+    // malformed payload -- fall back to the generic message above rather than dropping the notification
+  }
+  event.waitUntil(
+    self.registration.showNotification(payload.title, {
+      body: payload.body,
+      icon: "/icons/icon-192.png",
+      badge: "/icons/icon-192.png",
+      data: { url: payload.url },
+    }),
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const url = event.notification.data && event.notification.data.url ? event.notification.data.url : "/";
+  event.waitUntil(
+    (async () => {
+      const windows = await clients.matchAll({ type: "window", includeUncontrolled: true });
+      for (const client of windows) {
+        if ("focus" in client) {
+          client.focus();
+          if ("navigate" in client) client.navigate(url).catch(() => {});
+          return;
+        }
+      }
+      await clients.openWindow(url);
+    })(),
+  );
+});
