@@ -17,7 +17,7 @@ export function FlagPriceButton({ priceUpdateId }: { priceUpdateId: number }) {
     try {
       await apiFetch(`/price-updates/${priceUpdateId}/flag`, { method: "POST", body: JSON.stringify({}) }, token);
       setFlagged(true);
-      showToast("Thanks — flagged for review.");
+      showToast("Thanks — we'll check this price.");
     } catch (err) {
       showToast((err as Error).message, "error");
     } finally {
@@ -27,7 +27,7 @@ export function FlagPriceButton({ priceUpdateId }: { priceUpdateId: number }) {
 
   return (
     <button type="button" className="text-link-button muted" disabled={busy || flagged} onClick={() => void flag()}>
-      {flagged ? "🚩 Flagged" : "🚩 This looks off"}
+      {flagged ? "🚩 Reported" : "🚩 Report wrong price"}
     </button>
   );
 }
