@@ -10,7 +10,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 
 if TYPE_CHECKING:
-    from app.models.price_update import PriceUpdate
+    from app.models.commodity import Commodity
+    from app.models.market import Market
 
 
 class CostBreakdown(Base):
@@ -31,9 +32,12 @@ class CostBreakdown(Base):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    price_update_id: Mapped[int] = mapped_column(
-        ForeignKey("price_updates.id", ondelete="CASCADE"), nullable=False, index=True
-    )
+    # Pinned to the commodity+market, not to one specific price record -- a price
+    # update replaces the old row entirely (a new id), so a cost breakdown tied to a
+    # single price_update_id would silently stop showing the moment the price next
+    # changed. This way the cost data stays attached and visible across price updates.
+    commodity_id: Mapped[int] = mapped_column(ForeignKey("commodities.id", ondelete="RESTRICT"), nullable=False, index=True)
+    market_id: Mapped[int] = mapped_column(ForeignKey("markets.id", ondelete="RESTRICT"), nullable=False, index=True)
     transport: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False, default=Decimal("0.00"))
     warehouse: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False, default=Decimal("0.00"))
     security: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False, default=Decimal("0.00"))
@@ -50,4 +54,5 @@ class CostBreakdown(Base):
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
     )
 
-    price_update: Mapped[PriceUpdate] = relationship(back_populates="cost_breakdowns")
+    commodity: Mapped[Commodity] = relationship(back_populates="cost_breakdowns")
+    market: Mapped[Market] = relationship(back_populates="cost_breakdowns")

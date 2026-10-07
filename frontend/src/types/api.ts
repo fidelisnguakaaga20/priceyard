@@ -169,7 +169,8 @@ export type StorageSuitability = {
 
 export type CostBreakdown = {
   id: number;
-  price_update_id: number;
+  commodity_id: number;
+  market_id: number;
   transport: string | number;
   warehouse: string | number;
   security: string | number;
