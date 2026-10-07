@@ -52,6 +52,11 @@ def create_cost_breakdown(db: Session, payload: CostBreakdownCreate) -> CostBrea
     return item
 
 
+def delete_cost_breakdown(db: Session, item: CostBreakdown) -> None:
+    db.delete(item)
+    db.commit()
+
+
 def get_cost_breakdown(db: Session, item_id: int) -> CostBreakdown:
     item = db.get(CostBreakdown, item_id)
     if item is None:

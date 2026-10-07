@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -11,6 +11,7 @@ from app.schemas.cost_breakdown_schema import (
 )
 from app.services.cost_breakdown_service import (
     create_cost_breakdown,
+    delete_cost_breakdown,
     get_cost_breakdown,
     list_cost_breakdowns,
     update_cost_breakdown,
@@ -54,3 +55,13 @@ def edit_item(
     _: User = Depends(require_roles("admin")),
 ) -> CostBreakdown:
     return update_cost_breakdown(db, get_cost_breakdown(db, item_id), payload)
+
+
+@router.delete("/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
+def remove_item(
+    item_id: int,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_roles("admin")),
+) -> Response:
+    delete_cost_breakdown(db, get_cost_breakdown(db, item_id))
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
