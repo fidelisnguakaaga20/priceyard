@@ -63,6 +63,8 @@ def create_watchlist_item(db: Session, user_id: int, payload: WatchlistCreate) -
         user_id=user_id,
         commodity_id=payload.commodity_id,
         market_id=payload.market_id,
+        target_price=payload.target_price,
+        target_direction=payload.target_direction,
     )
     db.add(item)
     db.commit()

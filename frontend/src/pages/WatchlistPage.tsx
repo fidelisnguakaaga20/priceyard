@@ -6,7 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import { useCommodityMarketPairs } from "../hooks/useCommodityMarketPairs";
 import { useToast } from "../context/ToastContext";
 import { apiFetch } from "../services/api";
-import type { Commodity, Market, PriceUpdate, WatchlistItem } from "../types/api";
+import type { Commodity, Market, PriceUpdate, TargetDirection, WatchlistItem } from "../types/api";
 import { agingClass, money, movementIcon, relativeTime } from "../utils";
 
 const FEEDBACK_PROMPT_KEY = "priceyard_feedback_prompted";
@@ -20,6 +20,8 @@ export function WatchlistPage() {
   const [prices, setPrices] = useState<PriceUpdate[]>([]);
   const [commodityId, setCommodityId] = useState("");
   const [marketId, setMarketId] = useState("");
+  const [targetPrice, setTargetPrice] = useState("");
+  const [targetDirection, setTargetDirection] = useState<TargetDirection>("at_or_below");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -104,10 +106,14 @@ export function WatchlistPage() {
         body: JSON.stringify({
           commodity_id: commodityId ? Number(commodityId) : null,
           market_id: marketId ? Number(marketId) : null,
+          target_price: targetPrice ? Number(targetPrice) : null,
+          target_direction: targetPrice ? targetDirection : null,
         }),
       }, token);
       setCommodityId("");
       setMarketId("");
+      setTargetPrice("");
+      setTargetDirection("at_or_below");
       await load(false);
       showToast("Added to your watchlist.");
     } catch (err) {
@@ -134,7 +140,7 @@ export function WatchlistPage() {
   };
 
   return <section className="page page-section">
-    <div className="page-title"><span className="eyebrow">Your saved interests</span><h1>Watchlist</h1><p>Save a product, a market, or both — we'll email you whenever a new price is approved for it, so you don't have to keep checking back.</p></div>
+    <div className="page-title"><span className="eyebrow">Your saved interests</span><h1>Watchlist</h1><p>Save a product, a market, or both — we'll alert you by email (and by phone, if enabled below) whenever a new price is approved for it. Set a target price if you only want to hear about it once it actually reaches a number you care about.</p></div>
     <PushAlertPrompt />
     {showFeedbackPrompt && (
       <div className="feedback-prompt">
@@ -148,6 +154,8 @@ export function WatchlistPage() {
     <form className="filter-bar" onSubmit={submit}>
       <label>Commodity<select value={commodityId} onChange={(e) => changeCommodity(e.target.value)}><option value="">Choose a commodity</option>{commodities.filter((x) => x.is_active).map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</select></label>
       <label>Market<select value={marketId} onChange={(e) => setMarketId(e.target.value)}><option value="">Choose a market</option>{availableMarkets.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</select>{selectedCommodityName && availableMarkets.length < activeMarkets.length && <small className="muted">{selectedCommodityName} is only tracked at {availableMarkets.length} market{availableMarkets.length === 1 ? "" : "s"} here.</small>}</label>
+      <label>Only alert me at a price (optional)<input type="number" min="0" step="1" placeholder="e.g. 200000" value={targetPrice} onChange={(e) => setTargetPrice(e.target.value)} /></label>
+      {targetPrice && <label>Direction<select value={targetDirection} onChange={(e) => setTargetDirection(e.target.value as TargetDirection)}><option value="at_or_below">Drops to or below this</option><option value="at_or_above">Rises to or above this</option></select></label>}
       <div className="filter-actions"><button className="button button-small" disabled={saving || loading}>{saving ? <ButtonSpinner label="Please wait…" /> : "Save item"}</button></div>
     </form>
     {error && <div className="status-box error">{error}</div>}
@@ -158,6 +166,7 @@ export function WatchlistPage() {
           <span className="eyebrow">Saved item</span>
           <h3>{item.commodity_id ? commodityMap.get(item.commodity_id) || `Commodity #${item.commodity_id}` : "All commodities"}</h3>
           <p className="muted">{item.market_id ? marketMap.get(item.market_id) || `Market #${item.market_id}` : "No market restriction"}</p>
+          {item.target_price && <p className="muted">🎯 Alert when {item.target_direction === "at_or_above" ? "≥" : "≤"} {money(item.target_price)}</p>}
           {match ? (
             <>
               <p className="price-range">{money(match.price_low)} – {money(match.price_high)}</p>

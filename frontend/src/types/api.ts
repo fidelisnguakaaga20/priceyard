@@ -192,11 +192,15 @@ export type FAQItem = {
   updated_at: string;
 };
 
+export type TargetDirection = "at_or_below" | "at_or_above";
+
 export type WatchlistItem = {
   id: number;
   user_id: number;
   commodity_id: number | null;
   market_id: number | null;
+  target_price: string | number | null;
+  target_direction: TargetDirection | null;
   created_at: string;
   updated_at: string;
 };
