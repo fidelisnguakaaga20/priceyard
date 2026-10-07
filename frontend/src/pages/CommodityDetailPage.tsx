@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { CommodityImage } from "../components/CommodityImage";
 import { ConfidenceInfo } from "../components/ConfidenceInfo";
+import { CostCalculator } from "../components/CostCalculator";
 import { Disclaimer, MARKET_DISCLAIMER, PRICE_DISCLAIMER, STORAGE_DISCLAIMER } from "../components/Disclaimer";
 import { FlagPriceButton } from "../components/FlagPriceButton";
 import { LoadingSpinner } from "../components/LoadingSpinner";
@@ -94,7 +95,16 @@ export function CommodityDetailPage() {
         <article className="card"><h3>Buying zone</h3>{zones.length ? zones.map((x) => { const today = new Date().toISOString().slice(0, 10); const outOfSeason = x.valid_from && x.valid_to && (today < x.valid_from || today > x.valid_to); return <div className="stack-item" key={x.id}><span className="eyebrow">{marketLabel(x.market_id)}</span><strong>{money(x.price_low)} – {money(x.price_high)}</strong><p>{x.reason}</p><small>Confidence: {x.confidence}</small>{outOfSeason && <small className="season-note">Not currently in season — active {shortDate(x.valid_from)} to {shortDate(x.valid_to)}</small>}</div>; }) : <p className="muted">No buying-zone observation currently available.</p>}</article>
         <article className="card"><h3>Sell-watch window</h3>{sellWatch.length ? sellWatch.map((x) => { const inSeason = isWithinSeasonalMonths(x.start_period, x.end_period); return <div className="stack-item" key={x.id}><span className="eyebrow">{marketLabel(x.market_id)}</span><strong>{x.start_period}{x.end_period ? ` – ${x.end_period}` : ""}</strong><p>{x.observation}</p><small>Confidence: {x.confidence}</small>{inSeason === false && <small className="season-note">Not currently in season</small>}</div>; }) : <p className="muted">No sell-watch observation currently available.</p>}</article>
         <article className="card"><h3>Storage suitability</h3>{storage.length ? storage.map((x) => <div className="stack-item" key={x.id}><span className="eyebrow">{marketLabel(x.market_id)}</span><strong>{x.suitability_status.replace(/_/g, " ")}</strong><p>{x.summary || x.quality_storage_notes || "No summary supplied."}</p><small>Spoilage risk: {x.spoilage_risk || "—"} · Buyer availability: {x.buyer_availability || "—"}</small></div>) : <p className="muted">No storage-suitability observation currently available.</p>}<Disclaimer>{STORAGE_DISCLAIMER}</Disclaimer></article>
-        <article className="card"><h3>Cost breakdown</h3>{costs.length ? costs.map((x) => <div className="stack-item" key={x.id}><strong>Estimated landing/storage: {money(x.total_estimated_landing_storage_cost)}</strong><p>Purchase reference: {money(x.purchase_price_reference)} · Additional costs: {money(x.total_additional_cost)}</p><small>Transport {money(x.transport)} · Warehouse {money(x.warehouse)} · Market charges {money(x.market_charges)}</small></div>) : <p className="muted">No cost breakdown currently linked to these current price records.</p>}</article>
+        <article className="card"><h3>Cost breakdown</h3>{costs.length ? costs.map((x) => {
+          const relatedPrice = prices.find((p) => p.id === x.price_update_id);
+          const unitLabel = relatedPrice?.bag_size || relatedPrice?.unit || "unit";
+          return <div className="stack-item" key={x.id}>
+            <strong>Estimated landing/storage: {money(x.total_estimated_landing_storage_cost)}</strong>
+            <p>Purchase reference: {money(x.purchase_price_reference)} · Additional costs: {money(x.total_additional_cost)}</p>
+            <small>Transport {money(x.transport)} · Warehouse {money(x.warehouse)} · Market charges {money(x.market_charges)}</small>
+            <CostCalculator breakdown={x} unitLabel={unitLabel} />
+          </div>;
+        }) : <p className="muted">No cost breakdown currently linked to these current price records.</p>}</article>
       </div>}
     </PremiumGate>
   </section>;
