@@ -99,10 +99,10 @@ export function CommodityDetailPage() {
           const unitLabel = relatedPrice?.bag_size || relatedPrice?.unit || "unit";
           return <div className="stack-item" key={x.id}>
             <span className="eyebrow">{marketLabel(x.market_id)}</span>
-            <strong>Estimated landing/storage: {money(x.total_estimated_landing_storage_cost)}</strong>
+            <CostCalculator breakdown={x} unitLabel={unitLabel} />
+            <p className="cost-reference-label">Reference breakdown (per {unitLabel})</p>
             <p>Purchase reference: {money(x.purchase_price_reference)} · Additional costs: {money(x.total_additional_cost)}</p>
             <small>Transport {money(x.transport)} · Warehouse {money(x.warehouse)} · Market charges {money(x.market_charges)}</small>
-            <CostCalculator breakdown={x} unitLabel={unitLabel} />
           </div>;
         }) : <p className="muted">No cost breakdown currently linked to these current price records.</p>}</article>
       </div>}

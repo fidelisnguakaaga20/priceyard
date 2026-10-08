@@ -12,8 +12,10 @@ export function CostCalculator({ breakdown, unitLabel }: { breakdown: CostBreakd
 
   return (
     <div className="cost-calculator">
+      <h4>💰 Cost Calculator</h4>
+      <p className="muted">Priced per {unitLabel}. Enter how many you're buying to see your total cost.</p>
       <div className="form-stack">
-        <label>Quantity (each = {unitLabel})
+        <label>How many are you buying?
           <input type="number" min="0" step="1" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
         </label>
       </div>

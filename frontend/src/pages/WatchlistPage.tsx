@@ -69,6 +69,13 @@ export function WatchlistPage() {
   const commodityMap = useMemo(() => new Map(commodities.map((x) => [x.id, x.name])), [commodities]);
   const marketMap = useMemo(() => new Map(markets.map((x) => [x.id, x.name])), [markets]);
 
+  const isTargetReached = (item: WatchlistItem, match: PriceUpdate | undefined): boolean => {
+    if (!item.target_price || !match) return false;
+    const target = Number(item.target_price);
+    if (item.target_direction === "at_or_above") return Number(match.price_high) >= target;
+    return Number(match.price_low) <= target;
+  };
+
   const findPriceFor = (item: WatchlistItem): PriceUpdate | undefined => {
     if (item.commodity_id && item.market_id) {
       return prices.find((p) => p.commodity_id === item.commodity_id && p.market_id === item.market_id);
@@ -162,11 +169,12 @@ export function WatchlistPage() {
     {loading ? <LoadingSpinner label="Loading your watchlist…" /> : <>
       <div className="watchlist-grid">{items.map((item) => {
         const match = findPriceFor(item);
+        const reached = isTargetReached(item, match);
         return <article className="card" key={item.id}>
           <span className="eyebrow">Saved item</span>
           <h3>{item.commodity_id ? commodityMap.get(item.commodity_id) || `Commodity #${item.commodity_id}` : "All commodities"}</h3>
           <p className="muted">{item.market_id ? marketMap.get(item.market_id) || `Market #${item.market_id}` : "No market restriction"}</p>
-          {item.target_price && <p className="muted">🎯 Alert when {item.target_direction === "at_or_above" ? "≥" : "≤"} {money(item.target_price)}</p>}
+          {item.target_price && (reached ? <p className="target-reached-badge">✅ Target reached!</p> : <p className="muted">🎯 Alert when {item.target_direction === "at_or_above" ? "≥" : "≤"} {money(item.target_price)}</p>)}
           {match ? (
             <>
               <p className="price-range">{money(match.price_low)} – {money(match.price_high)}</p>

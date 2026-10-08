@@ -21,58 +21,10 @@
     margin-right: 0;
   }
 
-  .menu-button {
-    display: none !important;
-  }
-
-  .main-nav,
-  .main-nav.open {
-    position: static;
-    display: grid;
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 2px;
-    padding: 0 0 10px;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
-    overflow: visible;
-  }
-
-  .nav-primary,
-  .nav-account {
-    display: flex;
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-    align-items: center;
-    justify-content: space-between;
-    gap: 2px;
-  }
-
-  .nav-primary a,
-  .nav-account a,
-  .nav-account .nav-button {
-    flex: 0 1 auto;
-    min-width: 0;
-    min-height: 40px;
-    padding: 8px 5px;
-    text-align: center;
-    white-space: nowrap;
-  }
-
-  .nav-primary a {
-    font-size: .78rem;
-  }
-
-  .nav-account a,
-  .nav-account .nav-button {
-    font-size: clamp(.7rem, 3vw, .8rem);
-  }
-
+  /* Below 640px used to force-hide the hamburger and show every nav link inline
+     instead -- cramped on the smallest phones, and inconsistent with the 641-900px
+     range, which already collapses into a hamburger menu. Letting styles.css's
+     existing hamburger behavior apply uniformly here instead. */
   .nav-account .nav-cta {
     padding-inline: 12px;
   }
