@@ -21,26 +21,7 @@ button:disabled { cursor: not-allowed; opacity: .72; }
 .brand-mark { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 11px; background: #214e34; color: white; font-weight: 800; }
 .brand strong { display: block; font-size: 1.06rem; }.brand small { display: block; color: #657267; font-size: .72rem; margin-top: 2px; }
 .main-nav { display: flex; align-items: center; gap: 5px; }.main-nav a, .nav-button { border: 0; background: transparent; text-decoration: none; padding: 9px 10px; border-radius: 8px; color: #4a5b4f; }.main-nav a:hover, .nav-button:hover { background: #e9eee5; color: #173d28; }.main-nav a.active { background: #d9e5d1; color: #133a22; font-weight: 800; box-shadow: inset 0 -3px 0 #214e34; }.main-nav .nav-cta { background: #214e34; color: white; padding-inline: 16px; }.main-nav .nav-cta:hover { background: #183c28; color: white; }
-.menu-button { display: none; flex-direction: column; align-items: center; justify-content: center; gap: 5px; width: 40px; height: 40px; border: 1px solid #cad5c8; background: white; padding: 0; border-radius: 8px; cursor: pointer; }
-.menu-bar { display: block; width: 20px; height: 2px; border-radius: 2px; background: #214e34; transition: transform .25s ease, opacity .2s ease; }
-.menu-button.open .menu-bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-.menu-button.open .menu-bar:nth-child(2) { opacity: 0; }
-.menu-button.open .menu-bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-@media (prefers-reduced-motion: no-preference) {
-  /* .nav-primary/.nav-account are display:contents (no box of their own), so the
-     animation has to target their actual rendered children two levels deep. */
-  .main-nav.open .nav-primary > *,
-  .main-nav.open .nav-account > * { animation: nav-item-in .22s ease both; }
-  .main-nav.open .nav-primary > *:nth-child(1) { animation-delay: .03s; }
-  .main-nav.open .nav-primary > *:nth-child(2) { animation-delay: .06s; }
-  .main-nav.open .nav-primary > *:nth-child(3) { animation-delay: .09s; }
-  .main-nav.open .nav-primary > *:nth-child(4) { animation-delay: .12s; }
-  .main-nav.open .nav-account > *:nth-child(1) { animation-delay: .15s; }
-  .main-nav.open .nav-account > *:nth-child(2) { animation-delay: .18s; }
-  .main-nav.open .nav-account > *:nth-child(3) { animation-delay: .21s; }
-  .main-nav.open .nav-account > *:nth-child(4) { animation-delay: .24s; }
-}
-@keyframes nav-item-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+.menu-button { display: none; border: 1px solid #cad5c8; background: white; padding: 8px 11px; border-radius: 8px; }
 .access-strip { width: 100%; max-width: 100%; min-height: 28px; background: #173d28; color: #e6f1e7; font-size: .78rem; display: flex; justify-content: center; gap: 24px; align-items: center; flex-wrap: wrap; }
 .access-strip > span { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
 .display-toggles { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }

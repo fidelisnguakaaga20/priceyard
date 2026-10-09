@@ -65,9 +65,7 @@ export function Layout() {
             <span className="brand-mark">PY</span>
             <span><strong>PriceYard</strong><small>Know the market before you buy or sell.</small></span>
           </Link>
-          <button className={open ? "menu-button open" : "menu-button"} type="button" aria-label="Toggle navigation" aria-expanded={open} onClick={() => setOpen((value) => !value)}>
-            <span className="menu-bar" /><span className="menu-bar" /><span className="menu-bar" />
-          </button>
+          <button className="menu-button" type="button" aria-label="Toggle navigation" aria-expanded={open} onClick={() => setOpen((value) => !value)}>☰ Menu</button>
           <nav className={open ? "main-nav open" : "main-nav"} aria-label="Primary navigation">
             <div className="nav-primary">
               {navItems.map(([to, label]) => <NavLink key={to} to={to} onClick={() => setOpen(false)}>{label}</NavLink>)}
