@@ -206,6 +206,13 @@ html.easy-reading .confidence-badge, html.easy-reading .movement { font-weight: 
 .cost-reference-label { text-transform: uppercase; letter-spacing: .08em; font-size: .72rem; font-weight: 800; color: #788279; margin: 14px 0 4px; }
 .target-reached-badge { display: inline-block; margin: 4px 0; padding: 4px 10px; border-radius: 999px; background: #173d28; color: white; font-weight: 800; font-size: .85rem; }
 .feedback-screenshot-thumb { max-width: 160px; max-height: 120px; border-radius: 8px; border: 1px solid #dfe5db; margin-top: 8px; object-fit: cover; }
+.price-ticker { overflow: hidden; background: #173d28; padding: 10px 0; white-space: nowrap; }
+.price-ticker-track { display: inline-flex; animation: price-ticker-scroll 28s linear infinite; }
+.price-ticker:hover .price-ticker-track { animation-play-state: paused; }
+.price-ticker-item { display: inline-flex; align-items: center; gap: 8px; color: white; font-weight: 700; font-size: .9rem; padding: 0 24px; border-right: 1px solid rgba(255,255,255,.15); }
+.price-ticker-market { color: #a9c4ad; font-weight: 600; font-size: .78rem; }
+@keyframes price-ticker-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .price-ticker-track { animation: none; overflow-x: auto; } }
 .price-card-note { background: #fbf6ec; border: 1px solid #ecdfc4; border-radius: 10px; padding: 10px 13px; margin: 14px 0 0; font-size: .85rem; color: #5c4b1f; }
 .price-card-note strong { color: #4a3c17; }
 .aging-warn { color: #a8720a; font-weight: 700; }

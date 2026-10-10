@@ -4,6 +4,7 @@ import { CommodityImage } from "../components/CommodityImage";
 import { Disclaimer, PRICE_DISCLAIMER } from "../components/Disclaimer";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { PriceCard } from "../components/PriceCard";
+import { PriceTicker } from "../components/PriceTicker";
 import { NativeShareButton } from "../components/ShareButtons";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { apiFetch } from "../services/api";
@@ -13,6 +14,7 @@ import { comingSoonShareContent, comingSoonShareUrl, dateOnly, money, priceShare
 export function HomePage() {
   useDocumentTitle("Know the market before you buy or sell");
   const [prices, setPrices] = useState<PriceUpdate[]>([]);
+  const [tickerPrices, setTickerPrices] = useState<PriceUpdate[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [upcoming, setUpcoming] = useState<Commodity[]>([]);
@@ -23,7 +25,7 @@ export function HomePage() {
 
   useEffect(() => {
     apiFetch<PriceUpdate[]>("/price-updates")
-      .then((items) => { setPrices(items.slice(0, 3)); setRecordCount(items.length); })
+      .then((items) => { setPrices(items.slice(0, 3)); setTickerPrices(items); setRecordCount(items.length); })
       .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false));
     apiFetch<Commodity[]>("/commodities")
@@ -42,6 +44,7 @@ export function HomePage() {
 
   return (
     <>
+      <PriceTicker items={tickerPrices} />
       <section className="hero page">
         <div className="hero-copy">
           <span className="eyebrow">Market price information</span>
