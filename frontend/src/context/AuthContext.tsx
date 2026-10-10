@@ -13,7 +13,7 @@ type AuthContextValue = {
   loading: boolean;
   accessLabel: AccessLabel;
   hasFullAccess: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, remember?: boolean) => Promise<void>;
   loginWithGoogle: (idToken: string) => Promise<void>;
   register: (payload: { full_name: string; email: string; phone?: string; password: string; referral_code?: string }) => Promise<void>;
   logout: () => void;
@@ -22,6 +22,40 @@ type AuthContextValue = {
 
 const STORAGE_KEY = "priceyard_access_token";
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+
+// "Remember me" decides where the token lives: localStorage survives closing the
+// browser (stays logged in up to the token's 90-day life), sessionStorage is wiped
+// the moment the tab/browser closes -- the right default on a shared/public device.
+function readStoredToken(): string | null {
+  try {
+    return localStorage.getItem(STORAGE_KEY) || sessionStorage.getItem(STORAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function writeStoredToken(token: string, remember: boolean): void {
+  try {
+    if (remember) {
+      localStorage.setItem(STORAGE_KEY, token);
+      sessionStorage.removeItem(STORAGE_KEY);
+    } else {
+      sessionStorage.setItem(STORAGE_KEY, token);
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  } catch {
+    // storage unavailable (private mode, blocked) -- auth still works for this tab via state
+  }
+}
+
+function clearStoredToken(): void {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+    sessionStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // ignore
+  }
+}
 
 function computeAccess(user: User | null, subscription: Subscription | null): { label: AccessLabel; full: boolean } {
   if (!user) return { label: "Guest", full: false };
@@ -37,14 +71,14 @@ function computeAccess(user: User | null, subscription: Subscription | null): { 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem(STORAGE_KEY));
+  const [token, setToken] = useState<string | null>(() => readStoredToken());
   const [user, setUser] = useState<User | null>(null);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(Boolean(token));
   const expiredHandledRef = useRef(false);
 
   const clearAuth = useCallback(() => {
-    localStorage.removeItem(STORAGE_KEY);
+    clearStoredToken();
     setToken(null);
     setUser(null);
     setSubscription(null);
@@ -88,12 +122,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (token) void refreshWithToken(token);
   }, [token, refreshWithToken]);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, remember = true) => {
     const response = await apiFetch<{ access_token: string }>("/auth/login", {
       method: "POST",
       body: JSON.stringify({ email, password }),
     });
-    localStorage.setItem(STORAGE_KEY, response.access_token);
+    writeStoredToken(response.access_token, remember);
     setToken(response.access_token);
     await refreshWithToken(response.access_token);
   };
@@ -103,7 +137,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       method: "POST",
       body: JSON.stringify({ id_token: idToken }),
     });
-    localStorage.setItem(STORAGE_KEY, response.access_token);
+    writeStoredToken(response.access_token, true);
     setToken(response.access_token);
     await refreshWithToken(response.access_token);
   };
