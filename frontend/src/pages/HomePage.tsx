@@ -7,12 +7,16 @@ import { PriceCard } from "../components/PriceCard";
 import { PriceTicker } from "../components/PriceTicker";
 import { NativeShareButton } from "../components/ShareButtons";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
+import { usePreferences } from "../context/PreferencesContext";
 import { apiFetch } from "../services/api";
 import type { Commodity, Market, PriceUpdate, Testimonial } from "../types/api";
 import { comingSoonShareContent, comingSoonShareUrl, dateOnly, money, priceShareContent, relativeTime, whatsAppShareUrl, WHATSAPP_COMMUNITY_URL } from "../utils";
 
+const AUTO_REFRESH_MS = 60_000;
+
 export function HomePage() {
   useDocumentTitle("Know the market before you buy or sell");
+  const { dataSaver } = usePreferences();
   const [prices, setPrices] = useState<PriceUpdate[]>([]);
   const [tickerPrices, setTickerPrices] = useState<PriceUpdate[]>([]);
   const [error, setError] = useState("");
@@ -23,11 +27,15 @@ export function HomePage() {
   const [recordCount, setRecordCount] = useState<number | null>(null);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
 
-  useEffect(() => {
+  const loadPrices = (silent = false) => {
     apiFetch<PriceUpdate[]>("/price-updates")
       .then((items) => { setPrices(items.slice(0, 3)); setTickerPrices(items); setRecordCount(items.length); })
-      .catch((err: Error) => setError(err.message))
-      .finally(() => setLoading(false));
+      .catch((err: Error) => { if (!silent) setError(err.message); })
+      .finally(() => { if (!silent) setLoading(false); });
+  };
+
+  useEffect(() => {
+    loadPrices();
     apiFetch<Commodity[]>("/commodities")
       .then((items) => {
         setUpcoming(items.filter((item) => item.is_upcoming));
@@ -41,6 +49,15 @@ export function HomePage() {
       .then(setTestimonials)
       .catch(() => undefined);
   }, []);
+
+  // Silently keep the homepage's prices current while it's open (ticker + "Today's
+  // prices"), skipped under Data saver since it costs mobile data on a page people
+  // often leave open.
+  useEffect(() => {
+    if (dataSaver) return;
+    const interval = setInterval(() => loadPrices(true), AUTO_REFRESH_MS);
+    return () => clearInterval(interval);
+  }, [dataSaver]);
 
   return (
     <>

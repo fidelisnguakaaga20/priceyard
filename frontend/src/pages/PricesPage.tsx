@@ -5,10 +5,14 @@ import { ButtonSpinner, LoadingSpinner } from "../components/LoadingSpinner";
 import { PriceCard } from "../components/PriceCard";
 import { useCommodityMarketPairs } from "../hooks/useCommodityMarketPairs";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
+import { usePreferences } from "../context/PreferencesContext";
 import { apiFetch } from "../services/api";
 import type { Commodity, Market, PriceUpdate } from "../types/api";
 
+const AUTO_REFRESH_MS = 60_000;
+
 export function PricesPage() {
+  const { dataSaver } = usePreferences();
   useDocumentTitle("Current Prices");
   const [searchParams] = useSearchParams();
   const [items, setItems] = useState<PriceUpdate[]>([]);
@@ -25,15 +29,21 @@ export function PricesPage() {
   const [loading, setLoading] = useState(true);
   const [filtersLoading, setFiltersLoading] = useState(true);
 
-  const load = async (params?: { commodity?: string; market?: string; movement?: string }) => {
-    setLoading(true); setError("");
+  const load = async (params?: { commodity?: string; market?: string; movement?: string }, silent = false) => {
+    if (!silent) { setLoading(true); setError(""); }
     const query = new URLSearchParams();
     if (params?.commodity) query.set("commodity", params.commodity);
     if (params?.market) query.set("market", params.market);
     if (params?.movement) query.set("movement", params.movement);
-    try { setItems(await apiFetch<PriceUpdate[]>(`/price-updates${query.size ? `?${query}` : ""}`)); }
-    catch (err) { setError((err as Error).message); }
-    finally { setLoading(false); }
+    try {
+      const data = await apiFetch<PriceUpdate[]>(`/price-updates${query.size ? `?${query}` : ""}`);
+      setItems(data);
+      if (!silent) setError("");
+    } catch (err) {
+      if (!silent) setError((err as Error).message);
+    } finally {
+      if (!silent) setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -46,6 +56,15 @@ export function PricesPage() {
       setMarkets(marketItems);
     }).catch(() => undefined).finally(() => setFiltersLoading(false));
   }, []);
+
+  // Silently keep the list current while it's open, so an admin's new/edited price
+  // shows up without the user needing to reload -- skipped under Data saver, since
+  // repeated background fetches cost mobile data that toggle exists to avoid.
+  useEffect(() => {
+    if (dataSaver) return;
+    const interval = setInterval(() => { void load({ commodity, market, movement }, true); }, AUTO_REFRESH_MS);
+    return () => clearInterval(interval);
+  }, [dataSaver, commodity, market, movement]);
 
   const submit = (event: FormEvent) => { event.preventDefault(); void load({ commodity, market, movement }); };
   const clear = () => { setCommodity(""); setMarket(""); setMovement(""); void load(); };
