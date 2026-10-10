@@ -31,6 +31,9 @@ class Feedback(Base):
     willingness_to_pay_feedback: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
     is_public_testimonial: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="false")
     testimonial_display_name: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # A data: URI (base64), not a file path -- kept simple, no new storage service.
+    # Size-capped at submission time in the schema validator.
+    screenshot_data: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 

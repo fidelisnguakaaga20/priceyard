@@ -14,6 +14,7 @@ type Feedback = {
   continue_using_feedback: boolean | null;
   is_public_testimonial: boolean;
   testimonial_display_name: string | null;
+  screenshot_data: string | null;
   created_at: string;
 };
 type Summary = { count: number; average_rating: number | null };
@@ -108,7 +109,7 @@ export function AdminFeedbackPage() {
     </div>
     <label className="admin-inline-filter">Filter rating<select value={rating} disabled={loading || removingId !== null} onChange={(e) => setRating(e.target.value)}><option value="">All</option>{[1, 2, 3, 4, 5].map((x) => <option key={x}>{x}</option>)}</select></label>
     <AdminStatus error={error} success={message} />
-    {loading ? <AdminLoading label="Loading feedback…"/> : <div className="admin-card-list">{items.map((item) => <article className="card" key={item.id}><div className="card-row"><div><span className="eyebrow">#{item.id} · {item.rating}/5 · user #{item.user_id}</span><h3>{item.comment || "Feedback"}</h3><p>{item.complaint_or_suggestion || "No complaint/suggestion"}</p><small>Continue using: {item.continue_using_feedback === null ? "No answer" : item.continue_using_feedback ? "Yes" : "No"}</small><small>{item.missing_market_request ? `Market request: ${item.missing_market_request}` : ""} {item.missing_commodity_request ? `Commodity request: ${item.missing_commodity_request}` : ""}</small></div><AdminActionButton className="button button-small button-danger" busy={removingId === item.id} disabled={removingId !== null && removingId !== item.id} onClick={() => void remove(item.id)}>Delete</AdminActionButton></div>
+    {loading ? <AdminLoading label="Loading feedback…"/> : <div className="admin-card-list">{items.map((item) => <article className="card" key={item.id}><div className="card-row"><div><span className="eyebrow">#{item.id} · {item.rating}/5 · user #{item.user_id}</span><h3>{item.comment || "Feedback"}</h3><p>{item.complaint_or_suggestion || "No complaint/suggestion"}</p><small>Continue using: {item.continue_using_feedback === null ? "No answer" : item.continue_using_feedback ? "Yes" : "No"}</small><small>{item.missing_market_request ? `Market request: ${item.missing_market_request}` : ""} {item.missing_commodity_request ? `Commodity request: ${item.missing_commodity_request}` : ""}</small>{item.screenshot_data && <p><a href={item.screenshot_data} target="_blank" rel="noopener noreferrer"><img src={item.screenshot_data} alt="Feedback screenshot" className="feedback-screenshot-thumb" /></a></p>}</div><AdminActionButton className="button button-small button-danger" busy={removingId === item.id} disabled={removingId !== null && removingId !== item.id} onClick={() => void remove(item.id)}>Delete</AdminActionButton></div>
       <div className="admin-testimonial-row">
         {item.is_public_testimonial ? (
           <>

@@ -4,15 +4,41 @@ import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { apiFetch } from "../services/api";
 
+const MAX_SCREENSHOT_BYTES = 2 * 1024 * 1024;
+
+function readFileAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = () => reject(new Error("Could not read that file."));
+    reader.readAsDataURL(file);
+  });
+}
+
 export function FeedbackPage() {
   const { token } = useAuth();
   const { showToast } = useToast();
   const [rating, setRating] = useState(5);
   const [suggestion, setSuggestion] = useState("");
   const [continueUsing, setContinueUsing] = useState<boolean | null>(null);
+  const [screenshot, setScreenshot] = useState<string | null>(null);
+  const [screenshotName, setScreenshotName] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+
+  const pickScreenshot = async (file: File | undefined) => {
+    if (!file) { setScreenshot(null); setScreenshotName(""); return; }
+    if (!file.type.startsWith("image/")) { setError("Please choose an image file."); return; }
+    if (file.size > MAX_SCREENSHOT_BYTES) { setError("Screenshot must be smaller than 2MB."); return; }
+    try {
+      setScreenshot(await readFileAsDataUrl(file));
+      setScreenshotName(file.name);
+      setError("");
+    } catch (err) {
+      setError((err as Error).message);
+    }
+  };
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -36,6 +62,7 @@ export function FeedbackPage() {
             rating,
             complaint_or_suggestion: suggestion || null,
             continue_using_feedback: continueUsing,
+            screenshot_data: screenshot,
           }),
         },
         token,
@@ -43,6 +70,8 @@ export function FeedbackPage() {
       setMessage("Thank you. Your feedback was submitted.");
       setSuggestion("");
       setContinueUsing(null);
+      setScreenshot(null);
+      setScreenshotName("");
       showToast("Thank you. Your feedback was submitted.");
     } catch (err) {
       setError((err as Error).message);
@@ -74,6 +103,12 @@ export function FeedbackPage() {
         {rating >= 4 ? "What do you like about PriceYard? Your comment might be featured on our homepage." : "Complaint or suggestion"}
         <textarea rows={4} value={suggestion} onChange={(e) => setSuggestion(e.target.value)} placeholder={rating >= 4 ? "e.g. it helped me buy or sell at a better price…" : "Tell us what went wrong or what we could do better…"} />
       </label>
+      <label>
+        Add a screenshot (optional)
+        <input type="file" accept="image/*" onChange={(e) => void pickScreenshot(e.target.files?.[0])} />
+        <small className="muted">Up to 2MB. Helpful if you're reporting something that's easier to show than explain.</small>
+      </label>
+      {screenshot && <p className="muted">📎 {screenshotName} attached — <button type="button" className="text-link-button" onClick={() => void pickScreenshot(undefined)}>remove</button></p>}
       <label>
         Continue using?
         <select value={continueUsing === null ? "" : String(continueUsing)} onChange={(e) => setContinueUsing(e.target.value === "" ? null : e.target.value === "true")}>
