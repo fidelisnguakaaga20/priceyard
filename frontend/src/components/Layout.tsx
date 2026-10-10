@@ -29,7 +29,7 @@ const navItems = [
 export function Layout() {
   const { user, accessLabel, subscription, logout, loading: authLoading } = useAuth();
   const trialDaysLeft = accessLabel === "Trial" ? daysUntil(subscription?.trial_ends_at) : null;
-  const { dataSaver, toggleDataSaver, easyReading, toggleEasyReading } = usePreferences();
+  const { dataSaver, toggleDataSaver, easyReading, toggleEasyReading, darkMode, toggleDarkMode } = usePreferences();
   const { showToast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -107,6 +107,7 @@ export function Layout() {
           <span className="display-toggles">
             <button type="button" className={dataSaver ? "toggle-pill on" : "toggle-pill"} aria-pressed={dataSaver} onClick={toggleDataSaver}>Data saver: {dataSaver ? "On" : "Off"}</button>
             <button type="button" className={easyReading ? "toggle-pill on" : "toggle-pill"} aria-pressed={easyReading} onClick={toggleEasyReading}>Easy reading: {easyReading ? "On" : "Off"}</button>
+            <button type="button" className={darkMode ? "toggle-pill on" : "toggle-pill"} aria-pressed={darkMode} onClick={toggleDarkMode}>Dark mode: {darkMode ? "On" : "Off"}</button>
           </span>
         </div>
         {showTicker && <PriceTicker items={tickerPrices} />}
