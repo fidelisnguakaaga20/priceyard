@@ -6,12 +6,18 @@ import { InstallPrompt } from "./InstallPrompt";
 import { ButtonSpinner } from "./LoadingSpinner";
 import { OfflineBanner } from "./OfflineBanner";
 import { OnboardingTour } from "./OnboardingTour";
+import { PriceTicker } from "./PriceTicker";
 import { usePreferences } from "../context/PreferencesContext";
 import { useToast } from "../context/ToastContext";
 import { SUPPORT_WHATSAPP_NUMBER, WhatsAppSupportButton } from "./WhatsAppSupportButton";
+import type { PriceUpdate } from "../types/api";
 import { daysUntil, WHATSAPP_COMMUNITY_URL } from "../utils";
 
 const VISIT_PING_KEY = "py_visit_pinged";
+const TICKER_REFRESH_MS = 60_000;
+// Admin needs focus for data entry, and Login/Register are deliberately minimal --
+// everywhere else a trader is actually browsing gets the live ticker.
+const TICKER_HIDDEN_PREFIXES = ["/admin", "/login", "/register"];
 
 const navItems = [
   ["/prices", "Current Prices"],
@@ -29,6 +35,17 @@ export function Layout() {
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+  const [tickerPrices, setTickerPrices] = useState<PriceUpdate[]>([]);
+  const showTicker = !TICKER_HIDDEN_PREFIXES.some((prefix) => location.pathname.startsWith(prefix));
+
+  useEffect(() => {
+    if (!showTicker) return;
+    const loadTicker = () => { void apiFetch<PriceUpdate[]>("/price-updates").then(setTickerPrices).catch(() => {}); };
+    loadTicker();
+    if (dataSaver) return;
+    const interval = setInterval(loadTicker, TICKER_REFRESH_MS);
+    return () => clearInterval(interval);
+  }, [dataSaver, showTicker]);
 
   useEffect(() => {
     // Wait for auth to resolve so an already-logged-in admin's own visits never get
@@ -92,6 +109,7 @@ export function Layout() {
             <button type="button" className={easyReading ? "toggle-pill on" : "toggle-pill"} aria-pressed={easyReading} onClick={toggleEasyReading}>Easy reading: {easyReading ? "On" : "Off"}</button>
           </span>
         </div>
+        {showTicker && <PriceTicker items={tickerPrices} />}
       </header>
       {trialDaysLeft !== null && trialDaysLeft >= 0 && (
         <div className="trial-banner">

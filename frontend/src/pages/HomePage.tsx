@@ -4,7 +4,6 @@ import { CommodityImage } from "../components/CommodityImage";
 import { Disclaimer, PRICE_DISCLAIMER } from "../components/Disclaimer";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { PriceCard } from "../components/PriceCard";
-import { PriceTicker } from "../components/PriceTicker";
 import { NativeShareButton } from "../components/ShareButtons";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { usePreferences } from "../context/PreferencesContext";
@@ -18,7 +17,6 @@ export function HomePage() {
   useDocumentTitle("Know the market before you buy or sell");
   const { dataSaver } = usePreferences();
   const [prices, setPrices] = useState<PriceUpdate[]>([]);
-  const [tickerPrices, setTickerPrices] = useState<PriceUpdate[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [upcoming, setUpcoming] = useState<Commodity[]>([]);
@@ -29,7 +27,7 @@ export function HomePage() {
 
   const loadPrices = (silent = false) => {
     apiFetch<PriceUpdate[]>("/price-updates")
-      .then((items) => { setPrices(items.slice(0, 3)); setTickerPrices(items); setRecordCount(items.length); })
+      .then((items) => { setPrices(items.slice(0, 3)); setRecordCount(items.length); })
       .catch((err: Error) => { if (!silent) setError(err.message); })
       .finally(() => { if (!silent) setLoading(false); });
   };
@@ -61,7 +59,6 @@ export function HomePage() {
 
   return (
     <>
-      <PriceTicker items={tickerPrices} />
       <section className="hero page">
         <div className="hero-copy">
           <span className="eyebrow">Market price information</span>
