@@ -112,11 +112,11 @@ def get_price_update(price_update_id: int, db: Session = Depends(get_db)) -> Pri
 def add_price_update(
     payload: PriceUpdateCreate,
     db: Session = Depends(get_db),
-    current_admin: User = Depends(require_roles("admin")),
+    current_user: User = Depends(require_roles("admin", "reporter")),
 ) -> PriceUpdate:
-    item = create_price_update(db, payload, current_admin)
+    item = create_price_update(db, payload, current_user)
     create_audit_log(
-        db, actor=current_admin, action="price_update.create", table_name="price_updates",
+        db, actor=current_user, action="price_update.create", table_name="price_updates",
         record_id=item.id, new_value=snapshot_model(item),
     )
     return item

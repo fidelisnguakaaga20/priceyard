@@ -90,6 +90,7 @@ export function Layout() {
             <div className="nav-account">
               {user && <NavLink to="/watchlist" onClick={() => setOpen(false)}>Watchlist</NavLink>}
               {user && <NavLink to="/feedback" onClick={() => setOpen(false)}>Feedback</NavLink>}
+              {(user?.role === "reporter" || user?.role === "admin") && <NavLink to="/report-price" onClick={() => setOpen(false)}>Report a price</NavLink>}
               {user?.role === "admin" && <NavLink to="/admin" onClick={() => setOpen(false)}>Admin</NavLink>}
               {user ? (
                 <>

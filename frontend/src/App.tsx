@@ -15,6 +15,7 @@ import { PaymentCallbackPage } from "./pages/PaymentCallbackPage";
 import { PriceHistoryPage } from "./pages/PriceHistoryPage";
 import { PricesPage } from "./pages/PricesPage";
 import { RegisterPage } from "./pages/RegisterPage";
+import { ReportPricePage } from "./pages/ReportPricePage";
 import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import { WatchlistPage } from "./pages/WatchlistPage";
 import { AdminActivityPage } from "./pages/admin/AdminActivityPage";
@@ -51,6 +52,7 @@ export default function App() {
         <Route path="payment/callback" element={<ProtectedRoute><PaymentCallbackPage /></ProtectedRoute>} />
         <Route path="watchlist" element={<ProtectedRoute><WatchlistPage /></ProtectedRoute>} />
         <Route path="feedback" element={<ProtectedRoute><FeedbackPage /></ProtectedRoute>} />
+        <Route path="report-price" element={<ProtectedRoute><ReportPricePage /></ProtectedRoute>} />
         <Route path="admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
           <Route index element={<AdminDashboardPage />} />
           <Route path="activity" element={<AdminActivityPage />} />

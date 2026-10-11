@@ -113,8 +113,19 @@ def _approved_price_statement(
 
 def create_price_update(db: Session, payload: PriceUpdateCreate, creator: User) -> PriceUpdate:
     _validate_reference_records(db, payload.commodity_id, payload.market_id)
+    values = payload.model_dump()
+    if creator.role == "reporter":
+        # A reporter submits a raw field observation only. Confidence level and any
+        # editorial commentary/sourcing are the admin's judgment to add during
+        # review, not something an unvetted submission should be able to self-attest.
+        values["confidence_level"] = "Reporter submitted"
+        values["possible_meaning"] = None
+        values["suggested_action"] = "Watch"
+        values["source_type"] = None
+        values["source_1"] = None
+        values["source_2"] = None
     price_update = PriceUpdate(
-        **payload.model_dump(),
+        **values,
         status="pending",
         created_by=creator.id,
         approved_by=None,

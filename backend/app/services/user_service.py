@@ -54,6 +54,9 @@ def update_user(db: Session, user: User, payload: AdminUserUpdate) -> User:
     elif payload.role == "admin":
         user.role = "admin"
         db.commit()
+    elif payload.role == "reporter":
+        user.role = "reporter"
+        db.commit()
     else:
         db.commit()
 

@@ -18,5 +18,5 @@ class UserResponse(BaseModel):
 
 
 class AdminUserUpdate(BaseModel):
-    role: Literal["admin", "free_user", "paid_user"] | None = None
+    role: Literal["admin", "free_user", "paid_user", "reporter"] | None = None
     is_active: bool | None = None

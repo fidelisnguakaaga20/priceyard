@@ -11,7 +11,7 @@ from app.security import decode_access_token
 from app.services.subscription_service import get_subscription_for_user, has_full_access
 
 bearer_scheme = HTTPBearer(auto_error=False)
-VALID_MVP_ROLES = frozenset({"admin", "free_user", "paid_user"})
+VALID_MVP_ROLES = frozenset({"admin", "free_user", "paid_user", "reporter"})
 
 
 def get_current_user(

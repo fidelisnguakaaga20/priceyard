@@ -3,7 +3,7 @@ export type User = {
   full_name: string;
   email: string;
   phone: string | null;
-  role: "admin" | "free_user" | "paid_user" | string;
+  role: "admin" | "free_user" | "paid_user" | "reporter" | string;
   is_active: boolean;
   referred_by_id: number | null;
   created_at: string;
