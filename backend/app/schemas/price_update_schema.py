@@ -174,3 +174,10 @@ class PriceUpdateAdminResponse(PriceUpdatePublicResponse):
     source_2: str | None
     created_by: int
     approved_by: int | None
+
+
+class SubmissionStats(BaseModel):
+    submitted: int
+    pending: int
+    approved: int
+    rejected: int

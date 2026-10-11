@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { ApiError, apiFetch } from "../services/api";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
+import { useTranslation } from "../translations";
 import type { Commodity, Market } from "../types/api";
 
 const movements = ["up", "down", "stable", "unknown"];
@@ -22,6 +23,7 @@ export function ReportPricePage() {
   useDocumentTitle("Report a price");
   const { token, user } = useAuth();
   const { showToast } = useToast();
+  const t = useTranslation();
   const [commodities, setCommodities] = useState<Commodity[]>([]);
   const [markets, setMarkets] = useState<Market[]>([]);
   const [optionsLoading, setOptionsLoading] = useState(true);
@@ -82,37 +84,37 @@ export function ReportPricePage() {
 
   return <section className="page page-section narrow">
     <div className="page-title">
-      <span className="eyebrow">Field report</span>
-      <h1>Report a market price</h1>
-      <p>Quick price report from the market. An admin will review before it goes live — no need to add commentary or sourcing.</p>
+      <span className="eyebrow">{t("report_eyebrow")}</span>
+      <h1>{t("report_heading")}</h1>
+      <p>{t("report_sub")}</p>
     </div>
     <form className="form-stack card" onSubmit={submit}>
       <label>
-        Commodity
+        {t("report_commodity")}
         <select name="commodity_id" required disabled={optionsLoading}>
-          <option value="">Choose a commodity</option>
+          <option value="">{t("report_choose_commodity")}</option>
           {commodities.map((item) => <option value={item.id} key={item.id}>{item.name}</option>)}
         </select>
       </label>
       <label>
-        Market
+        {t("report_market")}
         <select name="market_id" required disabled={optionsLoading}>
-          <option value="">Choose a market</option>
+          <option value="">{t("report_choose_market")}</option>
           {markets.map((item) => <option value={item.id} key={item.id}>{item.name}</option>)}
         </select>
       </label>
       <div className="form-grid">
-        <label>Price low<input name="price_low" type="number" min="0" step="0.01" required /></label>
-        <label>Price high<input name="price_high" type="number" min="0" step="0.01" required /></label>
-        <label>Number of bags<input name="unit" defaultValue="1 bag" placeholder="e.g. 1 bag" required /></label>
-        <label>Bag size (kg)<input name="bag_size" placeholder="e.g. 50kg" required /></label>
-        <label>Movement<select name="movement" defaultValue="unknown">{movements.map((item) => <option key={item}>{item}</option>)}</select></label>
-        <label>Date/time seen<input name="update_date_time" type="datetime-local" defaultValue={nowForInput()} required /></label>
+        <label>{t("report_price_low")}<input name="price_low" type="number" min="0" step="0.01" required /></label>
+        <label>{t("report_price_high")}<input name="price_high" type="number" min="0" step="0.01" required /></label>
+        <label>{t("report_unit")}<input name="unit" defaultValue="1 bag" placeholder="e.g. 1 bag" required /></label>
+        <label>{t("report_bag_size")}<input name="bag_size" placeholder="e.g. 50kg" required /></label>
+        <label>{t("report_movement")}<select name="movement" defaultValue="unknown">{movements.map((item) => <option key={item}>{item}</option>)}</select></label>
+        <label>{t("report_date_seen")}<input name="update_date_time" type="datetime-local" defaultValue={nowForInput()} required /></label>
       </div>
       {message && <div className="status-box success">{message}</div>}
       {error && <div className="status-box error">{error}</div>}
       <button className="button" disabled={busy || optionsLoading}>
-        {busy ? <ButtonSpinner label="Submitting…" /> : "Submit price report"}
+        {busy ? <ButtonSpinner label={t("report_submitting")} /> : t("report_submit")}
       </button>
     </form>
   </section>;

@@ -4,7 +4,7 @@ import { ONBOARDING_TOUR_SEEN_EVENT, ONBOARDING_TOUR_SEEN_KEY } from "../compone
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { apiFetch } from "../services/api";
-import type { PaymentInitiateResponse, PaymentPlan, ReferralSummary } from "../types/api";
+import type { PaymentInitiateResponse, PaymentPlan, ReferralSummary, SubmissionStats } from "../types/api";
 import { dateOnly, referralLink, referralWhatsAppShareUrl } from "../utils";
 
 const ONBOARDING_KEY = "priceyard_onboarding_dismissed";
@@ -23,6 +23,7 @@ export function DashboardPage() {
   const [onboardingDismissed, setOnboardingDismissed] = useState(readOnboardingDismissed);
   const [tourSeen, setTourSeen] = useState(readTourSeen);
   const [referral, setReferral] = useState<ReferralSummary | null>(null);
+  const [submissionStats, setSubmissionStats] = useState<SubmissionStats | null>(null);
   const [copied, setCopied] = useState(false);
   const [upgrading, setUpgrading] = useState<PaymentPlan | null>(null);
   const dismissOnboarding = () => {
@@ -38,6 +39,10 @@ export function DashboardPage() {
   useEffect(() => {
     if (!token || user?.role === "admin") return;
     apiFetch<ReferralSummary>("/auth/referral-summary", {}, token).then(setReferral).catch(() => undefined);
+  }, [token, user?.role]);
+  useEffect(() => {
+    if (!token || user?.role !== "reporter") return;
+    apiFetch<SubmissionStats>("/price-updates/my-stats", {}, token).then(setSubmissionStats).catch(() => undefined);
   }, [token, user?.role]);
   const copyReferralLink = async () => {
     if (!referral) return;
@@ -89,6 +94,19 @@ export function DashboardPage() {
         </div>
       </article>
     )}
+    {submissionStats && (
+      <article className="card">
+        <span className="eyebrow">Your field reports</span>
+        <h2>{submissionStats.submitted} submitted</h2>
+        <p>Thanks for helping keep PriceYard current. Every report is reviewed by an admin before it goes live.</p>
+        <dl className="data-list compact">
+          <div><dt>Approved</dt><dd>{submissionStats.approved}</dd></div>
+          <div><dt>Pending review</dt><dd>{submissionStats.pending}</dd></div>
+          <div><dt>Rejected</dt><dd>{submissionStats.rejected}</dd></div>
+        </dl>
+        <div className="button-row"><Link className="button button-small" to="/report-price">Report another price →</Link></div>
+      </article>
+    )}
     {referral && (
       <article className="card">
         <span className="eyebrow">Invite a friend</span>
@@ -101,6 +119,6 @@ export function DashboardPage() {
         </div>
       </article>
     )}
-    <div className="shortcut-grid"><Link className="shortcut" to="/prices"><strong>Prices</strong><span>See latest prices →</span></Link><Link className="shortcut" to="/watchlist"><strong>Watchlist</strong><span>See what you saved →</span></Link><Link className="shortcut" to="/feedback"><strong>Feedback</strong><span>Tell us what you think →</span></Link><Link className="shortcut" to="/history"><strong>History</strong><span>See past prices →</span></Link>{user.role === "admin" && <Link className="shortcut" to="/admin"><strong>Admin</strong><span>Manage PriceYard MVP records →</span></Link>}</div>
+    <div className="shortcut-grid"><Link className="shortcut" to="/prices"><strong>Prices</strong><span>See latest prices →</span></Link><Link className="shortcut" to="/watchlist"><strong>Watchlist</strong><span>See what you saved →</span></Link><Link className="shortcut" to="/feedback"><strong>Feedback</strong><span>Tell us what you think →</span></Link><Link className="shortcut" to="/history"><strong>History</strong><span>See past prices →</span></Link>{(user.role === "reporter" || user.role === "admin") && <Link className="shortcut" to="/report-price"><strong>Report a price</strong><span>Submit a field observation →</span></Link>}{user.role === "admin" && <Link className="shortcut" to="/admin"><strong>Admin</strong><span>Manage PriceYard MVP records →</span></Link>}</div>
   </section>;
 }

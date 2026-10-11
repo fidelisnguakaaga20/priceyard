@@ -30,6 +30,7 @@ def notify_watchlist_subscribers(db: Session, price_update: PriceUpdate) -> int:
     from app.config import get_settings
     from app.services.email_service import send_email
     from app.services.push_service import send_push_to_user
+    from app.services.whatsapp_service import send_whatsapp_message
 
     frontend_url = get_settings().frontend_url.rstrip("/")
 
@@ -85,5 +86,18 @@ def notify_watchlist_subscribers(db: Session, price_update: PriceUpdate) -> int:
                 url=f"{frontend_url}/prices",
             )
         except Exception:
-            continue
+            pass
+
+        if user.phone:
+            try:
+                send_whatsapp_message(
+                    to_phone=user.phone,
+                    body=(
+                        f"PriceYard: {price_update.commodity.name} at {price_update.market.name} is now "
+                        f"NGN {price_update.price_low:,.0f} - NGN {price_update.price_high:,.0f} ({price_update.unit}). "
+                        f"{frontend_url}/prices"
+                    ),
+                )
+            except Exception:
+                continue
     return sent

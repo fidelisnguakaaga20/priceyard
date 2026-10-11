@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import type { Language } from "../translations";
 
 type PreferencesContextValue = {
   dataSaver: boolean;
@@ -7,12 +8,23 @@ type PreferencesContextValue = {
   toggleEasyReading: () => void;
   darkMode: boolean;
   toggleDarkMode: () => void;
+  language: Language;
+  toggleLanguage: () => void;
 };
 
 const DATA_SAVER_KEY = "priceyard_data_saver";
 const EASY_READING_KEY = "priceyard_easy_reading";
 const DARK_MODE_KEY = "priceyard_dark_mode";
+const LANGUAGE_KEY = "priceyard_language";
 const PreferencesContext = createContext<PreferencesContextValue | undefined>(undefined);
+
+function readStoredLanguage(): Language {
+  try {
+    return localStorage.getItem(LANGUAGE_KEY) === "pcm" ? "pcm" : "en";
+  } catch {
+    return "en";
+  }
+}
 
 function readStoredBoolean(key: string): boolean {
   try {
@@ -57,8 +69,10 @@ export function PreferencesProvider({ children }: { children: React.ReactNode })
   const [easyReading, setEasyReading] = useState(() => readStoredBoolean(EASY_READING_KEY));
   const [darkOverride, setDarkOverride] = useState<boolean | null>(() => readStoredTheme());
   const darkMode = darkOverride ?? systemPrefersDark();
+  const [language, setLanguage] = useState<Language>(() => readStoredLanguage());
 
   useEffect(() => { writeStoredBoolean(DATA_SAVER_KEY, dataSaver); }, [dataSaver]);
+  useEffect(() => { try { localStorage.setItem(LANGUAGE_KEY, language); } catch { /* ignore storage failures */ } }, [language]);
   useEffect(() => {
     writeStoredBoolean(EASY_READING_KEY, easyReading);
     document.documentElement.classList.toggle("easy-reading", easyReading);
@@ -82,6 +96,8 @@ export function PreferencesProvider({ children }: { children: React.ReactNode })
       writeStoredBoolean(DARK_MODE_KEY, next);
       setDarkOverride(next);
     },
+    language,
+    toggleLanguage: () => setLanguage((value) => (value === "en" ? "pcm" : "en")),
   };
 
   return <PreferencesContext.Provider value={value}>{children}</PreferencesContext.Provider>;

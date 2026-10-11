@@ -34,6 +34,9 @@ class Settings(BaseSettings):
     vapid_public_key: str | None = None
     vapid_private_key: str | None = None
     vapid_claim_email: str = "fidelisnguakaaga20@gmail.com"
+    whatsapp_phone_number_id: str | None = None
+    whatsapp_access_token: str | None = None
+    whatsapp_api_version: str = "v21.0"
 
     model_config = SettingsConfigDict(
         env_file=".env",

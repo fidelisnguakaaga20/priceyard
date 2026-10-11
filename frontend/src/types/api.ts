@@ -213,6 +213,13 @@ export type PriceUpdateAdmin = PriceUpdate & {
   approved_by: number | null;
 };
 
+export type SubmissionStats = {
+  submitted: number;
+  pending: number;
+  approved: number;
+  rejected: number;
+};
+
 export type FeedbackItem = {
   id: number; user_id: number; rating: number; comment: string | null; price_usefulness: string | null; price_accuracy: string | null;
   missing_market_request: string | null; missing_commodity_request: string | null; complaint_or_suggestion: string | null;

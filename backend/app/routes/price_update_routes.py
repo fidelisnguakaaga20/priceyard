@@ -13,6 +13,7 @@ from app.schemas.price_update_schema import (
     PriceUpdateCreate,
     PriceUpdatePublicResponse,
     PriceUpdateUpdate,
+    SubmissionStats,
     TimeOfDay,
 )
 from app.services.audit_service import create_audit_log, snapshot_model
@@ -23,6 +24,7 @@ from app.services.price_update_service import (
     delete_price_update,
     get_approved_price_update,
     get_price_update_for_admin,
+    get_submission_stats,
     list_latest_approved_price_updates,
     list_admin_price_updates,
     list_market_comparison,
@@ -101,6 +103,14 @@ def get_flagged_price_updates(
     _admin: User = Depends(require_roles("admin")),
 ) -> list[FlaggedPriceSummary]:
     return list_flagged_price_updates(db)
+
+
+@router.get("/my-stats", response_model=SubmissionStats)
+def get_my_submission_stats(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> dict[str, int]:
+    return get_submission_stats(db, current_user.id)
 
 
 @router.get("/{price_update_id}", response_model=PriceUpdatePublicResponse)

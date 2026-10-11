@@ -2,7 +2,7 @@ from datetime import date, datetime, time, timedelta, timezone
 from decimal import Decimal
 
 from fastapi import HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
@@ -222,6 +222,23 @@ def list_price_history(
         include_outdated=True,
     ).order_by(PriceUpdate.update_date_time.asc(), PriceUpdate.id.asc())
     return list(db.scalars(statement).all())
+
+
+def get_submission_stats(db: Session, user_id: int) -> dict[str, int]:
+    """Counts of this user's own price-update submissions by status, so reporters
+    (who otherwise get no feedback after submitting) can see their contributions."""
+    rows = db.execute(
+        select(PriceUpdate.status, func.count())
+        .where(PriceUpdate.created_by == user_id)
+        .group_by(PriceUpdate.status)
+    ).all()
+    counts = {status_value: count for status_value, count in rows}
+    return {
+        "submitted": sum(counts.values()),
+        "pending": counts.get("pending", 0),
+        "approved": counts.get("approved", 0),
+        "rejected": counts.get("rejected", 0),
+    }
 
 
 def list_admin_price_updates(db: Session) -> list[PriceUpdate]:

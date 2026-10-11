@@ -8,6 +8,7 @@ import { NativeShareButton } from "../components/ShareButtons";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { usePreferences } from "../context/PreferencesContext";
 import { apiFetch } from "../services/api";
+import { useTranslation } from "../translations";
 import type { Commodity, Market, PriceUpdate, Testimonial } from "../types/api";
 import { comingSoonShareContent, comingSoonShareUrl, dateOnly, money, priceShareContent, relativeTime, whatsAppShareUrl, WHATSAPP_COMMUNITY_URL } from "../utils";
 
@@ -16,6 +17,7 @@ const AUTO_REFRESH_MS = 60_000;
 export function HomePage() {
   useDocumentTitle("Know the market before you buy or sell");
   const { dataSaver } = usePreferences();
+  const t = useTranslation();
   const [prices, setPrices] = useState<PriceUpdate[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -61,12 +63,12 @@ export function HomePage() {
     <>
       <section className="hero page">
         <div className="hero-copy">
-          <span className="eyebrow">Market price information</span>
-          <h1>Know the market before you buy or sell.</h1>
-          <p>See today's and past prices, price changes, and real market updates for Egusi, Honey Beans and Palm oil.</p>
+          <span className="eyebrow">{t("home_eyebrow")}</span>
+          <h1>{t("home_headline")}</h1>
+          <p>{t("home_subtext")}</p>
           {!loading && prices[0] && (
             <div className="hero-price-preview">
-              <span className="eyebrow">Live now</span>
+              <span className="eyebrow">{t("home_live_now")}</span>
               <p className="price-range">{prices[0].commodity.name}: {money(prices[0].price_low)} – {money(prices[0].price_high)}</p>
               <span className="muted">{prices[0].market.name} · updated {relativeTime(prices[0].update_date_time)}</span>
               <a className="text-link" href={whatsAppShareUrl(prices[0])} target="_blank" rel="noopener noreferrer">Share on WhatsApp →</a>
@@ -74,33 +76,33 @@ export function HomePage() {
             </div>
           )}
           <div className="button-row">
-            <Link className="button" to="/prices">Check prices</Link>
-            <Link className="button button-secondary" to="/market-days">See market days</Link>
+            <Link className="button" to="/prices">{t("home_check_prices")}</Link>
+            <Link className="button button-secondary" to="/market-days">{t("home_see_market_days")}</Link>
           </div>
         </div>
         <div className="hero-panel">
-          <strong>PriceYard starts focused.</strong>
+          <strong>{t("home_panel_title")}</strong>
           <ul>
-            <li>PriceYard covers Egusi, Honey Beans, Palm oil</li>
-            <li>Abuja/FCT, Kwali, Nasarawa, Benue</li>
-            <li>Real price range, not one fixed number</li>
-            <li>How sure we are about the price, and when it was last checked</li>
+            <li>{t("home_panel_li1")}</li>
+            <li>{t("home_panel_li2")}</li>
+            <li>{t("home_panel_li3")}</li>
+            <li>{t("home_panel_li4")}</li>
           </ul>
-          <a className="text-link" href={WHATSAPP_COMMUNITY_URL} target="_blank" rel="noopener noreferrer">Join our free WhatsApp updates →</a>
+          <a className="text-link" href={WHATSAPP_COMMUNITY_URL} target="_blank" rel="noopener noreferrer">{t("home_join_whatsapp")}</a>
         </div>
       </section>
 
       {commodityCount !== null && marketCount !== null && recordCount !== null && (
         <div className="page stats-strip">
-          <span><strong>{commodityCount}</strong> product{commodityCount === 1 ? "" : "s"} tracked</span>
-          <span><strong>{marketCount}</strong> market{marketCount === 1 ? "" : "s"} covered</span>
-          <span><strong>{recordCount}</strong> confirmed price{recordCount === 1 ? "" : "s"}</span>
+          <span><strong>{commodityCount}</strong> {t("home_products_tracked")}</span>
+          <span><strong>{marketCount}</strong> {t("home_markets_covered")}</span>
+          <span><strong>{recordCount}</strong> {t("home_confirmed_prices")}</span>
         </div>
       )}
 
       {upcoming.length > 0 && (
         <section className="page section-block">
-          <div className="section-heading"><div><span className="eyebrow">Coming soon</span><h2>New products coming soon</h2></div></div>
+          <div className="section-heading"><div><span className="eyebrow">{t("home_coming_soon_eyebrow")}</span><h2>{t("home_coming_soon_heading")}</h2></div></div>
           <div className="card-grid">
             {upcoming.map((item) => (
               <article className="card" key={item.id}>
@@ -118,13 +120,13 @@ export function HomePage() {
       )}
 
       <section className="page section-block">
-        <div className="section-heading"><div><span className="eyebrow">Latest market information</span><h2>Today's prices</h2></div><Link className="text-link" to="/prices">See all prices →</Link></div>
+        <div className="section-heading"><div><span className="eyebrow">{t("home_today_eyebrow")}</span><h2>{t("home_today_heading")}</h2></div><Link className="text-link" to="/prices">{t("home_see_all_prices")}</Link></div>
         {loading ? <LoadingSpinner label="Loading approved prices…" /> : error ? <div className="status-box error">Could not load prices: {error}</div> : prices.length ? <div className="card-grid">{prices.map((item) => <PriceCard key={item.id} item={item} />)}</div> : <div className="status-box">No approved current price updates are available yet. Check back soon.</div>}
       </section>
 
       {testimonials.length > 0 && (
         <section className="page section-block">
-          <div className="section-heading"><div><span className="eyebrow">From real users</span><h2>What traders are saying</h2></div></div>
+          <div className="section-heading"><div><span className="eyebrow">{t("home_testimonials_eyebrow")}</span><h2>{t("home_testimonials_heading")}</h2></div></div>
           <div className="card-grid">
             {testimonials.map((item) => (
               <article className="card testimonial-card" key={item.id}>
@@ -138,9 +140,9 @@ export function HomePage() {
       )}
 
       <section className="page section-block three-column">
-        <article className="info-tile"><span>01</span><h3>Compare prices</h3><p>See current and previous ranges without pretending every market transaction has one exact price.</p></article>
-        <article className="info-tile"><span>02</span><h3>Read our market notes</h3><p>Possible Meaning and Suggested Action stay observational and are never presented as guaranteed trading instructions.</p></article>
-        <article className="info-tile"><span>03</span><h3>Check how sure we are</h3><p>Use source confidence, market timing and freshness before making a major buying, selling or storage decision.</p></article>
+        <article className="info-tile"><span>01</span><h3>{t("home_tile1_title")}</h3><p>{t("home_tile1_body")}</p></article>
+        <article className="info-tile"><span>02</span><h3>{t("home_tile2_title")}</h3><p>{t("home_tile2_body")}</p></article>
+        <article className="info-tile"><span>03</span><h3>{t("home_tile3_title")}</h3><p>{t("home_tile3_body")}</p></article>
       </section>
 
       <section className="page section-block"><Disclaimer>{PRICE_DISCLAIMER}</Disclaimer></section>
