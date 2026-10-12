@@ -11,7 +11,6 @@ import { usePreferences } from "../context/PreferencesContext";
 import { useToast } from "../context/ToastContext";
 import { SUPPORT_WHATSAPP_NUMBER, WhatsAppSupportButton } from "./WhatsAppSupportButton";
 import type { PriceUpdate } from "../types/api";
-import { useTranslation } from "../translations";
 import { daysUntil, WHATSAPP_COMMUNITY_URL } from "../utils";
 
 const VISIT_PING_KEY = "py_visit_pinged";
@@ -21,17 +20,16 @@ const TICKER_REFRESH_MS = 60_000;
 const TICKER_HIDDEN_PREFIXES = ["/admin", "/login", "/register"];
 
 const navItems = [
-  ["/prices", "nav_current_prices"],
-  ["/history", "nav_price_history"],
-  ["/market-days", "nav_market_days"],
-  ["/faq", "nav_faq"],
+  ["/prices", "Current Prices"],
+  ["/history", "Price History"],
+  ["/market-days", "Market Days"],
+  ["/faq", "FAQ"],
 ] as const;
 
 export function Layout() {
   const { user, accessLabel, subscription, logout, loading: authLoading } = useAuth();
   const trialDaysLeft = accessLabel === "Trial" ? daysUntil(subscription?.trial_ends_at) : null;
-  const { dataSaver, toggleDataSaver, easyReading, toggleEasyReading, darkMode, toggleDarkMode, language, toggleLanguage } = usePreferences();
-  const t = useTranslation();
+  const { dataSaver, toggleDataSaver, easyReading, toggleEasyReading, darkMode, toggleDarkMode } = usePreferences();
   const { showToast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -87,20 +85,20 @@ export function Layout() {
           <button className="menu-button" type="button" aria-label="Toggle navigation" aria-expanded={open} onClick={() => setOpen((value) => !value)}>☰ Menu</button>
           <nav className={open ? "main-nav open" : "main-nav"} aria-label="Primary navigation">
             <div className="nav-primary">
-              {navItems.map(([to, labelKey]) => <NavLink key={to} to={to} onClick={() => setOpen(false)}>{t(labelKey)}</NavLink>)}
+              {navItems.map(([to, label]) => <NavLink key={to} to={to} onClick={() => setOpen(false)}>{label}</NavLink>)}
             </div>
             <div className="nav-account">
-              {user && <NavLink to="/watchlist" onClick={() => setOpen(false)}>{t("nav_watchlist")}</NavLink>}
-              {user && <NavLink to="/feedback" onClick={() => setOpen(false)}>{t("nav_feedback")}</NavLink>}
-              {(user?.role === "reporter" || user?.role === "admin") && <NavLink to="/report-price" onClick={() => setOpen(false)}>{t("nav_report_price")}</NavLink>}
-              {user?.role === "admin" && <NavLink to="/admin" onClick={() => setOpen(false)}>{t("nav_admin")}</NavLink>}
+              {user && <NavLink to="/watchlist" onClick={() => setOpen(false)}>Watchlist</NavLink>}
+              {user && <NavLink to="/feedback" onClick={() => setOpen(false)}>Feedback</NavLink>}
+              {(user?.role === "reporter" || user?.role === "admin") && <NavLink to="/report-price" onClick={() => setOpen(false)}>Report a price</NavLink>}
+              {user?.role === "admin" && <NavLink to="/admin" onClick={() => setOpen(false)}>Admin</NavLink>}
               {user ? (
                 <>
-                  <NavLink to="/dashboard" onClick={() => setOpen(false)}>{t("nav_dashboard")}</NavLink>
-                  <button className="nav-button" type="button" disabled={loggingOut} onClick={() => void handleLogout()}>{loggingOut ? <ButtonSpinner label="Please wait…" /> : t("nav_log_out")}</button>
+                  <NavLink to="/dashboard" onClick={() => setOpen(false)}>Dashboard</NavLink>
+                  <button className="nav-button" type="button" disabled={loggingOut} onClick={() => void handleLogout()}>{loggingOut ? <ButtonSpinner label="Please wait…" /> : "Log out"}</button>
                 </>
               ) : (
-                <NavLink className="nav-cta" to="/login" onClick={() => setOpen(false)}>{t("nav_log_in")}</NavLink>
+                <NavLink className="nav-cta" to="/login" onClick={() => setOpen(false)}>Log in</NavLink>
               )}
             </div>
           </nav>
@@ -108,10 +106,9 @@ export function Layout() {
         <div className="access-strip">
           <span>Access: <strong>{accessLabel}</strong></span>{user && <span>{user.full_name}</span>}
           <span className="display-toggles">
-            <button type="button" className={dataSaver ? "toggle-pill on" : "toggle-pill"} aria-pressed={dataSaver} onClick={toggleDataSaver}>{t("toggle_data_saver")}: {dataSaver ? t("toggle_on") : t("toggle_off")}</button>
-            <button type="button" className={easyReading ? "toggle-pill on" : "toggle-pill"} aria-pressed={easyReading} onClick={toggleEasyReading}>{t("toggle_easy_reading")}: {easyReading ? t("toggle_on") : t("toggle_off")}</button>
-            <button type="button" className={darkMode ? "toggle-pill on" : "toggle-pill"} aria-pressed={darkMode} onClick={toggleDarkMode}>{t("toggle_dark_mode")}: {darkMode ? t("toggle_on") : t("toggle_off")}</button>
-            <button type="button" className={language === "pcm" ? "toggle-pill on" : "toggle-pill"} aria-pressed={language === "pcm"} onClick={toggleLanguage}>{t("toggle_language")}: {language === "pcm" ? t("language_pidgin") : t("language_english")}</button>
+            <button type="button" className={dataSaver ? "toggle-pill on" : "toggle-pill"} aria-pressed={dataSaver} onClick={toggleDataSaver}>Data saver: {dataSaver ? "On" : "Off"}</button>
+            <button type="button" className={easyReading ? "toggle-pill on" : "toggle-pill"} aria-pressed={easyReading} onClick={toggleEasyReading}>Easy reading: {easyReading ? "On" : "Off"}</button>
+            <button type="button" className={darkMode ? "toggle-pill on" : "toggle-pill"} aria-pressed={darkMode} onClick={toggleDarkMode}>Dark mode: {darkMode ? "On" : "Off"}</button>
           </span>
         </div>
         {showTicker && <PriceTicker items={tickerPrices} />}
