@@ -137,3 +137,5 @@ been performed.
 ## Superseding root verification (2026-10-15)
 
 Final backend discovery passed 141 tests (zero failures/errors/skips) in 27.289 seconds. Price suite now includes 29 cases, including explicit export-bound rejection without record loss. PostgreSQL suite passed 12 tests in 20.492 seconds, including added concurrent reset-token/session and last-admin protection checks. These synthetic results supersede earlier subset counts and do not imply production/provider verification.
+
+Final checkpoint supplement: the additional exact-identity/current-measurement share-card cases raised combined backend discovery to **144/144 passed in 33.352 seconds**. Final PostgreSQL discovery **12/12 passed in 20.492 seconds**, including account-security races. See PRICEYARD_PROGRESS.md and IMPLEMENTATION_REPORT.md for the current authoritative results and local commit.

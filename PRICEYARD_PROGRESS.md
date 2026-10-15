@@ -3,7 +3,7 @@
 Last updated: 2026-10-15 (Africa/Lagos). Working branch: `codex/priceyard-hardening`.
 Latest verified: **144 backend, 12 PostgreSQL, 21 Node and 10 browser workflows passed; actual offline PWA lifecycle passed; TypeScript/Vite build passed**. No production release.
 
-Starting commit: `76dbd27`. Implementation changes are currently uncommitted; local commit references will be recorded after final review.
+Starting commit: `76dbd27`. **Implementation checkpoint: `13a83e8`** ? 187 files, including source, four migrations, tests, dependencies, progress, findings map and deployment/recovery documentation. This local commit has not been pushed. A following documentation-only commit records final handover details.
 
 ## Authority and safety boundaries
 
@@ -73,9 +73,9 @@ These are local source files, not production execution. Legacy successful paymen
 
 ## Remaining work and next resume point
 
-The earlier local implementation/testing backlog is completed except final review/checkpoint recording in progress. Consult [the implementation report](docs/IMPLEMENTATION_REPORT.md) and [all-36 findings map](docs/audit-remediation-status.md) before interpreting this as production readiness.
+The earlier local implementation/testing backlog and final review are complete at the local checkpoint, subject to the explicit unresolved security and release requirements below. Consult [the implementation report](docs/IMPLEMENTATION_REPORT.md) and [all-36 findings map](docs/audit-remediation-status.md) before interpreting this as production readiness.
 
-1. Finish recording the local checkpoint commit and final diff review; preserve all tests/results below.
+1. Completed: reviewed/staged only intended source and documentation, passed cached diff checks and created local implementation checkpoint `13a83e8`. Preserve that checkpoint and the final test results below.
 2. Before release, decide the final cookie/hosting/MFA policy; JavaScript-readable refresh tokens and missing refresh-family replay detection remain explicitly open security limitations.
 3. Separately authorize/configure staging-provider compatibility checks, scheduled outbox worker, shared limiter if scaling, target-host dependency review, exact proxy/CORS/TLS and database privileges. Current local authorization does not permit contacting live providers/production.
 4. Obtain an approved backup and isolated restore proof, review actual migration conflicts/evidence, and agree on recovery/monitoring/load targets. Do not infer actual customer records from synthetic fixtures.
@@ -115,3 +115,7 @@ Future sessions should read this file, inspect changes since the recorded checkp
 - Final frontend build after the capped badge clarification: 21 Node tests and TypeScript passed; Vite completed in 1.44 seconds, main JS 279.26 kB / 85.12 kB gzip. Documentation-only changes do not require repeating the passing runtime suites. The changed-file inventory contains 184 paths; runtime, browser binaries, build snapshots and private configuration are excluded.
 
 - Final visual review added missing grade/type labels to public cards/share text and corrected social-preview exact commodity/current measurement selection. Three new share-card HTTP tests passed; full backend now **144/144 passed in 33.352 seconds**. Final Node **21/21**, TypeScript and Vite passed in **1.86 seconds**, main JS **279.60 kB / 85.18 kB gzip**. Current browser tests also assert the grade is visible. No pricing, trial or historical record was changed.
+
+- Checkpoint: **13a83e8**, `Harden PriceYard accounts, payments, prices and isolated verification`; **187 files changed**. Commit hooks were disabled for this local checkpoint to avoid external side effects. Final browser 10/10 and PWA lifecycle both passed against the final grade-labelled build. No code changed after those checks.
+- The disposable PostgreSQL cluster is stopped after verification; its synthetic data and identity marker are retained under ignored `audit-prep/p00/runtime/`. Future PostgreSQL runs require starting only that same marked cluster on 127.0.0.1:55439, then using the fixed guarded verifier. Do not initialize or select a configured production database.
+- Next work requires a concrete remaining security/operational requirement from the list above. Do not deploy, push, merge, migrate production or contact live providers without the separate authorization those actions require.
