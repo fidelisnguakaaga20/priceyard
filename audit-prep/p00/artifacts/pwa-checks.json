@@ -1,0 +1,5 @@
+{
+  "pwa_checks_passed": 1,
+  "scope": "actual worker registration, public cache, offline shell/assets/prices, protected/history cache exclusion and logout purge",
+  "external_page_requests": 0
+}

@@ -1,0 +1,11 @@
+{
+  "real_api_preview": true,
+  "guest": {
+    "current_rows": 6,
+    "history_status": 401,
+    "sources_hidden": true
+  },
+  "trial_login": true,
+  "admin_login_and_user_list": true,
+  "production_connections": 0
+}

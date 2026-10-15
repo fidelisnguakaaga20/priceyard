@@ -1,0 +1,5 @@
+{
+  "browser_checks_passed": 10,
+  "live_requests": 0,
+  "boundary": "fresh Chromium profile; all page requests fulfilled locally; service workers blocked"
+}
