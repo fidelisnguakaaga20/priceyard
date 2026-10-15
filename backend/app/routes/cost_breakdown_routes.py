@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.cost_breakdown import CostBreakdown
 from app.models.user import User
+from app.services.intelligence_query_service import get_visible_intelligence, list_intelligence
 from app.schemas.cost_breakdown_schema import (
     CostBreakdownCreate,
     CostBreakdownResponse,
@@ -23,19 +24,24 @@ router = APIRouter(prefix="/cost-breakdowns", tags=["cost-breakdowns"])
 
 @router.get("", response_model=list[CostBreakdownResponse])
 def get_items(
+    commodity_id: int | None = Query(default=None, gt=0),
+    market_id: int | None = Query(default=None, gt=0),
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=1000, ge=1, le=1000),
     db: Session = Depends(get_db),
-    _: User = Depends(require_full_access),
+    current_user: User = Depends(require_full_access),
 ) -> list[CostBreakdown]:
-    return list_cost_breakdowns(db)
+    return list_intelligence(db, CostBreakdown, commodity_id=commodity_id, market_id=market_id,
+                             page=page, page_size=page_size, active_only=current_user.role != "admin")
 
 
 @router.get("/{item_id}", response_model=CostBreakdownResponse)
 def get_item(
     item_id: int,
     db: Session = Depends(get_db),
-    _: User = Depends(require_full_access),
+    current_user: User = Depends(require_full_access),
 ) -> CostBreakdown:
-    return get_cost_breakdown(db, item_id)
+    return get_visible_intelligence(db, CostBreakdown, item_id, active_only=current_user.role != "admin")
 
 
 @router.post("", response_model=CostBreakdownResponse, status_code=status.HTTP_201_CREATED)

@@ -4,7 +4,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, Numeric, String, Text, func
+from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, Index, Numeric, String, Text, column, func, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -33,9 +33,23 @@ class PriceUpdate(Base):
             name="ck_price_updates_movement",
         ),
         CheckConstraint(
-            "status IN ('pending', 'approved', 'rejected')",
+            "status IN ('pending', 'approved', 'rejected', 'withdrawn')",
             name="ck_price_updates_status",
         ),
+        CheckConstraint(
+            "(previous_price_low IS NULL AND previous_price_high IS NULL) OR "
+            "(previous_price_low IS NOT NULL AND previous_price_high IS NOT NULL "
+            "AND previous_price_low >= 0 AND previous_price_high >= previous_price_low)",
+            name="ck_price_updates_previous_range",
+        ),
+        Index("ix_price_updates_current_series", "status", "commodity_id", "market_id", "update_date_time", "id"),
+        Index("ix_price_updates_approved_measurement_series", "commodity_id", "market_id",
+              func.lower(func.trim(func.coalesce(column("unit"), ""))),
+              func.lower(func.trim(func.coalesce(column("bag_size"), ""))),
+              func.lower(func.trim(func.coalesce(column("commodity_type"), ""))),
+              func.lower(func.trim(func.coalesce(column("grade"), ""))),
+              column("update_date_time").desc(), column("id").desc(),
+              postgresql_where=text("status = 'approved'"), sqlite_where=text("status = 'approved'")),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -49,6 +63,10 @@ class PriceUpdate(Base):
     unit: Mapped[str] = mapped_column(String(100), nullable=False)
     bag_size: Mapped[str | None] = mapped_column(String(100), nullable=True)
     commodity_type: Mapped[str | None] = mapped_column(String(150), nullable=True)
+    grade: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    previous_price_update_id: Mapped[int | None] = mapped_column(
+        ForeignKey("price_updates.id", ondelete="RESTRICT"), nullable=True, index=True
+    )
     market_day: Mapped[str | None] = mapped_column(String(30), nullable=True)
     time_of_day: Mapped[str | None] = mapped_column(String(20), nullable=True)
     movement: Mapped[str] = mapped_column(String(20), nullable=False, default="unknown", index=True)
@@ -77,3 +95,13 @@ class PriceUpdate(Base):
     flags: Mapped[list[PriceFlag]] = relationship(
         back_populates="price_update", cascade="all, delete-orphan", passive_deletes=True
     )
+
+    @property
+    def measurement_series(self) -> str:
+        from app.utils.price_measurement import series_key
+
+        return series_key(self)
+
+    @property
+    def measurement_status(self) -> str:
+        return "recorded_labels" if self.bag_size and self.bag_size.strip() else "legacy_unspecified"

@@ -6,6 +6,7 @@ from app.models.commodity import Commodity
 from app.models.market import Market
 from app.models.sell_watch_window import SellWatchWindow
 from app.models.user import User
+from app.services.intelligence_query_service import reject_null_required
 from app.schemas.sell_watch_window_schema import SellWatchWindowCreate, SellWatchWindowUpdate
 
 
@@ -53,6 +54,7 @@ def update_sell_watch_window(
     db: Session, window: SellWatchWindow, payload: SellWatchWindowUpdate
 ) -> SellWatchWindow:
     changes = payload.model_dump(exclude_unset=True)
+    reject_null_required(changes, ("commodity_id", "market_id", "start_period", "observation", "confidence"))
     commodity_id = int(changes.get("commodity_id", window.commodity_id))
     market_id = int(changes.get("market_id", window.market_id))
     _validate_active_market_scope(db, commodity_id=commodity_id, market_id=market_id)

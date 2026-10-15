@@ -4,7 +4,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Numeric, func
+from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, Numeric, String, false, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -32,12 +32,18 @@ class CostBreakdown(Base):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    is_archived: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default=false())
     # Pinned to the commodity+market, not to one specific price record -- a price
     # update replaces the old row entirely (a new id), so a cost breakdown tied to a
     # single price_update_id would silently stop showing the moment the price next
     # changed. This way the cost data stays attached and visible across price updates.
     commodity_id: Mapped[int] = mapped_column(ForeignKey("commodities.id", ondelete="RESTRICT"), nullable=False, index=True)
     market_id: Mapped[int] = mapped_column(ForeignKey("markets.id", ondelete="RESTRICT"), nullable=False, index=True)
+    unit: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    bag_size: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    commodity_type: Mapped[str | None] = mapped_column(String(150), nullable=True)
+    grade: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    reference_date_time: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     transport: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False, default=Decimal("0.00"))
     warehouse: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False, default=Decimal("0.00"))
     security: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False, default=Decimal("0.00"))

@@ -1,36 +1,69 @@
-# PriceYard Stage 20 Access-Control Matrix
+# PriceYard access-control matrix
 
-Status: **IN PROGRESS — pre-fix assessment**
+Current hardening-branch contract, October 2026. Backend authorization is authoritative.
+Earlier stage pre-fix matrices are superseded by the full development authorization.
 
-Authority: PriceYard Official Reference Document → Architecture Design → AI Project Execution Plan.
+Commercial entitlement and work authority are independent. Free/expired accounts
+receive limited access. Valid Trial/Paid/manual grants provide full commercial
+access. Reporter/Admin authority does not disappear when a subscription expires.
 
-The backend is the security authority. Frontend hiding is presentation only and is never accepted as access-control proof.
+| Capability | Guest | Free / expired | Valid Trial | Valid Paid / manual grant | Reporter | Admin |
+|---|---|---|---|---|---|---|
+| Active public catalogs, published FAQ/testimonials | Yes | Yes | Yes | Yes | Yes | Yes |
+| Current public price summaries | Yes | Yes | Yes | Yes | Yes | Yes |
+| Complete eligible history and dated searches | No | No | Yes | Yes | With full entitlement | Yes |
+| Basic market-signal facts | No | Yes | Yes | Yes | Yes | Yes |
+| Deeper signal/quality/buying/sell/storage/cost intelligence | No | No | Yes | Yes | With full entitlement | Yes |
+| Own watchlist, preferences, feedback, subscription/payment status | No | Own | Own | Own | Own | Authorized management too |
+| Submit pending price and own statistics | No | No | No | No | Yes | Yes |
+| Approve/reject/correct/withdraw prices | No | No | No | No | No | Yes |
+| Master data, user, subscription, payment, FAQ, audit/export administration | No | No | No | No | No | Yes |
+| Private market source identities | No | No | No | No | No editorial-source access | Authorized management only |
 
-| Access state | Public/sample prices | Published FAQ | Feedback submit | Watchlist | Basic market signals | Quality/deeper intelligence | Buying zones | Sell-watch | Storage suitability | Cost breakdown | Admin APIs | Expected Stage 20 result | Current assessment |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Guest | Yes, limited/sample only | Yes | No | No | No | No | No | No | No | No | No | Public/sample only | **FAIL — public price response currently includes deeper guidance fields (`possible_meaning`, `suggested_action`, notes/extra detail) beyond the approved public Prices-page field set.** |
-| Free | Yes, limited | Yes | Yes | Yes | Yes, basic only | No | No | No | No | No | No | Limited + feedback/basic watchlist | **FAIL — market-signal API currently returns full signal meaning/action and quality-signal API is available to any authenticated active user.** |
-| Trial | Yes, full approved access for 14 days | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes | No | Full approved user access | PASS by existing subscription/full-access guards, pending owner runtime matrix test. |
-| Active Paid | Yes, full approved access | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes | No | Full approved user access | PASS by existing subscription/full-access guards, pending owner runtime matrix test. |
-| Expired | Yes, limited | Yes | Yes | Yes | Yes, basic only | No | No | No | No | No | No | Same limited access as Free | **FAIL for same Free-tier signal/quality exposure gap; premium Stage 10–12 endpoints are already blocked.** |
-| Cancelled | Yes, limited | Yes | Yes | Yes | Yes, basic only | No | No | No | No | No | No | Same limited access as Free | **FAIL for same Free-tier signal/quality exposure gap; premium Stage 10–12 endpoints are already blocked.** |
-| Inactive | Public pages only; authenticated account access blocked | Published FAQ | No authenticated action | No | No | No | No | No | No | No | No | Account is blocked by backend | PASS by `get_current_user`/login active checks, pending owner runtime test. |
-| Admin | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Full administration | PASS by role guards, pending owner runtime matrix test. |
+Disabled accounts cannot perform authenticated actions. Their bearer credentials
+are revoked; reactivation does not resurrect them. Public pages remain accessible
+anonymously. An invalid supplied Authorization header is rejected rather than
+silently treated as Guest.
 
-## Stage 20 protected-endpoint expectations
+## Field boundaries
 
-The following existing backend endpoints are treated as full-intelligence endpoints and must return 401/403 to Guest/Free/Expired/Cancelled/Inactive as applicable, while Trial/Active Paid/Admin may read them:
+Public current summaries preserve ranges, previous ranges, optional recorded average,
+measurement/grade, movement, confidence and observation time. They omit
+possible_meaning, suggested_action and notes. Full consumer responses add these
+premium fields. They still exclude private source_1/source_2 and administrative
+contributor fields.
 
-- `GET /quality-signals`
-- `GET /buying-zones`
-- `GET /sell-watch-windows`
-- `GET /storage-suitability`
-- `GET /cost-breakdowns`
+Basic market signals omit deeper meaning/action. Quality and the other intelligence
+families require full access for list and detail. Source identities remain absent
+from consumer responses, notifications, general audit snapshots and CSV exports.
 
-`GET /market-signals` must provide only the approved **basic** signal view to limited authenticated users; deeper meaning/action belongs to full approved intelligence.
+Reporter POST accepts a raw pending observation and strips source/editorial claims.
+A Reporter cannot approve, access unrelated management APIs, or bypass commercial
+gates. Explicit staff access grants are commercial records, not automatic Reporter
+privileges.
 
-Public price endpoints must not expose private source identities or deeper premium guidance to Guest/limited users. Admin responses may contain private-source/admin fields only under admin authorization.
+## Historical access and preservation
 
-## Current pre-fix finding
+- Date parameters on current/comparison paths require full access.
+- Limited direct-ID reads allow only eligible current series records.
+- Consumer history requires approved records and active commodity/market references.
+- Outdated approved observations remain in eligible history.
+- Current selection never falls back beneath an outdated latest record.
+- Admin history retains inactive/status visibility.
+- Withdrawal/archive preserves business evidence instead of physical deletion.
+- Personal resources require their account owner, or an explicitly authorized Admin.
 
-Stage 20 cannot pass without an approved access-control correction. No production/backend/frontend behavior has been changed by this assessment. The required correction is subject to the project Change Control rule before implementation.
+Cancellation of future access intent does not remove valid purchased/manual access.
+At the actual cutoff, commercial access becomes limited while staff authority stays.
+
+## Proof and remaining limits
+
+Synthetic service/API tests verify forbidden status codes and absence of premium
+fields, not only frontend hiding. Real main-ASGI tests use genuine synthetic JWT
+sessions and transaction middleware. See
+[price evidence](evidence/backend-price-hardening.md) and the
+[current progress record](../PRICEYARD_PROGRESS.md).
+
+These tests do not inspect live account entitlements. Refresh credentials remain
+JavaScript-readable; HttpOnly cookies and administrator MFA are not implemented.
+No public sample quota or paid-plan price change was introduced.

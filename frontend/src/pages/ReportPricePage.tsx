@@ -5,6 +5,7 @@ import { useToast } from "../context/ToastContext";
 import { ApiError, apiFetch } from "../services/api";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import type { Commodity, Market } from "../types/api";
+import { toUtcFromLagos } from "../lib/priceSeries.mjs";
 
 const movements = ["up", "down", "stable", "unknown"];
 
@@ -13,8 +14,7 @@ function errorText(err: unknown): string {
 }
 
 function nowForInput(): string {
-  const now = new Date();
-  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  const now = new Date(Date.now() + 60 * 60 * 1000);
   return now.toISOString().slice(0, 16);
 }
 
@@ -49,12 +49,13 @@ export function ReportPricePage() {
       market_id: Number(f.get("market_id")),
       price_low: priceLow,
       price_high: priceHigh,
-      average_price: Math.round((priceLow + priceHigh) * 50) / 100,
+      average_price: f.get("average_price") ? Number(f.get("average_price")) : null,
       unit: String(f.get("unit")),
       bag_size: String(f.get("bag_size")),
+      grade: String(f.get("grade") || "") || null,
       movement: String(f.get("movement")),
       confidence_level: "Reporter submitted",
-      update_date_time: new Date(String(f.get("update_date_time"))).toISOString(),
+      update_date_time: toUtcFromLagos(String(f.get("update_date_time"))),
       is_outdated: false,
       suggested_action: "Watch",
     };
@@ -104,10 +105,12 @@ export function ReportPricePage() {
       <div className="form-grid">
         <label>Price low<input name="price_low" type="number" min="0" step="0.01" required /></label>
         <label>Price high<input name="price_high" type="number" min="0" step="0.01" required /></label>
+        <label>Observed average (optional)<input name="average_price" type="number" min="0" step="0.01" /></label>
         <label>Number of bags<input name="unit" defaultValue="1 bag" placeholder="e.g. 1 bag" required /></label>
         <label>Bag size (kg)<input name="bag_size" placeholder="e.g. 50kg" required /></label>
+        <label>Grade (optional)<input name="grade" maxLength={100} /></label>
         <label>Movement<select name="movement" defaultValue="unknown">{movements.map((item) => <option key={item}>{item}</option>)}</select></label>
-        <label>Date/time seen<input name="update_date_time" type="datetime-local" defaultValue={nowForInput()} required /></label>
+        <label>Date/time seen (Nigeria time)<input name="update_date_time" type="datetime-local" defaultValue={nowForInput()} required /></label>
       </div>
       {message && <div className="status-box success">{message}</div>}
       {error && <div className="status-box error">{error}</div>}

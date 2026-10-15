@@ -5,7 +5,8 @@ import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { apiFetch } from "../services/api";
 import type { PaymentInitiateResponse, PaymentPlan, ReferralSummary, SubmissionStats } from "../types/api";
-import { dateOnly, referralLink, referralWhatsAppShareUrl } from "../utils";
+import { referralLink, referralWhatsAppShareUrl, shortDate } from "../utils";
+import { paidCutoffValue } from "../lib/priceSeries.mjs";
 
 const ONBOARDING_KEY = "priceyard_onboarding_dismissed";
 
@@ -26,6 +27,16 @@ export function DashboardPage() {
   const [submissionStats, setSubmissionStats] = useState<SubmissionStats | null>(null);
   const [copied, setCopied] = useState(false);
   const [upgrading, setUpgrading] = useState<PaymentPlan | null>(null);
+  const [verificationBusy, setVerificationBusy] = useState(false);
+  const requestVerification = async () => {
+    if (!user || verificationBusy) return;
+    setVerificationBusy(true);
+    try {
+      await apiFetch("/auth/request-verification", { method: "POST", body: JSON.stringify({ email: user.email }) });
+      showToast("If your account needs verification, a link will be sent to your email.");
+    } catch (error) { showToast(error instanceof Error ? error.message : "Please retry later.", "error"); }
+    finally { setVerificationBusy(false); }
+  };
   const dismissOnboarding = () => {
     try { localStorage.setItem(ONBOARDING_KEY, "1"); } catch { /* ignore storage failures */ }
     setOnboardingDismissed(true);
@@ -64,7 +75,7 @@ export function DashboardPage() {
     }
   };
   if (!user) return null;
-  const showUpgrade = user.role !== "admin" && subscription?.status !== "active";
+  const showUpgrade = user.role !== "admin" && !subscription?.manual_grant;
   return <section className="page page-section"><div className="page-title"><span className="eyebrow">User dashboard</span><h1>Welcome, {user.full_name}</h1><p>Your account and quick links to PriceYard tools.</p></div>
     {user.role !== "admin" && !onboardingDismissed && tourSeen && (
       <article className="card onboarding-card">
@@ -80,17 +91,18 @@ export function DashboardPage() {
       </article>
     )}
     <div className="dashboard-grid">
-      <article className="card"><span className="eyebrow">Current access</span><h2>{accessLabel}</h2><p>{hasFullAccess ? "You can see full price details." : "You have limited access. Start a trial or upgrade to see everything."}</p>{user.role !== "admin" && subscription && <dl className="data-list compact"><div><dt>Status</dt><dd>{subscription.status}</dd></div><div><dt>Trial ends</dt><dd>{dateOnly(subscription.trial_ends_at)}</dd></div><div><dt>Plan</dt><dd>{subscription.plan_name}</dd></div></dl>}</article>
-      <article className="card"><span className="eyebrow">Account</span><h2>{user.email}</h2><p>Role: {user.role.replace(/_/g, " ")}</p></article>
+      <article className="card"><span className="eyebrow">Current access</span><h2>{accessLabel}</h2><p>{hasFullAccess ? "You can see full price details." : "You can see public summaries. Upgrade for price history and guidance."}</p>{user.role !== "admin" && subscription && <dl className="data-list compact"><div><dt>Status</dt><dd>{subscription.status}</dd></div><div><dt>Trial ends (Nigeria)</dt><dd>{shortDate(subscription.trial_ends_at)}</dd></div><div><dt>Paid access ends (Nigeria)</dt><dd>{subscription.manual_grant ? "Manual grant: no expiry" : shortDate(paidCutoffValue(subscription))}</dd></div><div><dt>Plan</dt><dd>{subscription.plan_name}</dd></div></dl>}</article>
+      <article className="card"><span className="eyebrow">Account</span><h2>{user.email}</h2><p>Account type: {user.role === "admin" ? "Administrator" : user.role === "reporter" ? "Reporter" : "Member"}</p>{user.email_verified !== true && <><p>Confirm your email to protect your account and qualify future referral rewards. Your original 14-day trial keeps running from registration.</p><button className="button button-small button-secondary" disabled={verificationBusy} onClick={() => void requestVerification()}>{verificationBusy ? "Please wait…" : "Send verification link"}</button></>}</article>
     </div>
     {showUpgrade && (
       <article className="card">
-        <span className="eyebrow">Upgrade</span>
-        <h2>Get full access</h2>
+        <span className="eyebrow">{subscription?.status === "active" ? "Renew" : "Upgrade"}</span>
+        <h2>{subscription?.status === "active" ? "Extend your access" : "Get full access"}</h2>
         <p>See buying zones, sell-watch windows, storage suitability and cost breakdowns for every commodity, with no trial limits.</p>
+        <p>Monthly: ₦2,500 for 30 days. Seasonal: ₦6,000 for 90 days. Each payment is a one-time purchase, with no automatic recurring charge. Renewal preserves unused trial and purchased time.</p>
         <div className="button-row">
-          <button type="button" className="button" disabled={upgrading !== null} onClick={() => void startUpgrade("monthly")}>{upgrading === "monthly" ? "Please wait…" : "₦2,500 / month"}</button>
-          <button type="button" className="button button-secondary" disabled={upgrading !== null} onClick={() => void startUpgrade("seasonal")}>{upgrading === "seasonal" ? "Please wait…" : "₦6,000 / 3 months"}</button>
+          <button type="button" className="button" disabled={upgrading !== null} onClick={() => void startUpgrade("monthly")}>{upgrading === "monthly" ? "Please wait…" : "₦2,500 / 30 days"}</button>
+          <button type="button" className="button button-secondary" disabled={upgrading !== null} onClick={() => void startUpgrade("seasonal")}>{upgrading === "seasonal" ? "Please wait…" : "₦6,000 / 90 days"}</button>
         </div>
       </article>
     )}
@@ -110,8 +122,8 @@ export function DashboardPage() {
     {referral && (
       <article className="card">
         <span className="eyebrow">Invite a friend</span>
-        <h2>Get {referral.reward_days} extra trial days per referral</h2>
-        <p>Share your link. When someone registers with it, you get {referral.reward_days} extra trial days automatically.</p>
+        <h2>Earn {referral.reward_days} extra access days per qualifying referral</h2>
+        <p>Your referred friend must verify their email and complete their first successful subscription purchase. Rewards are seven days each, up to four qualifying rewards (28 days); previously earned rewards are preserved.</p>
         <dl className="data-list compact"><div><dt>Your referral code</dt><dd>{referral.referral_code}</dd></div><div><dt>People referred so far</dt><dd>{referral.referred_count}</dd></div></dl>
         <div className="button-row">
           <button type="button" className="button button-small button-secondary" onClick={() => void copyReferralLink()}>{copied ? "Link copied!" : "Copy referral link"}</button>

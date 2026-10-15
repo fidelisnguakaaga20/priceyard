@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.orm import Session
+from sqlalchemy import select
 
 from app.database import get_db
 from app.models.faq_item import FAQItem
@@ -25,6 +26,11 @@ router = APIRouter(prefix="/faq", tags=["faq"])
 @router.get("", response_model=list[FAQPublicResponse])
 def get_published_items(db: Session = Depends(get_db)) -> list[FAQItem]:
     return list_published_faqs(db)
+
+
+@router.get("/admin/all", response_model=list[FAQAdminResponse])
+def get_admin_items(db: Session = Depends(get_db), _: User = Depends(require_roles("admin"))) -> list[FAQItem]:
+    return list(db.scalars(select(FAQItem).order_by(FAQItem.id.desc()).limit(1000)).all())
 
 
 @router.get("/{faq_id}", response_model=FAQPublicResponse)

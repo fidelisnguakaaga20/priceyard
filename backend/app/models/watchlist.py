@@ -51,6 +51,10 @@ class Watchlist(Base):
     # 'at_or_above' (sell-side: alert when the range's high reaches this or higher).
     # Always set together with target_price, always null otherwise.
     target_direction: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    target_unit: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    target_bag_size: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    target_commodity_type: Mapped[str | None] = mapped_column(String(150), nullable=True)
+    target_grade: Mapped[str | None] = mapped_column(String(100), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
@@ -61,3 +65,10 @@ class Watchlist(Base):
     user: Mapped[User] = relationship(back_populates="watchlist_items")
     commodity: Mapped[Commodity | None] = relationship(back_populates="watchlist_items")
     market: Mapped[Market | None] = relationship(back_populates="watchlist_items")
+
+    @property
+    def target_measurement_confirmed(self) -> bool:
+        return self.target_price is None or bool(
+            self.commodity_id and self.market_id and self.target_unit and self.target_unit.strip()
+            and self.target_bag_size and self.target_bag_size.strip()
+        )

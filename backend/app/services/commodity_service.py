@@ -22,7 +22,7 @@ def get_commodity(db: Session, commodity_id: int) -> Commodity:
 
 
 def _ensure_unique_name(db: Session, name: str, *, exclude_id: int | None = None) -> None:
-    statement = select(Commodity).where(func.lower(Commodity.name) == name.lower())
+    statement = select(Commodity).where(func.lower(func.trim(Commodity.name)) == name.strip().lower())
     if exclude_id is not None:
         statement = statement.where(Commodity.id != exclude_id)
     if db.scalar(statement) is not None:
@@ -46,26 +46,24 @@ def update_commodity(db: Session, commodity: Commodity, payload: CommodityUpdate
     changes = payload.model_dump(exclude_unset=True)
     if "name" in changes and changes["name"] is None:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Commodity name cannot be null")
-    if "is_active" in changes and changes["is_active"] is None:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Commodity active status cannot be null")
+    for field in ("is_active", "is_upcoming"):
+        if field in changes and changes[field] is None:
+            raise HTTPException(status_code=422, detail=f"{field} cannot be null")
     if "name" in changes:
         _ensure_unique_name(db, changes["name"], exclude_id=commodity.id)
 
     for field, value in changes.items():
         setattr(commodity, field, value)
 
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(status_code=409, detail="Commodity already exists or conflicts with retained data") from exc
     db.refresh(commodity)
     return commodity
 
 
 def delete_commodity(db: Session, commodity: Commodity) -> None:
-    db.delete(commodity)
-    try:
-        db.commit()
-    except IntegrityError as exc:
-        db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Commodity cannot be deleted because it is referenced by existing records",
-        ) from exc
+    commodity.is_active = False
+    db.commit()

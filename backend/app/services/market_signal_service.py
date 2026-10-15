@@ -7,6 +7,7 @@ from app.models.market import Market
 from app.models.market_signal import MarketSignal
 from app.models.price_update import PriceUpdate
 from app.models.user import User
+from app.services.intelligence_query_service import reject_null_required
 from app.schemas.market_signal_schema import MarketSignalCreate, MarketSignalUpdate
 
 
@@ -64,11 +65,12 @@ def get_market_signal(db: Session, signal_id: int) -> MarketSignal:
 
 
 def list_market_signals(db: Session) -> list[MarketSignal]:
-    return list(db.scalars(select(MarketSignal).order_by(MarketSignal.created_at.desc(), MarketSignal.id.desc())).all())
+    return list(db.scalars(select(MarketSignal).where(MarketSignal.is_archived.is_(False)).order_by(MarketSignal.created_at.desc(), MarketSignal.id.desc())).all())
 
 
 def update_market_signal(db: Session, signal: MarketSignal, payload: MarketSignalUpdate) -> MarketSignal:
     changes = payload.model_dump(exclude_unset=True)
+    reject_null_required(changes, ("commodity_id", "market_id", "signal_type", "signal_description"))
     commodity_id = int(changes.get("commodity_id", signal.commodity_id))
     market_id = int(changes.get("market_id", signal.market_id))
     price_update_id = changes.get("price_update_id", signal.price_update_id)
@@ -88,5 +90,5 @@ def update_market_signal(db: Session, signal: MarketSignal, payload: MarketSigna
 
 
 def delete_market_signal(db: Session, signal: MarketSignal) -> None:
-    db.delete(signal)
+    signal.is_archived = True
     db.commit()

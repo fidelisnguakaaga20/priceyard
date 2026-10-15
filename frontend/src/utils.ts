@@ -18,7 +18,7 @@ export function shortDate(value: string | null | undefined): string {
   if (!value) return "—";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat("en-NG", { dateStyle: "medium", timeStyle: "short", hour12: true }).format(date);
+  return new Intl.DateTimeFormat("en-NG", { dateStyle: "medium", timeStyle: "short", hour12: true, timeZone: "Africa/Lagos" }).format(date);
 }
 
 export function agingClass(value: string | null | undefined): string {
@@ -108,6 +108,8 @@ type ShareablePrice = {
   price_high: string | number;
   unit: string;
   bag_size?: string | null;
+  commodity_type?: string | null;
+  grade?: string | null;
 };
 
 const COMMODITY_EMOJI: Record<string, string> = {
@@ -137,14 +139,14 @@ export function priceShareContent(item: ShareablePrice): ShareContent {
   // (which keys purely on URL and can hold a stale title/image for a long time) is
   // forced to fetch a fresh preview instead of replaying an old cached one.
   const url = `${shareBaseUrl()}/share/commodities/${encodeURIComponent(item.commodity.name)}?pu=${item.id}`;
-  const measure = item.bag_size || item.unit;
+  const measure = [item.unit, item.bag_size || "bag size not recorded", item.commodity_type, item.grade ? `grade ${item.grade}` : "grade not recorded"].filter(Boolean).join(" · ");
   const message = `${commodityEmoji(item.commodity.name)} New price update: ${item.commodity.name} @ ${item.market.name} — ${money(item.price_low)} – ${money(item.price_high)} (${measure})`;
   return { message, url };
 }
 
 export function whatsAppShareUrl(item: ShareablePrice): string {
   const { message, url } = priceShareContent(item);
-  return `https://wa.me/?text=${encodeURIComponent(`${message}\n👉 See full details (free): ${url}`)}`;
+  return `https://wa.me/?text=${encodeURIComponent(`${message}\n👉 See current public summary: ${url}`)}`;
 }
 
 export function referralLink(code: string): string {
@@ -167,7 +169,7 @@ export function comingSoonShareUrl(commodity: { name: string; updated_at: string
 }
 
 export function referralWhatsAppShareUrl(code: string, rewardDays: number): string {
-  const text = `Track real agricultural commodity prices with PriceYard — sign up with my link and I get ${rewardDays} extra trial days:\n${referralLink(code)}`;
+  const text = `Track agricultural commodity prices with PriceYard. Verify your email and complete your first subscription purchase through my referral to qualify me for ${rewardDays} extra access days, subject to the campaign limit:\n${referralLink(code)}`;
   return `https://wa.me/?text=${encodeURIComponent(text)}`;
 }
 
@@ -175,5 +177,5 @@ export function dateOnly(value: string | null | undefined): string {
   if (!value) return "—";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat("en-NG", { dateStyle: "medium" }).format(date);
+  return new Intl.DateTimeFormat("en-NG", { dateStyle: "medium", timeZone: "Africa/Lagos" }).format(date);
 }

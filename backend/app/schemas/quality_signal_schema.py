@@ -27,7 +27,7 @@ class QualitySignalCreate(BaseModel):
     quality_status: str | None = Field(default=None, max_length=100)
     moisture_status: str | None = Field(default=None, max_length=100)
     storage_readiness: str | None = Field(default=None, max_length=100)
-    risk_note: str | None = None
+    risk_note: str | None = Field(default=None, max_length=5000)
 
     model_config = ConfigDict(str_strip_whitespace=True)
 
@@ -44,7 +44,7 @@ class QualitySignalUpdate(BaseModel):
     quality_status: str | None = Field(default=None, max_length=100)
     moisture_status: str | None = Field(default=None, max_length=100)
     storage_readiness: str | None = Field(default=None, max_length=100)
-    risk_note: str | None = None
+    risk_note: str | None = Field(default=None, max_length=5000)
 
     model_config = ConfigDict(str_strip_whitespace=True)
 

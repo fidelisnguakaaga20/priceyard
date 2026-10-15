@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, DateTime, String, Text, func
+from sqlalchemy import Boolean, DateTime, Index, String, Text, column, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -21,6 +21,10 @@ if TYPE_CHECKING:
 
 class Market(Base):
     __tablename__ = "markets"
+    __table_args__ = (
+        Index("uq_markets_normalized_scope", func.lower(func.trim(column("name"))),
+              func.lower(func.trim(func.coalesce(column("state"), ""))), unique=True),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(150), nullable=False, index=True)

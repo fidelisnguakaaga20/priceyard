@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.sell_watch_window import SellWatchWindow
 from app.models.user import User
+from app.services.intelligence_query_service import get_visible_intelligence, list_intelligence
 from app.schemas.sell_watch_window_schema import (
     SellWatchWindowCreate,
     SellWatchWindowResponse,
@@ -22,19 +23,24 @@ router = APIRouter(prefix="/sell-watch-windows", tags=["sell-watch-windows"])
 
 @router.get("", response_model=list[SellWatchWindowResponse])
 def get_windows(
+    commodity_id: int | None = Query(default=None, gt=0),
+    market_id: int | None = Query(default=None, gt=0),
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=1000, ge=1, le=1000),
     db: Session = Depends(get_db),
-    _: User = Depends(require_full_access),
+    current_user: User = Depends(require_full_access),
 ) -> list[SellWatchWindow]:
-    return list_sell_watch_windows(db)
+    return list_intelligence(db, SellWatchWindow, commodity_id=commodity_id, market_id=market_id,
+                             page=page, page_size=page_size, active_only=current_user.role != "admin")
 
 
 @router.get("/{window_id}", response_model=SellWatchWindowResponse)
 def get_window(
     window_id: int,
     db: Session = Depends(get_db),
-    _: User = Depends(require_full_access),
+    current_user: User = Depends(require_full_access),
 ) -> SellWatchWindow:
-    return get_sell_watch_window(db, window_id)
+    return get_visible_intelligence(db, SellWatchWindow, window_id, active_only=current_user.role != "admin")
 
 
 @router.post("", response_model=SellWatchWindowResponse, status_code=status.HTTP_201_CREATED)

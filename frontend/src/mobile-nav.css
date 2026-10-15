@@ -3,6 +3,19 @@
   display: contents;
 }
 
+@media (max-width: 900px) {
+  .main-nav { max-height: calc(100vh - var(--header-bottom, 180px) - 16px); max-height: calc(100dvh - var(--header-bottom, 180px) - 16px); overflow-y: auto; overscroll-behavior: contain; }
+  .main-nav a, .main-nav button { min-height: 44px; }
+  .admin-nav-toggle { display: block; width: 100%; margin-bottom: 12px; text-align: left; }
+  .admin-nav:not(.admin-nav-open) { display: none; }
+  .admin-nav.admin-nav-open { max-height: 45vh; overflow-y: auto; }
+}
+@media (min-width: 901px) { .admin-nav-toggle { display: none; } }
+.onboarding-card { max-height: 85vh; max-height: 85dvh; overflow-y: auto; }
+:focus-visible { outline: 3px solid #438a58; outline-offset: 3px; }
+.admin-form .checkbox-label { display: flex; align-items: center; gap: 8px; }
+.admin-form input[type="checkbox"] { width: 22px; height: 22px; min-height: 22px; flex: 0 0 22px; accent-color: #214e34; }
+
 @media (max-width: 640px) {
   .header-inner {
     width: 100%;
@@ -10,8 +23,8 @@
     min-height: 0;
     padding-inline: 12px;
     display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
   }
 
   .brand {

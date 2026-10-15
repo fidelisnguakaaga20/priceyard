@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.market_signal import MarketSignal
 from app.models.user import User
-from app.schemas.market_signal_schema import MarketSignalCreate, MarketSignalResponse, MarketSignalUpdate
+from app.schemas.market_signal_schema import BasicMarketSignalResponse, MarketSignalCreate, MarketSignalResponse, MarketSignalUpdate
+from app.services.intelligence_query_service import get_visible_intelligence, list_intelligence
 from app.services.market_signal_service import (
     create_market_signal,
     delete_market_signal,
@@ -12,26 +13,35 @@ from app.services.market_signal_service import (
     list_market_signals,
     update_market_signal,
 )
-from app.utils.permissions import get_current_user, require_roles
+from app.utils.permissions import get_current_user, require_roles, user_has_full_access
 
 router = APIRouter(prefix="/market-signals", tags=["market-signals"])
 
 
-@router.get("", response_model=list[MarketSignalResponse])
+@router.get("", response_model=list[MarketSignalResponse | BasicMarketSignalResponse])
 def get_signals(
+    commodity_id: int | None = Query(default=None, gt=0),
+    market_id: int | None = Query(default=None, gt=0),
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=1000, ge=1, le=1000),
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
-) -> list[MarketSignal]:
-    return list_market_signals(db)
+    current_user: User = Depends(get_current_user),
+):
+    schema = MarketSignalResponse if user_has_full_access(db, current_user) else BasicMarketSignalResponse
+    items = list_intelligence(db, MarketSignal, commodity_id=commodity_id, market_id=market_id,
+                             page=page, page_size=page_size, active_only=current_user.role != "admin")
+    return [schema.model_validate(item) for item in items]
 
 
-@router.get("/{signal_id}", response_model=MarketSignalResponse)
+@router.get("/{signal_id}", response_model=MarketSignalResponse | BasicMarketSignalResponse)
 def get_signal(
     signal_id: int,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
-) -> MarketSignal:
-    return get_market_signal(db, signal_id)
+    current_user: User = Depends(get_current_user),
+):
+    item = get_visible_intelligence(db, MarketSignal, signal_id, active_only=current_user.role != "admin")
+    schema = MarketSignalResponse if user_has_full_access(db, current_user) else BasicMarketSignalResponse
+    return schema.model_validate(item)
 
 
 @router.post("", response_model=MarketSignalResponse, status_code=status.HTTP_201_CREATED)

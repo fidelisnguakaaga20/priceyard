@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, String, func
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, func, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -21,6 +21,8 @@ if TYPE_CHECKING:
     from app.models.sell_watch_window import SellWatchWindow
     from app.models.subscription import Subscription
     from app.models.watchlist import Watchlist
+    from app.models.auth_session import AuthSession
+    from app.models.email_verification_token import EmailVerificationToken
 
 
 class User(Base):
@@ -33,6 +35,9 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     google_id: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True)
     auth_provider: Mapped[str] = mapped_column(String(20), nullable=False, default="local")
+    # NULL identifies pre-verification legacy accounts; it never proves ownership.
+    email_verified: Mapped[bool | None] = mapped_column(Boolean, nullable=True, default=False)
+    auth_version: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default=text("0"))
     role: Mapped[str] = mapped_column(String(32), nullable=False, default="free_user", index=True)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, index=True)
     referral_code: Mapped[str] = mapped_column(String(12), unique=True, nullable=False, index=True)
@@ -61,5 +66,11 @@ class User(Base):
         back_populates="user", cascade="all, delete-orphan", passive_deletes=True
     )
     push_subscriptions: Mapped[list[PushSubscription]] = relationship(
+        back_populates="user", cascade="all, delete-orphan", passive_deletes=True
+    )
+    auth_sessions: Mapped[list[AuthSession]] = relationship(
+        back_populates="user", cascade="all, delete-orphan", passive_deletes=True
+    )
+    email_verification_tokens: Mapped[list[EmailVerificationToken]] = relationship(
         back_populates="user", cascade="all, delete-orphan", passive_deletes=True
     )

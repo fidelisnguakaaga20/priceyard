@@ -8,6 +8,7 @@ from app.models.buying_zone import BuyingZone
 from app.models.commodity import Commodity
 from app.models.market import Market
 from app.models.user import User
+from app.services.intelligence_query_service import reject_null_required
 from app.schemas.buying_zone_schema import BuyingZoneCreate, BuyingZoneUpdate
 
 
@@ -72,6 +73,7 @@ def list_buying_zones(db: Session) -> list[BuyingZone]:
 
 def update_buying_zone(db: Session, zone: BuyingZone, payload: BuyingZoneUpdate) -> BuyingZone:
     changes = payload.model_dump(exclude_unset=True)
+    reject_null_required(changes, ("commodity_id", "market_id", "price_low", "price_high", "reason", "confidence"))
     commodity_id = int(changes.get("commodity_id", zone.commodity_id))
     market_id = int(changes.get("market_id", zone.market_id))
     price_low = changes.get("price_low", zone.price_low)

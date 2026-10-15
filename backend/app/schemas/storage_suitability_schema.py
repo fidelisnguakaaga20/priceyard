@@ -48,8 +48,8 @@ class StorageSuitabilityCreate(BaseModel):
     oversupply_risk: str | None = Field(default=None, max_length=100)
     spoilage_risk: str | None = Field(default=None, max_length=100)
     buyer_availability: str | None = Field(default=None, max_length=150)
-    quality_storage_notes: str | None = None
-    summary: str | None = None
+    quality_storage_notes: str | None = Field(default=None, max_length=5000)
+    summary: str | None = Field(default=None, max_length=5000)
 
     model_config = ConfigDict(str_strip_whitespace=True)
 
@@ -75,8 +75,8 @@ class StorageSuitabilityUpdate(BaseModel):
     oversupply_risk: str | None = Field(default=None, max_length=100)
     spoilage_risk: str | None = Field(default=None, max_length=100)
     buyer_availability: str | None = Field(default=None, max_length=150)
-    quality_storage_notes: str | None = None
-    summary: str | None = None
+    quality_storage_notes: str | None = Field(default=None, max_length=5000)
+    summary: str | None = Field(default=None, max_length=5000)
 
     model_config = ConfigDict(str_strip_whitespace=True)
 

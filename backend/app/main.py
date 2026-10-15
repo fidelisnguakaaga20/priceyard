@@ -1,11 +1,15 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+from app.http_safety import BodyLimitMiddleware
+from app.transactions import install_transactions
 
 from app.config import get_settings
 from app.rate_limit import limiter
 from app.routes.activity_routes import router as activity_router
+from app.routes.admin_metrics_routes import router as admin_metrics_router
 from app.routes.audit_log_routes import router as audit_log_router
 from app.routes.auth_routes import router as auth_router
 from app.routes.buying_zone_routes import router as buying_zone_router
@@ -37,6 +41,8 @@ app = FastAPI(
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
+app.add_middleware(BodyLimitMiddleware, max_bytes=settings.max_request_bytes)
 
 allowed_origins = [
     origin.strip().rstrip("/")
@@ -54,6 +60,7 @@ if allowed_origins:
 
 app.include_router(auth_router)
 app.include_router(activity_router)
+app.include_router(admin_metrics_router)
 app.include_router(audit_log_router)
 app.include_router(subscription_router)
 app.include_router(user_router)
@@ -79,3 +86,23 @@ app.include_router(share_router)
 @app.get("/health")
 def health_check() -> dict[str, str]:
     return {"status": "healthy"}
+
+
+@app.get("/ready")
+def readiness_check() -> dict[str, str]:
+    """Check database/schema readiness without revealing configuration or errors."""
+    from sqlalchemy import text
+    from app.database import get_engine
+    from app.security import _jwt_secret
+    try:
+        _jwt_secret()
+        with get_engine().connect() as connection:
+            revision = connection.scalar(text("SELECT version_num FROM alembic_version"))
+            if revision != "0025_notification_outbox":
+                raise RuntimeError("Schema not current")
+    except Exception:
+        raise HTTPException(status_code=503, detail="Service is not ready") from None
+    return {"status": "ready"}
+
+
+install_transactions(app)

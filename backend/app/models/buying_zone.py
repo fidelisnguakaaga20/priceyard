@@ -52,3 +52,14 @@ class BuyingZone(Base):
     commodity: Mapped[Commodity] = relationship(back_populates="buying_zones")
     market: Mapped[Market] = relationship(back_populates="buying_zones")
     creator: Mapped[User] = relationship(back_populates="buying_zones")
+
+    @property
+    def validity_status(self) -> str:
+        from app.utils.price_measurement import LAGOS_TIMEZONE
+
+        today = datetime.now(LAGOS_TIMEZONE).date()
+        if self.valid_from is not None and today < self.valid_from:
+            return "upcoming"
+        if self.valid_to is not None and today > self.valid_to:
+            return "expired"
+        return "within_recorded_period" if self.valid_from is not None or self.valid_to is not None else "unspecified"

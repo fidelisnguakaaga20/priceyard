@@ -12,7 +12,7 @@ type FlaggedPrice = {
 };
 
 export function AdminFlaggedPricesPage() {
-  const { data, loading, error: loadError, reload, token } = useAdminList<FlaggedPrice>("/price-updates/admin/flagged");
+  const { data, loading, error: loadError, reload, token, pagination } = useAdminList<FlaggedPrice>("/price-updates/admin/flagged");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
@@ -35,7 +35,7 @@ export function AdminFlaggedPricesPage() {
     <AdminStatus error={error || loadError} success={message} />
     {loading ? <AdminLoading label="Loading flagged prices…" /> : (
       <div className="admin-card-list">
-        {data.length === 0 && <p>No open flags — nothing to review right now.</p>}
+        {data.length === 0 && <p>No open flags on this page.</p>}
         {data.map((item) => (
           <article className="card" key={item.price_update_id}>
             <div className="card-row">
@@ -49,5 +49,6 @@ export function AdminFlaggedPricesPage() {
         ))}
       </div>
     )}
+    {pagination}
   </div>;
 }

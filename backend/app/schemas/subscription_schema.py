@@ -15,6 +15,9 @@ class SubscriptionResponse(BaseModel):
     trial_ends_at: datetime | None
     start_date: date | None
     end_date: date | None
+    paid_expires_at: datetime | None = None
+    manual_grant: bool = False
+    cancellation_requested_at: datetime | None = None
     payment_reference: str | None
     created_at: datetime
     updated_at: datetime

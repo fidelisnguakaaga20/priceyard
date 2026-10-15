@@ -22,11 +22,11 @@ def get_market(db: Session, market_id: int) -> Market:
 
 
 def _normalized_state(value: str | None) -> str | None:
-    return value.strip().lower() if value else None
+    return value.strip().lower() if value else ""
 
 
 def _ensure_unique_market(db: Session, name: str, state_value: str | None, *, exclude_id: int | None = None) -> None:
-    statement = select(Market).where(func.lower(Market.name) == name.lower())
+    statement = select(Market).where(func.lower(func.trim(Market.name)) == name.strip().lower())
     if exclude_id is not None:
         statement = statement.where(Market.id != exclude_id)
 
@@ -40,7 +40,11 @@ def create_market(db: Session, payload: MarketCreate) -> Market:
     _ensure_unique_market(db, payload.name, payload.state)
     market = Market(**payload.model_dump())
     db.add(market)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(status_code=409, detail="Market already exists") from exc
     db.refresh(market)
     return market
 
@@ -62,18 +66,15 @@ def update_market(db: Session, market: Market, payload: MarketUpdate) -> Market:
     for field, value in changes.items():
         setattr(market, field, value)
 
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(status_code=409, detail="Market already exists or conflicts with retained data") from exc
     db.refresh(market)
     return market
 
 
 def delete_market(db: Session, market: Market) -> None:
-    db.delete(market)
-    try:
-        db.commit()
-    except IntegrityError as exc:
-        db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Market cannot be deleted because it is referenced by existing records",
-        ) from exc
+    market.is_active = False
+    db.commit()

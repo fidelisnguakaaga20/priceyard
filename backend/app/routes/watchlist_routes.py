@@ -4,11 +4,12 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.user import User
 from app.models.watchlist import Watchlist
-from app.schemas.watchlist_schema import WatchlistCreate, WatchlistResponse
+from app.schemas.watchlist_schema import WatchlistCreate, WatchlistResponse, WatchlistTargetUpdate
 from app.services.watchlist_service import (
     create_watchlist_item,
     delete_watchlist_item,
     list_watchlist_items,
+    update_watchlist_target,
 )
 from app.utils.permissions import get_current_user
 
@@ -40,3 +41,11 @@ def remove_item(
 ) -> Response:
     delete_watchlist_item(db, current_user.id, item_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.patch("/{item_id}", response_model=WatchlistResponse)
+def confirm_target(
+    item_id: int, payload: WatchlistTargetUpdate,
+    db: Session = Depends(get_db), current_user: User = Depends(get_current_user),
+) -> Watchlist:
+    return update_watchlist_target(db, current_user.id, item_id, payload)

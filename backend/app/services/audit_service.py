@@ -23,7 +23,7 @@ SENSITIVE_KEY_FRAGMENTS = (
 )
 # Price-source identities are intentionally excluded from audit snapshots.
 # They are operationally private and are not required by Stage 16 audit proof.
-PRIVATE_AUDIT_FIELDS = {"source_1", "source_2"}
+PRIVATE_AUDIT_FIELDS = {"source_1", "source_2", "google_id", "auth_version"}
 
 
 def _is_sensitive_key(key: str) -> bool:
@@ -96,8 +96,9 @@ def create_audit_log(
     return item
 
 
-def list_audit_logs(db: Session) -> list[AuditLog]:
-    return list(db.scalars(select(AuditLog).order_by(AuditLog.created_at.desc(), AuditLog.id.desc())).all())
+def list_audit_logs(db: Session, *, page: int = 1, page_size: int = 100) -> list[AuditLog]:
+    return list(db.scalars(select(AuditLog).order_by(AuditLog.created_at.desc(), AuditLog.id.desc())
+                           .offset((page - 1) * page_size).limit(page_size)).all())
 
 
 def get_audit_log(db: Session, audit_log_id: int) -> AuditLog:

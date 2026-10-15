@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -14,10 +14,12 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 @router.get("", response_model=list[UserResponse])
 def get_users(
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=100, ge=1, le=1000),
     db: Session = Depends(get_db),
     _: User = Depends(require_roles("admin")),
 ) -> list[User]:
-    return list_users(db)
+    return list_users(db, page=page, page_size=page_size)
 
 
 @router.get("/{user_id}", response_model=UserResponse)

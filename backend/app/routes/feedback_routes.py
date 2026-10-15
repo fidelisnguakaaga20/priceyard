@@ -54,10 +54,12 @@ def get_feedback_summary(
 @router.get("", response_model=list[FeedbackResponse])
 def get_feedback_list(
     rating: int | None = Query(default=None, ge=1, le=5),
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=100, ge=1, le=1000),
     db: Session = Depends(get_db),
     _admin: User = Depends(require_roles("admin")),
 ) -> list[Feedback]:
-    return list_feedback(db, rating=rating)
+    return list_feedback(db, rating=rating, page=page, page_size=page_size)
 
 
 @router.get("/{feedback_id}", response_model=FeedbackResponse)

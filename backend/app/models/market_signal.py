@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, ForeignKey, String, Text, func
+from sqlalchemy import Boolean, DateTime, ForeignKey, String, Text, false, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -19,6 +19,7 @@ class MarketSignal(Base):
     __tablename__ = "market_signals"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    is_archived: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default=false())
     commodity_id: Mapped[int] = mapped_column(ForeignKey("commodities.id", ondelete="RESTRICT"), nullable=False, index=True)
     market_id: Mapped[int] = mapped_column(ForeignKey("markets.id", ondelete="RESTRICT"), nullable=False, index=True)
     price_update_id: Mapped[int | None] = mapped_column(ForeignKey("price_updates.id", ondelete="CASCADE"), nullable=True, index=True)

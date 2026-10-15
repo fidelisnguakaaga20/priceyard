@@ -33,7 +33,7 @@ class SellWatchWindowCreate(BaseModel):
     market_id: int = Field(gt=0)
     start_period: str = Field(min_length=1, max_length=100)
     end_period: str | None = Field(default=None, max_length=100)
-    observation: str = Field(min_length=1)
+    observation: str = Field(min_length=1, max_length=5000)
     confidence: str = Field(min_length=1, max_length=100)
 
     model_config = ConfigDict(str_strip_whitespace=True)
@@ -49,7 +49,7 @@ class SellWatchWindowUpdate(BaseModel):
     market_id: int | None = Field(default=None, gt=0)
     start_period: str | None = Field(default=None, min_length=1, max_length=100)
     end_period: str | None = Field(default=None, max_length=100)
-    observation: str | None = Field(default=None, min_length=1)
+    observation: str | None = Field(default=None, min_length=1, max_length=5000)
     confidence: str | None = Field(default=None, min_length=1, max_length=100)
 
     model_config = ConfigDict(str_strip_whitespace=True)

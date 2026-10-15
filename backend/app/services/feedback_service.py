@@ -17,11 +17,11 @@ def create_feedback(db: Session, current_user: User, payload: FeedbackCreate) ->
     return item
 
 
-def list_feedback(db: Session, rating: int | None = None) -> list[Feedback]:
+def list_feedback(db: Session, rating: int | None = None, *, page: int = 1, page_size: int = 100) -> list[Feedback]:
     statement = select(Feedback).order_by(Feedback.created_at.desc(), Feedback.id.desc())
     if rating is not None:
         statement = statement.where(Feedback.rating == rating)
-    return list(db.scalars(statement).all())
+    return list(db.scalars(statement.offset((page - 1) * page_size).limit(page_size)).all())
 
 
 def get_feedback(db: Session, feedback_id: int) -> Feedback:
@@ -65,6 +65,7 @@ def list_public_testimonials(db: Session) -> list[TestimonialResponse]:
         select(Feedback)
         .where(Feedback.is_public_testimonial.is_(True))
         .order_by(Feedback.created_at.desc())
+        .limit(100)
     )
     items = db.scalars(statement).all()
     return [

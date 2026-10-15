@@ -1,584 +1,208 @@
-# API Endpoints
-
-## Stage 2 — Backend Foundation
-
-### GET /health
-
-Purpose: verify that the PriceYard FastAPI backend is running.
-
-Authentication: none.
-
-Expected successful response:
-
-```json
-{"status":"healthy"}
-```
-
-Owner-verified in Stage 2 with HTTP 200.
-
-## Stage 3 — Database Foundation
-
-No new public/business API endpoint is introduced in Stage 3.
-
-Stage 3 adds only the approved PostgreSQL/SQLAlchemy/Alembic database foundation and model schema.
-
-## Stage 4 — Authentication
-
-### POST /auth/register
-
-Purpose: create a normal PriceYard user account.
-
-Authentication: none.
-
-Input:
-- `full_name`
-- `email`
-- optional `phone`
-- `password`
-
-Rules:
-- email must be unique;
-- phone must be unique when supplied;
-- password is stored only as a bcrypt hash;
-- public registration always assigns `free_user`;
-- password/hash is never returned.
-
-### POST /auth/login
-
-Purpose: authenticate an active user and issue a JWT access token.
-
-Authentication: none.
-
-Input:
-- `email`
-- `password`
-
-Rules:
-- invalid credentials return 401;
-- inactive users are blocked;
-- successful login returns a bearer JWT.
-
-### GET /auth/me
-
-Purpose: return the authenticated user's safe account profile.
-
-Authentication: bearer JWT required.
-
-Rules:
-- missing/invalid/expired JWT is rejected;
-- inactive users are blocked;
-- password/hash is never returned.
-
-## Later approved stages
-
-Commodity, market, price, signal, quality, FAQ, feedback and broader admin APIs remain unimplemented until their approved stages.
-
-## Stage 5 — Subscription and 14-Day Trial
-
-### GET /subscriptions
-Purpose: list subscription records for manual administration.
-Authentication: admin bearer JWT required.
-
-### GET /subscriptions/{user_id}
-Purpose: return one user's subscription/trial record.
-Authentication: bearer JWT required. A normal user may view only their own record; admin may view any user's record.
-
-### PATCH /subscriptions/{user_id}/status
-Purpose: manually set an approved subscription status.
-Authentication: admin bearer JWT required.
-
-Allowed statuses:
-- `free`
-- `trial`
-- `active`
-- `expired`
-- `cancelled`
-
-Stage 5 rules:
-- normal public registration creates a 14-day trial subscription;
-- trial status gives full-access classification only until `trial_ends_at`;
-- an expired trial transitions to `expired` and the user remains/returns `free_user`;
-- `active` is the paid/full-access status and assigns `paid_user` for a normal user;
-- `free`, `expired`, and `cancelled` are limited-access statuses;
-- payment gateway integration remains deferred.
-
-## Stage 6 — Admin Core Management
-
-### GET /users
-Purpose: list PriceYard users for administration.
-Authentication: admin bearer JWT required.
-
-### GET /users/{user_id}
-Purpose: view one user's safe account details.
-Authentication: admin bearer JWT required.
-Rule: password hashes are never returned.
-
-### PATCH /users/{user_id}
-Purpose: change an approved MVP role and/or activate/deactivate a user.
-Authentication: admin bearer JWT required.
-Allowed roles: `admin`, `free_user`, `paid_user`.
-Reporter remains deferred.
-Role/subscription consistency:
-- `paid_user` synchronizes to active paid subscription status;
-- `free_user` synchronizes to free subscription status;
-- `admin` grants administration role directly.
-
-### GET /commodities
-Purpose: view commodities.
-Authentication: none.
-CR-03 rule: returns active commodities only.
-
-### GET /commodities/admin/all
-Purpose: allow administration to view active and inactive commodities for CRUD/reactivation.
-Authentication: admin bearer JWT required.
-
-### GET /commodities/{commodity_id}
-Purpose: view one commodity.
-Authentication: none.
-CR-03 rule: inactive commodities return 404 publicly.
-
-### POST /commodities
-Purpose: add a commodity.
-Authentication: admin bearer JWT required.
-
-### PATCH /commodities/{commodity_id}
-Purpose: edit a commodity.
-Authentication: admin bearer JWT required.
-
-### DELETE /commodities/{commodity_id}
-Purpose: delete a commodity when it is not referenced by dependent records.
-Authentication: admin bearer JWT required.
-
-Initial approved commodities:
-- Egusi
-- Beans
-- Palm oil
-
-### GET /markets
-Purpose: view markets.
-Authentication: none.
-CR-03 rule: returns active markets only.
-
-### GET /markets/admin/all
-Purpose: allow administration to view active and inactive markets for CRUD/reactivation.
-Authentication: admin bearer JWT required.
-
-### GET /markets/{market_id}
-Purpose: view one market.
-Authentication: none.
-CR-03 rule: inactive markets return 404 publicly.
-
-### POST /markets
-Purpose: add a market.
-Authentication: admin bearer JWT required.
-
-### PATCH /markets/{market_id}
-Purpose: edit a market.
-Authentication: admin bearer JWT required.
-
-### DELETE /markets/{market_id}
-Purpose: delete a market when it is not referenced by dependent records.
-Authentication: admin bearer JWT required.
-
-Initial approved markets:
-- Abuja/FCT — market day not set unless independently verified
-- Kwali Market — Tuesday
-- Nasarawa — Monday
-- Benue — market day not set unless independently verified
-
-Stage 6 reuses the Stage 5 subscription management APIs. No new payment behavior is introduced.
-
-## Stage 7 — Price Updates
-
-### GET /price-updates
-Purpose: return the latest approved, current price record for each commodity/market pair.
-Authentication: none at Stage 7; full access-tier enforcement is tested in the approved later access-control stage.
-Public privacy rule: `source_1` and `source_2` are never returned.
-Stage boundary: this is a current/latest view, not the Stage 8 chronological history/filter system.
-
-### GET /price-updates/{price_update_id}
-Purpose: return one approved price update.
-Authentication: none at Stage 7.
-Rule: pending/rejected records are not publicly returned; private source identities are excluded.
-
-### POST /price-updates
-Purpose: create a price update.
-Authentication: admin bearer JWT required.
-Rule: created records begin with `pending` status; `created_by` is server-controlled.
-
-### PATCH /price-updates/{price_update_id}
-Purpose: edit a price update.
-Authentication: admin bearer JWT required.
-
-### PATCH /price-updates/{price_update_id}/approve
-Purpose: approve a price update for public retrieval.
-Authentication: admin bearer JWT required.
-Rule: records the approving admin in `approved_by`.
-
-### PATCH /price-updates/{price_update_id}/reject
-Purpose: reject a price update.
-Authentication: admin bearer JWT required.
-
-### PATCH /price-updates/{price_update_id}/mark-outdated
-Purpose: mark a price update as outdated so it is not presented as current data.
-Authentication: admin bearer JWT required.
-
-### DELETE /price-updates/{price_update_id}
-Purpose: delete an incorrect price update when no dependent record prevents deletion.
-Authentication: admin bearer JWT required.
-
-Stage 7 validation rules:
-- current price uses `price_low` and `price_high` and permits equal values only when an exact confirmed value is intentionally supplied;
-- `price_high` cannot be below `price_low`;
-- `average_price` must be within the current range;
-- previous range values are optional when not confirmed, but when supplied they must be supplied as a pair and form a valid range;
-- movement is `up`, `down`, `stable`, or `unknown`;
-- suggested action is `Watch`, `Investigate`, `Buy Carefully`, `Hold`, or `Sell Carefully`;
-- explicit guarantee/financial-advice wording is rejected from `possible_meaning`;
-- public responses exclude private `source_1` and `source_2` values.
-
-## Stage 8 — Search, Filters, History, Comparison
-
-### GET /price-updates
-Returns latest approved, non-outdated price records (latest per commodity + market). Existing no-query behavior is preserved.
-CR-03 rule: public results require both an active commodity and an active market.
-
-Optional query parameters:
-- `commodity` — case-insensitive commodity-name search.
-- `market` — case-insensitive market-name filter.
-- `date` — exact UTC calendar date (`YYYY-MM-DD`) for the stored update timestamp.
-- `movement` — `up`, `down`, `stable`, or `unknown`.
-
-### GET /price-updates/history
-Returns approved price records in chronological order. Historical approved records remain available even when marked outdated, because outdated status means the record is no longer current, not that it should disappear from history.
-CR-03 rule: public history requires both an active commodity and an active market; protected admin history preserves management visibility for inactive references.
-
-### GET /price-updates/admin/history
-Purpose: preserve administration visibility of approved history linked to active or inactive commodity/market records.
-Authentication: admin bearer JWT required.
-
-Optional query parameters:
-- `commodity`
-- `market`
-- `date`
-- `movement`
-- `time_of_day` — `morning`, `afternoon`, `evening`, or `closing`.
-
-### GET /price-updates/comparison
-Returns the latest approved, non-outdated record per market for a commodity. Each record contains both current and previous price ranges, movement, confidence, Possible Meaning, and Suggested Action, allowing previous/current and cross-market comparison without duplicating price data.
-
-Required query parameter:
-- `commodity`
-
-Optional query parameter:
-- `date`
-
-Public source privacy remains unchanged: `source_1` and `source_2` are not returned.
-
-## Stage 9 — Market Signals and Quality Signals
-
-### GET /market-signals
-Purpose: list market signals created by PriceYard administration.
-Authentication: active bearer JWT required at Stage 9. Full tier-by-tier premium access enforcement remains scheduled for Stage 20.
-Response includes the approved market-signal disclaimer.
-
-### GET /market-signals/{signal_id}
-Purpose: view one market signal.
-Authentication: active bearer JWT required.
-Response includes the approved market-signal disclaimer.
-
-### POST /market-signals
-Purpose: create a market signal.
-Authentication: admin bearer JWT required.
-Fields: `commodity_id`, `market_id`, optional `price_update_id`, `signal_type`, `signal_description`, optional `possible_meaning`, optional approved `suggested_action`.
-Rules: explicit guarantee/financial-advice wording is rejected; `created_by` is server-controlled.
-
-### PATCH /market-signals/{signal_id}
-Purpose: edit a market signal.
-Authentication: admin bearer JWT required.
-
-### DELETE /market-signals/{signal_id}
-Purpose: delete a market signal.
-Authentication: admin bearer JWT required.
-
-Market-signal disclaimer returned by the API:
-
-> Market signals are observations based on available market information. They are not guaranteed predictions or financial advice. Users should verify before making major buying, selling, or storage decisions.
-
-### GET /quality-signals
-Purpose: list quality/readiness observations.
-Authentication: active bearer JWT required at Stage 9. Full tier-by-tier premium access enforcement remains scheduled for Stage 20.
-
-### GET /quality-signals/{signal_id}
-Purpose: view one quality/readiness observation.
-Authentication: active bearer JWT required.
-
-### POST /quality-signals
-Purpose: create quality/readiness information.
-Authentication: admin bearer JWT required.
-Fields: `commodity_id`, `market_id`, optional `price_update_id`, optional `quality_status`, `moisture_status`, `storage_readiness`, `risk_note`.
-Rule: explicit unsupported laboratory-confirmation wording is rejected; `created_by` is server-controlled.
-
-### PATCH /quality-signals/{signal_id}
-Purpose: edit quality/readiness information.
-Authentication: admin bearer JWT required.
-
-### DELETE /quality-signals/{signal_id}
-Purpose: delete quality/readiness information.
-Authentication: admin bearer JWT required.
-
-For both signal types, an optional linked price update must use the same commodity and market. Market-signal meaning/action remains separate from price-update meaning/action.
-
-
-## Stage 10 — Buying Zones and Sell-Watch Windows
-
-### GET /buying-zones
-Purpose: list buying-zone market observations.
-Authentication/access: admin, active trial, or active paid access required. Free/expired/cancelled users do not receive this full-intelligence view.
-Response includes the buying-zone safety disclaimer.
-
-### GET /buying-zones/{zone_id}
-Purpose: view one buying-zone observation.
-Authentication/access: admin, active trial, or active paid access required.
-
-### POST /buying-zones
-Purpose: create a buying-zone observation.
-Authentication: admin bearer JWT required.
-Fields: `commodity_id`, `market_id`, `price_low`, `price_high`, `reason`, optional `valid_from`, optional `valid_to`, `confidence`.
-Rules: invalid ranges and reversed validity periods are rejected; `created_by` is server-controlled; guarantee/financial-advice wording is rejected.
-
-### PATCH /buying-zones/{zone_id}
-Purpose: edit a buying-zone observation.
-Authentication: admin bearer JWT required.
-
-Buying-zone API disclaimer:
-
-> Buying zones are market observations and are not guaranteed lowest prices, guaranteed buying opportunities, predictions, or financial advice.
-
-### GET /sell-watch-windows
-Purpose: list sell-watch market observations.
-Authentication/access: admin, active trial, or active paid access required. Free/expired/cancelled users do not receive this full-intelligence view.
-Response includes the sell-watch safety disclaimer.
-
-### GET /sell-watch-windows/{window_id}
-Purpose: view one sell-watch observation.
-Authentication/access: admin, active trial, or active paid access required.
-
-### POST /sell-watch-windows
-Purpose: create a sell-watch observation.
-Authentication: admin bearer JWT required.
-Fields: `commodity_id`, `market_id`, `start_period`, optional `end_period`, `observation`, `confidence`.
-Rules: `created_by` is server-controlled; guaranteed-profit/prediction/financial-advice wording is rejected.
-
-### PATCH /sell-watch-windows/{window_id}
-Purpose: edit a sell-watch observation.
-Authentication: admin bearer JWT required.
-
-Sell-watch API disclaimer:
-
-> Sell-watch windows are market observations and are not guaranteed profit periods, guaranteed selling opportunities, predictions, or financial advice.
-
-Stage 10 did not include the Stage 11 storage-suitability API.
-
-
-## Stage 11 — Storage Suitability
-
-### GET /storage-suitability
-Purpose: list storage-suitability observations.
-Authentication/access: admin, active trial, or active paid access required. Free/expired/cancelled users do not receive this full-intelligence view.
-Response includes the approved storage-suitability disclaimer.
-
-### GET /storage-suitability/{item_id}
-Purpose: view one storage-suitability observation.
-Authentication/access: admin, active trial, or active paid access required.
-
-### POST /storage-suitability
-Purpose: create a storage-suitability observation.
-Authentication: admin bearer JWT required.
-Fields: `commodity_id`, `market_id`, optional `price_update_id`, `suitability_status`, optional `import_risk`, `oversupply_risk`, `spoilage_risk`, `buyer_availability`, `quality_storage_notes`, `summary`.
-Rules: status must be `good`, `watch`, `risky`, or `not_recommended`; optional price-update link must match the same commodity and market; explicit guaranteed profit/preservation/scarcity/future-price wording is rejected.
-
-### PATCH /storage-suitability/{item_id}
-Purpose: edit a storage-suitability observation.
-Authentication: admin bearer JWT required.
-
-Storage-suitability API disclaimer:
-
-> Storage suitability is based on available market and quality information. It does not guarantee profit, preservation, or future price increase.
-
-No Stage 12 cost-breakdown API is included in Stage 11.
-
-## Stage 12 — Cost Breakdown
-
-### GET /cost-breakdowns
-Purpose: list cost breakdowns linked to price updates.
-Authentication/access: admin, active trial, or active paid access required. Free/expired/cancelled users do not receive this full-intelligence view.
-
-### GET /cost-breakdowns/{item_id}
-Purpose: view one cost breakdown.
-Authentication/access: admin, active trial, or active paid access required.
-
-### POST /cost-breakdowns
-Purpose: create a cost breakdown for a price update.
-Authentication: admin bearer JWT required.
-Input fields: `price_update_id`, `transport`, `warehouse`, `security`, `market_charges`, `loading_offloading`, `other_costs`, `purchase_price_reference`.
-Server-calculated response fields: `total_additional_cost`, `total_estimated_landing_storage_cost`.
-Rules: linked price update must exist; negative amounts are rejected; client input does not control calculated totals.
-
-### PATCH /cost-breakdowns/{item_id}
-Purpose: edit cost components or purchase-price reference.
-Authentication: admin bearer JWT required.
-Rules: every edit recalculates both totals; negative amounts are rejected.
-
-No full accounting, average-cost calculator, Stage 13 watchlist API, or other future feature is included in Stage 12.
-
-## Stage 13 — Watchlist
-
-### POST /watchlist
-Purpose: save a commodity, market, or commodity+market combination to the authenticated user's own watchlist.
-Authentication: active bearer JWT required.
-Input fields: optional `commodity_id`, optional `market_id`; at least one is required.
-Rules: referenced commodity/market must exist and be active; `user_id` is server-controlled; an exact duplicate for the same user returns HTTP 409; target-price input/alert behavior is not part of Stage 13.
-
-### GET /watchlist
-Purpose: list only the authenticated user's own watchlist items.
-Authentication: active bearer JWT required.
-Rule: no user-id query parameter is accepted; the JWT identity is the authority.
-
-### DELETE /watchlist/{item_id}
-Purpose: remove one item from the authenticated user's own watchlist.
-Authentication: active bearer JWT required.
-Rule: an item owned by another user is not exposed or removed.
-
-Stage 13 does not add target-price alerts, Stage 14 FAQ management, or any later-stage feature.
-
-## Stage 14 — FAQ
-
-### GET /faq
-Purpose: publicly list published FAQ items only.
-Authentication: none required.
-Rule: hidden/unpublished FAQ items are excluded. Public responses do not expose admin creator identity or publication-control fields.
-
-### GET /faq/{faq_id}
-Purpose: publicly view one published FAQ item.
-Authentication: none required.
-Rule: hidden/unpublished FAQ items return HTTP 404.
-
-### POST /faq
-Purpose: create a new FAQ draft.
-Authentication: admin bearer JWT required.
-Input fields: `question`, `answer`, `category`.
-Rule: new FAQ items start hidden; clients cannot publish through the create payload.
-
-### PATCH /faq/{faq_id}
-Purpose: edit FAQ question, answer, or category.
-Authentication: admin bearer JWT required.
-
-### PATCH /faq/{faq_id}/publish
-Purpose: publish an FAQ item for public viewing.
-Authentication: admin bearer JWT required.
-
-### PATCH /faq/{faq_id}/hide
-Purpose: hide an FAQ item from public viewing.
-Authentication: admin bearer JWT required.
-
-### DELETE /faq/{faq_id}
-Purpose: delete an incorrect FAQ item.
-Authentication: admin bearer JWT required.
-This endpoint is included because the approved Architecture Design defines FAQ deletion as part of the FAQ management API.
-
-Stage 14 content rules:
-- write FAQ content in PriceYard's own words;
-- do not copy paid-group content word-for-word;
-- do not include private phone/account numbers or vendor contact/payment instructions;
-- avoid guaranteed-profit, guaranteed-prediction, forced buy/sell, or financial-advice claims;
-- preserve approved PriceYard disclaimers where relevant.
-
-The paid-source word-for-word rule requires human/editorial source comparison; it is not represented as an automated plagiarism detector.
-
-No Stage 15 feedback-management API or later-stage feature is added in Stage 14.
-
-
-## Stage 15 — User Feedback and 1–5 Star Rating
-
-### POST /feedback
-Purpose: allow an authenticated user to submit PriceYard experience feedback.
-Authentication: active bearer JWT required.
-Input fields: `rating`, `comment`, `price_usefulness`, `price_accuracy`, `missing_market_request`, `missing_commodity_request`, `complaint_or_suggestion`, `continue_using_feedback`, `willingness_to_pay_feedback`.
-Rules: rating must be 1 through 5; `user_id` is server-controlled from the authenticated user and cannot be supplied by the client.
-
-### GET /feedback
-Purpose: admin-only feedback list with optional rating filter.
-Authentication: admin bearer JWT required.
-Query: optional `rating=1..5`.
-Rule: ordinary users cannot browse private feedback from other users.
-
-### GET /feedback/summary
-Purpose: admin-only basic feedback summary.
-Authentication: admin bearer JWT required.
-Response: total feedback count and average rating only. No advanced analytics are included.
-
-### GET /feedback/{feedback_id}
-Purpose: admin-only view of one feedback record, including complaints/suggestions.
-Authentication: admin bearer JWT required.
-
-### DELETE /feedback/{feedback_id}
-Purpose: admin-only removal of a feedback record under the Architecture-approved Feedback API.
-Authentication: admin bearer JWT required.
-
-Stage 15 reuses the existing Stage 3 `feedback` table and adds no migration, Stage 16 audit-log behavior, advanced analytics, or other later-stage feature.
-
-## Stage 16 — Audit Logs
-
-### GET /audit-logs
-Purpose: allow an admin to view audit history for important administrative changes.
-Authentication: admin bearer JWT required.
-Response fields: `id`, `user_id`, `action`, `table_name`, `record_id`, `old_value`, `new_value`, `created_at`.
-Rule: ordinary users cannot browse audit history.
-
-### GET /audit-logs/{audit_log_id}
-Purpose: allow an admin to view one audit record.
-Authentication: admin bearer JWT required.
-
-Stage 16 records important admin changes for price updates, commodities, markets, FAQ, subscriptions, users, and feedback administration. Price-update edit snapshots preserve changes to `possible_meaning` and `suggested_action`.
-
-Audit snapshots intentionally exclude password/password-hash fields, secrets/tokens, database credentials/URLs, `.env` values, and private price-source identities (`source_1`, `source_2`). Stage 16 adds no CSV export or Stage 17 feature.
-
-## Stage 17 — Simple CSV Report Export
-
-### GET /reports/prices.csv
-Purpose: download a simple CSV report of approved PriceYard price intelligence.
-Authentication: admin bearer JWT required.
-Query filters:
-- optional `commodity`
-- optional `market`
-- optional `date_from` (YYYY-MM-DD)
-- optional `date_to` (YYYY-MM-DD)
-
-Rules:
-- only approved `price_updates` are exported;
-- date range is inclusive; `date_from` later than `date_to` is rejected;
-- export includes commodity, market, current price range, previous price range, movement, update date/time, confidence, Possible Meaning, Suggested Action, linked market signals, and linked quality signals;
-- the Stage 9 signal schema has no separate approval-status field, so linked admin-managed signals are exported only when attached to an approved price update;
-- private source identities (`source_1`, `source_2`), password data, JWT/secrets, and unnecessary personal data are not exported;
-- no PDF generation, report-storage table, advanced analytics, or Stage 18 frontend is included.
-
-Response: `text/csv` attachment named `priceyard-price-report.csv`.
-
-## Stage 18 — Frontend API Integration
-
-Stage 18 adds no new backend API contract. The React + TypeScript public/user frontend consumes the approved APIs from Stages 4–15, including authentication, subscription self-view, commodities, markets, price updates/history/comparison, signals, quality, buying zones, sell-watch windows, storage suitability, cost breakdowns, FAQ, feedback, and watchlist.
-
-Local Vite development uses `/api/*` as a proxy to `http://127.0.0.1:8000`. Deployment will use `VITE_API_URL` and the approved production CORS/origin configuration in Stages 21–22.
-
-Private `source_1` / `source_2` values are not consumed by the Stage 18 frontend. Admin-management API consumption is deferred to Stage 19.
-
-## Stage 19 — Admin Frontend Integration
-
-Stage 19 adds no backend API endpoint and does not change any approved API contract. The React admin frontend reuses the existing authenticated/admin endpoints from Stages 6–17 for users, commodities, markets, price updates, signals, buying zones, sell-watch windows, storage suitability, costs, FAQ, subscriptions, feedback, audit logs and CSV export.
-
-Backend role/subscription authorization remains authoritative; frontend route hiding is presentation only.
-# AUTH-01 password recovery
-
-- `POST /auth/forgot-password` — accepts an email and always returns the same generic response. For an active matching account, a single-use 15-minute reset link is sent.
-- `POST /auth/reset-password` — accepts a reset token and an 8–72 character new password. Expired, invalid, or used tokens are rejected.
+# PriceYard API contracts
+
+Current October 2026 hardening-branch contracts. This document supersedes the
+earlier stage-by-stage endpoint descriptions; historical stage evidence remains
+under `docs/evidence`. Backend schemas/routes are the final field-level reference.
+No deployed API was contacted to prepare this document.
+
+## Common behavior
+
+JSON inputs/outputs unless noted. Monetary observations use Decimal, with at most
+14 digits and two decimal places. Pydantic validation errors return 422. Protected
+routes use `Authorization: Bearer <access_token>`; invalid/missing authentication
+returns 401 and insufficient authority returns 403. Inactive accounts are blocked.
+Ownership checks never trust a client-supplied user ID.
+
+A supplied malformed/invalid Authorization header is rejected even on an optionally
+authenticated price endpoint. Omitting it requests the public view.
+
+Request bodies are bounded before decoding (default three MiB); oversized bodies
+return 413. Authentication/provider/write rate limits may return 429. The HTTP
+unit of work commits mutations and audit records before success; commit failure
+returns a controlled 503. Provider failures never justify inventing successful
+payment or email delivery.
+
+Paginated APIs retain array responses. Most paged lists use `page >= 1` and
+`page_size = 1..1000`. Price history/admin history, users, subscriptions,
+administrator flagged prices, audit logs and feedback default to 100. Current
+prices and scoped intelligence default to 1000. Payments instead use
+`offset >= 0` and `limit = 1..500`, default 100. A page is not a total count.
+
+## Authentication
+
+| Route | Input / access | Result |
+|---|---|---|
+| POST /auth/register | Name, email, password; optional phone/referral_code | Safe user; 14-day trial begins immediately; verification queued |
+| POST /auth/login | Email, password, optional remember_me | Session credentials |
+| POST /auth/google | id_token, optional remember_me | Known verified identity login or new account; email collisions require explicit recovery/linking |
+| POST /auth/refresh | refresh_token | Rotated refresh credential and new access token |
+| POST /auth/logout | Current bearer session | Revokes that server session |
+| POST /auth/logout-all | Authenticated | Revokes all account sessions |
+| POST /auth/request-verification | Email | Generic message; eligible proof queued with cooldown |
+| POST /auth/verify-email | token | Consumes valid single-use email proof |
+| POST /auth/google/link | Bearer, id_token, current password | Links verified matching identities explicitly |
+| POST /auth/forgot-password | Email | Generic message; eligible recovery queued |
+| POST /auth/reset-password | token, new_password | Atomic one-use claim; password changed and sessions revoked |
+| GET /auth/me | Bearer | Safe current account |
+| GET /auth/referral-summary | Bearer | Own attribution summary and reward size |
+
+Session credential response: `access_token`, `token_type`, `refresh_token`,
+`expires_in`, `session_expires_at`. Access lifetime defaults to 900 seconds.
+Stored refresh tokens are hashed server-side; cookie-based credentials are not
+implemented. The legacy API default for omitted remember_me is true; current
+frontend login defaults to an explicit unchecked remember choice.
+
+New passwords retain minimum eight characters and maximum 72 UTF-8 bytes. Reset
+defaults to 15 minutes and verification to 30 minutes. Old account email ownership
+is not fabricated. Valid existing passwords remain valid; old JWTs without server
+session identity require login again.
+
+## Users, subscriptions and payments
+
+| Route | Access / behavior |
+|---|---|
+| GET /users; GET /users/{id}; PATCH /users/{id} | Admin; bounded list, safe fields; role/activity management; last-active-admin protection |
+| GET /subscriptions | Admin; page/page_size; all expired rows processed before the requested page |
+| GET /subscriptions/{user_id} | Owner or Admin |
+| PATCH /subscriptions/{user_id}/status | Admin; cannot erase valid purchased/manual access |
+| POST /subscriptions/send-trial-reminders | Admin; eligible reminders accepted for queued delivery |
+| POST /subscriptions/cron/send-trial-reminders | Exact secret-protected scheduler route; never a public cron |
+| POST /payments/initiate | Authenticated account; plan monthly or seasonal; returns checkout URL/reference |
+| POST /payments/webhook | Exact raw-body Paystack signature and validated event evidence |
+| GET /payments/status/{reference} | Owner or Admin; distinguishes payment confirmation from access applied |
+| GET /payments | Admin; offset/limit |
+| POST /payments/reconcile | Admin; signed_payload, signature, reason, optional reviewed legacy_resolution |
+
+Plans: NGN 2,500/30 days and NGN 6,000/90 days. No automatic recurring charges.
+Renewals add to unused paid time/valid trial. Server access uses an exclusive UTC
+cutoff; legacy inclusive end dates retain their entire date. Manual indefinite
+grants survive payments. Cancellation records intent without deleting valid access.
+
+Checkout terms/account binding are retained for reconciliation. Amount, currency,
+successful state, customer, environment and provider transaction identity must
+match. Callback URLs do not activate access. Duplicate events apply once. Historical
+success records lacking proof of applied access require reviewed
+`already_applied` or `apply_missing` reconciliation; never blanket replay them.
+
+Pending checkout intent is persisted before provider initialization. This deliberate
+transaction boundary grants no access and retains the reconciliation reference if
+checkout creation times out. Admin/manual-grant accounts cannot start an unnecessary
+subscription checkout.
+
+Referrals qualify prospectively on a verified first successful purchase, once per
+referred account. Eligible Trial/Free referrers receive seven days, capped at four
+new awards per referrer. Existing earned time is retained.
+
+## Commodities and markets
+
+Public GET list/detail returns active records only. Admin GET
+`/commodities/admin/all` and `/markets/admin/all` includes inactive records.
+POST/PATCH/DELETE require Admin. DELETE deactivates retained identity instead of
+erasing history. Stable IDs distinguish namesake markets. Normalized name/state
+uniqueness is protected by database indexes after reviewed migration preflight.
+
+## Prices and history
+
+| Route | Contract |
+|---|---|
+| GET /price-updates | Current recorded measurement series; optional authentication selects response fields |
+| GET /price-updates/comparison | commodity or commodity_id required; current market/specification observations |
+| GET /price-updates/history | Full access; chronological approved active-reference history, including outdated rows |
+| GET /price-updates/{id} | Public/limited only eligible current ID; full access may read eligible history |
+| GET /price-updates/admin/history | Admin; all statuses and inactive references; page/page_size |
+| GET /price-updates/admin/flagged | Admin; joined flag aggregates; page/page_size |
+| GET /price-updates/my-stats | Own submitted/pending/approved/rejected counts |
+| POST /price-updates | Admin/Reporter; starts pending |
+| PATCH /price-updates/{id} | Admin; published corrections require correction_reason of 10..500 characters |
+| PATCH /price-updates/{id}/approve | Admin; derives comparable predecessor/range/movement |
+| PATCH /price-updates/{id}/reject | Admin; retains evidence |
+| PATCH /price-updates/{id}/mark-outdated | Admin; does not cause older-current fallback |
+| DELETE /price-updates/{id} | Admin; 204 withdrawal, retained row/links/revisions |
+| POST /price-updates/{id}/flag | Authenticated account able to read the price |
+| POST /price-updates/{id}/flags/resolve | Admin |
+
+Current/history filters: commodity/market names, stable commodity_id/market_id,
+date and movement; history also time_of_day. Historical date searches require full
+access on every path. Date means Africa/Lagos calendar day. Current selection ranks
+latest first, then applies outdated and movement filters.
+
+Create requires commodity_id, market_id, price_low/high, unit, bag_size,
+confidence_level, update_date_time and suggested_action. Average is optional.
+Optional recorded metadata includes commodity_type, grade, market_day/time_of_day,
+previous ranges, confidential sources and editorial commentary. Approval derives
+previous ranges/movement rather than accepting contradictory supplied claims.
+
+Public summary retains current/previous ranges, optional recorded average,
+measurement, movement, confidence and observation metadata. Full access adds
+possible_meaning, suggested_action and notes. Private source_1/source_2 are excluded
+from consumer schemas. Reporter submissions cannot self-attest source/confidence
+or editorial guidance; source values are stripped.
+
+Recorded series includes commodity, market, unit, bag specification, variant and
+grade. No physical conversion or grade is guessed. Missing bag specification is
+legacy_unspecified and cannot be joined into a comparable chart. Missing averages
+produce unknown direction, never a fabricated midpoint. Responses include
+measurement_series, measurement_status and previous_price_update_id.
+
+New timestamps require an offset, normalize to UTC and cannot exceed five minutes
+into the future. Corrections preserve originals. A linked observation's specification
+cannot silently move beneath intelligence.
+
+Only anonymous undated current lists emit `X-PriceYard-Public: true` and short
+public cache lifetime; authenticated lists are private/no-store and vary by
+Authorization. History/detail never emit the public-cache marker.
+
+## Intelligence
+
+GET market-signal list/detail requires authentication. Limited accounts receive
+basic facts; deeper meaning/action requires full access. GET quality-signals,
+buying-zones, sell-watch-windows, storage-suitability and cost-breakdowns requires
+full access. Writes require Admin.
+
+Lists support commodity_id/market_id and page/page_size. Consumers require active
+references and an approved linked price. Admin management retains inactive-reference
+visibility. Archived market/quality/cost records are omitted from normal lists.
+
+Market/quality/storage price links must match commodity and market. Market and
+quality DELETE archive retained rows. Buying-zone responses include validity_status
+for either date boundary without automatically hiding records. Sell-watch periods
+remain editorial strings; they are not authoritative dated forecasts.
+
+New costs require commodity_id, market_id, unit, bag_size, reference_date_time and
+purchase_price_reference; optional variant/grade and six nonnegative cost components.
+The server calculates totals. Historical missing cost metadata stays null.
+Required PATCH fields reject explicit null; nullable commentary may be cleared.
+
+## Other implemented routes
+
+| Group | Access / notable contract |
+|---|---|
+| GET /faq and /faq/{id} | Published only |
+| GET /faq/admin/all | Admin, including hidden drafts |
+| FAQ POST/PATCH/publish/hide/DELETE | Admin; content validation and audit |
+| POST /feedback | Own authenticated submission; bounded text/screenshot |
+| Feedback list/detail/summary/delete/testimonial administration | Admin; list page/page_size |
+| GET /testimonials | Public curated safe fields |
+| Watchlist GET/POST/DELETE | Own account; paired commodity/market uses AND matching |
+| Push subscribe/unsubscribe/status | Own account and verified browser endpoint ownership |
+| GET /audit-logs and /{id} | Admin; sanitized snapshots; list page/page_size |
+| GET /admin/metrics | Admin; aggregate totals/current/effective-access counts; distinguishes recorded success, provider confirmation and access application; currencies stay separate |
+| GET /reports/prices.csv | Admin; optional names/date range; Lagos day boundaries; safe textual spreadsheet cells |
+| POST /activity/ping | Rate-limited public count |
+| GET /activity/summary; POST /activity/seen | Admin |
+| GET /share/commodities/{name} | Public social-preview HTML |
+| GET /health | Process liveness only; not a database/provider readiness assertion |
+| GET /ready | Required secret, database and exact expected revision check; redacted 503 on failure; not provider/backup readiness |
+
+Targets compare only an explicitly confirmed measurement basis. Legacy numeric
+targets are preserved but alerts remain paused until measurement is confirmed.
+Notification payloads contain eligible public facts; delivery rechecks account,
+watch/measurement, current observation and revision eligibility.
+
+Endpoint schemas/OpenAPI describe the definitive optional fields. Monitoring,
+provider compatibility, hosting headers, restore and capacity need separately
+authorized environment verification; local route coverage is not live certification.
+
+### Public social-preview identity
+
+GET /share/commodities/{commodity_name} resolves the exact commodity identity. Optional positive `pu` selects only an eligible current observation of that commodity, market and measurement. Historical/wrong-commodity IDs and ambiguous unqualified links show a generic current-selection message; they never quote a guessed series or disclose history. Quantity, bag size, variant and grade accompany a current quote. CSV export rejects more than 10,000 selected observations and asks for narrower filters without removing data.

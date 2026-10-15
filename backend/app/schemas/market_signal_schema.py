@@ -39,8 +39,8 @@ class MarketSignalCreate(BaseModel):
     market_id: int = Field(gt=0)
     price_update_id: int | None = Field(default=None, gt=0)
     signal_type: str = Field(min_length=1, max_length=100)
-    signal_description: str = Field(min_length=1)
-    possible_meaning: str | None = None
+    signal_description: str = Field(min_length=1, max_length=5000)
+    possible_meaning: str | None = Field(default=None, max_length=5000)
     suggested_action: SuggestedAction | None = None
 
     model_config = ConfigDict(str_strip_whitespace=True)
@@ -56,8 +56,8 @@ class MarketSignalUpdate(BaseModel):
     market_id: int | None = Field(default=None, gt=0)
     price_update_id: int | None = Field(default=None, gt=0)
     signal_type: str | None = Field(default=None, min_length=1, max_length=100)
-    signal_description: str | None = Field(default=None, min_length=1)
-    possible_meaning: str | None = None
+    signal_description: str | None = Field(default=None, min_length=1, max_length=5000)
+    possible_meaning: str | None = Field(default=None, max_length=5000)
     suggested_action: SuggestedAction | None = None
 
     model_config = ConfigDict(str_strip_whitespace=True)
@@ -68,18 +68,21 @@ class MarketSignalUpdate(BaseModel):
         return _validate_observational_text(value, field_name=info.field_name)
 
 
-class MarketSignalResponse(BaseModel):
+class BasicMarketSignalResponse(BaseModel):
     id: int
     commodity_id: int
     market_id: int
     price_update_id: int | None
     signal_type: str
     signal_description: str
-    possible_meaning: str | None
-    suggested_action: str | None
     created_by: int
     created_at: datetime
     updated_at: datetime
     disclaimer: str = MARKET_SIGNAL_DISCLAIMER
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class MarketSignalResponse(BasicMarketSignalResponse):
+    possible_meaning: str | None
+    suggested_action: str | None

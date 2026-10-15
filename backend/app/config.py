@@ -1,4 +1,5 @@
 from functools import lru_cache
+import os
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -13,7 +14,16 @@ class Settings(BaseSettings):
     jwt_secret: str | None = None
     jwt_algorithm: str = "HS256"
     google_client_id: str | None = None
-    access_token_expire_minutes: int = 129_600  # 90 days -- users stay logged in until they explicitly log out
+    access_token_expire_minutes: int = 15
+    auth_session_remember_days: int = 90
+    auth_session_nonremember_hours: int = 24
+    jwt_issuer: str = "priceyard"
+    jwt_audience: str = "priceyard-api"
+    email_verification_expire_minutes: int = 30
+    email_verification_cooldown_seconds: int = 60
+    rate_limit_storage_uri: str = "memory://"
+    notification_max_attempts: int = 5
+    max_request_bytes: int = 3 * 1024 * 1024
     cors_origins: str = ""
     frontend_url: str = "http://127.0.0.1:5173"
     password_reset_expire_minutes: int = 15
@@ -47,4 +57,8 @@ class Settings(BaseSettings):
 
 @lru_cache
 def get_settings() -> Settings:
+    # The isolated runner sets this before any application import. Never load a
+    # developer/production dotenv file from a test process.
+    if os.environ.get("PRICEYARD_TEST_MODE") == "isolated":
+        return Settings(_env_file=None)
     return Settings()

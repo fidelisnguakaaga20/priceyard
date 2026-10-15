@@ -1,5 +1,26 @@
 # PriceYard Database Schema
 
+## Current hardening additions
+
+The October 2026 branch prepares revisions 0022–0025. It adds auth_sessions,
+email_verification_tokens, entitlement_grants, referral_rewards, price_revisions
+and notification_jobs; ownership/session-version and precise entitlement fields;
+price grade/predecessor references; cost measurement/reference metadata; retained
+archive flags; normalized identity indexes; and explicit watch target measurement.
+Existing price averages remain nullable. No historic measurement, grade, timestamp
+repair or missing payment application is fabricated.
+
+Consumer active-only history remains approved policy. Price withdrawal and
+commodity/market deactivation preserve identities and links. Revision originals
+remain restricted and private sources are excluded from general audit/consumer
+schemas. New migrations refuse destructive downgrade where evidence would be lost.
+
+Models/migrations are the current field-level authority. See
+[API contracts](api-endpoints.md), [deployment recovery](deployment-plan.md) and
+[guarded migration evidence](evidence/backend-price-hardening.md). The following
+stage inventory is historical; it does not limit the implemented schema or certify
+the production migration state.
+
 ## Status
 Stage 3 foundation is RETESTED/PASS. Stage 10, Stage 11, and Stage 12 tables are owner-verified. Stage 13 is authorized to add only the approved `watchlists` table.
 

@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AdminLayout } from "./components/AdminLayout";
 import { AdminRoute } from "./components/AdminRoute";
@@ -18,25 +19,31 @@ import { RegisterPage } from "./pages/RegisterPage";
 import { ReportPricePage } from "./pages/ReportPricePage";
 import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import { WatchlistPage } from "./pages/WatchlistPage";
-import { AdminActivityPage } from "./pages/admin/AdminActivityPage";
-import { AdminAuditLogsPage } from "./pages/admin/AdminAuditLogsPage";
-import { AdminCommoditiesPage } from "./pages/admin/AdminCommoditiesPage";
-import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage";
-import { AdminExportPage } from "./pages/admin/AdminExportPage";
-import { AdminFAQPage } from "./pages/admin/AdminFAQPage";
-import { AdminFeedbackPage } from "./pages/admin/AdminFeedbackPage";
-import { AdminFlaggedPricesPage } from "./pages/admin/AdminFlaggedPricesPage";
-import { AdminBuyingZonesPage, AdminCostBreakdownPage, AdminSellWatchPage, AdminStoragePage } from "./pages/admin/AdminIntelligencePages";
-import { AdminMarketsPage } from "./pages/admin/AdminMarketsPage";
-import { AdminPriceUpdatesPage } from "./pages/admin/AdminPriceUpdatesPage";
-import { AdminMarketSignalsPage, AdminQualitySignalsPage } from "./pages/admin/AdminSignalsPage";
-import { AdminPaymentsPage } from "./pages/admin/AdminPaymentsPage";
-import { AdminSubscriptionsPage } from "./pages/admin/AdminSubscriptionsPage";
-import { AdminUsersPage } from "./pages/admin/AdminUsersPage";
+import { VerifyEmailPage } from "./pages/VerifyEmailPage";
+
+const AdminActivityPage = lazy(() => import("./pages/admin/AdminActivityPage").then((module) => ({ default: module.AdminActivityPage })));
+const AdminAuditLogsPage = lazy(() => import("./pages/admin/AdminAuditLogsPage").then((module) => ({ default: module.AdminAuditLogsPage })));
+const AdminCommoditiesPage = lazy(() => import("./pages/admin/AdminCommoditiesPage").then((module) => ({ default: module.AdminCommoditiesPage })));
+const AdminDashboardPage = lazy(() => import("./pages/admin/AdminDashboardPage").then((module) => ({ default: module.AdminDashboardPage })));
+const AdminExportPage = lazy(() => import("./pages/admin/AdminExportPage").then((module) => ({ default: module.AdminExportPage })));
+const AdminFAQPage = lazy(() => import("./pages/admin/AdminFAQPage").then((module) => ({ default: module.AdminFAQPage })));
+const AdminFeedbackPage = lazy(() => import("./pages/admin/AdminFeedbackPage").then((module) => ({ default: module.AdminFeedbackPage })));
+const AdminFlaggedPricesPage = lazy(() => import("./pages/admin/AdminFlaggedPricesPage").then((module) => ({ default: module.AdminFlaggedPricesPage })));
+const AdminBuyingZonesPage = lazy(() => import("./pages/admin/AdminIntelligencePages").then((module) => ({ default: module.AdminBuyingZonesPage })));
+const AdminCostBreakdownPage = lazy(() => import("./pages/admin/AdminIntelligencePages").then((module) => ({ default: module.AdminCostBreakdownPage })));
+const AdminSellWatchPage = lazy(() => import("./pages/admin/AdminIntelligencePages").then((module) => ({ default: module.AdminSellWatchPage })));
+const AdminStoragePage = lazy(() => import("./pages/admin/AdminIntelligencePages").then((module) => ({ default: module.AdminStoragePage })));
+const AdminMarketsPage = lazy(() => import("./pages/admin/AdminMarketsPage").then((module) => ({ default: module.AdminMarketsPage })));
+const AdminPriceUpdatesPage = lazy(() => import("./pages/admin/AdminPriceUpdatesPage").then((module) => ({ default: module.AdminPriceUpdatesPage })));
+const AdminMarketSignalsPage = lazy(() => import("./pages/admin/AdminSignalsPage").then((module) => ({ default: module.AdminMarketSignalsPage })));
+const AdminQualitySignalsPage = lazy(() => import("./pages/admin/AdminSignalsPage").then((module) => ({ default: module.AdminQualitySignalsPage })));
+const AdminPaymentsPage = lazy(() => import("./pages/admin/AdminPaymentsPage").then((module) => ({ default: module.AdminPaymentsPage })));
+const AdminSubscriptionsPage = lazy(() => import("./pages/admin/AdminSubscriptionsPage").then((module) => ({ default: module.AdminSubscriptionsPage })));
+const AdminUsersPage = lazy(() => import("./pages/admin/AdminUsersPage").then((module) => ({ default: module.AdminUsersPage })));
 
 export default function App() {
   return (
-    <Routes>
+    <Suspense fallback={<p role="status" className="page page-section">Loading page?</p>}><Routes>
       <Route element={<Layout />}>
         <Route index element={<HomePage />} />
         <Route path="prices" element={<PricesPage />} />
@@ -48,6 +55,7 @@ export default function App() {
         <Route path="register" element={<RegisterPage />} />
         <Route path="forgot-password" element={<ForgotPasswordPage />} />
         <Route path="reset-password" element={<ResetPasswordPage />} />
+        <Route path="verify-email" element={<VerifyEmailPage />} />
         <Route path="dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
         <Route path="payment/callback" element={<ProtectedRoute><PaymentCallbackPage /></ProtectedRoute>} />
         <Route path="watchlist" element={<ProtectedRoute><WatchlistPage /></ProtectedRoute>} />
@@ -76,6 +84,6 @@ export default function App() {
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
-    </Routes>
+    </Routes></Suspense>
   );
 }

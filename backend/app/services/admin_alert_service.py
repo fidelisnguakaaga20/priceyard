@@ -6,11 +6,11 @@ from app.models.user import User
 
 def notify_admins(db: Session, *, subject: str, body: str) -> None:
     """Email every active admin. Best-effort only - a failed send must never block the action that triggered it."""
-    from app.services.email_service import send_email
+    from hashlib import sha256
+    from app.services.notification_service import enqueue_notification
 
     admins = db.scalars(select(User).where(User.role == "admin", User.is_active.is_(True))).all()
     for admin in admins:
-        try:
-            send_email(recipient=admin.email, subject=subject, body=body)
-        except Exception:
-            continue
+        enqueue_notification(db, channel="email", recipient=admin.email,
+                             payload={"subject": subject, "body": body},
+                             event_key="admin:" + sha256((subject + body).encode()).hexdigest())

@@ -5,6 +5,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.models.price_flag import PriceFlag
+from app.models.commodity import Commodity
+from app.models.market import Market
 from app.models.price_update import PriceUpdate
 from app.models.user import User
 from app.schemas.price_flag_schema import FlaggedPriceSummary
@@ -24,32 +26,27 @@ def flag_price_update(db: Session, user: User, price_update: PriceUpdate, reason
     return True
 
 
-def list_flagged_price_updates(db: Session) -> list[FlaggedPriceSummary]:
+def list_flagged_price_updates(db: Session, *, page: int = 1, page_size: int = 100) -> list[FlaggedPriceSummary]:
+    if page < 1 or not 1 <= page_size <= 1000:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=422, detail="Invalid pagination")
     statement = (
         select(
             PriceFlag.price_update_id,
+            Commodity.name.label("commodity_name"),
+            Market.name.label("market_name"),
             func.count(PriceFlag.id).label("flag_count"),
             func.max(PriceFlag.created_at).label("latest_flag_at"),
         )
+        .join(PriceUpdate, PriceFlag.price_update_id == PriceUpdate.id)
+        .join(Commodity, PriceUpdate.commodity_id == Commodity.id)
+        .join(Market, PriceUpdate.market_id == Market.id)
         .where(PriceFlag.resolved.is_(False))
-        .group_by(PriceFlag.price_update_id)
-        .order_by(func.max(PriceFlag.created_at).desc())
+        .group_by(PriceFlag.price_update_id, Commodity.name, Market.name)
+        .order_by(func.max(PriceFlag.created_at).desc(), PriceFlag.price_update_id.desc())
+        .offset((page - 1) * page_size).limit(page_size)
     )
-    results: list[FlaggedPriceSummary] = []
-    for price_update_id, flag_count, latest_flag_at in db.execute(statement).all():
-        price_update = db.get(PriceUpdate, price_update_id)
-        if price_update is None:
-            continue
-        results.append(
-            FlaggedPriceSummary(
-                price_update_id=price_update_id,
-                commodity_name=price_update.commodity.name,
-                market_name=price_update.market.name,
-                flag_count=flag_count,
-                latest_flag_at=latest_flag_at,
-            )
-        )
-    return results
+    return [FlaggedPriceSummary(**row) for row in db.execute(statement).mappings().all()]
 
 
 def resolve_flags(db: Session, price_update_id: int) -> int:

@@ -3,9 +3,9 @@ from datetime import datetime, timezone
 from html import escape as html_escape
 from urllib.parse import quote
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from fastapi.responses import HTMLResponse
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
@@ -45,7 +45,7 @@ def _relative_age(moment: datetime) -> str:
 
 
 @router.get("/commodities/{commodity_name}", response_class=HTMLResponse)
-def share_commodity_card(commodity_name: str, db: Session = Depends(get_db)) -> HTMLResponse:
+def share_commodity_card(commodity_name: str, pu: int | None = Query(default=None, gt=0), db: Session = Depends(get_db)) -> HTMLResponse:
     """Serve a crawler-friendly HTML card with per-commodity Open Graph tags, then hand
     real visitors off to the React app. Social crawlers (WhatsApp, Facebook, Twitter, ...)
     don't execute JavaScript, so the SPA's single static index.html can't vary its preview
@@ -58,11 +58,15 @@ def share_commodity_card(commodity_name: str, db: Session = Depends(get_db)) -> 
 
     log_activity_event(db, event_type="share_view", label=commodity_name)
 
-    items = list_latest_approved_price_updates(db, commodity_search=commodity_name)
-    item = items[0] if items else None
+    commodity = db.scalar(select(Commodity).where(func.lower(func.trim(Commodity.name)) == commodity_name.strip().lower()))
+    items = list_latest_approved_price_updates(db, commodity_id=commodity.id) if commodity is not None else []
+    # A shared observation identifies its exact current market/measurement. Old
+    # IDs and ambiguous unqualified links must not quote another series/product.
+    item = next((candidate for candidate in items if candidate.id == pu), None) if pu is not None else (items[0] if len(items) == 1 else None)
 
     if item is not None:
-        measure = item.bag_size or item.unit
+        measure = " · ".join(filter(None, (item.unit, item.bag_size or "bag size not recorded", item.commodity_type,
+                                               f"grade {item.grade}" if item.grade else "grade not recorded")))
         title = f"{item.commodity.name} — {_format_naira(item.price_low)}–{_format_naira(item.price_high)} | PriceYard"
         description = (
             f"{item.commodity.name} at {item.market.name}: "
@@ -71,7 +75,6 @@ def share_commodity_card(commodity_name: str, db: Session = Depends(get_db)) -> 
         )
         image = _social_preview_image(item.commodity.image_url or fallback_image)
     else:
-        commodity = db.scalar(select(Commodity).where(Commodity.name.ilike(commodity_name)))
         if commodity is not None and commodity.is_upcoming:
             title = f"{commodity.name} — Coming Soon | PriceYard"
             when = f" Expected {commodity.expected_available_date:%B %Y}." if commodity.expected_available_date else ""
@@ -79,7 +82,8 @@ def share_commodity_card(commodity_name: str, db: Session = Depends(get_db)) -> 
             image = _social_preview_image(commodity.image_url or fallback_image)
         elif commodity is not None:
             title = f"{commodity.name} — PriceYard"
-            description = commodity.description or "See today's market prices, ranges and trends on PriceYard."
+            description = ("This shared observation may have changed. Open PriceYard to select a current market and measurement."
+                           if pu is not None or items else commodity.description or "See today's market prices, ranges and trends on PriceYard.")
             image = _social_preview_image(commodity.image_url or fallback_image)
         else:
             title = f"{commodity_name} — PriceYard"

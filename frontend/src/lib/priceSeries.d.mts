@@ -1,0 +1,10 @@
+import type { PriceUpdate, Subscription, WatchlistItem } from "../types/api";
+export function measurementLabel(item: Pick<PriceUpdate, "unit" | "bag_size" | "commodity_type" | "grade">): string;
+export function seriesKey(item: PriceUpdate): string;
+export function groupComparablePrices(items: PriceUpdate[]): { key: string; records: PriceUpdate[] }[];
+export function reconcileRecords<T extends { id: number }>(authoritative: T[], local: T[]): T[];
+export function lagosDay(now?: Date): string;
+export function outsideDateWindow(from: string | null, to: string | null, day?: string): boolean;
+export function toUtcFromLagos(value: string): string;
+export function matchesTargetBasis(target: WatchlistItem, price: PriceUpdate): boolean;
+export function paidCutoffValue(subscription: Pick<Subscription, "paid_expires_at" | "end_date">): string | null;

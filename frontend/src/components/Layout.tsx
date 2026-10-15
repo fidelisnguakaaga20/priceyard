@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { apiFetch } from "../services/api";
@@ -34,9 +34,34 @@ export function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = useState(false);
+  const header = useRef<HTMLElement>(null);
+  const menuButton = useRef<HTMLButtonElement>(null);
+  const navigation = useRef<HTMLElement>(null);
   const [loggingOut, setLoggingOut] = useState(false);
   const [tickerPrices, setTickerPrices] = useState<PriceUpdate[]>([]);
   const showTicker = !TICKER_HIDDEN_PREFIXES.some((prefix) => location.pathname.startsWith(prefix));
+
+  useEffect(() => { setOpen(false); }, [location.pathname]);
+  useEffect(() => {
+    if (!header.current) return;
+    const element = header.current;
+    const size = () => element.style.setProperty("--header-bottom", `${element.getBoundingClientRect().height}px`);
+    size();
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", size);
+      return () => window.removeEventListener("resize", size);
+    }
+    const observer = new ResizeObserver(size);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+  useEffect(() => {
+    if (!open) return;
+    navigation.current?.querySelector<HTMLElement>("a, button")?.focus();
+    const close = (event: KeyboardEvent) => { if (event.key === "Escape") { setOpen(false); menuButton.current?.focus(); } };
+    document.addEventListener("keydown", close);
+    return () => document.removeEventListener("keydown", close);
+  }, [open]);
 
   useEffect(() => {
     if (!showTicker) return;
@@ -66,24 +91,26 @@ export function Layout() {
     if (loggingOut) return;
     setLoggingOut(true);
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
-    logout();
-    setOpen(false);
-    setLoggingOut(false);
-    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
-    showToast("Logout successful.");
-    navigate("/", { replace: true });
+    try {
+      await logout();
+      setOpen(false);
+      showToast("Logout successful.");
+      navigate("/", { replace: true });
+    } catch {
+      showToast("Sign-out could not be confirmed. Retry when your connection returns.", "error");
+    } finally { setLoggingOut(false); }
   };
 
   return (
     <div className="app-shell">
-      <header className="site-header">
+      <header className="site-header" ref={header}>
         <div className="header-inner">
           <Link to="/" className="brand" onClick={() => setOpen(false)}>
             <span className="brand-mark">PY</span>
             <span><strong>PriceYard</strong><small>Know the market before you buy or sell.</small></span>
           </Link>
-          <button className="menu-button" type="button" aria-label="Toggle navigation" aria-expanded={open} onClick={() => setOpen((value) => !value)}>☰ Menu</button>
-          <nav className={open ? "main-nav open" : "main-nav"} aria-label="Primary navigation">
+          <button ref={menuButton} className="menu-button" type="button" aria-label="Toggle navigation" aria-controls="primary-navigation" aria-expanded={open} onClick={() => setOpen((value) => !value)}>☰ Menu</button>
+          <nav ref={navigation} id="primary-navigation" className={open ? "main-nav open" : "main-nav"} aria-label="Primary navigation">
             <div className="nav-primary">
               {navItems.map(([to, label]) => <NavLink key={to} to={to} onClick={() => setOpen(false)}>{label}</NavLink>)}
             </div>

@@ -14,7 +14,7 @@ export function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [remember, setRemember] = useState(true);
+  const [remember, setRemember] = useState(false);
   const [busy, setBusy] = useState(false);
   if (user) return <Navigate to="/dashboard" replace />;
 
@@ -43,7 +43,7 @@ export function LoginPage() {
     if (busy) return;
     setBusy(true);
     try {
-      await loginWithGoogle(idToken);
+      await loginWithGoogle(idToken, remember);
       setBusy(false);
       await afterLogin();
     } catch (err) {

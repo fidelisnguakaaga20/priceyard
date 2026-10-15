@@ -4,6 +4,8 @@ from functools import lru_cache
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
+from sqlalchemy.pool import StaticPool
+from fastapi import Request
 
 from app.config import get_settings
 
@@ -19,6 +21,10 @@ def get_engine() -> Engine:
     if not settings.database_url:
         raise RuntimeError("DATABASE_URL is required for database operations")
 
+    if settings.app_env == "test":
+        if settings.database_url != "sqlite+pysqlite:///:memory:":
+            raise RuntimeError("Test database must be an isolated in-memory database")
+        return create_engine(settings.database_url, poolclass=StaticPool, connect_args={"check_same_thread": False})
     return create_engine(
         settings.database_url,
         pool_pre_ping=True,
@@ -37,13 +43,18 @@ def get_session_factory() -> sessionmaker[Session]:
     )
 
 
-def get_db() -> Generator[Session, None, None]:
-    """FastAPI database-session dependency for later API stages."""
-    db = get_session_factory()()
-    try:
-        yield db
-    finally:
-        db.close()
+class AtomicSession(Session):
+    """Only the HTTP unit of work may commit; service commits become flushes."""
+
+    def commit(self) -> None:
+        self.flush()
+
+
+def get_db(request: Request) -> Session:
+    """Share one unit of work, finalized before its HTTP response is returned."""
+    if not hasattr(request.state, "database_session"):
+        request.state.database_session = AtomicSession(bind=get_engine(), autoflush=False, expire_on_commit=False)
+    return request.state.database_session
 
 
 def verify_database_connection() -> None:

@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { apiFetch } from "../../services/api";
-import { useAuth } from "../../context/AuthContext";
-import { AdminActionButton, AdminLoading, AdminStatus, errorText } from "./adminUtils";
+import { AdminActionButton, AdminLoading, AdminStatus, errorText, useAdminList } from "./adminUtils";
+import { createLatestRequestGate } from "../../lib/adminPaging.mjs";
 
 type Feedback = {
   id: number;
@@ -20,37 +20,37 @@ type Feedback = {
 type Summary = { count: number; average_rating: number | null };
 
 export function AdminFeedbackPage() {
-  const { token } = useAuth();
-  const [items, setItems] = useState<Feedback[]>([]);
-  const [summary, setSummary] = useState<Summary | null>(null);
   const [rating, setRating] = useState("");
+  const { data: items, token, loading, error: loadError, reload, pagination } = useAdminList<Feedback>(rating ? `/feedback?rating=${rating}` : "/feedback");
+  const [summary, setSummary] = useState<Summary | null>(null);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(true);
   const [removingId, setRemovingId] = useState<number | null>(null);
   const [testimonialBusyId, setTestimonialBusyId] = useState<number | null>(null);
   const [displayNames, setDisplayNames] = useState<Record<number, string>>({});
 
-  const load = useCallback(async (showLoader = true) => {
-    if (!token) return;
-    if (showLoader) setLoading(true);
+  const summaryRequests = useRef(createLatestRequestGate());
+  const summaryActive = useRef(true);
+  const currentToken = useRef(token);
+  currentToken.current = token;
+  const loadSummary = useCallback(async () => {
+    if (!summaryActive.current) return;
+    const request = summaryRequests.current.begin();
+    if (!currentToken.current) { setSummary(null); return; }
     try {
-      const q = rating ? `?rating=${rating}` : "";
-      const [rows, feedbackSummary] = await Promise.all([
-        apiFetch<Feedback[]>(`/feedback${q}`, {}, token),
-        apiFetch<Summary>("/feedback/summary", {}, token),
-      ]);
-      setItems(rows);
-      setSummary(feedbackSummary);
-      setError("");
+      const feedbackSummary = await apiFetch<Summary>("/feedback/summary", { signal: request.signal }, currentToken.current);
+      if (request.isCurrent()) setSummary(feedbackSummary);
     } catch (err) {
-      setError(errorText(err));
-    } finally {
-      if (showLoader) setLoading(false);
+      if (request.isCurrent()) setError(errorText(err));
     }
-  }, [token, rating]);
+  }, []);
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => {
+    summaryActive.current = true;
+    void loadSummary();
+    return () => { summaryActive.current = false; summaryRequests.current.cancel(); };
+  }, [token, loadSummary]);
+  const load = useCallback(async (showLoader = true) => { await Promise.all([reload(showLoader), loadSummary()]); }, [reload, loadSummary]);
 
   async function remove(id: number) {
     if (!token || removingId !== null || !confirm("Delete this feedback?")) return;
@@ -58,6 +58,7 @@ export function AdminFeedbackPage() {
     try {
       await apiFetch(`/feedback/${id}`, { method: "DELETE" }, token);
       setMessage("Feedback deleted.");
+      setError("");
       await load(false);
     } catch (err) {
       setError(errorText(err));
@@ -108,7 +109,7 @@ export function AdminFeedbackPage() {
       <article className="admin-metric"><span>Average rating</span><strong>{summary?.average_rating == null ? "—" : summary.average_rating.toFixed(2)}</strong></article>
     </div>
     <label className="admin-inline-filter">Filter rating<select value={rating} disabled={loading || removingId !== null} onChange={(e) => setRating(e.target.value)}><option value="">All</option>{[1, 2, 3, 4, 5].map((x) => <option key={x}>{x}</option>)}</select></label>
-    <AdminStatus error={error} success={message} />
+    <AdminStatus error={error || loadError} success={message} />
     {loading ? <AdminLoading label="Loading feedback…"/> : <div className="admin-card-list">{items.map((item) => <article className="card" key={item.id}><div className="card-row"><div><span className="eyebrow">#{item.id} · {item.rating}/5 · user #{item.user_id}</span><h3>{item.comment || "Feedback"}</h3><p>{item.complaint_or_suggestion || "No complaint/suggestion"}</p><small>Continue using: {item.continue_using_feedback === null ? "No answer" : item.continue_using_feedback ? "Yes" : "No"}</small><small>{item.missing_market_request ? `Market request: ${item.missing_market_request}` : ""} {item.missing_commodity_request ? `Commodity request: ${item.missing_commodity_request}` : ""}</small>{item.screenshot_data && <p><a href={item.screenshot_data} target="_blank" rel="noopener noreferrer"><img src={item.screenshot_data} alt="Feedback screenshot" className="feedback-screenshot-thumb" /></a></p>}</div><AdminActionButton className="button button-small button-danger" busy={removingId === item.id} disabled={removingId !== null && removingId !== item.id} onClick={() => void remove(item.id)}>Delete</AdminActionButton></div>
       <div className="admin-testimonial-row">
         {item.is_public_testimonial ? (
@@ -131,6 +132,7 @@ export function AdminFeedbackPage() {
         )}
       </div>
     </article>)}</div>}
+    {pagination}
   </div>;
 }
 

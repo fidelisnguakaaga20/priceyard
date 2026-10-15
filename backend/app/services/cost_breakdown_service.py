@@ -21,13 +21,19 @@ _ZERO = Decimal("0.00")
 
 
 def _validate_commodity(db: Session, commodity_id: int) -> None:
-    if db.get(Commodity, commodity_id) is None:
+    item = db.get(Commodity, commodity_id)
+    if item is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Commodity not found")
+    if not item.is_active:
+        raise HTTPException(status_code=422, detail="Commodity is inactive")
 
 
 def _validate_market(db: Session, market_id: int) -> None:
-    if db.get(Market, market_id) is None:
+    item = db.get(Market, market_id)
+    if item is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Market not found")
+    if not item.is_active:
+        raise HTTPException(status_code=422, detail="Market is inactive")
 
 
 def _calculate_totals(values: dict[str, Decimal]) -> tuple[Decimal, Decimal]:
@@ -53,7 +59,7 @@ def create_cost_breakdown(db: Session, payload: CostBreakdownCreate) -> CostBrea
 
 
 def delete_cost_breakdown(db: Session, item: CostBreakdown) -> None:
-    db.delete(item)
+    item.is_archived = True
     db.commit()
 
 
@@ -67,7 +73,7 @@ def get_cost_breakdown(db: Session, item_id: int) -> CostBreakdown:
 def list_cost_breakdowns(db: Session) -> list[CostBreakdown]:
     return list(
         db.scalars(
-            select(CostBreakdown).order_by(CostBreakdown.created_at.desc(), CostBreakdown.id.desc())
+            select(CostBreakdown).where(CostBreakdown.is_archived.is_(False)).order_by(CostBreakdown.created_at.desc(), CostBreakdown.id.desc())
         ).all()
     )
 
@@ -78,6 +84,9 @@ def update_cost_breakdown(
     payload: CostBreakdownUpdate,
 ) -> CostBreakdown:
     changes = payload.model_dump(exclude_unset=True)
+    for field in (*_COST_FIELDS, "commodity_id", "market_id", "purchase_price_reference", "unit", "bag_size", "reference_date_time"):
+        if field in changes and changes[field] is None:
+            raise HTTPException(status_code=422, detail=f"{field} cannot be null")
     commodity_id = int(changes.get("commodity_id", item.commodity_id))
     market_id = int(changes.get("market_id", item.market_id))
     _validate_commodity(db, commodity_id)

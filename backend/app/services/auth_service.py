@@ -10,8 +10,7 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.models.user import User
-from app.services.audit_service import create_audit_log, snapshot_model
-from app.services.subscription_service import apply_referral_reward, build_trial_subscription
+from app.services.subscription_service import build_trial_subscription
 from app.schemas.auth_schema import RegisterRequest
 from app.utils.password import hash_password, verify_password
 
@@ -76,12 +75,13 @@ def register_user(db: Session, payload: RegisterRequest) -> User:
         is_active=True,
         referral_code=generate_referral_code(db),
         referred_by_id=referrer.id if referrer else None,
+        email_verified=False,
     )
     user.subscription = build_trial_subscription(user=user)
     db.add(user)
 
     try:
-        db.commit()
+        db.flush()
     except IntegrityError as exc:
         db.rollback()
         raise HTTPException(
@@ -89,24 +89,14 @@ def register_user(db: Session, payload: RegisterRequest) -> User:
             detail="User account already exists",
         ) from exc
 
-    if referrer is not None:
-        old_value = snapshot_model(referrer.subscription) if referrer.subscription else None
-        if apply_referral_reward(db, referrer):
-            create_audit_log(
-                db, actor=referrer, action="referral.reward_granted", table_name="subscriptions",
-                record_id=referrer.subscription.id, old_value=old_value, new_value=snapshot_model(referrer.subscription),
-            )
-
-    # SessionLocal uses expire_on_commit=False and PostgreSQL/SQLAlchemy returns
-    # generated fields during INSERT, so avoid a second database round trip after
-    # a successful commit. This prevents a transient pooler disconnect after the
-    # commit from turning a successfully created account into a false HTTP 500.
+    # A referral is an attribution only; the payment workflow qualifies rewards.
+    # The request transaction commits after all related changes are successful.
     return user
 
 
 def authenticate_user(db: Session, *, email: str, password: str) -> User:
     normalized_email = normalize_email(email)
-    user = db.scalar(select(User).where(func.lower(User.email) == normalized_email))
+    user = db.scalar(select(User).where(func.lower(User.email) == normalized_email).with_for_update().execution_options(populate_existing=True))
 
     if user is None or not verify_password(password, user.password_hash):
         raise HTTPException(
@@ -124,7 +114,7 @@ def authenticate_user(db: Session, *, email: str, password: str) -> User:
     return user
 
 
-def authenticate_or_create_google_user(db: Session, token: str) -> User:
+def verify_google_claims(token: str) -> dict:
     settings = get_settings()
     if not settings.google_client_id:
         raise HTTPException(
@@ -144,19 +134,35 @@ def authenticate_or_create_google_user(db: Session, token: str) -> User:
 
     google_sub = claims.get("sub")
     email = claims.get("email")
-    if not google_sub or not email or not claims.get("email_verified"):
+    if (
+        claims.get("iss") not in {"accounts.google.com", "https://accounts.google.com"}
+        or claims.get("aud") != settings.google_client_id
+        or not isinstance(google_sub, str) or not google_sub or len(google_sub) > 255
+        or not isinstance(email, str) or not email or len(email) > 320
+        or claims.get("email_verified") is not True
+    ):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Google account could not be verified",
         )
 
-    normalized_email = normalize_email(email)
-    user = db.scalar(select(User).where(User.google_id == google_sub))
+    return claims
+
+
+def authenticate_or_create_google_user(db: Session, token: str) -> User:
+    claims = verify_google_claims(token)
+    google_sub = claims["sub"]
+    normalized_email = normalize_email(claims["email"])
+    user = db.scalar(select(User).where(User.google_id == google_sub).with_for_update().execution_options(populate_existing=True))
 
     if user is None:
         user = db.scalar(select(User).where(func.lower(User.email) == normalized_email))
         if user is not None:
-            user.google_id = google_sub
+            # Matching email is never sufficient to merge login identities.
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="An account already uses this email. Sign in or reset its password, verify your email, then link Google from your account.",
+            )
         else:
             full_name = str(claims.get("name") or normalized_email.split("@")[0]).strip()[:150]
             user = User(
@@ -168,6 +174,7 @@ def authenticate_or_create_google_user(db: Session, token: str) -> User:
                 is_active=True,
                 google_id=google_sub,
                 auth_provider="google",
+                email_verified=True,
                 referral_code=generate_referral_code(db),
             )
             user.subscription = build_trial_subscription(user=user)
@@ -179,8 +186,13 @@ def authenticate_or_create_google_user(db: Session, token: str) -> User:
             detail="User account is inactive",
         )
 
+    if normalize_email(user.email) == normalized_email:
+        # A known provider subject proves this stored email only when it still
+        # matches. An unrelated verified email must not change local ownership.
+        user.email_verified = True
+
     try:
-        db.commit()
+        db.flush()
     except IntegrityError as exc:
         db.rollback()
         raise HTTPException(
@@ -188,5 +200,30 @@ def authenticate_or_create_google_user(db: Session, token: str) -> User:
             detail="Account conflict during Google sign-in",
         ) from exc
 
-    db.refresh(user)
     return user
+
+
+def link_google_identity(db: Session, user: User, *, token: str, password: str) -> User:
+    claims = verify_google_claims(token)
+    locked = db.scalar(select(User).where(User.id == user.id).with_for_update().execution_options(populate_existing=True))
+    if locked is None or not locked.is_active:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Account is inactive")
+    if locked.email_verified is not True:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Verify your email before linking Google")
+    if not verify_password(password, locked.password_hash):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Confirm your current password to link Google")
+    if normalize_email(claims["email"]) != normalize_email(locked.email):
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Google must use your verified account email")
+    if locked.google_id is not None and locked.google_id != claims["sub"]:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="A different Google identity is already linked")
+    owner = db.scalar(select(User).where(User.google_id == claims["sub"], User.id != locked.id))
+    if owner is not None:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Google identity is already linked to another account")
+    locked.google_id = claims["sub"]
+    locked.auth_provider = "local_google"
+    try:
+        db.flush()
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Account conflict during Google linking") from exc
+    return locked

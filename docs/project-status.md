@@ -1,3 +1,13 @@
+# Historical project status log
+
+The entries below record earlier stage approvals/evidence and are retained for
+traceability. They do not describe the October 2026 hardening branch's final state.
+The owner's later full development authorization supersedes earlier stop/deferred
+boundaries. Current progress and verification are recorded in
+[PRICEYARD_PROGRESS.md](../PRICEYARD_PROGRESS.md); current contracts are in
+[API endpoints](api-endpoints.md) and [audit remediation status](audit-remediation-status.md).
+No historic PASS entry is a claim that current production was retested.
+
 # AUTH-02 — Brevo HTTPS email delivery (2026-08-29)
 
 - Status: implemented and locally tested.

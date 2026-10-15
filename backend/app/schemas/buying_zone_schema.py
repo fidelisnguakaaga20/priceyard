@@ -34,7 +34,7 @@ class BuyingZoneCreate(BaseModel):
     market_id: int = Field(gt=0)
     price_low: Decimal = Field(ge=0, max_digits=14, decimal_places=2)
     price_high: Decimal = Field(ge=0, max_digits=14, decimal_places=2)
-    reason: str = Field(min_length=1)
+    reason: str = Field(min_length=1, max_length=5000)
     valid_from: date | None = None
     valid_to: date | None = None
     confidence: str = Field(min_length=1, max_length=100)
@@ -60,7 +60,7 @@ class BuyingZoneUpdate(BaseModel):
     market_id: int | None = Field(default=None, gt=0)
     price_low: Decimal | None = Field(default=None, ge=0, max_digits=14, decimal_places=2)
     price_high: Decimal | None = Field(default=None, ge=0, max_digits=14, decimal_places=2)
-    reason: str | None = Field(default=None, min_length=1)
+    reason: str | None = Field(default=None, min_length=1, max_length=5000)
     valid_from: date | None = None
     valid_to: date | None = None
     confidence: str | None = Field(default=None, min_length=1, max_length=100)
@@ -83,6 +83,7 @@ class BuyingZoneResponse(BaseModel):
     valid_from: date | None
     valid_to: date | None
     confidence: str
+    validity_status: str
     created_by: int
     created_at: datetime
     updated_at: datetime

@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app.models.commodity import Commodity
 from app.models.market import Market
 from app.models.watchlist import Watchlist
-from app.schemas.watchlist_schema import WatchlistCreate
+from app.schemas.watchlist_schema import WatchlistCreate, WatchlistTargetUpdate
 
 
 def _validate_commodity(db: Session, commodity_id: int | None) -> None:
@@ -65,10 +65,35 @@ def create_watchlist_item(db: Session, user_id: int, payload: WatchlistCreate) -
         market_id=payload.market_id,
         target_price=payload.target_price,
         target_direction=payload.target_direction,
+        target_unit=payload.target_unit,
+        target_bag_size=payload.target_bag_size,
+        target_commodity_type=payload.target_commodity_type,
+        target_grade=payload.target_grade,
     )
     db.add(item)
     db.commit()
     db.refresh(item)
+    return item
+
+
+def update_watchlist_target(db: Session, user_id: int, item_id: int, payload: WatchlistTargetUpdate) -> Watchlist:
+    item = db.scalar(select(Watchlist).where(Watchlist.id == item_id, Watchlist.user_id == user_id).with_for_update())
+    if item is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Watchlist item not found")
+    commodity_id = payload.commodity_id or item.commodity_id
+    market_id = payload.market_id or item.market_id
+    if payload.target_price is not None and (commodity_id is None or market_id is None):
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Select a commodity and market for this price target")
+    _validate_commodity(db, commodity_id)
+    _validate_market(db, market_id)
+    duplicate = _find_duplicate(db, user_id=user_id, commodity_id=commodity_id, market_id=market_id)
+    if duplicate is not None and duplicate.id != item.id:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Watchlist item already exists")
+    item.commodity_id = commodity_id
+    item.market_id = market_id
+    for field in ("target_price", "target_direction", "target_unit", "target_bag_size", "target_commodity_type", "target_grade"):
+        setattr(item, field, getattr(payload, field))
+    db.flush()
     return item
 
 

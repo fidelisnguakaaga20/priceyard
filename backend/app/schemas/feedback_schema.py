@@ -10,15 +10,15 @@ MAX_SCREENSHOT_BYTES = 2 * 1024 * 1024  # 2MB, decoded
 
 class FeedbackCreate(BaseModel):
     rating: int = Field(ge=1, le=5)
-    comment: str | None = None
-    price_usefulness: str | None = None
-    price_accuracy: str | None = None
-    missing_market_request: str | None = None
-    missing_commodity_request: str | None = None
-    complaint_or_suggestion: str | None = None
+    comment: str | None = Field(default=None, max_length=5000)
+    price_usefulness: str | None = Field(default=None, max_length=500)
+    price_accuracy: str | None = Field(default=None, max_length=500)
+    missing_market_request: str | None = Field(default=None, max_length=500)
+    missing_commodity_request: str | None = Field(default=None, max_length=500)
+    complaint_or_suggestion: str | None = Field(default=None, max_length=5000)
     continue_using_feedback: bool | None = None
     willingness_to_pay_feedback: bool | None = None
-    screenshot_data: str | None = None
+    screenshot_data: str | None = Field(default=None, max_length=2_796_250)
 
     model_config = ConfigDict(str_strip_whitespace=True, extra="forbid")
 
@@ -27,11 +27,14 @@ class FeedbackCreate(BaseModel):
     def validate_screenshot(cls, value: str | None) -> str | None:
         if value is None or value == "":
             return None
-        if not value.startswith("data:image/"):
-            raise ValueError("Screenshot must be an image file")
+        prefixes = {"data:image/png;base64": b"\x89PNG\r\n\x1a\n", "data:image/jpeg;base64": b"\xff\xd8\xff", "data:image/webp;base64": b"RIFF"}
         try:
-            _, encoded = value.split(",", 1)
+            prefix, encoded = value.split(",", 1)
+            if prefix not in prefixes:
+                raise ValueError("Only PNG, JPEG and WebP screenshots are supported")
             raw = base64.b64decode(encoded, validate=True)
+            if not raw.startswith(prefixes[prefix]) or (prefix.endswith("webp;base64") and raw[8:12] != b"WEBP"):
+                raise ValueError("Screenshot format does not match its image type")
         except Exception as exc:
             raise ValueError("Screenshot data is not valid") from exc
         if len(raw) > MAX_SCREENSHOT_BYTES:

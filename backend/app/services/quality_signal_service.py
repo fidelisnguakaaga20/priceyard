@@ -7,6 +7,7 @@ from app.models.market import Market
 from app.models.price_update import PriceUpdate
 from app.models.quality_signal import QualitySignal
 from app.models.user import User
+from app.services.intelligence_query_service import reject_null_required
 from app.schemas.quality_signal_schema import QualitySignalCreate, QualitySignalUpdate
 
 
@@ -64,11 +65,12 @@ def get_quality_signal(db: Session, signal_id: int) -> QualitySignal:
 
 
 def list_quality_signals(db: Session) -> list[QualitySignal]:
-    return list(db.scalars(select(QualitySignal).order_by(QualitySignal.created_at.desc(), QualitySignal.id.desc())).all())
+    return list(db.scalars(select(QualitySignal).where(QualitySignal.is_archived.is_(False)).order_by(QualitySignal.created_at.desc(), QualitySignal.id.desc())).all())
 
 
 def update_quality_signal(db: Session, signal: QualitySignal, payload: QualitySignalUpdate) -> QualitySignal:
     changes = payload.model_dump(exclude_unset=True)
+    reject_null_required(changes, ("commodity_id", "market_id"))
     commodity_id = int(changes.get("commodity_id", signal.commodity_id))
     market_id = int(changes.get("market_id", signal.market_id))
     price_update_id = changes.get("price_update_id", signal.price_update_id)
@@ -88,5 +90,5 @@ def update_quality_signal(db: Session, signal: QualitySignal, payload: QualitySi
 
 
 def delete_quality_signal(db: Session, signal: QualitySignal) -> None:
-    db.delete(signal)
+    signal.is_archived = True
     db.commit()

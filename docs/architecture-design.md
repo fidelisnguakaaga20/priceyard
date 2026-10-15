@@ -1,4 +1,22 @@
-# PriceYard Architecture Design — Repository Control Copy
+# PriceYard architecture: current contracts and historical design
+
+The October 2026 full development authorization supersedes earlier deferred-stage
+boundaries. Current contracts are in [API endpoints](api-endpoints.md),
+[access control](access-control-matrix.md), [deployment](deployment-plan.md) and
+the root [progress record](../PRICEYARD_PROGRESS.md). Historical design text below
+is retained for traceability; its manual-payment/Reporter-deferred statements are
+not the current implemented behavior.
+
+Current flow: React public/member/Reporter/Admin pages call FastAPI bearer-session
+APIs. Database-backed authority/entitlement checks precede service operations.
+The HTTP transaction commits mutations and sanitized administrative evidence before
+success. Validated payment activation records payment/grant/subscription together;
+pending checkout intent has a deliberate earlier durable boundary before provider
+initialization. Notifications enqueue transactionally and a separate worker delivers
+with leases/retries. PostgreSQL stores retained prices, restricted revisions and
+payment evidence. External providers are never part of synthetic test transport.
+
+## Historical stage design
 
 ## Approved stack
 - Frontend: React + TypeScript

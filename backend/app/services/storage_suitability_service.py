@@ -6,6 +6,7 @@ from app.models.commodity import Commodity
 from app.models.market import Market
 from app.models.price_update import PriceUpdate
 from app.models.storage_suitability import StorageSuitability
+from app.services.intelligence_query_service import reject_null_required
 from app.schemas.storage_suitability_schema import StorageSuitabilityCreate, StorageSuitabilityUpdate
 
 
@@ -78,6 +79,7 @@ def update_storage_suitability(
     payload: StorageSuitabilityUpdate,
 ) -> StorageSuitability:
     changes = payload.model_dump(exclude_unset=True)
+    reject_null_required(changes, ("commodity_id", "market_id", "suitability_status"))
     commodity_id = int(changes.get("commodity_id", item.commodity_id))
     market_id = int(changes.get("market_id", item.market_id))
     price_update_id = changes.get("price_update_id", item.price_update_id)

@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, Header, HTTPException, status
+import hmac
+
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
@@ -20,16 +22,18 @@ router = APIRouter(prefix="/subscriptions", tags=["subscriptions"])
 
 def verify_cron_secret(x_cron_secret: str | None = Header(default=None)) -> None:
     settings = get_settings()
-    if not settings.cron_secret or x_cron_secret != settings.cron_secret:
+    if not settings.cron_secret or not x_cron_secret or not hmac.compare_digest(x_cron_secret.encode("utf-8"), settings.cron_secret.encode("utf-8")):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or missing cron secret")
 
 
 @router.get("", response_model=list[SubscriptionResponse])
 def get_subscriptions(
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=100, ge=1, le=1000),
     db: Session = Depends(get_db),
     _: User = Depends(require_roles("admin")),
 ) -> list[Subscription]:
-    return list_subscriptions(db)
+    return list_subscriptions(db, page=page, page_size=page_size)
 
 
 @router.get("/{user_id}", response_model=SubscriptionResponse)

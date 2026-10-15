@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { apiFetch } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import type { ActivitySummary } from "../types/api";
@@ -31,6 +31,9 @@ export function AdminLayout() {
   const { token } = useAuth();
   const [unseen, setUnseen] = useState(0);
   const [flaggedCount, setFlaggedCount] = useState(0);
+  const [navigationOpen, setNavigationOpen] = useState(false);
+  const location = useLocation();
+  useEffect(() => { setNavigationOpen(false); }, [location.pathname]);
 
   useEffect(() => {
     if (!token) return;
@@ -46,8 +49,9 @@ export function AdminLayout() {
 
   return <section className="page page-section admin-page">
     <div className="page-title"><span className="eyebrow">Administrator</span><h1>PriceYard admin</h1><p>Manage the approved MVP records without changing the product scope.</p></div>
-    <nav className="admin-nav" aria-label="Admin navigation">
-      {adminLinks.map(([to, label]) => <NavLink key={to} to={to} end={to === "/admin"}>{label}{to === "/admin/flagged" && flaggedCount > 0 && <span className="admin-nav-badge">{flaggedCount}</span>}</NavLink>)}
+    <button className="button button-secondary admin-nav-toggle" type="button" aria-controls="admin-navigation" aria-expanded={navigationOpen} onClick={() => setNavigationOpen((value) => !value)}>Admin sections</button>
+    <nav id="admin-navigation" className={navigationOpen ? "admin-nav admin-nav-open" : "admin-nav"} aria-label="Admin navigation">
+      {adminLinks.map(([to, label]) => <NavLink key={to} to={to} end={to === "/admin"}>{label}{to === "/admin/flagged" && flaggedCount > 0 && <span className="admin-nav-badge">{flaggedCount >= 100 ? "100+" : flaggedCount}</span>}</NavLink>)}
       <NavLink to="/admin/activity" onClick={() => setUnseen(0)}>Activity{unseen > 0 && <span className="admin-nav-badge">{unseen}</span>}</NavLink>
     </nav>
     <div className="admin-content"><Outlet /></div>
