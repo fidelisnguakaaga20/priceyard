@@ -1,0 +1,9 @@
+{
+  "tests_run": 6,
+  "failures": 30,
+  "errors": 0,
+  "skipped": 0,
+  "duration_seconds": 2.654,
+  "pattern": "test_price_access_boundaries.py",
+  "runtime": "in-process synthetic SQLite; TCP and DNS denied"
+}

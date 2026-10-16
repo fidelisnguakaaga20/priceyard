@@ -12,7 +12,7 @@ from app.services.quality_signal_service import (
     list_quality_signals,
     update_quality_signal,
 )
-from app.utils.permissions import get_current_user, require_roles
+from app.utils.permissions import require_full_access, require_roles
 
 router = APIRouter(prefix="/quality-signals", tags=["quality-signals"])
 
@@ -20,7 +20,7 @@ router = APIRouter(prefix="/quality-signals", tags=["quality-signals"])
 @router.get("", response_model=list[QualitySignalResponse])
 def get_signals(
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    _: User = Depends(require_full_access),
 ) -> list[QualitySignal]:
     return list_quality_signals(db)
 
@@ -29,7 +29,7 @@ def get_signals(
 def get_signal(
     signal_id: int,
     db: Session = Depends(get_db),
-    _: User = Depends(get_current_user),
+    _: User = Depends(require_full_access),
 ) -> QualitySignal:
     return get_quality_signal(db, signal_id)
 

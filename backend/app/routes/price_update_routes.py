@@ -1,6 +1,7 @@
 from datetime import date
 
 from fastapi import APIRouter, Depends, Query, Response, status
+from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -34,9 +35,23 @@ from app.services.price_update_service import (
     update_price_update,
 )
 from app.services.watchlist_alert_service import notify_watchlist_subscribers
-from app.utils.permissions import get_current_user, require_full_access, require_roles
+from app.utils.permissions import bearer_scheme, get_current_user, require_full_access, require_roles
 
 router = APIRouter(prefix="/price-updates", tags=["price-updates"])
+
+
+def _require_history_access(
+    db: Session,
+    items: list[PriceUpdate],
+    credentials: HTTPAuthorizationCredentials | None,
+) -> None:
+    if not items:
+        return
+    # Apply the same public-current rule to alternate date/comparison/ID URLs.
+    # Keep the previous-price summary of a current record public as before.
+    public_ids = {item.id for item in list_latest_approved_price_updates(db)}
+    if any(item.id not in public_ids for item in items):
+        require_full_access(get_current_user(credentials, db), db)
 
 
 @router.get("", response_model=list[PriceUpdatePublicResponse])
@@ -46,14 +61,18 @@ def get_latest_price_updates(
     selected_date: date | None = Query(default=None, alias="date"),
     movement: Movement | None = Query(default=None),
     db: Session = Depends(get_db),
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
 ) -> list[PriceUpdate]:
-    return list_latest_approved_price_updates(
+    items = list_latest_approved_price_updates(
         db,
         commodity_search=commodity,
         market_search=market,
         selected_date=selected_date,
         movement=movement,
     )
+    if selected_date is not None:
+        _require_history_access(db, items, credentials)
+    return items
 
 
 @router.get("/history", response_model=list[PriceUpdatePublicResponse])
@@ -81,12 +100,16 @@ def get_market_comparison(
     commodity: str = Query(min_length=1, max_length=100),
     selected_date: date | None = Query(default=None, alias="date"),
     db: Session = Depends(get_db),
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
 ) -> list[PriceUpdate]:
-    return list_market_comparison(
+    items = list_market_comparison(
         db,
         commodity_search=commodity,
         selected_date=selected_date,
     )
+    if selected_date is not None:
+        _require_history_access(db, items, credentials)
+    return items
 
 
 @router.get("/admin/history", response_model=list[PriceUpdateAdminResponse])
@@ -114,8 +137,14 @@ def get_my_submission_stats(
 
 
 @router.get("/{price_update_id}", response_model=PriceUpdatePublicResponse)
-def get_price_update(price_update_id: int, db: Session = Depends(get_db)) -> PriceUpdate:
-    return get_approved_price_update(db, price_update_id)
+def get_price_update(
+    price_update_id: int,
+    db: Session = Depends(get_db),
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
+) -> PriceUpdate:
+    item = get_approved_price_update(db, price_update_id)
+    _require_history_access(db, [item], credentials)
+    return item
 
 
 @router.post("", response_model=PriceUpdateAdminResponse, status_code=status.HTTP_201_CREATED)

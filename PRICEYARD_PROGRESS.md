@@ -28,8 +28,9 @@ subscription listing processes every expired account. Batch 3 (PY-10) verified:
 spreadsheet-safe text export. Batch 4 verified existing account refresh/logout
 races (part of PY-18). Batch 5 verified approved internal login revocation storage
 (PY-04 and parts of PY-07/PY-09/PY-28). Batch 6 verified remaining PY-09 last-Admin
-concurrency protection. Next: historical URL/access boundaries (PY-01) and align
-quality-signal access with the existing full-access screen (part of PY-02).
+concurrency protection. Batch 7 verified historical URL/access boundaries (PY-01)
+and quality-signal access matching the existing full-access screen (part of PY-02).
+Next: payment evidence/activation safety and remaining account-access accuracy.
 Apply small technical batches with automated and browser verification. Reuse
 existing local tools from .git/priceyard-local-recovery-20261015; do not reinstall
 or read private configuration. Runtime is tools/local-test/runtime (ignored).
@@ -38,8 +39,8 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
 
 | ID | Improvement | Current status |
 |---|---|---|
-| PY-01 | Consistent historical access checks | Pending |
-| PY-02 | Confidential/restricted market information | Pending |
+| PY-01 | Consistent historical access checks | Complete in batch 7; date/comparison/ID routes enforce existing history entitlement; current summaries preserved |
+| PY-02 | Confidential/restricted market information | Partial: quality list/detail match existing premium screen; broader source/audit response review pending; public basic guidance unchanged |
 | PY-03 | Google ownership and safe account linking | Pending; new linking UI requires approval |
 | PY-04 | Password reset and login revocation | Complete in batch 5; actual HTTP/browser and PostgreSQL reset/logout races passed |
 | PY-05 | Referral abuse protection | Pending; preserve original rewards/qualification; policy changes require approval |
@@ -274,3 +275,32 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
 - Evidence: tools/local-test/evidence/batch-6-*.json. Five checklist items fully
   verified so far (PY-04, PY-09, PY-10, PY-15, PY-34); other items remain pending
   or explicitly partial. Production still untouched.
+
+### Batch 7 — PY-01; part of PY-02
+
+- Historical date/comparison/direct-ID requests now require the same existing
+  history entitlement. Current public records, including their previous-price
+  summaries, remain public. A dated request returning the currently public
+  record stays public even if its last update is old; no artificial freshness
+  policy was added. Outdated records cannot bypass the public-current rule by ID.
+- Quality list/detail now use full access, matching the original premium screen.
+  Public Possible Meaning/Suggested Action remain unchanged. No frontend, schema,
+  wording, prices, fields, measurements, markets or subscription policy changed.
+- Six HTTP regression tests reproduced 30 failing assertions/subtests before
+  the fix. Initial test fixture had incorrect trial timestamp names, corrected
+  to the original model before reproducing those failures. Afterward all 37
+  backend tests passed, zero failures/errors/skips, 17.530s.
+- Real browser/API checks passed for Guest, Free, Trial, Paid, Reporter, Admin
+  and both expired-Reporter fixtures. All alternate historical routes reject
+  unauthorized access; original current cards and commodity pages still load;
+  entitled accounts see the original history rows and quality section. Corrected
+  a checker-only table selector to the existing history-table-view class.
+- This reuses the existing latest-record selector so public eligibility cannot
+  drift. Its unbounded query cost remains PY-20 work; this batch makes no claim
+  of historical pagination/performance completion. No frontend rebuild needed.
+- Manual: http://127.0.0.1:55446/history — free@example.com sees the original
+  access gate; trial@example.com sees the two fabricated records. Password for
+  both: PriceYardDemo8!. Current Prices remains public. Preview restarted with
+  fresh fake accounts only. Test-only PostgreSQL remains stopped.
+- Evidence: tools/local-test/evidence/batch-7-*.json. Six checklist IDs complete;
+  30 remain pending/partial. All commits are local; production is untouched.
