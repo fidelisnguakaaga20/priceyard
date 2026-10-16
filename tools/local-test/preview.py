@@ -54,10 +54,13 @@ now = datetime.now(timezone.utc)
 with Session(engine) as db:
     users = {}
     demo_hash = hash_password("PriceYardDemo8!")
-    for name, role, access in (("free", "free_user", "free"), ("trial", "free_user", "trial"), ("paid", "paid_user", "active"), ("reporter", "reporter", "free"), ("admin", "admin", "free"), ("expired-reporter", "reporter", "trial_expired"), ("expired-paid-reporter", "reporter", "paid_expired"), ("reset", "free_user", "trial"), ("payment", "free_user", "free"), ("manual-paid", "paid_user", "manual_active"), ("value-paid", "paid_user", "active"), ("value-trial", "free_user", "trial"), ("verify", "free_user", "free"), ("referrer", "free_user", "trial")):
+    for name, role, access in (("free", "free_user", "free"), ("trial", "free_user", "trial"), ("paid", "paid_user", "active"), ("reporter", "reporter", "free"), ("admin", "admin", "free"), ("expired-reporter", "reporter", "trial_expired"), ("expired-paid-reporter", "reporter", "paid_expired"), ("reset", "free_user", "trial"), ("payment", "free_user", "free"), ("manual-paid", "paid_user", "manual_active"), ("value-paid", "paid_user", "active"), ("value-trial", "free_user", "trial"), ("verify", "free_user", "free"), ("referrer", "free_user", "trial"), ("google", "free_user", "trial")):
         user = User(full_name=f"Test {name.title()}", email=f"{name}@example.com", password_hash=demo_hash, role=role, is_active=True, referral_code="TEST"+name.upper())
         if name == "trial":
             user.phone = "+2348000000001"  # Fabricated notification recipient only.
+        if name == "google":
+            user.google_id = "synthetic-preview-linked-subject"
+            user.auth_provider = "google"
         if access in {"trial", "trial_expired"}:
             user.subscription = build_trial_subscription(user=user, now=now-timedelta(days=15) if access == "trial_expired" else now)
         else:
@@ -196,6 +199,35 @@ async def manual_review_controls(request):
 outage = {"enabled": False}
 checkout_mode = {"mode": "disabled"}
 verification_mode = {"mode": "disabled"}
+google_mode = {"mode": "disabled"}
+
+
+async def set_google_mode(request):
+    payload = await request.json()
+    if payload not in [{"mode": mode} for mode in ("disabled", "existing_email", "linked", "new", "unverified", "outage")]:
+        return JSONResponse({"detail": "Choose a synthetic Google fixture"}, status_code=400)
+    google_mode.update(payload)
+    return JSONResponse({"synthetic_only": True, **google_mode})
+
+
+async def serve_fake_google(app, scope, receive, send):
+    if google_mode["mode"] == "disabled":
+        return await JSONResponse({"detail": "Real Google sign-in is disabled in local testing"}, status_code=503)(scope, receive, send)
+    from google.auth.exceptions import TransportError
+    from fastapi import HTTPException
+    def verified(token, request, audience):
+        if token != "synthetic-preview-google-token" or audience != "synthetic-client":
+            raise HTTPException(status_code=401, detail="Unknown fabricated Google token")
+        if google_mode["mode"] == "outage":
+            raise TransportError("Fabricated Google verification outage")
+        linked = google_mode["mode"] == "linked"
+        return {"sub": "synthetic-preview-linked-subject" if linked else "synthetic-preview-new-subject",
+                "email": "google@example.com" if linked else "trial@example.com" if google_mode["mode"] == "existing_email" else "new-google@example.com",
+                "email_verified": False if google_mode["mode"] == "unverified" else True, "name":"Test Google New"}
+    # Only this serialized test request can consume fabricated verified claims.
+    # Cryptographic verification is covered separately with synthetic RSA keys.
+    with patch("app.services.auth_service.google_id_token.verify_oauth2_token", side_effect=verified):
+        await app(scope, receive, send)
 
 
 async def verification_controls(request):
@@ -292,7 +324,9 @@ class LocalOnly:
             return await JSONResponse({"detail": "Synthetic temporary outage"}, status_code=503)(scope, receive, secured)
         if scope["type"] == "http":
             async with self.request_lock:
-                if notification_mode["enabled"] and scope.get("method") == "PATCH" and re.fullmatch(r"/api/price-updates/[0-9]+/approve", scope.get("path", "")):
+                if scope.get("path") == "/api/auth/google":
+                    await serve_fake_google(self.app, scope, receive, secured)
+                elif notification_mode["enabled"] and scope.get("method") == "PATCH" and re.fullmatch(r"/api/price-updates/[0-9]+/approve", scope.get("path", "")):
                     await serve_fake_notifications(self.app, scope, receive, secured)
                 elif scope.get("path") == "/api/payments/initiate" and checkout_mode["mode"] != "disabled":
                     await serve_fake_checkout(self.app, scope, receive, secured)
@@ -303,7 +337,7 @@ class LocalOnly:
         else:
             await self.app(scope, receive, secured)
 
-preview = LocalOnly(Starlette(routes=[Route("/__test__/status", status), Route("/__test__/alerts", notification_controls, methods=["GET", "POST"]), Route("/__test__/inbox", inbox), Route("/__test__/controls", controls), Route("/__test__/push", push_controls), Route("/__test__/payments", payment_controls), Route("/__test__/manual-review", manual_review_controls), Route("/__test__/purchase-value", purchase_value_controls), Route("/__test__/verification", verification_controls), Route("/__test__/verification-mode", set_verification_mode, methods=["POST"]), Route("/__test__/checkout", checkout_controls), Route("/__test__/checkout-mode", set_checkout_mode, methods=["POST"]), Route("/__test__/payment-event", payment_event, methods=["POST"]), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
+preview = LocalOnly(Starlette(routes=[Route("/__test__/status", status), Route("/__test__/google-mode", set_google_mode, methods=["POST"]), Route("/__test__/alerts", notification_controls, methods=["GET", "POST"]), Route("/__test__/inbox", inbox), Route("/__test__/controls", controls), Route("/__test__/push", push_controls), Route("/__test__/payments", payment_controls), Route("/__test__/manual-review", manual_review_controls), Route("/__test__/purchase-value", purchase_value_controls), Route("/__test__/verification", verification_controls), Route("/__test__/verification-mode", set_verification_mode, methods=["POST"]), Route("/__test__/checkout", checkout_controls), Route("/__test__/checkout-mode", set_checkout_mode, methods=["POST"]), Route("/__test__/payment-event", payment_event, methods=["POST"]), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
 
 if __name__ == "__main__":
     import uvicorn

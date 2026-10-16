@@ -15,7 +15,7 @@ class LoginRequest(BaseModel):
 
 
 class GoogleLoginRequest(BaseModel):
-    id_token: str = Field(min_length=10)
+    id_token: str = Field(min_length=10, max_length=16384)
 
 
 class TokenResponse(BaseModel):

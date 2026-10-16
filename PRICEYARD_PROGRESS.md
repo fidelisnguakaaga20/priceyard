@@ -102,13 +102,20 @@ the practical secure Google linking option in docs/GOOGLE_ACCOUNT_LINKING_APPROV
 on 2026-10-16. Implement/verify that next; no further approval required for that
 exact scope. Fourteen IDs complete, 22 partial/pending. Native test PG is running.
 
+Batch 27 verified: approved subject-based Google ownership, strict verified claims,
+bounded certificate transport/token input, controlled outages and concurrent
+first-login recovery. All 126 backend tests, twenty marked PostgreSQL cases and
+six browser/API/account checks passed. Fifteen IDs complete, 21 partial/pending.
+Next: history/navigation response ordering, existing date-entry consistency,
+dashboard query/totals efficiency and remaining administrative transactions.
+
 ## Checklist — do not repeat the audit
 
 | ID | Improvement | Current status |
 |---|---|---|
 | PY-01 | Consistent historical access checks | Complete in batch 7; date/comparison/ID routes enforce existing history entitlement; current summaries preserved |
 | PY-02 | Confidential/restricted market information | Partial: quality list/detail match existing premium screen; broader source/audit response review pending; public basic guidance unchanged |
-| PY-03 | Google ownership and safe account linking | Pending implementation: owner approved non-linking by email alone, preserving already-linked sign-ins and existing password/reset flow; exact scope docs/GOOGLE_ACCOUNT_LINKING_APPROVAL.md; no new linking UI |
+| PY-03 | Google ownership and safe account linking | Application-side approved scope complete in batch 27: stable subject ownership, no email-only linking/overwrite, existing password/reset fallback and original trials; cryptographic/HTTP/PG/browser verified. Live Google popup/provider compatibility remains operational PY-35 |
 | PY-04 | Password reset and login revocation | Complete in batch 5; actual HTTP/browser and PostgreSQL reset/logout races passed |
 | PY-05 | Referral abuse protection | Partial: atomic registration/reward/audit, duplicate-registration safety and concurrent seven-day reward preservation verified in batch 20; qualification/abuse-cap changes require approval and remain unchanged |
 | PY-06 | Safe push notification destinations | Application-side complete in batch 13; known-provider/key validation, bounded TLS transport, no redirects; live provider compatibility remains operational verification |
@@ -917,3 +924,41 @@ exact scope. Fourteen IDs complete, 22 partial/pending. Native test PG is runnin
 - Owner responded to the Google-linking decision during this batch and authorized
   the recommended safe option. Scope/compatibility recorded in the approval doc;
   it remains pending implementation and must not be presented as finished here.
+
+### Batch 27 — PY-03; further PY-08/PY-29
+
+- Owner authorized the recommended secure/friendly Google linking option. An
+  unmatched Google subject cannot attach to/replace an existing email account;
+  controlled 409 explains the original password/reset route. Already-linked
+  subjects continue, including when Google's email changes; no account merge,
+  history rewrite or automatic unlink. New users retain the original 14-day trial.
+- Require a real verified-email boolean, bounded nonblank subject and valid email
+  from verified claims. Token input bounded to 16KiB. Existing Google library still
+  verifies signatures/audience/issuer/expiry. Certificate transport uses the fixed
+  Google URL, verified TLS, no redirects/proxy inheritance and 3s/10s timeouts.
+  Provider outages return sanitized 503; invalid authentication returns 401.
+- Concurrent first sign-ins recover a unique-conflict winner by proven subject
+  only; different subjects sharing an email cannot claim the existing identity.
+  Remove unnecessary post-commit refresh to avoid false failure after account save.
+  No new fields, screen, pricing, referral qualification or session policy.
+- Ten before tests reproduced sixteen failures/eight errors. Malformed verified
+  claims are synthetic robustness cases, not proof of Google issuing such tokens.
+  After: ten focused passed, 3.367s; all 126 backend passed, 61.323s. Real installed
+  verification library tested against ephemeral RSA-signed tokens/certificate
+  responses for bad signature/audience/issuer/expiry; no provider contact.
+- Twenty pinned PostgreSQL cases passed, 45.246s: simultaneous same-subject login
+  yields one account/trial; different-subject email collision denied; existing paid
+  account, binding, password, role and auth version preserved. Other races pass.
+- Six browser checks passed: collision/password fallback, linked and new Google
+  accounts in original Dashboard/history/plans, unverified denial, controlled
+  outage, and live Google disabled. Fake verified responses only. Real Google
+  popup/button is intentionally not exercised with a live client/provider.
+  Checker corrections used the existing numeric subscription URL and omitted
+  private auth_provider from public UserResponse; product API fields unchanged.
+- Evidence: tools/local-test/evidence/batch-27-*.json. No frontend change/build.
+  Manual original password login: http://127.0.0.1:55446/login. Fabricated Google
+  API controls /__test__/google-mode are disabled after automated checks.
+- Contract reference (read-only):
+  https://developers.google.com/identity/gsi/web/guides/verify-google-id-token
+  consulted 2026-10-16. Fifteen IDs complete; 21 partial/pending. Native synthetic
+  PG remains running for the next batch; production/master/backup untouched.

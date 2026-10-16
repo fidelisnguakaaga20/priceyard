@@ -2,7 +2,9 @@
 
 Status: owner approved using the proposed secure, practical option on 2026-10-16:
 "do the best that is user firendly and same time secured for the app".
-Implementation and verification are still pending at this checkpoint.
+Implemented and verified in batch 27: ten focused tests, 126 full backend tests,
+twenty marked PostgreSQL cases and six browser/API/account checks passed. The
+real Google popup/provider remains an operational check outside isolated testing.
 
 Current original behavior: after Google token verification, the service looks up
 the Google subject. If not found, it matches email and attaches that subject to

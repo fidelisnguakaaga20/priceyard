@@ -1,0 +1,9 @@
+{
+  "tests_run": 10,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "duration_seconds": 3.367,
+  "pattern": "test_google_account_security.py",
+  "runtime": "in-process synthetic SQLite; TCP and DNS denied"
+}

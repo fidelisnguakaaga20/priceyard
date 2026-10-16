@@ -1,0 +1,14 @@
+{
+  "checks": {
+    "same_email_cannot_attach_and_original_password_login_works": true,
+    "already_linked_user_keeps_trial_and_history": true,
+    "new_google_user_gets_original_trial_and_plans": true,
+    "unverified_does_not_log_in": true,
+    "outage_does_not_log_in": true,
+    "live_google_disabled": true
+  },
+  "external_page_requests": 0,
+  "production_connections": 0,
+  "verified_claims": "fabricated only; actual cryptographic verifier covered by backend tests",
+  "live_google_popup_tested": false
+}

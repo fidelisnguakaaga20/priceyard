@@ -2,8 +2,11 @@ import secrets
 import string
 
 from fastapi import HTTPException, status
+from google.auth import exceptions as google_errors
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token as google_id_token
+from pydantic import EmailStr, TypeAdapter, ValidationError
+import requests
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -17,6 +20,16 @@ from app.schemas.auth_schema import RegisterRequest
 from app.utils.password import hash_password, verify_password
 
 REFERRAL_CODE_ALPHABET = "".join(c for c in string.ascii_uppercase + string.digits if c not in "0O1I")
+GOOGLE_CERTIFICATES_URL = "https://www.googleapis.com/oauth2/v1/certs"
+GOOGLE_EMAIL = TypeAdapter(EmailStr)
+
+
+class _GoogleCertificateRequest(google_requests.Request):
+    def __call__(self, url, method="GET", body=None, headers=None, timeout=None, **kwargs):
+        if url != GOOGLE_CERTIFICATES_URL or method.upper() != "GET":
+            raise google_errors.TransportError("Unsupported certificate destination")
+        kwargs.update(allow_redirects=False, verify=True)
+        return super().__call__(url, method=method, body=body, headers=headers, timeout=(3, 10), **kwargs)
 
 
 def normalize_email(email: str) -> str:
@@ -142,30 +155,38 @@ def authenticate_or_create_google_user(db: Session, token: str) -> User:
         )
 
     try:
-        claims = google_id_token.verify_oauth2_token(
-            token, google_requests.Request(), settings.google_client_id
-        )
-    except ValueError as exc:
+        with requests.Session() as transport:
+            transport.trust_env = False
+            claims = google_id_token.verify_oauth2_token(
+                token, _GoogleCertificateRequest(session=transport), settings.google_client_id
+            )
+    except (google_errors.TransportError, requests.RequestException) as exc:
+        raise HTTPException(status_code=503, detail="Google sign-in is temporarily unavailable. Please try again or use your email and password.") from exc
+    except (ValueError, google_errors.GoogleAuthError) as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid Google sign-in token",
         ) from exc
 
-    google_sub = claims.get("sub")
-    email = claims.get("email")
-    if not google_sub or not email or not claims.get("email_verified"):
+    google_sub = claims.get("sub") if isinstance(claims, dict) else None
+    email = claims.get("email") if isinstance(claims, dict) else None
+    if (not isinstance(google_sub, str) or not google_sub.strip() or len(google_sub) > 255
+            or not isinstance(email, str) or claims.get("email_verified") is not True):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Google account could not be verified",
         )
 
-    normalized_email = normalize_email(email)
+    try:
+        normalized_email = normalize_email(str(GOOGLE_EMAIL.validate_python(email)))
+    except ValidationError as exc:
+        raise HTTPException(status_code=401, detail="Google account could not be verified") from exc
     user = db.scalar(select(User).where(User.google_id == google_sub))
 
     if user is None:
         user = db.scalar(select(User).where(func.lower(User.email) == normalized_email))
         if user is not None:
-            user.google_id = google_sub
+            raise HTTPException(status_code=409, detail="For your security, use your existing PriceYard email and password. You can reset your password if needed.")
         else:
             full_name = str(claims.get("name") or normalized_email.split("@")[0]).strip()[:150]
             user = User(
@@ -192,10 +213,18 @@ def authenticate_or_create_google_user(db: Session, token: str) -> User:
         db.commit()
     except IntegrityError as exc:
         db.rollback()
+        # A simultaneous first sign-in may have created this proven subject.
+        # Recover by subject only, never by the email-only association above.
+        existing = db.scalar(select(User).where(User.google_id == google_sub))
+        if existing is not None:
+            if not existing.is_active:
+                raise HTTPException(status_code=403, detail="User account is inactive") from exc
+            return existing
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="Account conflict during Google sign-in",
         ) from exc
 
-    db.refresh(user)
+    # Generated fields were returned by INSERT. Avoid turning a saved account
+    # into a false sign-in failure if a post-commit refresh hits an outage.
     return user

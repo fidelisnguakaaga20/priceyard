@@ -123,6 +123,61 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def google_signup_race(self, *, same_subject):
+        from app.services.auth_service import authenticate_or_create_google_user
+        Base.metadata.create_all(self.engine)
+        barrier = threading.Barrier(2); outcomes = []; subjects = []
+        def verifier(token, request, audience):
+            barrier.wait(timeout=15)
+            return {"sub":"synthetic-pg-google-"+("same" if same_subject else token), "email":"pg-google-new@example.com", "email_verified":True}
+        def worker(index):
+            with Session(self.engine, expire_on_commit=False) as db:
+                try:
+                    user = authenticate_or_create_google_user(db, "synthetic-google-token-"+str(index))
+                    outcomes.append(200); subjects.append(user.id)
+                except HTTPException as error:
+                    db.rollback(); outcomes.append(error.status_code)
+                except BaseException as error:
+                    db.rollback(); outcomes.append(type(error).__name__)
+        with patch("app.services.auth_service.google_id_token.verify_oauth2_token", side_effect=verifier):
+            threads = [threading.Thread(target=worker, args=(index,)) for index in range(2)]
+            for thread in threads: thread.start()
+            for thread in threads: thread.join(25)
+        self.assertFalse(any(thread.is_alive() for thread in threads))
+        self.assertCountEqual(outcomes, [200, 200] if same_subject else [200, 409])
+        with Session(self.engine) as db:
+            rows = db.scalars(select(User)).all(); self.assertEqual(len(rows), 1)
+            self.assertTrue(all(user_id == rows[0].id for user_id in subjects))
+            self.assertEqual(rows[0].subscription.trial_ends_at-rows[0].subscription.trial_started_at, timedelta(days=14))
+            self.assertEqual(len(db.scalars(select(Subscription)).all()), 1)
+
+    def test_concurrent_same_google_subject_has_one_account_and_trial(self):
+        self.google_signup_race(same_subject=True)
+
+    def test_concurrent_different_google_subjects_cannot_claim_same_email(self):
+        self.google_signup_race(same_subject=False)
+
+    def test_google_email_collision_preserves_existing_paid_account_and_binding(self):
+        from app.services.auth_service import authenticate_or_create_google_user
+        Base.metadata.create_all(self.engine)
+        with Session(self.engine, expire_on_commit=False) as db:
+            user = User(full_name="Synthetic Google owner", email="pg-google-existing@example.com", password_hash="original-unused-hash",
+                        role="reporter", referral_code="PGGOOGLE", google_id="existing-owned-google-subject", auth_version=4)
+            user.subscription = Subscription(status="active", plan_name="paid_monthly", end_date=datetime.now(timezone.utc).date()+timedelta(days=12))
+            db.add(user); db.commit()
+            before = (user.id, user.password_hash, user.google_id, user.role, user.auth_version, user.subscription.end_date)
+            claims = {"sub":"unmatched-google-subject", "email":user.email, "email_verified":True}
+            with patch("app.services.auth_service.google_id_token.verify_oauth2_token", return_value=claims):
+                with self.assertRaises(HTTPException) as denied:
+                    authenticate_or_create_google_user(db, "synthetic-google-token")
+                self.assertEqual(denied.exception.status_code, 409)
+            db.rollback(); db.expire_all(); restored = db.get(User, before[0])
+            self.assertEqual((restored.id, restored.password_hash, restored.google_id, restored.role, restored.auth_version, restored.subscription.end_date), before)
+            claims.update(sub=restored.google_id, email="changed-google-email@example.com")
+            with patch("app.services.auth_service.google_id_token.verify_oauth2_token", return_value=claims):
+                linked = authenticate_or_create_google_user(db, "synthetic-google-token")
+            self.assertEqual(linked.id, before[0]); self.assertEqual(linked.email, "pg-google-existing@example.com")
+
     def test_original_feedback_screenshot_and_private_fields_are_preserved(self):
         from pydantic import ValidationError
         from app.models.feedback import Feedback
