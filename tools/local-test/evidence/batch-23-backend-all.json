@@ -1,0 +1,10 @@
+{
+  "tests_run": 105,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "duration_seconds": 121.755,
+  "pattern": "test_*.py",
+  "runtime": "in-process synthetic SQLite; TCP and DNS denied",
+  "evidence_source": "Completed guard.py terminal summary; concurrent focused notification test overwrote the shared runtime report before copying. Full run discovered 105 tests before the two new notification cases were added."
+}

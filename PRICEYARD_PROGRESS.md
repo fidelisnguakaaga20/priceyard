@@ -78,8 +78,12 @@ Batch 22 verified: current-price requests ignore superseded responses;
 automatic refresh uses the last applied filters and skips a pending foreground
 request. Four filter checks, both outage/recovery checks and seven original-browser
 baseline workflows passed; TypeScript/Vite passed. Original JSX/CSS unchanged.
-Batch 23 in progress: database-side current-price ranking passes six focused tests;
-full backend/PostgreSQL/browser verification remains before saving that batch.
+Batch 23 verified: database-side current-price ranking passes six focused tests,
+105 full backend tests, fifteen pinned PostgreSQL cases, seven baseline browser
+flows and eight account/access cases. All historical records remain accessible.
+Batch 24 in progress: notification email failure no longer skips the same user's
+push/WhatsApp attempts. One of five focused tests reproduced the original defect;
+post-fix backend/browser checks remain before saving this batch.
 
 ## Checklist — do not repeat the audit
 
@@ -104,7 +108,7 @@ full backend/PostgreSQL/browser verification remains before saving that batch.
 | PY-17 | Correct market-detail loading | Complete for identified loading races/combined-failure defect in batch 16; obsolete commodity/account responses ignored and independent successful sections retained |
 | PY-18 | Accurate account/payment/access messages | Complete for identified account/expiry/callback defects in batches 4/11/19; verified return refreshes access, unconfirmed return never claims payment received in title |
 | PY-19 | Existing FAQ draft/hide/publish management | Complete in batch 12; hidden drafts remain available to Admin across reload, public publication boundary verified |
-| PY-20 | Bounded queries with accessible historical records | Pending |
+| PY-20 | Bounded queries with accessible historical records | Partial: current/comparison selection ranks in the database and hydrates only latest records; history/access preserved in batch 23; remaining history/admin query bounds pending |
 | PY-21 | Reliable independent alerts | Pending; no new delivery promises |
 | PY-22 | Efficient loading and accurate dashboard totals | Pending |
 | PY-23 | Preserve layout while fixing mobile overflow | Pending |
@@ -795,3 +799,27 @@ full backend/PostgreSQL/browser verification remains before saving that batch.
   Automated checks cover delayed response/timer races that are hard to time by hand.
 - Evidence: tools/local-test/evidence/batch-22-*.json. Thirteen IDs complete;
   23 partial/pending. Local only; native PostgreSQL remains stopped.
+
+### Batch 23 — further PY-20
+
+- Select the latest approved record per existing commodity/market pair using a
+  database window rank, then apply outdated/movement exclusions. Existing date,
+  search, active-catalog and timestamp/ID tie rules remain identical. No quantity
+  inference, new fields/index/migration, history deletion or response truncation.
+- Before: one card hydrated 201 prices. After: one price object, with all 201
+  historical records retained and readable. Six focused tests passed, 1.879s;
+  full 105 backend tests passed, 121.755s. Concurrent focused notification testing
+  overwrote the shared runtime report before copying; the full-suite artifact
+  explicitly identifies its source as the completed terminal summary.
+- Fifteen pinned PostgreSQL cases passed, 68.981s, including 151 retained rows,
+  one hydrated current row, movement/outdated/date rules and all security/payment
+  races. Initial new native date assertion compared local-zone hour with UTC;
+  corrected the checker to normalize the returned timestamptz. Product unchanged.
+- Seven baseline and eight account/access browser cases passed: original cards,
+  filters, detail/history boundaries, confidential-source exclusion, plans, Admin
+  form and mobile layout. No frontend rebuild/change in this batch.
+- Manual: http://127.0.0.1:55446/prices; trial@example.com / PriceYardDemo8!
+  can still open original Price History. No new pagination or hidden history cap.
+- Evidence: tools/local-test/evidence/batch-23-*.json. Thirteen IDs complete,
+  23 partial/pending. Native PostgreSQL shutdown's 20s wait timed out, but a
+  subsequent pg_ctl status verified no server running. Preview remains local.

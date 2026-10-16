@@ -183,25 +183,32 @@ def list_latest_approved_price_updates(
     # This prevents an older non-outdated record from resurfacing as "current".
     # Movement is also applied after selecting the latest record so a movement
     # filter cannot accidentally surface an older historical match.
-    statement = _approved_price_statement(
+    ranked = _approved_price_statement(
         commodity_search=commodity_search,
         market_search=market_search,
         selected_date=selected_date,
         movement=None,
         include_outdated=True,
-    ).order_by(PriceUpdate.update_date_time.desc(), PriceUpdate.id.desc())
+    ).with_only_columns(
+        PriceUpdate.id.label("price_update_id"),
+        func.row_number().over(
+            partition_by=(PriceUpdate.commodity_id, PriceUpdate.market_id),
+            order_by=(PriceUpdate.update_date_time.desc(), PriceUpdate.id.desc()),
+        ).label("position"),
+    ).subquery()
 
-    latest_by_market_commodity: dict[tuple[int, int], PriceUpdate] = {}
-    for item in db.scalars(statement).all():
-        key = (item.commodity_id, item.market_id)
-        if key not in latest_by_market_commodity:
-            latest_by_market_commodity[key] = item
-
-    return [
-        item
-        for item in latest_by_market_commodity.values()
-        if not item.is_outdated and (movement is None or item.movement == movement)
-    ]
+    # Rank inside the database so retained history is not loaded into Python
+    # for every current-price/ticker request. Do not limit or delete history.
+    statement = (
+        select(PriceUpdate)
+        .join(ranked, ranked.c.price_update_id == PriceUpdate.id)
+        .options(*PRICE_UPDATE_LOAD_OPTIONS)
+        .where(ranked.c.position == 1, PriceUpdate.is_outdated.is_(False))
+        .order_by(PriceUpdate.update_date_time.desc(), PriceUpdate.id.desc())
+    )
+    if movement is not None:
+        statement = statement.where(PriceUpdate.movement == movement)
+    return list(db.scalars(statement).all())
 
 
 def list_price_history(

@@ -122,6 +122,41 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_current_price_ranking_bounds_hydration_without_losing_history(self):
+        from sqlalchemy import event, func
+        from app.models.commodity import Commodity
+        from app.models.market import Market
+        from app.models.price_update import PriceUpdate
+        from app.services.price_update_service import list_latest_approved_price_updates, list_price_history
+        Base.metadata.create_all(self.engine)
+        now = datetime(2026, 10, 16, 12, tzinfo=timezone.utc)
+        with Session(self.engine) as db:
+            user = User(full_name="Synthetic query", email="pgquery@example.com", password_hash="unused", role="admin", referral_code="PGQUERY")
+            commodity = Commodity(name="Egusi", is_active=True)
+            market = Market(name="Kwali Market", is_active=True)
+            db.add_all([user, commodity, market]); db.flush()
+            for age in range(150, -1, -1):
+                db.add(PriceUpdate(commodity_id=commodity.id, market_id=market.id,
+                    price_low=210000, price_high=220000, unit="1 bag", bag_size=None,
+                    confidence_level="Low confidence", movement="up" if age == 0 else "down",
+                    update_date_time=now-timedelta(hours=age), status="approved", created_by=user.id))
+            db.commit()
+        with Session(self.engine) as db:
+            loaded = []
+            @event.listens_for(db, "loaded_as_persistent")
+            def count_load(session, instance):
+                if isinstance(instance, PriceUpdate): loaded.append(instance.id)
+            records = list_latest_approved_price_updates(db)
+            self.assertEqual(len(records), 1); self.assertEqual(loaded, [records[0].id])
+            self.assertEqual(records[0].unit, "1 bag"); self.assertIsNone(records[0].bag_size)
+            self.assertEqual(list_latest_approved_price_updates(db, movement="down"), [])
+            # Native PostgreSQL returns timestamptz in its session timezone.
+            self.assertEqual(list_latest_approved_price_updates(db, selected_date=now.date()-timedelta(days=1))[0].update_date_time.astimezone(timezone.utc).hour, 23)
+            records[0].is_outdated = True; db.commit()
+            self.assertEqual(list_latest_approved_price_updates(db), [])
+            self.assertEqual(len(list_price_history(db)), 151)
+            self.assertEqual(db.scalar(select(func.count()).select_from(PriceUpdate)), 151)
+
     def setUp(self):
         global CURRENT_SCHEMA
         CURRENT_SCHEMA = None

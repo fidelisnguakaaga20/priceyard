@@ -1,0 +1,9 @@
+{
+  "tests_run": 6,
+  "failures": 1,
+  "errors": 0,
+  "skipped": 0,
+  "duration_seconds": 2.11,
+  "pattern": "test_current_price_query.py",
+  "runtime": "in-process synthetic SQLite; TCP and DNS denied"
+}
