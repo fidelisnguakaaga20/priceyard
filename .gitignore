@@ -30,3 +30,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Disposable, synthetic-only local verification
+/tools/local-test/runtime/
