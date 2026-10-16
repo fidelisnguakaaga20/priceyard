@@ -6,6 +6,7 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 MAX_SCREENSHOT_BYTES = 2 * 1024 * 1024  # 2MB, decoded
+MAX_SCREENSHOT_ENCODING = 4 * ((MAX_SCREENSHOT_BYTES + 2) // 3)
 
 
 class FeedbackCreate(BaseModel):
@@ -29,9 +30,15 @@ class FeedbackCreate(BaseModel):
             return None
         if not value.startswith("data:image/"):
             raise ValueError("Screenshot must be an image file")
+        separator = value.find(",")
+        if separator < 0:
+            raise ValueError("Screenshot data is not valid")
+        # Check length before slicing/decoding an arbitrarily large payload.
+        # Keep the original decoded 2MB boundary and image-format policy.
+        if len(value) - separator - 1 > MAX_SCREENSHOT_ENCODING:
+            raise ValueError("Screenshot must be smaller than 2MB")
         try:
-            _, encoded = value.split(",", 1)
-            raw = base64.b64decode(encoded, validate=True)
+            raw = base64.b64decode(value[separator + 1:], validate=True)
         except Exception as exc:
             raise ValueError("Screenshot data is not valid") from exc
         if len(raw) > MAX_SCREENSHOT_BYTES:

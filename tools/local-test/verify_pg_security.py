@@ -123,6 +123,28 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_original_feedback_screenshot_and_private_fields_are_preserved(self):
+        from pydantic import ValidationError
+        from app.models.feedback import Feedback
+        from app.schemas.feedback_schema import FeedbackCreate, MAX_SCREENSHOT_BYTES
+        from app.services.feedback_service import create_feedback, get_feedback, list_public_testimonials
+        Base.metadata.create_all(self.engine)
+        image = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII="
+        with Session(self.engine) as db:
+            user = User(full_name="Synthetic feedback", email="pgfeedback@example.com", password_hash="unused", role="free_user", referral_code="PGFEEDBACK")
+            db.add(user); db.commit()
+            item = create_feedback(db, user, FeedbackCreate(rating=5, screenshot_data=image, complaint_or_suggestion="Synthetic screenshot evidence", continue_using_feedback=True))
+            saved_id = item.id
+            self.assertEqual(list_public_testimonials(db), [])
+            with self.assertRaises(ValidationError):
+                FeedbackCreate(rating=5, screenshot_data="data:image/png;base64," + "A" * (4*((MAX_SCREENSHOT_BYTES+2)//3)+4))
+        with Session(self.engine) as db:
+            item = get_feedback(db, saved_id)
+            self.assertEqual(item.screenshot_data, image)
+            self.assertEqual(item.complaint_or_suggestion, "Synthetic screenshot evidence")
+            self.assertTrue(item.continue_using_feedback)
+            self.assertEqual(len(db.scalars(select(Feedback)).all()), 1)
+
     def test_concurrent_price_edits_preserve_ordered_atomic_audit(self):
         from app.models.commodity import Commodity
         from app.models.market import Market

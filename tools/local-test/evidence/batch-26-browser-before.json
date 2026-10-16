@@ -1,0 +1,11 @@
+{
+  "checks": {
+    "invalid_replacement_clears_previous_attachment": false,
+    "invalid_replacement_is_not_submitted": false,
+    "original_form_still_saves": true,
+    "last_selected_file_wins": false
+  },
+  "expected_original_bug": true,
+  "external_page_requests": 0,
+  "production_connections": 0
+}

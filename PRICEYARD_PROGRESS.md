@@ -95,18 +95,25 @@ remaining administrative audit transactions, bounded feedback screenshot decodin
 requests, Google-claim validation/account-linking decision, and price comparison
 semantics requiring owner approval. No redesign or new measurement assumptions.
 
+Batch 26 verified: feedback screenshot bounds before decoding and stale file
+selection guards. All 116 backend tests, seventeen pinned PostgreSQL cases and
+four before/after browser checks passed; original CSS unchanged. Owner approved
+the practical secure Google linking option in docs/GOOGLE_ACCOUNT_LINKING_APPROVAL.md
+on 2026-10-16. Implement/verify that next; no further approval required for that
+exact scope. Fourteen IDs complete, 22 partial/pending. Native test PG is running.
+
 ## Checklist — do not repeat the audit
 
 | ID | Improvement | Current status |
 |---|---|---|
 | PY-01 | Consistent historical access checks | Complete in batch 7; date/comparison/ID routes enforce existing history entitlement; current summaries preserved |
 | PY-02 | Confidential/restricted market information | Partial: quality list/detail match existing premium screen; broader source/audit response review pending; public basic guidance unchanged |
-| PY-03 | Google ownership and safe account linking | Pending; new linking UI requires approval |
+| PY-03 | Google ownership and safe account linking | Pending implementation: owner approved non-linking by email alone, preserving already-linked sign-ins and existing password/reset flow; exact scope docs/GOOGLE_ACCOUNT_LINKING_APPROVAL.md; no new linking UI |
 | PY-04 | Password reset and login revocation | Complete in batch 5; actual HTTP/browser and PostgreSQL reset/logout races passed |
 | PY-05 | Referral abuse protection | Partial: atomic registration/reward/audit, duplicate-registration safety and concurrent seven-day reward preservation verified in batch 20; qualification/abuse-cap changes require approval and remain unchanged |
 | PY-06 | Safe push notification destinations | Application-side complete in batch 13; known-provider/key validation, bounded TLS transport, no redirects; live provider compatibility remains operational verification |
 | PY-07 | Shared-device/session safety | Partial: server revocation, stale UI protection, possession-based push ownership/concurrent registration and bounded current-device logout cleanup verified; JS token storage/offline cleanup limits remain |
-| PY-08 | Input/upload/request abuse bounds | Partial: push endpoint/key/query bounds verified; broader input/upload/request bounds pending |
+| PY-08 | Input/upload/request abuse bounds | Partial: push endpoint/key/query bounds and feedback pre-decode 2MB screenshot bound verified; broader request bounds pending |
 | PY-09 | Concurrent security-action safety | Complete for identified reset/logout/last-Admin cases in batches 5/6; six PostgreSQL cases passed |
 | PY-10 | Spreadsheet export safety | Complete in batch 3; text/numeric regressions and original browser download/access checks passed |
 | PY-11 | Correct saved administrator price state | Complete in batch 10; actual create/approve/correct/outdated/reject/reload browser regression passed |
@@ -125,7 +132,7 @@ semantics requiring owner approval. No redesign or new measurement assumptions.
 | PY-24 | Keyboard/focus accessibility | Pending |
 | PY-25 | Safe and clearly aged offline prices | Pending; visible additions require approval |
 | PY-26 | Complete atomic administrative audit | Partial: payment, registration/referral and price create/edit/approve/reject/outdated share atomic sanitized audits; concurrent price edit trail verified in batch 25; remaining administrative writes pending |
-| PY-27 | Consistent existing editing/password inputs | Pending |
+| PY-27 | Consistent existing editing/password inputs | Partial: feedback file replacement/removal/async ordering fixed without form changes in batch 26; remaining editing/password cases pending |
 | PY-28 | Historical record preservation | Partial: approved 0022 tested on fresh/populated synthetic PostgreSQL; future migration/history work pending |
 | PY-29 | Stable identities and dependent records | Pending; no automatic merge |
 | PY-30 | Isolated automated/browser verification | Partial: baseline guards, 12 original tests, six real browser workflows passed; expand with each batch |
@@ -883,3 +890,30 @@ semantics requiring owner approval. No redesign or new measurement assumptions.
   historical source records or production data changed.
 - Evidence: tools/local-test/evidence/batch-25-*.json. Fourteen IDs complete,
   22 partial/pending; broader Admin writes and operational checks remain open.
+
+### Batch 26 — further PY-08/PY-27
+
+- Preserve the existing 2MB decoded screenshot boundary and accepted formats;
+  reject excessive encoded length before slicing/allocating decoded content.
+  Boundary-sized original payload remains valid; just-over-limit remains invalid.
+- Invalid/replaced/removed selections clear prior attachment state immediately;
+  a slower obsolete FileReader cannot overwrite the last selection. Successful
+  submission invalidates unfinished reads. Original JSX, labels and CSS unchanged.
+- Five focused tests reproduced one pre-decode failure, then passed in 0.079s.
+  All 116 backend tests passed, 49.266s; seventeen marked PostgreSQL cases passed,
+  36.942s, including feedback image/text preservation and hidden publication state.
+  First failing mock assertion printed the fabricated base64 argument; simplified
+  the checker to report only the call count. No secret or real screenshot involved.
+- Browser before/after: invalid replacement clears attachment, does not submit the
+  prior image, last-selected file wins, original form still saves. All four passed.
+  TypeScript/Vite passed, 2.01s; JS318.97kB/90.15kB gzip. Original CSS artifact
+  index-19youOJ7.css remains identical, 31.58kB/7.09kB gzip.
+- Manual: http://127.0.0.1:55446/feedback, trial@example.com / PriceYardDemo8!.
+  Attach a small test image, then choose one over 2MB: the old attachment must
+  disappear and the original size error appears. No live recipients/providers.
+- Evidence: tools/local-test/evidence/batch-26-*.json. Fourteen complete,
+  22 partial/pending. No schema, prices, policy or production changes. Synthetic
+  PostgreSQL remains running for the next security batch; stop it before final.
+- Owner responded to the Google-linking decision during this batch and authorized
+  the recommended safe option. Scope/compatibility recorded in the approval doc;
+  it remains pending implementation and must not be presented as finished here.

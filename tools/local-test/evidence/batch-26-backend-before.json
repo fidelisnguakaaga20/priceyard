@@ -1,0 +1,9 @@
+{
+  "tests_run": 5,
+  "failures": 1,
+  "errors": 0,
+  "skipped": 0,
+  "duration_seconds": 0.145,
+  "pattern": "test_feedback_upload_bounds.py",
+  "runtime": "in-process synthetic SQLite; TCP and DNS denied"
+}

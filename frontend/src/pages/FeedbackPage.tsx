@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import { ButtonSpinner } from "../components/LoadingSpinner";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
@@ -26,17 +26,22 @@ export function FeedbackPage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const screenshotSequence = useRef(0);
 
   const pickScreenshot = async (file: File | undefined) => {
-    if (!file) { setScreenshot(null); setScreenshotName(""); return; }
+    const sequence = ++screenshotSequence.current;
+    setScreenshot(null); setScreenshotName("");
+    if (!file) return;
     if (!file.type.startsWith("image/")) { setError("Please choose an image file."); return; }
     if (file.size > MAX_SCREENSHOT_BYTES) { setError("Screenshot must be smaller than 2MB."); return; }
     try {
-      setScreenshot(await readFileAsDataUrl(file));
+      const data = await readFileAsDataUrl(file);
+      if (sequence !== screenshotSequence.current) return;
+      setScreenshot(data);
       setScreenshotName(file.name);
       setError("");
     } catch (err) {
-      setError((err as Error).message);
+      if (sequence === screenshotSequence.current) setError((err as Error).message);
     }
   };
 
@@ -70,6 +75,7 @@ export function FeedbackPage() {
       setMessage("Thank you. Your feedback was submitted.");
       setSuggestion("");
       setContinueUsing(null);
+      screenshotSequence.current++;
       setScreenshot(null);
       setScreenshotName("");
       showToast("Thank you. Your feedback was submitted.");
