@@ -1,0 +1,6 @@
+{
+  "hidden_draft_survives_reload": true,
+  "publish_hide_public_boundary": true,
+  "deleted_fake_draft_disappears": true,
+  "production_connections": 0
+}

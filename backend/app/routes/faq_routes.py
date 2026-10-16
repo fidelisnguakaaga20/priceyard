@@ -14,6 +14,7 @@ from app.services.faq_service import (
     get_faq_for_admin,
     get_published_faq,
     list_published_faqs,
+    list_admin_faqs,
     set_faq_publication,
     update_faq,
 )
@@ -25,6 +26,14 @@ router = APIRouter(prefix="/faq", tags=["faq"])
 @router.get("", response_model=list[FAQPublicResponse])
 def get_published_items(db: Session = Depends(get_db)) -> list[FAQItem]:
     return list_published_faqs(db)
+
+
+@router.get("/admin", response_model=list[FAQAdminResponse])
+def get_admin_items(
+    db: Session = Depends(get_db),
+    _: User = Depends(require_roles("admin")),
+) -> list[FAQItem]:
+    return list_admin_faqs(db)
 
 
 @router.get("/{faq_id}", response_model=FAQPublicResponse)

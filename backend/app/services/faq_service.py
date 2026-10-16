@@ -43,6 +43,10 @@ def list_published_faqs(db: Session) -> list[FAQItem]:
     )
 
 
+def list_admin_faqs(db: Session) -> list[FAQItem]:
+    return list(db.scalars(select(FAQItem).order_by(FAQItem.category.asc(), FAQItem.id.asc())).all())
+
+
 def update_faq(db: Session, item: FAQItem, payload: FAQUpdate) -> FAQItem:
     for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(item, field, value)

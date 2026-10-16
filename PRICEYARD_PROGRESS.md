@@ -34,8 +34,9 @@ Batch 8 verifies strict signed payment evidence (part of PY-33). Batch 9 verifie
 atomic payment/access/audit writes and concurrent replay/provider-ID protection
 (parts of PY-31/PY-33/PY-26). Batch 10 verifies saved Admin price state (PY-11).
 Batch 11 verifies account expiry display/timers (further PY-18; legacy UTC parsing
-part of PY-13). Next: remaining payment reconciliation/checkout validation and
-existing FAQ administration persistence. PY-32 business calculation approval is pending
+part of PY-13). Batch 12 verifies original FAQ draft/publication persistence
+(PY-19). Next: push destination/security bounds and remaining payment
+reconciliation/checkout validation. PY-32 business calculation approval is pending
 in docs/PURCHASE_VALUE_APPROVAL.md; continue independent technical work meanwhile.
 Apply small technical batches with automated and browser verification. Reuse
 existing local tools from .git/priceyard-local-recovery-20261015; do not reinstall
@@ -63,7 +64,7 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
 | PY-16 | Correct filters and response ordering | Pending |
 | PY-17 | Correct market-detail loading | Pending |
 | PY-18 | Accurate account/payment/access messages | Partial: stale profile/401/outage fixes plus batch 11 expiry display/timers verified; callback/payment messaging verification pending |
-| PY-19 | Existing FAQ draft/hide/publish management | Pending |
+| PY-19 | Existing FAQ draft/hide/publish management | Complete in batch 12; hidden drafts remain available to Admin across reload, public publication boundary verified |
 | PY-20 | Bounded queries with accessible historical records | Pending |
 | PY-21 | Reliable independent alerts | Pending; no new delivery promises |
 | PY-22 | Efficient loading and accurate dashboard totals | Pending |
@@ -425,3 +426,27 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
   or manual-paid@example.com. All retain the original entitlement screens.
   Evidence: tools/local-test/evidence/batch-11-*.json. Seven IDs complete;
   29 remain partial/pending. No production access or deployment.
+
+### Batch 12 — PY-19
+
+- Added an Admin-only FAQ listing for saved hidden and published items. Public
+  list/detail still expose only published items. The original Admin screen uses
+  that saved data rather than relying on a session-only hidden-record cache.
+  Published and hidden items stay in the original sections; no duplicate stale
+  row remains after deleting a disposable test draft. All original UI headings,
+  text, fields, publication rules and CSS remain unchanged. No schema addition.
+- Browser first reproduced hidden draft disappearing from Admin after reload.
+  Afterward creation/reload/publish/public-read/hide/reload/delete all passed
+  through real synthetic API responses. Only fabricated draft data was deleted;
+  no original FAQ or business record was accessed/removed.
+- Four new HTTP tests cover saved visibility, public hidden-record exclusion,
+  Guest/Free/Paid/Reporter rejection at the Admin route and publication workflow.
+  All 51 backend tests passed, zero failures/errors/skips, 27.918s.
+- TypeScript/Vite passed (4.26s, main 316.67kB/89.36kB gzip). CSS remains the
+  original index-19youOJ7.css. Preview restarted only its in-memory fake database.
+  FAQ administrative audit atomicity is separate PY-26 work, not claimed here.
+- Manual: http://127.0.0.1:55446/admin/faq, admin@example.com / PriceYardDemo8!.
+  Create a hidden fake FAQ and refresh: it remains available. Visitors see it
+  only after Publish, and Hide removes it from their public FAQ list.
+- Evidence: tools/local-test/evidence/batch-12-*.json. Eight IDs complete;
+  28 remain partial/pending. Paid/trial-value business approval still pending.
