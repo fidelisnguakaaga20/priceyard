@@ -76,6 +76,7 @@ with Session(engine) as db:
     db.add(Payment(user_id=users["value-paid"].id, reference="py_local_renewal_only", plan="monthly", amount=2500, currency="NGN", status="pending"))
     db.add(Payment(user_id=users["value-trial"].id, reference="py_local_trial_purchase_only", plan="seasonal", amount=6000, currency="NGN", status="pending"))
     db.add(Payment(user_id=users["verify"].id, reference="py_local_verify_only", plan="monthly", amount=2500, currency="NGN", status="pending"))
+    db.add(Payment(user_id=users["manual-paid"].id, reference="py_local_manual_review_only", plan="monthly", amount=2500, currency="NGN", status="pending"))
     db.commit()
 
 from starlette.applications import Starlette
@@ -116,13 +117,15 @@ async def payment_event(request):
     from app.config import get_settings
     from sqlalchemy import select
     payload = await request.json()
-    if payload not in ({"event": "wrong_amount"}, {"event": "valid"}, {"event": "activation_failure"}, {"event": "value_paid"}, {"event": "value_trial"}):
+    if payload not in ({"event": "wrong_amount"}, {"event": "valid"}, {"event": "activation_failure"}, {"event": "value_paid"}, {"event": "value_trial"}, {"event": "manual_review"}):
         return JSONResponse({"detail": "Choose a fabricated local payment event"}, status_code=400)
     event = {"event": "charge.success", "data": {"reference": "py_local_browser_only", "id": 700001, "amount": 249999 if payload["event"] == "wrong_amount" else 250000, "currency": "NGN", "status": "success"}}
     if payload["event"] == "value_paid":
         event["data"].update(reference="py_local_renewal_only", id=700002)
     elif payload["event"] == "value_trial":
         event["data"].update(reference="py_local_trial_purchase_only", id=700003, amount=600000)
+    elif payload["event"] == "manual_review":
+        event["data"].update(reference="py_local_manual_review_only", id=700005)
     raw = json.dumps(event).encode()
     key = "sk_test_priceyard_local_browser_only"
     signature = hmac.new(key.encode(), raw, hashlib.sha512).hexdigest()
@@ -152,6 +155,10 @@ async def purchase_value_controls(request):
                               "trial_end": str(subscription.trial_ends_at) if subscription.trial_ends_at else None}
     html = (LAB / "purchase_value_controls.html").read_text(encoding="utf-8")
     return HTMLResponse(html.replace("__STATE__", escape(json.dumps(fixtures, indent=2))))
+
+
+async def manual_review_controls(request):
+    return HTMLResponse((LAB / "manual_review_controls.html").read_text(encoding="utf-8"))
 
 outage = {"enabled": False}
 checkout_mode = {"mode": "disabled"}
@@ -261,7 +268,7 @@ class LocalOnly:
         else:
             await self.app(scope, receive, secured)
 
-preview = LocalOnly(Starlette(routes=[Route("/__test__/status", status), Route("/__test__/inbox", inbox), Route("/__test__/controls", controls), Route("/__test__/push", push_controls), Route("/__test__/payments", payment_controls), Route("/__test__/purchase-value", purchase_value_controls), Route("/__test__/verification", verification_controls), Route("/__test__/verification-mode", set_verification_mode, methods=["POST"]), Route("/__test__/checkout", checkout_controls), Route("/__test__/checkout-mode", set_checkout_mode, methods=["POST"]), Route("/__test__/payment-event", payment_event, methods=["POST"]), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
+preview = LocalOnly(Starlette(routes=[Route("/__test__/status", status), Route("/__test__/inbox", inbox), Route("/__test__/controls", controls), Route("/__test__/push", push_controls), Route("/__test__/payments", payment_controls), Route("/__test__/manual-review", manual_review_controls), Route("/__test__/purchase-value", purchase_value_controls), Route("/__test__/verification", verification_controls), Route("/__test__/verification-mode", set_verification_mode, methods=["POST"]), Route("/__test__/checkout", checkout_controls), Route("/__test__/checkout-mode", set_checkout_mode, methods=["POST"]), Route("/__test__/payment-event", payment_event, methods=["POST"]), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
 
 if __name__ == "__main__":
     import uvicorn

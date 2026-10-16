@@ -114,7 +114,8 @@ from app.services.auth_service import register_user
 from app.schemas.auth_schema import RegisterRequest
 from app.services.push_service import save_subscription
 from app.services.login_revocation_service import is_revoked, revoke_token
-from app.services.subscription_service import build_trial_subscription
+from app.services.subscription_service import build_trial_subscription, update_subscription_status
+from app.models.subscription import Subscription
 from app.services.user_service import update_user
 from app.schemas.user_schema import AdminUserUpdate
 from app.utils.password import hash_password
@@ -403,6 +404,39 @@ class PostgreSQLSecurityTests(unittest.TestCase):
 
     def test_duplicate_simultaneous_registration_only_rewards_once(self):
         self.referral_race(same_email=True)
+
+    def test_concurrent_manual_grant_purchase_holds_then_recovers_once(self):
+        Base.metadata.create_all(self.engine)
+        with Session(self.engine) as db:
+            user=User(full_name="Synthetic indefinite payer",email="pghold@example.com",password_hash="not-used",role="paid_user",is_active=True,referral_code="PGHOLD")
+            user.subscription=Subscription(plan_name="paid",status="active",end_date=None)
+            db.add(user);db.flush();user_id=user.id
+            db.add(Payment(user_id=user.id,reference="py_pg_review",plan="monthly",amount=2500,currency="NGN",status="pending"));db.commit()
+        payload={"event":"charge.success","data":{"reference":"py_pg_review","id":606060,"amount":250000,"currency":"NGN","status":"success"}}
+        def race(expected):
+            barrier=threading.Barrier(2);outcomes=[]
+            def worker():
+                with Session(self.engine) as db:
+                    barrier.wait(timeout=15)
+                    try:payment_service.handle_webhook_event(db,payload);outcomes.append(200)
+                    except HTTPException as error:db.rollback();outcomes.append(error.status_code)
+                    except BaseException as error:db.rollback();outcomes.append(type(error).__name__)
+            with patch.object(payment_service,"notify_admins",return_value=None):
+                threads=[threading.Thread(target=worker) for _ in range(2)]
+                for thread in threads:thread.start()
+                for thread in threads:thread.join(25)
+            self.assertFalse(any(thread.is_alive() for thread in threads));self.assertEqual(outcomes,[expected,expected])
+        race(409)
+        with Session(self.engine) as db:
+            self.assertIsNone(db.get(User,user_id).subscription.end_date)
+            payment=db.scalar(select(Payment));self.assertEqual(payment.status,"pending");self.assertEqual(payment.paystack_transaction_id,"606060")
+            self.assertEqual([item.action for item in db.scalars(select(AuditLog))],["payment.review_required"])
+            update_subscription_status(db,db.get(User,user_id).subscription,"free")
+        race(200)
+        with Session(self.engine) as db:
+            self.assertEqual(db.scalar(select(Payment)).status,"success")
+            self.assertEqual(db.get(User,user_id).subscription.end_date,datetime.now(timezone.utc).date()+timedelta(days=30))
+            self.assertCountEqual([item.action for item in db.scalars(select(AuditLog))],["payment.review_required","payment.success"])
 
     def test_concurrent_push_registration_cannot_overwrite_other_device_keys(self):
         import base64

@@ -21,8 +21,7 @@ Approved local-development rules for PY-32 (1 and 2):
    does not remove any trial time; no exact-hour billing field is introduced.
 3. Indefinite manual grants remain indefinite. Do not silently convert them to
    expiring access. Their checkout/pending-payment handling is a separate owner
-   decision, now approved in the specific scope below; implementation follows
-   verification of the current referral batch.
+   decision, now approved and implemented in the specific scope below (batch 21).
 
 Rules 1 and 2 change activation
 calculations and tests; no new product fields, forms, plan, price, referral rule,
@@ -47,5 +46,8 @@ Owner approved this exact local-only scope on 2026-10-16:
   production change or historical backfill. Refund/grant-resolution decisions
   remain with the business owner.
 
-Affected existing files if approved: payment_service.py and its HTTP/native
+Implementation files: payment_service.py and its HTTP/native
 PostgreSQL/browser tests. Existing manual grant administration remains unchanged.
+
+Verified in batch 21: 99 backend tests, fourteen marked PostgreSQL cases and the
+original Admin/browser hold-resolution-retry workflow passed. No production change.

@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.models.payment import Payment
+from app.models.audit_log import AuditLog
 from app.models.subscription import Subscription
 from app.models.user import User
 from app.schemas.payment_schema import PaymentInitiateResponse, PaymentPlan
@@ -48,6 +49,9 @@ def _valid_checkout_url(value: object) -> bool:
 
 
 def initiate_payment(db: Session, user: User, plan: PaymentPlan) -> PaymentInitiateResponse:
+    subscription = db.scalar(select(Subscription).where(Subscription.user_id == user.id))
+    if subscription is not None and subscription.status == "active" and subscription.end_date is None:
+        raise HTTPException(status_code=409, detail="Your account already has indefinite access. Contact support before buying a plan.")
     settings = get_settings()
     if not settings.paystack_secret_key:
         raise HTTPException(
@@ -189,6 +193,8 @@ def handle_webhook_event(db: Session, payload: dict) -> None:
     # never browser-supplied prices or a possibly changed current price list.
     transaction_id = data.get("id")
     _validate_recorded_evidence(payment, data)
+    if payment.paystack_transaction_id is not None and payment.paystack_transaction_id != str(transaction_id):
+        raise HTTPException(status_code=409, detail="Payment transaction conflicts with previously recorded evidence")
     if payment.status == "success":
         return
 
@@ -196,6 +202,7 @@ def handle_webhook_event(db: Session, payload: dict) -> None:
     if duplicate is not None:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Payment transaction is already recorded for another purchase")
 
+    held_for_review = False
     try:
         user = db.scalar(select(User).where(User.id == payment.user_id).with_for_update().execution_options(populate_existing=True))
         # Do not use an expiry helper here: its intermediate commit could release
@@ -203,19 +210,35 @@ def handle_webhook_event(db: Session, payload: dict) -> None:
         subscription = db.scalar(select(Subscription).where(Subscription.user_id == payment.user_id).with_for_update().execution_options(populate_existing=True))
         if user is None or subscription is None:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Subscription record is unavailable; payment not applied")
-        old_value = snapshot_model(subscription)
-        payment.status = "success"
-        payment.paystack_transaction_id = str(transaction_id)
-        activate_paid_subscription(db, subscription, plan=payment.plan, commit=False)
-        subscription.payment_reference = payment.reference
-        create_audit_log(
-            db, actor=user, action="payment.success", table_name="subscriptions",
-            record_id=subscription.id, old_value=old_value, new_value=snapshot_model(subscription), commit=False,
-        )
+        if subscription.status == "active" and subscription.end_date is None:
+            old_value = snapshot_model(payment)
+            payment.status = "pending"  # Confirmed funds, activation held; no days consumed.
+            payment.paystack_transaction_id = str(transaction_id)
+            already_logged = db.scalar(select(AuditLog.id).where(
+                AuditLog.action == "payment.review_required", AuditLog.table_name == "payments",
+                AuditLog.record_id == payment.id,
+            ).limit(1))
+            if already_logged is None:
+                create_audit_log(db, actor=user, action="payment.review_required", table_name="payments",
+                                 record_id=payment.id, old_value=old_value, new_value=snapshot_model(payment), commit=False)
+            held_for_review = True
+        else:
+            old_value = snapshot_model(subscription)
+            payment.status = "success"
+            payment.paystack_transaction_id = str(transaction_id)
+            activate_paid_subscription(db, subscription, plan=payment.plan, commit=False)
+            subscription.payment_reference = payment.reference
+            create_audit_log(
+                db, actor=user, action="payment.success", table_name="subscriptions",
+                record_id=subscription.id, old_value=old_value, new_value=snapshot_model(subscription), commit=False,
+            )
         db.commit()
     except Exception:
         db.rollback()
         raise
+
+    if held_for_review:
+        raise HTTPException(status_code=409, detail="Payment confirmed; activation requires manual review while indefinite access remains active")
 
     try:
         notify_admins(

@@ -1,0 +1,10 @@
+<!doctype html><html><head><title>Local indefinite-grant payment testing</title></head>
+<body style="font:18px system-ui;max-width:760px;margin:32px auto;padding:16px">
+<h1>Local indefinite-grant payment testing</h1><p>Fabricated accounts/payments only. No provider connection, charge or real customer.</p>
+<ol><li>Sign into <a href="/login" target="_blank">the original application</a> as manual-paid@example.com, password PriceYardDemo8!. Its indefinite access remains active.</li>
+<li>Send the fake confirmed purchase below. The 409 result means activation is held for review; access remains indefinite and no purchased days are consumed.</li>
+<li>Repeating the event keeps one review audit. An Admin can inspect payment.review_required in the existing Audit logs.</li>
+<li>Only if deliberately resolving this synthetic grant: use the original Admin Subscriptions control to change that account to Free, then retry the event. It activates the purchased 30 days once.</li></ol>
+<button id="send">Send fake purchase for review</button><pre id="result" role="status"></pre>
+<script>document.querySelector('#send').onclick=async()=>{const response=await fetch('/__test__/payment-event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({event:'manual_review'})});document.querySelector('#result').textContent=JSON.stringify(await response.json(),null,2)}</script>
+</body></html>

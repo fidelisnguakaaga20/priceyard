@@ -67,12 +67,12 @@ and PY-33 identified application defects complete: twelve IDs complete, 24 remai
 partial/pending. Next: atomic referral registration/reward, price query accuracy/
 bounded materialization, remaining source confidentiality and administrative audits.
 
-Batch 20 verified: registration/reward/audit use one transaction; four regression
-tests, all 91 backend tests, thirteen native PostgreSQL cases and original
-registration/referral browser checks passed. Owner approved
-the exact indefinite-grant checkout/held-purchase scope in
-docs/PURCHASE_VALUE_APPROVAL.md on 2026-10-16; implement after this batch. Do not
-leave that newly approved work as awaiting permission or silently convert grants.
+Batch 20 verified registration/referral atomicity. Batch 21 implements the owner's
+approved indefinite-grant checkout/held-purchase rules: all 99 backend tests,
+fourteen marked PostgreSQL cases and original Admin/browser review/recovery passed.
+PY-32 now complete: thirteen IDs complete, 23 partial/pending. Next: correct price
+filter refresh/order behavior, bounded current-price queries, source confidentiality
+and remaining atomic administrative writes. Preserve all original price units.
 
 ## Checklist — do not repeat the audit
 
@@ -109,7 +109,7 @@ leave that newly approved work as awaiting permission or silently convert grants
 | PY-29 | Stable identities and dependent records | Pending; no automatic merge |
 | PY-30 | Isolated automated/browser verification | Partial: baseline guards, 12 original tests, six real browser workflows passed; expand with each batch |
 | PY-31 | Confirmed payment activation and recovery | Partial: atomic confirmation, retry/replay and owner-only callback recovery from provider evidence verified; unattended recovery, indefinite grants and operational delivery/reconciliation decisions remain |
-| PY-32 | Preserve unused purchased/trial time | Dated-renewal/trial scope verified in batch 14; owner approved indefinite-grant checkout block/held purchases on 2026-10-16, implementation next |
+| PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches 14/21: carry forward dated paid/trial time; preserve indefinite grants, block new checkout and hold/recover old purchases without consuming days |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
 | PY-34 | Expiry without unintended staff-role loss | Complete in batch 2; 18 backend tests and two expired-Reporter browser cases passed |
 | PY-35 | Operational readiness and dependency evidence | Pending; production checks outside current scope |
@@ -737,3 +737,34 @@ leave that newly approved work as awaiting permission or silently convert grants
 - Owner explicitly approved the exact indefinite-grant checkout/held-payment scope
   in docs/PURCHASE_VALUE_APPROVAL.md during this batch. Implement it next (batch 21);
   it is not awaiting approval and is not claimed implemented by this checkpoint.
+
+### Batch 21 — approved indefinite-grant scope, PY-32; further PY-31/PY-26
+
+- Checkout is blocked before provider contact/new purchase creation for active
+  indefinite grants. Confirmed old purchases retain reference/provider ID and one
+  sanitized review audit, remain pending activation and consume no paid days.
+  Grant access remains unchanged. Deliberate grant resolution permits exact-once
+  retry/activation. Conflicting provider IDs cannot overwrite held evidence.
+- Eight HTTP tests reproduced seven failures before implementation. The first
+  checkout checker used an incomplete provider stub, then was corrected to a
+  complete successful fake checkout response before recording final before-results.
+  All 99 backend tests passed, 22.382s; fourteen marked PostgreSQL cases passed,
+  14.644s, including concurrent hold/review-once and recovery/credit-once.
+- Original-browser workflow passed: checkout 409, confirmed purchase 409/held,
+  grant remains active/indefinite with history access, replay preserves one review
+  audit/receipt. The original Admin Subscriptions selector deliberately resolves
+  only this fabricated grant to Free; retry grants the recorded 30 days once and
+  later replay preserves expiry. No provider/email/real-customer contact.
+- Manual: http://127.0.0.1:55446/__test__/manual-review, manual-paid@example.com /
+  PriceYardDemo8!. The automated test deliberately resolved this fake grant and
+  credited the fake purchase; restart the disposable preview to reseed before
+  checking the initial indefinite/held state. Existing Audit logs show
+  payment.review_required with the recorded reference/provider ID. Those are
+  existing database fields; review action is in the existing audit table.
+- No new schema, fields, product screen, prices, durations, automatic refund or
+  historical backfill. Historical successful payments remain unchanged. Native
+  PostgreSQL cluster stopped; SQLite preview remains running. No frontend rebuild
+  needed; the last original CSS artifact remains unchanged.
+- Evidence: tools/local-test/evidence/batch-21-*.json. Thirteen IDs complete;
+  23 pending/partial. All approved purchased-time rules now implemented; unattended
+  recovery/operational refund decisions remain separate PY-31/PY-35 work.
