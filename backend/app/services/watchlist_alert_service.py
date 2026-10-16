@@ -75,7 +75,8 @@ def notify_watchlist_subscribers(db: Session, price_update: PriceUpdate) -> int:
             send_email(recipient=user.email, subject=subject, body=body)
             sent += 1
         except Exception:
-            continue
+            # A failed email must not suppress this user's other channels.
+            pass
 
         try:
             send_push_to_user(

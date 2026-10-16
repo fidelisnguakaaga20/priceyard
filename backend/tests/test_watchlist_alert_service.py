@@ -1,5 +1,6 @@
 import os
 import unittest
+from unittest.mock import patch
 from datetime import datetime, timezone
 
 os.environ.setdefault("FRONTEND_URL", "https://priceyard.onrender.com")
@@ -143,6 +144,33 @@ class WatchlistAlertServiceTests(unittest.TestCase):
         self.assertEqual(sent, 1)  # only the non-failing recipient counted
         self.assertIn("watcher@example.com", calls)
         self.assertIn("marketwatcher@example.com", calls)
+
+    def test_failed_email_does_not_suppress_push_or_whatsapp_for_same_user(self) -> None:
+        self.watcher.phone = "+2348000000001"
+        self.market_watcher.phone = "+2348000000002"
+        self.db.commit()
+        def email(*, recipient, **kwargs):
+            if recipient == self.watcher.email:
+                raise RuntimeError("synthetic email failure")
+        with patch("app.services.email_service.send_email", side_effect=email) as mail, \
+                patch("app.services.push_service.send_push_to_user", return_value=1) as push, \
+                patch("app.services.whatsapp_service.send_whatsapp_message", return_value=None) as whatsapp:
+            self.assertEqual(watchlist_alert_service.notify_watchlist_subscribers(self.db, self.price_update), 1)
+        self.assertEqual(mail.call_count, 2)
+        self.assertCountEqual([call.args[1] for call in push.call_args_list], [self.watcher.id, self.market_watcher.id])
+        self.assertCountEqual([call.kwargs["to_phone"] for call in whatsapp.call_args_list], [self.watcher.phone, self.market_watcher.phone])
+
+    def test_push_and_whatsapp_failures_do_not_block_other_channels_or_watchers(self) -> None:
+        self.watcher.phone = "+2348000000001"
+        self.market_watcher.phone = "+2348000000002"
+        self.db.commit()
+        with patch("app.services.email_service.send_email", return_value=None) as mail, \
+                patch("app.services.push_service.send_push_to_user", side_effect=RuntimeError("synthetic push failure")) as push, \
+                patch("app.services.whatsapp_service.send_whatsapp_message", side_effect=RuntimeError("synthetic WhatsApp failure")) as whatsapp:
+            self.assertEqual(watchlist_alert_service.notify_watchlist_subscribers(self.db, self.price_update), 2)
+        self.assertEqual(mail.call_count, 2)
+        self.assertEqual(push.call_count, 2)
+        self.assertEqual(whatsapp.call_count, 2)
 
 
 if __name__ == "__main__":

@@ -56,6 +56,8 @@ with Session(engine) as db:
     demo_hash = hash_password("PriceYardDemo8!")
     for name, role, access in (("free", "free_user", "free"), ("trial", "free_user", "trial"), ("paid", "paid_user", "active"), ("reporter", "reporter", "free"), ("admin", "admin", "free"), ("expired-reporter", "reporter", "trial_expired"), ("expired-paid-reporter", "reporter", "paid_expired"), ("reset", "free_user", "trial"), ("payment", "free_user", "free"), ("manual-paid", "paid_user", "manual_active"), ("value-paid", "paid_user", "active"), ("value-trial", "free_user", "trial"), ("verify", "free_user", "free"), ("referrer", "free_user", "trial")):
         user = User(full_name=f"Test {name.title()}", email=f"{name}@example.com", password_hash=demo_hash, role=role, is_active=True, referral_code="TEST"+name.upper())
+        if name == "trial":
+            user.phone = "+2348000000001"  # Fabricated notification recipient only.
         if access in {"trial", "trial_expired"}:
             user.subscription = build_trial_subscription(user=user, now=now-timedelta(days=15) if access == "trial_expired" else now)
         else:
@@ -101,6 +103,37 @@ class PreviewFiles(StaticFiles):
 
 async def status(request):
     return JSONResponse({"synthetic_only": True, "process_id": os.getpid(), "database": "fresh memory SQLite", "providers": "disabled", "grades": False, "fixture": "original Egusi/Kwali Market/1 bag; bag size unknown", "isolation": isolation})
+
+notification_mode = {"enabled": False, "attempts": []}
+
+async def notification_controls(request):
+    if request.method == "POST":
+        payload = await request.json()
+        if type(payload.get("enabled")) is not bool:
+            return JSONResponse({"detail": "Expected a boolean"}, status_code=422)
+        notification_mode["enabled"] = payload["enabled"]
+        notification_mode["attempts"] = []
+    return JSONResponse(notification_mode)
+
+async def serve_fake_notifications(app, scope, receive, send):
+    # Only an explicit local approval request can enter these fake transports.
+    # Unknown recipients fail closed; none of these functions make network calls.
+    def email(*, recipient, **kwargs):
+        if recipient != "trial@example.com":
+            raise RuntimeError("Unknown fabricated notification recipient")
+        notification_mode["attempts"].append("email")
+        raise RuntimeError("Fabricated email delivery failure")
+    def push(db, user_id, **kwargs):
+        if db.get(User, user_id).email != "trial@example.com":
+            raise RuntimeError("Unknown fabricated notification recipient")
+        notification_mode["attempts"].append("push")
+        return 1
+    def whatsapp(*, to_phone, **kwargs):
+        if to_phone != "+2348000000001":
+            raise RuntimeError("Unknown fabricated notification recipient")
+        notification_mode["attempts"].append("whatsapp")
+    with patch("app.services.email_service.send_email", side_effect=email), patch("app.services.push_service.send_push_to_user", side_effect=push), patch("app.services.whatsapp_service.send_whatsapp_message", side_effect=whatsapp):
+        await app(scope, receive, send)
 
 async def push_controls(request):
     return HTMLResponse((LAB / "push_controls.html").read_text(encoding="utf-8"))
@@ -259,7 +292,9 @@ class LocalOnly:
             return await JSONResponse({"detail": "Synthetic temporary outage"}, status_code=503)(scope, receive, secured)
         if scope["type"] == "http":
             async with self.request_lock:
-                if scope.get("path") == "/api/payments/initiate" and checkout_mode["mode"] != "disabled":
+                if notification_mode["enabled"] and scope.get("method") == "PATCH" and re.fullmatch(r"/api/price-updates/[0-9]+/approve", scope.get("path", "")):
+                    await serve_fake_notifications(self.app, scope, receive, secured)
+                elif scope.get("path") == "/api/payments/initiate" and checkout_mode["mode"] != "disabled":
                     await serve_fake_checkout(self.app, scope, receive, secured)
                 elif scope.get("path") == "/api/payments/py_local_verify_only/verify" and verification_mode["mode"] != "disabled":
                     await serve_fake_verification(self.app, scope, receive, secured)
@@ -268,7 +303,7 @@ class LocalOnly:
         else:
             await self.app(scope, receive, secured)
 
-preview = LocalOnly(Starlette(routes=[Route("/__test__/status", status), Route("/__test__/inbox", inbox), Route("/__test__/controls", controls), Route("/__test__/push", push_controls), Route("/__test__/payments", payment_controls), Route("/__test__/manual-review", manual_review_controls), Route("/__test__/purchase-value", purchase_value_controls), Route("/__test__/verification", verification_controls), Route("/__test__/verification-mode", set_verification_mode, methods=["POST"]), Route("/__test__/checkout", checkout_controls), Route("/__test__/checkout-mode", set_checkout_mode, methods=["POST"]), Route("/__test__/payment-event", payment_event, methods=["POST"]), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
+preview = LocalOnly(Starlette(routes=[Route("/__test__/status", status), Route("/__test__/alerts", notification_controls, methods=["GET", "POST"]), Route("/__test__/inbox", inbox), Route("/__test__/controls", controls), Route("/__test__/push", push_controls), Route("/__test__/payments", payment_controls), Route("/__test__/manual-review", manual_review_controls), Route("/__test__/purchase-value", purchase_value_controls), Route("/__test__/verification", verification_controls), Route("/__test__/verification-mode", set_verification_mode, methods=["POST"]), Route("/__test__/checkout", checkout_controls), Route("/__test__/checkout-mode", set_checkout_mode, methods=["POST"]), Route("/__test__/payment-event", payment_event, methods=["POST"]), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
 
 if __name__ == "__main__":
     import uvicorn

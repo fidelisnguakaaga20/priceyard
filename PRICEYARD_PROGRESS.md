@@ -81,9 +81,10 @@ baseline workflows passed; TypeScript/Vite passed. Original JSX/CSS unchanged.
 Batch 23 verified: database-side current-price ranking passes six focused tests,
 105 full backend tests, fifteen pinned PostgreSQL cases, seven baseline browser
 flows and eight account/access cases. All historical records remain accessible.
-Batch 24 in progress: notification email failure no longer skips the same user's
-push/WhatsApp attempts. One of five focused tests reproduced the original defect;
-post-fix backend/browser checks remain before saving this batch.
+Batch 24 verified: notification email failure no longer skips the same user's
+push/WhatsApp attempts. Five focused tests, all 107 backend tests and the original
+Watch/Admin approval browser workflow passed. Fourteen IDs complete, 22 partial/
+pending. Next: atomic price changes/audit and post-commit notification failures.
 
 ## Checklist — do not repeat the audit
 
@@ -109,7 +110,7 @@ post-fix backend/browser checks remain before saving this batch.
 | PY-18 | Accurate account/payment/access messages | Complete for identified account/expiry/callback defects in batches 4/11/19; verified return refreshes access, unconfirmed return never claims payment received in title |
 | PY-19 | Existing FAQ draft/hide/publish management | Complete in batch 12; hidden drafts remain available to Admin across reload, public publication boundary verified |
 | PY-20 | Bounded queries with accessible historical records | Partial: current/comparison selection ranks in the database and hydrates only latest records; history/access preserved in batch 23; remaining history/admin query bounds pending |
-| PY-21 | Reliable independent alerts | Pending; no new delivery promises |
+| PY-21 | Reliable independent alerts | Application-side identified channel dependency complete in batch 24: failed email no longer skips push/WhatsApp; per-user/channel failures isolated; existing deduplication/count semantics retained. Delivery/retry operations remain PY-35 |
 | PY-22 | Efficient loading and accurate dashboard totals | Pending |
 | PY-23 | Preserve layout while fixing mobile overflow | Pending |
 | PY-24 | Keyboard/focus accessibility | Pending |
@@ -823,3 +824,26 @@ post-fix backend/browser checks remain before saving this batch.
 - Evidence: tools/local-test/evidence/batch-23-*.json. Thirteen IDs complete,
   23 partial/pending. Native PostgreSQL shutdown's 20s wait timed out, but a
   subsequent pg_ctl status verified no server running. Preview remains local.
+
+### Batch 24 — PY-21 identified independent-channel defect
+
+- Failed email no longer skips the same customer's existing push/WhatsApp paths.
+  Existing watch matching, target conditions, active-user check, per-user
+  deduplication, email-count return value and best-effort policy remain unchanged.
+  No new delivery channel, subscription rule, queue, schema or delivery guarantee.
+- One of five focused tests reproduced the original defect; all five passed
+  afterward, 31.291s. All 107 backend tests passed, 89.534s. Email, push and
+  WhatsApp failures are independently simulated; later users/channels still run.
+- Browser: original trial Watch button creates the watch; original Admin create/
+  approve form publishes the fabricated price. A forced email failure still
+  records push and WhatsApp attempts, approval returns 200 and survives reload,
+  and the current-price API shows it. Original fields/layout unchanged.
+- Test wrapper /__test__/alerts explicitly enables fake transports only around
+  approval requests, records attempts and rejects unknown fabricated recipients;
+  default is disabled. It is separate from the product and was disabled after
+  testing. Trial test fixture has a fabricated phone; no real recipient/service.
+- Evidence: tools/local-test/evidence/batch-24-*.json. Fourteen IDs complete;
+  22 partial/pending. Real delivery, durable retries/provider outages still require
+  operational work; no such production capability is claimed by this local test.
+- Manual: http://127.0.0.1:55446/prices. Existing appearance is preserved; the
+  automated notification evidence covers the invisible channel-failure behavior.
