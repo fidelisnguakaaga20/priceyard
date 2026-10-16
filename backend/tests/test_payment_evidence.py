@@ -115,3 +115,41 @@ class PaymentEvidenceTests(unittest.TestCase):
         for signature in ("invalid", "a" * 128, "x" * 128):
             self.assertEqual(self.send(self.payload(), signature=signature).status_code, 401)
             self.assert_not_credited()
+
+    def test_activation_failure_rolls_back_and_valid_retry_can_recover(self):
+        with patch("app.services.payment_service.activate_paid_subscription", side_effect=RuntimeError("Synthetic activation outage")):
+            self.assertEqual(self.send(self.payload()).status_code, 500)
+        self.assert_not_credited()
+        self.assertEqual(self.send(self.payload()).status_code, 200)
+
+    def test_audit_failure_rolls_back_payment_and_access_together(self):
+        with patch("app.services.payment_service.create_audit_log", side_effect=RuntimeError("Synthetic audit outage")):
+            self.assertEqual(self.send(self.payload()).status_code, 500)
+        self.assert_not_credited()
+        self.assertEqual(self.send(self.payload()).status_code, 200)
+
+    def test_missing_subscription_keeps_purchase_pending_for_recovery(self):
+        with Session(self.engine) as db:
+            db.delete(db.get(User, self.user_id).subscription)
+            db.commit()
+        self.assertEqual(self.send(self.payload()).status_code, 409)
+        with Session(self.engine) as db:
+            self.assertEqual(db.scalar(select(Payment)).status, "pending")
+            self.assertIsNone(db.scalar(select(Payment)).paystack_transaction_id)
+
+    def test_provider_transaction_cannot_credit_a_second_purchase(self):
+        with Session(self.engine) as db:
+            db.add(Payment(user_id=self.user_id, reference="py_prior_synthetic_payment", plan="monthly", amount=2500, currency="NGN", status="success", paystack_transaction_id="123456"))
+            db.commit()
+        self.assertEqual(self.send(self.payload()).status_code, 409)
+        with Session(self.engine) as db:
+            payment = db.scalar(select(Payment).where(Payment.reference == "py_evidence_only"))
+            self.assertEqual(payment.status, "pending")
+            self.assertEqual(db.get(User, self.user_id).subscription.status, "trial")
+
+    def test_notification_failure_does_not_undo_or_misreport_saved_payment(self):
+        with patch("app.services.payment_service.notify_admins", side_effect=RuntimeError("Synthetic notification outage")):
+            self.assertEqual(self.send(self.payload()).status_code, 200)
+        with Session(self.engine) as db:
+            self.assertEqual(db.scalar(select(Payment)).status, "success")
+            self.assertEqual(db.get(User, self.user_id).subscription.status, "active")

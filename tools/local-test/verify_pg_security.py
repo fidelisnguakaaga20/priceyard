@@ -103,8 +103,11 @@ import app.models
 from app.models.password_reset_token import PasswordResetToken
 from app.models.revoked_access_token import RevokedAccessToken
 from app.models.user import User
+from app.models.payment import Payment
+from app.models.audit_log import AuditLog
 from app.security import create_access_token
 from app.services import password_reset_service
+from app.services import payment_service
 from app.services.login_revocation_service import is_revoked, revoke_token
 from app.services.subscription_service import build_trial_subscription
 from app.services.user_service import update_user
@@ -290,6 +293,56 @@ class PostgreSQLSecurityTests(unittest.TestCase):
 
     def test_concurrent_last_admin_demotion_keeps_one_admin(self):
         self.admin_race({"role":"free_user"})
+
+    def payment_race(self, *, duplicate_transaction):
+        Base.metadata.create_all(self.engine)
+        with Session(self.engine) as db:
+            user=User(full_name="Synthetic payer",email="pgpayment@example.com",password_hash="not-used",role="free_user",is_active=True,referral_code="PGPAY")
+            user.subscription=build_trial_subscription(user=user,now=datetime(2000,1,1,tzinfo=timezone.utc))
+            db.add(user);db.flush()
+            references=["py_concurrent_one","py_concurrent_two"] if duplicate_transaction else ["py_concurrent_one"]
+            for reference in references:
+                db.add(Payment(user_id=user.id,reference=reference,plan="monthly",amount=2500,currency="NGN",status="pending"))
+            db.commit();user_id=user.id
+        barrier=threading.Barrier(2)
+        outcomes=[]
+        def delay_payment_write(connection,cursor,statement,parameters,context,executemany):
+            # Widen the old read/write race without waiting inside a protected
+            # region for another worker that is correctly waiting on its lock.
+            if statement.lstrip().upper().startswith("UPDATE PAYMENTS"):
+                time.sleep(0.1)
+        sqlalchemy.event.listen(self.engine,"before_cursor_execute",delay_payment_write)
+        def worker(reference):
+            payload={"event":"charge.success","data":{"reference":reference,"id":808080,"amount":250000,"currency":"NGN","status":"success"}}
+            with Session(self.engine) as db:
+                barrier.wait(timeout=15)
+                try:
+                    payment_service.handle_webhook_event(db,payload);outcomes.append(200)
+                except HTTPException as error:
+                    db.rollback();outcomes.append(error.status_code)
+                except BaseException as error:
+                    db.rollback();outcomes.append(type(error).__name__)
+        with patch.object(payment_service,"notify_admins",return_value=None):
+            worker_references=references if duplicate_transaction else references*2
+            threads=[threading.Thread(target=worker,args=(reference,)) for reference in worker_references]
+            for thread in threads:thread.start()
+            for thread in threads:thread.join(25)
+        sqlalchemy.event.remove(self.engine,"before_cursor_execute",delay_payment_write)
+        self.assertFalse(any(thread.is_alive() for thread in threads))
+        self.assertCountEqual(outcomes,[200,409] if duplicate_transaction else [200,200])
+        with Session(self.engine) as db:
+            payments=db.scalars(select(Payment)).all()
+            self.assertEqual(sum(payment.status=="success" for payment in payments),1)
+            self.assertEqual(len(db.scalars(select(AuditLog).where(AuditLog.action=="payment.success")).all()),1)
+            subscription=db.get(User,user_id).subscription
+            self.assertEqual(subscription.status,"active")
+            self.assertIn(subscription.payment_reference,references)
+
+    def test_concurrent_payment_replay_applies_access_and_audit_once(self):
+        self.payment_race(duplicate_transaction=False)
+
+    def test_one_provider_transaction_cannot_credit_concurrent_purchases(self):
+        self.payment_race(duplicate_transaction=True)
 
 
 if __name__ == "__main__":

@@ -81,6 +81,7 @@ def create_audit_log(
     record_id: int | None,
     old_value: dict[str, Any] | list[Any] | None = None,
     new_value: dict[str, Any] | list[Any] | None = None,
+    commit: bool = True,
 ) -> AuditLog:
     item = AuditLog(
         user_id=actor.id,
@@ -91,8 +92,11 @@ def create_audit_log(
         new_value=sanitize_audit_value(new_value),
     )
     db.add(item)
-    db.commit()
-    db.refresh(item)
+    if commit:
+        db.commit()
+        db.refresh(item)
+    else:
+        db.flush()
     return item
 
 

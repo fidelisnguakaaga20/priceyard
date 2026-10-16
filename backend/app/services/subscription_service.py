@@ -170,7 +170,7 @@ def update_subscription_status(db: Session, subscription: Subscription, new_stat
 PAID_PLAN_DURATIONS_DAYS = {"monthly": 30, "seasonal": 90}
 
 
-def activate_paid_subscription(db: Session, subscription: Subscription, *, plan: str, now: datetime | None = None) -> Subscription:
+def activate_paid_subscription(db: Session, subscription: Subscription, *, plan: str, now: datetime | None = None, commit: bool = True) -> Subscription:
     """Activate paid access for a completed payment. Distinct from
     update_subscription_status's "active" branch (used for manual admin grants,
     which stay indefinite/end_date=None) - a payment always has a real
@@ -183,8 +183,11 @@ def activate_paid_subscription(db: Session, subscription: Subscription, *, plan:
     subscription.end_date = current_time.date() + timedelta(days=duration_days)
     if subscription.user.role not in {"admin", "reporter"}:
         subscription.user.role = "paid_user"
-    db.commit()
-    db.refresh(subscription)
+    if commit:
+        db.commit()
+        db.refresh(subscription)
+    else:
+        db.flush()
     return subscription
 
 

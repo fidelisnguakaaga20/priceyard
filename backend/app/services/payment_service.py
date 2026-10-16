@@ -2,21 +2,25 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import logging
 import secrets
 from decimal import Decimal
 
 import requests
 from fastapi import HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.models.payment import Payment
+from app.models.subscription import Subscription
 from app.models.user import User
 from app.schemas.payment_schema import PaymentInitiateResponse, PaymentPlan
 from app.services.admin_alert_service import notify_admins
 from app.services.audit_service import create_audit_log, snapshot_model
-from app.services.subscription_service import activate_paid_subscription, find_subscription_for_user
+from app.services.subscription_service import activate_paid_subscription
+
+logger = logging.getLogger(__name__)
 
 PAYSTACK_INITIALIZE_URL = "https://api.paystack.co/transaction/initialize"
 
@@ -110,7 +114,12 @@ def handle_webhook_event(db: Session, payload: dict) -> None:
     if not isinstance(reference, str) or not reference or len(reference) > 100:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid payment evidence")
 
-    payment = db.scalar(select(Payment).where(Payment.reference == reference))
+    # Serialize confirmation across processes, including duplicate provider IDs
+    # on different purchases. Hold through payment, access and audit commit.
+    # SQLite is used only for unit/preview tests; PostgreSQL races are tested too.
+    if db.get_bind().dialect.name == "postgresql":
+        db.execute(text("SELECT pg_advisory_xact_lock(741523, 2)"))
+    payment = db.scalar(select(Payment).where(Payment.reference == reference).with_for_update().execution_options(populate_existing=True))
     if payment is None:
         return
 
@@ -126,29 +135,45 @@ def handle_webhook_event(db: Session, payload: dict) -> None:
     if payment.status == "success":
         return
 
-    payment.status = "success"
-    payment.paystack_transaction_id = str(data.get("id") or "") or None
-    db.commit()
+    duplicate = db.scalar(select(Payment.id).where(Payment.paystack_transaction_id == str(transaction_id), Payment.id != payment.id))
+    if duplicate is not None:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Payment transaction is already recorded for another purchase")
 
-    subscription = find_subscription_for_user(db, payment.user_id)
-    if subscription is None:
-        return
+    try:
+        user = db.scalar(select(User).where(User.id == payment.user_id).with_for_update().execution_options(populate_existing=True))
+        # Do not use an expiry helper here: its intermediate commit could release
+        # the confirmation lock before access and the audit record are saved.
+        subscription = db.scalar(select(Subscription).where(Subscription.user_id == payment.user_id).with_for_update().execution_options(populate_existing=True))
+        if user is None or subscription is None:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Subscription record is unavailable; payment not applied")
+        old_value = snapshot_model(subscription)
+        payment.status = "success"
+        payment.paystack_transaction_id = str(transaction_id)
+        activate_paid_subscription(db, subscription, plan=payment.plan, commit=False)
+        subscription.payment_reference = payment.reference
+        create_audit_log(
+            db, actor=user, action="payment.success", table_name="subscriptions",
+            record_id=subscription.id, old_value=old_value, new_value=snapshot_model(subscription), commit=False,
+        )
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
 
-    old_value = snapshot_model(subscription)
-    activate_paid_subscription(db, subscription, plan=payment.plan)
-    create_audit_log(
-        db, actor=payment.user, action="payment.success", table_name="subscriptions",
-        record_id=subscription.id, old_value=old_value, new_value=snapshot_model(subscription),
-    )
-    notify_admins(
-        db,
-        subject="New PriceYard payment received",
-        body=(
-            f"A payment was just confirmed on PriceYard:\n\n"
-            f"User: {payment.user.full_name} ({payment.user.email})\n"
-            f"Plan: {payment.plan}\nAmount: NGN {payment.amount:,.2f}\nReference: {payment.reference}"
-        ),
-    )
+    try:
+        notify_admins(
+            db,
+            subject="New PriceYard payment received",
+            body=(
+                f"A payment was just confirmed on PriceYard:\n\n"
+                f"User: {payment.user.full_name} ({payment.user.email})\n"
+                f"Plan: {payment.plan}\nAmount: NGN {payment.amount:,.2f}\nReference: {payment.reference}"
+            ),
+        )
+    except Exception:
+        db.rollback()
+        # Never log provider bodies, payment details or credentials on failures.
+        logger.error("Payment confirmation saved; administrator notification failed")
 
 
 def list_payments(db: Session) -> list[Payment]:

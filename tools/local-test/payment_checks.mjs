@@ -46,6 +46,13 @@ try {
   await page.reload();
   await page.getByRole('heading',{name:'Welcome, Test Payment'}).waitFor();
   assert.deepEqual(await snapshot(),before);
+  const failure=await send('Simulate activation failure');
+  assert.equal(failure.webhook_status,500);
+  assert.equal(failure.payment_status,'pending');
+  assert.equal(failure.subscription_status,'free');
+  await page.reload();
+  await page.getByRole('heading',{name:'Welcome, Test Payment'}).waitFor();
+  assert.deepEqual(await snapshot(),before);
   const valid=await send('Send valid test event');
   assert.equal(valid.webhook_status,200);
   assert.equal(valid.payment_status,'success');
@@ -58,7 +65,7 @@ try {
   assert.equal(after.live_initiation,503);
   assert.ok((await page.locator('body').innerText()).includes('Active Paid'));
   assert.deepEqual(await send('Send valid test event'),valid);
-  const report={before,wrong_amount_rejected:true,valid_synthetic_event_credited:true,repeat_keeps_same_expiry:true,after,original_dashboard_verified:true,production_connections:0};
+  const report={before,wrong_amount_rejected:true,activation_failure_keeps_pending_and_retry_recovers:true,valid_synthetic_event_credited:true,repeat_keeps_same_expiry:true,after,original_dashboard_verified:true,production_connections:0};
   fs.writeFileSync(path.join(lab,'runtime/payment-checks.json'),JSON.stringify(report,null,2));
   await page.screenshot({path:path.join(lab,'runtime/payment-after.png'),fullPage:true});
   console.log(JSON.stringify(report));

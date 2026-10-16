@@ -109,22 +109,26 @@ async def payment_event(request):
     from app.config import get_settings
     from sqlalchemy import select
     payload = await request.json()
-    if payload not in ({"event": "wrong_amount"}, {"event": "valid"}):
+    if payload not in ({"event": "wrong_amount"}, {"event": "valid"}, {"event": "activation_failure"}):
         return JSONResponse({"detail": "Choose a fabricated local payment event"}, status_code=400)
     event = {"event": "charge.success", "data": {"reference": "py_local_browser_only", "id": 700001, "amount": 249999 if payload["event"] == "wrong_amount" else 250000, "currency": "NGN", "status": "success"}}
     raw = json.dumps(event).encode()
     key = "sk_test_priceyard_local_browser_only"
     signature = hmac.new(key.encode(), raw, hashlib.sha512).hexdigest()
     fake_settings = get_settings().model_copy(update={"paystack_secret_key": key})
-    with patch("app.services.payment_service.get_settings", return_value=fake_settings):
-        async with httpx.AsyncClient(transport=httpx.ASGITransport(app=api), base_url="http://synthetic-asgi-only") as client:
+    from contextlib import ExitStack
+    with ExitStack() as patches:
+        patches.enter_context(patch("app.services.payment_service.get_settings", return_value=fake_settings))
+        if payload["event"] == "activation_failure":
+            patches.enter_context(patch("app.services.payment_service.activate_paid_subscription", side_effect=RuntimeError("Fabricated local activation failure")))
+        async with httpx.AsyncClient(transport=httpx.ASGITransport(app=api, raise_app_exceptions=False), base_url="http://synthetic-asgi-only") as client:
             response = await client.post("/payments/webhook", content=raw, headers={"x-paystack-signature": signature})
     with Session(engine) as db:
         payment = db.scalar(select(Payment).where(Payment.reference == "py_local_browser_only"))
         return JSONResponse({"synthetic_only": True, "webhook_status": response.status_code, "payment_status": payment.status, "subscription_status": payment.user.subscription.status, "end_date": str(payment.user.subscription.end_date) if payment.user.subscription.end_date else None})
 
 async def payment_controls(request):
-    return HTMLResponse('''<!doctype html><html><head><title>Local payment testing</title></head><body style="font:18px system-ui;max-width:760px;margin:32px auto;padding:16px"><h1>Local payment testing</h1><p>Fabricated payment@example.com account only. Password: PriceYardDemo8! No money is charged and no provider is contacted. These controls are separate from PriceYard.</p><ol><li>Sign in as payment@example.com in <a href="/login" target="_blank">the original application</a>.</li><li>Send the wrong-amount event. Access must remain Free.</li><li>Send the valid event. Reload the original Dashboard to see Active Paid.</li></ol><button onclick="sendEvent('wrong_amount')">Send wrong-amount test event</button> <button onclick="sendEvent('valid')">Send valid test event</button><pre id="result" role="status"></pre><script>async function sendEvent(event){const response=await fetch('/__test__/payment-event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({event})});document.querySelector('#result').textContent=JSON.stringify(await response.json(),null,2)}</script></body></html>''')
+    return HTMLResponse('''<!doctype html><html><head><title>Local payment testing</title></head><body style="font:18px system-ui;max-width:760px;margin:32px auto;padding:16px"><h1>Local payment testing</h1><p>Fabricated payment@example.com account only. Password: PriceYardDemo8! No money is charged and no provider is contacted. These controls are separate from PriceYard.</p><ol><li>Sign in as payment@example.com in <a href="/login" target="_blank">the original application</a>.</li><li>Send the wrong-amount event, then simulate an activation failure. Access must remain Free and payment pending.</li><li>Send the valid event. Reload the original Dashboard to see Active Paid. Repeating it keeps the same expiry.</li></ol><button onclick="sendEvent('wrong_amount')">Send wrong-amount test event</button> <button onclick="sendEvent('activation_failure')">Simulate activation failure</button> <button onclick="sendEvent('valid')">Send valid test event</button><pre id="result" role="status"></pre><script>async function sendEvent(event){const response=await fetch('/__test__/payment-event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({event})});document.querySelector('#result').textContent=JSON.stringify(await response.json(),null,2)}</script></body></html>''')
 
 outage = {"enabled": False}
 

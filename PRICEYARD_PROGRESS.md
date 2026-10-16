@@ -30,8 +30,11 @@ races (part of PY-18). Batch 5 verified approved internal login revocation stora
 (PY-04 and parts of PY-07/PY-09/PY-28). Batch 6 verified remaining PY-09 last-Admin
 concurrency protection. Batch 7 verified historical URL/access boundaries (PY-01)
 and quality-signal access matching the existing full-access screen (part of PY-02).
-Batch 8 verifies strict signed payment evidence (part of PY-33). Next: atomic
-payment activation/replay safety and remaining account-access accuracy.
+Batch 8 verifies strict signed payment evidence (part of PY-33). Batch 9 verifies
+atomic payment/access/audit writes and concurrent replay/provider-ID protection
+(parts of PY-31/PY-33/PY-26). Next: remaining account-access accuracy and payment
+reconciliation/checkout validation. PY-32 business calculation approval is pending
+in docs/PURCHASE_VALUE_APPROVAL.md; continue independent technical work meanwhile.
 Apply small technical batches with automated and browser verification. Reuse
 existing local tools from .git/priceyard-local-recovery-20261015; do not reinstall
 or read private configuration. Runtime is tools/local-test/runtime (ignored).
@@ -65,14 +68,14 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
 | PY-23 | Preserve layout while fixing mobile overflow | Pending |
 | PY-24 | Keyboard/focus accessibility | Pending |
 | PY-25 | Safe and clearly aged offline prices | Pending; visible additions require approval |
-| PY-26 | Complete atomic administrative audit | Pending |
+| PY-26 | Complete atomic administrative audit | Partial: payment confirmation/access/audit share one transaction; remaining administrative writes pending |
 | PY-27 | Consistent existing editing/password inputs | Pending |
 | PY-28 | Historical record preservation | Partial: approved 0022 tested on fresh/populated synthetic PostgreSQL; future migration/history work pending |
 | PY-29 | Stable identities and dependent records | Pending; no automatic merge |
 | PY-30 | Isolated automated/browser verification | Partial: baseline guards, 12 original tests, six real browser workflows passed; expand with each batch |
-| PY-31 | Confirmed payment activation and recovery | Pending; schema additions require approval |
-| PY-32 | Preserve unused purchased/trial time | Pending |
-| PY-33 | Validate payment evidence | Partial: batch 8 validates signed amount/currency/status/reference/transaction shape; duplicate transaction binding and checkout/reconciliation checks pending |
+| PY-31 | Confirmed payment activation and recovery | Partial: atomic activation, missing-subscription preservation and retry/replay tested; provider verification/reconciliation pending; schema additions require approval |
+| PY-32 | Preserve unused purchased/trial time | Pending owner approval of docs/PURCHASE_VALUE_APPROVAL.md; original calculations unchanged |
+| PY-33 | Validate payment evidence | Partial: signed evidence and duplicate provider-ID binding verified; checkout/reconciliation checks pending |
 | PY-34 | Expiry without unintended staff-role loss | Complete in batch 2; 18 backend tests and two expired-Reporter browser cases passed |
 | PY-35 | Operational readiness and dependency evidence | Pending; production checks outside current scope |
 | PY-36 | Accurate progress/documentation/maintainability | Progress record established; ongoing |
@@ -334,3 +337,33 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
   renewal/trial value, and checkout response validation remain explicitly pending.
   Evidence: tools/local-test/evidence/batch-8-*.json. Six IDs complete, 30 partial
   or pending; no production access, push, merge or deployment.
+
+### Batch 9 — parts of PY-31/PY-33/PY-26
+
+- Payment success, subscription activation and sanitized audit now use one
+  transaction. Existing standalone subscription/audit helpers still commit by
+  default. Activation records the existing subscription.payment_reference field;
+  no new schema. Missing subscription preserves the pending purchase for recovery.
+- PostgreSQL transaction advisory lock serializes confirmations across workers,
+  with refreshed locked payment/user/subscription rows. A provider transaction ID
+  cannot credit two local purchases, including different concurrent references.
+  No historical payment row is deleted/rewritten by a backfill. This protects
+  application confirmation paths; there is no new database uniqueness constraint.
+- Ancillary administrator-notification failure cannot undo a saved payment or
+  falsely report activation failure. A generic sanitized error is logged; durable
+  notification delivery/retry remains PY-21 work, not claimed solved here.
+- Five new fault/duplicate tests all failed before the fix. Current full backend
+  suite: 47 passed, zero failures/errors/skips, 22.935s. Eight native PostgreSQL
+  cases passed, 14.716s, including simultaneous same-payment replay (one success
+  audit) and two purchases sharing one provider ID (one 200, one 409).
+- Browser payment control now simulates activation failure before valid retry.
+  Wrong amount rejects; activation error keeps pending/Free; retry credits; replay
+  keeps expiry. Existing Dashboard/history reflect saved access. Live initiation
+  stays disabled 503. No frontend layout/build/dependency/schema change.
+- Owner approval requested separately for unused paid/trial-time calculations:
+  docs/PURCHASE_VALUE_APPROVAL.md. Await response before those dependent changes;
+  current prices/durations/trial/referrals/manual-grant behavior remain unchanged.
+- Manual: http://127.0.0.1:55446/__test__/payments. Dedicated fake account has
+  already been credited by tests; a preview restart reseeds it for another run.
+  Evidence: tools/local-test/evidence/batch-9-*.json. Six complete checklist IDs;
+  other 30 remain partial/pending. Local-only commits; no production contact.
