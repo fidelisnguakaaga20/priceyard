@@ -15,6 +15,9 @@ approved. No grade field, grade labels, guessed quantities or additional markets
 No production credentials, dotenv reads, production services/data, migrations,
 push, merge or deployment. Local commits of verified batches are authorized.
 Schema additions and visible/business changes require specific approval.
+Owner approved the specific internal auth_version/revoked_access_tokens scope on
+2026-10-16; see docs/LOCAL_SECURITY_STORAGE_PROPOSAL.md. No other schema/business
+scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
@@ -22,7 +25,9 @@ Baseline browser/isolation verification passed. Batch 1 (PY-15) verified:
 homepage/current prices clear stale errors after normal successful refresh.
 Batch 2 (PY-34) verified: subscription transitions preserve staff authority and
 subscription listing processes every expired account. Batch 3 (PY-10) verified:
-spreadsheet-safe text export. Next: existing account refresh/logout races (PY-18).
+spreadsheet-safe text export. Batch 4 verified existing account refresh/logout
+races (part of PY-18). Next: approved internal login revocation storage, PY-04
+and related PY-07/PY-09; production and visible business changes remain excluded.
 Apply small technical batches with automated and browser verification. Reuse
 existing local tools from .git/priceyard-local-recovery-20261015; do not reinstall
 or read private configuration. Runtime is tools/local-test/runtime (ignored).
@@ -48,7 +53,7 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
 | PY-15 | Prices recover after failed loading | Complete in batch 1; before/after browser regression passed |
 | PY-16 | Correct filters and response ordering | Pending |
 | PY-17 | Correct market-detail loading | Pending |
-| PY-18 | Accurate account/payment/access messages | Pending |
+| PY-18 | Accurate account/payment/access messages | Partial: batch 4 fixes stale profile/401 and outage logout; payment/expiry display verification pending |
 | PY-19 | Existing FAQ draft/hide/publish management | Pending |
 | PY-20 | Bounded queries with accessible historical records | Pending |
 | PY-21 | Reliable independent alerts | Pending; no new delivery promises |
@@ -157,3 +162,30 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
 - Evidence: tools/local-test/evidence/batch-3-*.json. Existing real spreadsheets
   and customer data were not accessed; real spreadsheet-product compatibility is
   not claimed from string/export checks.
+
+### Batch 4 — part of PY-18
+
+- Ignore superseded account-profile results after logout/account changes. A 401
+  from an older token cannot clear a newer login. Keep stored credentials and
+  last valid profile/subscription during transient failures; real 401/inactive
+  authentication still clears the current account. Background profile refresh
+  avoids unmounting existing screens unnecessarily.
+- No JSX/CSS/labels/form fields, token lifetime, Remember me defaults, account
+  provider flow or subscription/referral policy changed. This is client state
+  protection; server revocation still awaits the approved security-storage batch.
+- Browser checks reproduced late-profile resurrection and erased login on 503
+  before the fix. Three subsequent browser cases passed: logout remains Guest,
+  temporary account outage retains the session/reloads without a new password,
+  and late old-token 401 preserves a newer Admin login. Delayed responses carry
+  real synthetic API data; test-only request tags ensure deterministic ordering.
+- TypeScript/build passed (Vite 1.33s, main 315.56kB/89.00kB gzip); CSS artifact
+  remains the original index-19youOJ7.css. Original baseline workflows rerun.
+- Fixed a second harness-only issue: original PostgreSQL pool_recycle=300 would
+  erase a recycled memory database after five minutes. Memory-only guard strips
+  those PostgreSQL pool settings; six isolation cases still pass, including a
+  new persistence check across connections despite caller-requested recycling.
+- Manual: http://127.0.0.1:55446/login — sign into a fake account, log out, then
+  sign into another. No saved private account should reappear after logout.
+- Owner explicitly approved docs/LOCAL_SECURITY_STORAGE_PROPOSAL.md on 2026-10-16.
+  That scope allows internal revocation records only, not new product fields or
+  production migration. Evidence: tools/local-test/evidence/batch-4-*.json.

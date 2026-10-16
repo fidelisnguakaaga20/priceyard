@@ -96,7 +96,7 @@ def isolate() -> None:
         # Share one fresh memory database across API worker threads. Original
         # application's PostgreSQL pool options do not apply to SQLite.
         from sqlalchemy.pool import StaticPool
-        for option in ("pool_size", "max_overflow"):
+        for option in ("pool_size", "max_overflow", "pool_recycle", "pool_pre_ping"):
             kwargs.pop(option, None)
         kwargs.update(poolclass=StaticPool, connect_args={"check_same_thread": False})
         return original_create_engine(url, *args, **kwargs)

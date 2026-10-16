@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { apiFetch, setUnauthorizedHandler } from "../services/api";
+import { apiFetch, ApiError, setUnauthorizedHandler } from "../services/api";
 import { useToast } from "./ToastContext";
 import type { Subscription, User } from "../types/api";
 
@@ -76,8 +76,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(Boolean(token));
   const expiredHandledRef = useRef(false);
+  const activeTokenRef = useRef(token);
+  const refreshSequence = useRef(0);
+  const profileReady = useRef(false);
 
   const clearAuth = useCallback(() => {
+    ++refreshSequence.current;
+    activeTokenRef.current = null;
+    profileReady.current = false;
     clearStoredToken();
     setToken(null);
     setUser(null);
@@ -90,7 +96,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [token]);
 
   useEffect(() => {
-    setUnauthorizedHandler(() => {
+    setUnauthorizedHandler((failedToken) => {
+      if (failedToken !== activeTokenRef.current) return;
       if (expiredHandledRef.current) return;
       expiredHandledRef.current = true;
       clearAuth();
@@ -101,20 +108,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [clearAuth, navigate, showToast]);
 
   const refreshWithToken = useCallback(async (activeToken: string) => {
-    setLoading(true);
+    const sequence = ++refreshSequence.current;
+    const isCurrent = () => sequence === refreshSequence.current && activeTokenRef.current === activeToken;
+    if (!profileReady.current) setLoading(true);
     try {
       const currentUser = await apiFetch<User>("/auth/me", {}, activeToken);
-      setUser(currentUser);
+      if (!isCurrent()) return;
+      let currentSubscription: Subscription | null | undefined;
       try {
-        setSubscription(await apiFetch<Subscription>(`/subscriptions/${currentUser.id}`, {}, activeToken));
-      } catch {
-        setSubscription(null);
+        currentSubscription = await apiFetch<Subscription>(`/subscriptions/${currentUser.id}`, {}, activeToken);
+      } catch (error) {
+        if (error instanceof ApiError && [401, 403].includes(error.status)) throw error;
+        if (error instanceof ApiError && error.status === 404) currentSubscription = null;
       }
-    } catch {
-      clearAuth();
-      return;
+      if (!isCurrent()) return;
+      setUser(currentUser);
+      if (currentSubscription !== undefined) setSubscription(currentSubscription);
+      profileReady.current = true;
+    } catch (error) {
+      if (isCurrent() && error instanceof ApiError && [401, 403].includes(error.status)) clearAuth();
     } finally {
-      setLoading(false);
+      if (isCurrent()) setLoading(false);
     }
   }, [clearAuth]);
 
@@ -128,6 +142,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       body: JSON.stringify({ email, password }),
     });
     writeStoredToken(response.access_token, remember);
+    activeTokenRef.current = response.access_token;
+    profileReady.current = false;
     setToken(response.access_token);
     await refreshWithToken(response.access_token);
   };
@@ -138,6 +154,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       body: JSON.stringify({ id_token: idToken }),
     });
     writeStoredToken(response.access_token, true);
+    activeTokenRef.current = response.access_token;
+    profileReady.current = false;
     setToken(response.access_token);
     await refreshWithToken(response.access_token);
   };

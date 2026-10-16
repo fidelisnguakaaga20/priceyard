@@ -22,12 +22,12 @@ function errorDetail(payload: unknown, fallback: string): string {
   return fallback;
 }
 
-let unauthorizedHandler: (() => void) | null = null;
+let unauthorizedHandler: ((failedToken: string) => void) | null = null;
 
 /** Called once by AuthProvider. When any authenticated request comes back 401, this
  * runs instead of leaving the raw error sitting in whichever page happened to make
  * the call -- it clears the stale session and sends the user back to Login. */
-export function setUnauthorizedHandler(handler: (() => void) | null): void {
+export function setUnauthorizedHandler(handler: ((failedToken: string) => void) | null): void {
   unauthorizedHandler = handler;
 }
 
@@ -49,7 +49,7 @@ export async function apiFetch<T>(
       payload = null;
     }
     if (response.status === 401 && token && unauthorizedHandler) {
-      unauthorizedHandler();
+      unauthorizedHandler(token);
     }
     throw new ApiError(response.status, errorDetail(payload, `Request failed with status ${response.status}`));
   }

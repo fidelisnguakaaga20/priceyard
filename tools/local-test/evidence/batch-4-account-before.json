@@ -1,0 +1,14 @@
+{
+  "expected_original_defects": true,
+  "result": {
+    "delayed_profile_after_logout": {
+      "reproduced": true,
+      "logout_stays_visible_as_guest": false
+    },
+    "temporary_account_outage": {
+      "stored_session_preserved": false,
+      "recovers_without_new_password": false
+    }
+  },
+  "production_connections": 0
+}

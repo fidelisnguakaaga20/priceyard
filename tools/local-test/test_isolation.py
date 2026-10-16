@@ -49,6 +49,13 @@ class IsolationTests(unittest.TestCase):
         import sqlalchemy
         with sqlalchemy.create_engine("sqlite+pysqlite:///:memory:").connect() as connection:
             self.assertEqual(connection.execute(sqlalchemy.text("SELECT 1")).scalar(), 1)
+        # A PostgreSQL recycle setting must never erase the preview memory DB.
+        engine = sqlalchemy.create_engine("sqlite+pysqlite:///:memory:", pool_recycle=0, pool_pre_ping=True, pool_size=3, max_overflow=2)
+        with engine.begin() as connection:
+            connection.execute(sqlalchemy.text("CREATE TABLE synthetic_marker (id INTEGER)"))
+            connection.execute(sqlalchemy.text("INSERT INTO synthetic_marker VALUES (1)"))
+        with engine.connect() as connection:
+            self.assertEqual(connection.execute(sqlalchemy.text("SELECT id FROM synthetic_marker")).scalar(), 1)
         from app.config import get_settings
         settings = get_settings()
         self.assertEqual(settings.database_url, "sqlite+pysqlite:///:memory:")
