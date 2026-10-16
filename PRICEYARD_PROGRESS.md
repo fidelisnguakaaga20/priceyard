@@ -30,7 +30,8 @@ races (part of PY-18). Batch 5 verified approved internal login revocation stora
 (PY-04 and parts of PY-07/PY-09/PY-28). Batch 6 verified remaining PY-09 last-Admin
 concurrency protection. Batch 7 verified historical URL/access boundaries (PY-01)
 and quality-signal access matching the existing full-access screen (part of PY-02).
-Next: payment evidence/activation safety and remaining account-access accuracy.
+Batch 8 verifies strict signed payment evidence (part of PY-33). Next: atomic
+payment activation/replay safety and remaining account-access accuracy.
 Apply small technical batches with automated and browser verification. Reuse
 existing local tools from .git/priceyard-local-recovery-20261015; do not reinstall
 or read private configuration. Runtime is tools/local-test/runtime (ignored).
@@ -71,7 +72,7 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
 | PY-30 | Isolated automated/browser verification | Partial: baseline guards, 12 original tests, six real browser workflows passed; expand with each batch |
 | PY-31 | Confirmed payment activation and recovery | Pending; schema additions require approval |
 | PY-32 | Preserve unused purchased/trial time | Pending |
-| PY-33 | Validate payment evidence | Pending |
+| PY-33 | Validate payment evidence | Partial: batch 8 validates signed amount/currency/status/reference/transaction shape; duplicate transaction binding and checkout/reconciliation checks pending |
 | PY-34 | Expiry without unintended staff-role loss | Complete in batch 2; 18 backend tests and two expired-Reporter browser cases passed |
 | PY-35 | Operational readiness and dependency evidence | Pending; production checks outside current scope |
 | PY-36 | Accurate progress/documentation/maintainability | Progress record established; ongoing |
@@ -304,3 +305,32 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
   fresh fake accounts only. Test-only PostgreSQL remains stopped.
 - Evidence: tools/local-test/evidence/batch-7-*.json. Six checklist IDs complete;
   30 remain pending/partial. All commits are local; production is untouched.
+
+### Batch 8 — part of PY-33
+
+- Signed success events must match the recorded integer-kobo amount, NGN,
+  success status and valid transaction identity/reference before any credit.
+  Invalid shapes return controlled errors; signature format is checked before
+  constant-time HMAC comparison. Unknown references/unrelated events stay harmless.
+  Recorded purchase amounts remain authoritative; no repricing of old purchases.
+- Existing payment tests now use complete fabricated provider payloads, including
+  seasonal amount 600000 kobo. Five new HTTP tests reproduced 30 failed assertions
+  before this fix. Full suite: 42 passed, 20.168s. After aligning reference/ID
+  length bounds to original database columns, all 11 payment tests passed, 5.324s.
+- Real browser verified original Dashboard using payment@example.com: wrong
+  amount rejects with 422 and remains Free/history 403; valid fabricated event
+  grants Active Paid/history 200; replay keeps expiry. Live initiation stays 503
+  before and after testing. No money/provider/email connection is involved.
+- Separate wrapper controls /__test__/payments invoke the real webhook using
+  in-process ASGI transport and a temporary fabricated signing key; ordinary
+  provider configuration remains empty. No application UI/schema change/build.
+- Paystack public developer documentation consulted read-only, 2026-10-16:
+  https://paystack.com/docs/payments/verify-payments/ and
+  https://paystack.com/docs/payments/webhooks/ . No account/API service accessed.
+- Manual: http://127.0.0.1:55446/__test__/payments explains the fake event buttons
+  and original Dashboard login (PriceYardDemo8!). Automated testing already made
+  that dedicated fake account Paid; restarting preview restores its Free fixture.
+- Activation atomicity, duplicate provider-ID binding, recovery/reconciliation,
+  renewal/trial value, and checkout response validation remain explicitly pending.
+  Evidence: tools/local-test/evidence/batch-8-*.json. Six IDs complete, 30 partial
+  or pending; no production access, push, merge or deployment.

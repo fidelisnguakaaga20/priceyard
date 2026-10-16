@@ -2,10 +2,13 @@
 import asyncio
 from html import escape
 import json
+import hashlib
+import hmac
 import re
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import sys
+from unittest.mock import patch
 
 LAB = Path(__file__).resolve().parent
 sys.path.insert(0, str(LAB))
@@ -26,6 +29,7 @@ import app.models
 from app.models.commodity import Commodity
 from app.models.faq_item import FAQItem
 from app.models.market import Market
+from app.models.payment import Payment
 from app.models.price_update import PriceUpdate
 from app.models.subscription import Subscription
 from app.models.user import User
@@ -49,7 +53,7 @@ now = datetime.now(timezone.utc)
 with Session(engine) as db:
     users = {}
     demo_hash = hash_password("PriceYardDemo8!")
-    for name, role, access in (("free", "free_user", "free"), ("trial", "free_user", "trial"), ("paid", "paid_user", "active"), ("reporter", "reporter", "free"), ("admin", "admin", "free"), ("expired-reporter", "reporter", "trial_expired"), ("expired-paid-reporter", "reporter", "paid_expired"), ("reset", "free_user", "trial")):
+    for name, role, access in (("free", "free_user", "free"), ("trial", "free_user", "trial"), ("paid", "paid_user", "active"), ("reporter", "reporter", "free"), ("admin", "admin", "free"), ("expired-reporter", "reporter", "trial_expired"), ("expired-paid-reporter", "reporter", "paid_expired"), ("reset", "free_user", "trial"), ("payment", "free_user", "free")):
         user = User(full_name=f"Test {name.title()}", email=f"{name}@example.com", password_hash=demo_hash, role=role, is_active=True, referral_code="TEST"+name.upper())
         if access in {"trial", "trial_expired"}:
             user.subscription = build_trial_subscription(user=user, now=now-timedelta(days=15) if access == "trial_expired" else now)
@@ -67,6 +71,7 @@ with Session(engine) as db:
         # bag_size stays NULL. No invented grades or quantity conversions.
         db.add(PriceUpdate(commodity_id=commodity.id, market_id=market.id, price_low=low, price_high=low+10000, average_price=low+5000, previous_price_low=210000 if day == 0 else None, previous_price_high=220000 if day == 0 else None, unit="1 bag", bag_size=None, movement="up" if day == 0 else "unknown", confidence_level="Low confidence", update_date_time=now-timedelta(days=day), status="approved", created_by=users["admin"].id, approved_by=users["admin"].id, notes="Fabricated local test price; bag size not supplied.", source_1="LOCAL-PRIVATE-SOURCE"))
     db.add(FAQItem(question="Local testing question", answer="Fabricated test entry only.", category="Local testing", is_published=True, created_by=users["admin"].id))
+    db.add(Payment(user_id=users["payment"].id, reference="py_local_browser_only", plan="monthly", amount=2500, currency="NGN", status="pending"))
     db.commit()
 
 from starlette.applications import Starlette
@@ -95,6 +100,31 @@ async def status(request):
 async def inbox(request):
     links = "".join('<li><a href="'+escape(item["reset_url"], quote=True)+'">Open reset link for '+escape(item["recipient"])+'</a></li>' for item in local_reset_inbox)
     return HTMLResponse('<!doctype html><html><head><title>Local test inbox</title></head><body style="font:18px system-ui;max-width:760px;margin:32px auto;padding:16px"><h1>Local test inbox</h1><p>Fabricated accounts only. No email was sent. Reset links expire under the original application rules.</p><ul>'+links+'</ul><a href="/forgot-password">Open original password-reset request form</a></body></html>')
+
+async def payment_event(request):
+    # Test controls invoke the real webhook via an in-process ASGI transport.
+    # The fabricated signing key exists only during this serialized test call;
+    # ordinary payment initiation remains disabled by empty provider settings.
+    import httpx
+    from app.config import get_settings
+    from sqlalchemy import select
+    payload = await request.json()
+    if payload not in ({"event": "wrong_amount"}, {"event": "valid"}):
+        return JSONResponse({"detail": "Choose a fabricated local payment event"}, status_code=400)
+    event = {"event": "charge.success", "data": {"reference": "py_local_browser_only", "id": 700001, "amount": 249999 if payload["event"] == "wrong_amount" else 250000, "currency": "NGN", "status": "success"}}
+    raw = json.dumps(event).encode()
+    key = "sk_test_priceyard_local_browser_only"
+    signature = hmac.new(key.encode(), raw, hashlib.sha512).hexdigest()
+    fake_settings = get_settings().model_copy(update={"paystack_secret_key": key})
+    with patch("app.services.payment_service.get_settings", return_value=fake_settings):
+        async with httpx.AsyncClient(transport=httpx.ASGITransport(app=api), base_url="http://synthetic-asgi-only") as client:
+            response = await client.post("/payments/webhook", content=raw, headers={"x-paystack-signature": signature})
+    with Session(engine) as db:
+        payment = db.scalar(select(Payment).where(Payment.reference == "py_local_browser_only"))
+        return JSONResponse({"synthetic_only": True, "webhook_status": response.status_code, "payment_status": payment.status, "subscription_status": payment.user.subscription.status, "end_date": str(payment.user.subscription.end_date) if payment.user.subscription.end_date else None})
+
+async def payment_controls(request):
+    return HTMLResponse('''<!doctype html><html><head><title>Local payment testing</title></head><body style="font:18px system-ui;max-width:760px;margin:32px auto;padding:16px"><h1>Local payment testing</h1><p>Fabricated payment@example.com account only. Password: PriceYardDemo8! No money is charged and no provider is contacted. These controls are separate from PriceYard.</p><ol><li>Sign in as payment@example.com in <a href="/login" target="_blank">the original application</a>.</li><li>Send the wrong-amount event. Access must remain Free.</li><li>Send the valid event. Reload the original Dashboard to see Active Paid.</li></ol><button onclick="sendEvent('wrong_amount')">Send wrong-amount test event</button> <button onclick="sendEvent('valid')">Send valid test event</button><pre id="result" role="status"></pre><script>async function sendEvent(event){const response=await fetch('/__test__/payment-event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({event})});document.querySelector('#result').textContent=JSON.stringify(await response.json(),null,2)}</script></body></html>''')
 
 outage = {"enabled": False}
 
@@ -139,7 +169,7 @@ class LocalOnly:
         else:
             await self.app(scope, receive, secured)
 
-preview = LocalOnly(Starlette(routes=[Route("/__test__/status", status), Route("/__test__/inbox", inbox), Route("/__test__/controls", controls), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
+preview = LocalOnly(Starlette(routes=[Route("/__test__/status", status), Route("/__test__/inbox", inbox), Route("/__test__/controls", controls), Route("/__test__/payments", payment_controls), Route("/__test__/payment-event", payment_event, methods=["POST"]), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
 
 if __name__ == "__main__":
     import uvicorn

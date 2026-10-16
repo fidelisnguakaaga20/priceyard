@@ -90,23 +90,40 @@ def initiate_payment(db: Session, user: User, plan: PaymentPlan) -> PaymentIniti
 
 def verify_webhook_signature(raw_body: bytes, signature: str | None) -> bool:
     settings = get_settings()
-    if not settings.paystack_secret_key or not signature:
+    if (not settings.paystack_secret_key or not isinstance(signature, str)
+            or len(signature) != 128 or any(char not in "0123456789abcdefABCDEF" for char in signature)):
         return False
     expected = hmac.new(settings.paystack_secret_key.encode("utf-8"), raw_body, hashlib.sha512).hexdigest()
-    return hmac.compare_digest(expected, signature)
+    return hmac.compare_digest(expected, signature.lower())
 
 
 def handle_webhook_event(db: Session, payload: dict) -> None:
+    if not isinstance(payload, dict):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid webhook payload")
     if payload.get("event") != "charge.success":
         return
 
-    data = payload.get("data") or {}
+    data = payload.get("data")
+    if not isinstance(data, dict):
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid payment evidence")
     reference = data.get("reference")
-    if not reference:
-        return
+    if not isinstance(reference, str) or not reference or len(reference) > 100:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid payment evidence")
 
     payment = db.scalar(select(Payment).where(Payment.reference == reference))
-    if payment is None or payment.status == "success":
+    if payment is None:
+        return
+
+    # Compare integer kobo against the amount frozen in the original payment,
+    # never browser-supplied prices or a possibly changed current price list.
+    amount = data.get("amount")
+    transaction_id = data.get("id")
+    if (type(amount) is not int or amount <= 0 or Decimal(amount) != payment.amount * 100
+            or data.get("currency") != "NGN" or payment.currency != "NGN"
+            or data.get("status") != "success" or payment.plan not in PLAN_PRICES
+            or type(transaction_id) is not int or transaction_id <= 0 or len(str(transaction_id)) > 100):
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Payment evidence does not match the recorded purchase")
+    if payment.status == "success":
         return
 
     payment.status = "success"

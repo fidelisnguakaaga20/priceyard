@@ -49,8 +49,8 @@ class PaymentServiceTests(unittest.TestCase):
         self.db.close()
         self.engine.dispose()
 
-    def _signed_webhook(self, reference: str, transaction_id: int = 999) -> tuple[bytes, str]:
-        payload = {"event": "charge.success", "data": {"reference": reference, "id": transaction_id}}
+    def _signed_webhook(self, reference: str, transaction_id: int = 999, amount: int = 250000) -> tuple[bytes, str]:
+        payload = {"event": "charge.success", "data": {"reference": reference, "id": transaction_id, "amount": amount, "currency": "NGN", "status": "success"}}
         raw_body = json.dumps(payload).encode("utf-8")
         signature = hmac.new(b"sk_test_fake123", raw_body, hashlib.sha512).hexdigest()
         return raw_body, signature
@@ -86,7 +86,7 @@ class PaymentServiceTests(unittest.TestCase):
         self.db.add(payment)
         self.db.commit()
 
-        payload = json.loads(self._signed_webhook("py_test_3")[0])
+        payload = json.loads(self._signed_webhook("py_test_3", amount=600000)[0])
         payment_service.handle_webhook_event(self.db, payload)
         first_end_date = self.user.subscription.end_date
 
