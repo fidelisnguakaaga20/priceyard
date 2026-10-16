@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -14,7 +14,7 @@ router = APIRouter(prefix="/push", tags=["push"])
 
 @router.get("/subscribed")
 def check_subscribed(
-    endpoint: str,
+    endpoint: str = Query(min_length=1, max_length=500),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> dict[str, bool]:

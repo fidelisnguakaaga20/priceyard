@@ -1,4 +1,7 @@
-# Purchased-time rules awaiting owner approval
+# Purchased-time rules: rules 1 and 2 approved
+
+Owner approved both time-preservation rules on 2026-10-16. Rule 3's
+checkout/pending-payment handling remains a separate pending decision.
 
 No change to NGN 2,500 monthly / 30 days, NGN 6,000 seasonal / 90 days,
 or the original 14-day trial is proposed. No production change is authorized.
@@ -6,7 +9,7 @@ or the original 14-day trial is proposed. No production change is authorized.
 The current activation replaces the end date with today plus the purchased
 duration. Paying early can therefore remove remaining paid days or trial time.
 
-Proposed local-development rules for PY-32:
+Approved local-development rules for PY-32 (1 and 2):
 
 1. On an active dated paid subscription, append the purchased 30/90 days to
    its future end date. Example: 10 days remaining plus monthly purchase gives
@@ -20,7 +23,7 @@ Proposed local-development rules for PY-32:
    expiring access. Their checkout/pending-payment handling is a separate owner
    decision; implementation of that case stays pending.
 
-Only rules 1 and 2 are requested for approval now. They change activation
+Only rules 1 and 2 are approved now. They change activation
 calculations and tests; no new product fields, forms, plan, price, referral rule,
 production migration or historical backfill. Successful payment/audit rows remain
 preserved. Existing already-processed purchases are not automatically recalculated.

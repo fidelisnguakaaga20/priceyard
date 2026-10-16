@@ -35,9 +35,14 @@ atomic payment/access/audit writes and concurrent replay/provider-ID protection
 (parts of PY-31/PY-33/PY-26). Batch 10 verifies saved Admin price state (PY-11).
 Batch 11 verifies account expiry display/timers (further PY-18; legacy UTC parsing
 part of PY-13). Batch 12 verifies original FAQ draft/publication persistence
-(PY-19). Next: push destination/security bounds and remaining payment
-reconciliation/checkout validation. PY-32 business calculation approval is pending
-in docs/PURCHASE_VALUE_APPROVAL.md; continue independent technical work meanwhile.
+(PY-19). Batch 13 verifies push destination/key validation and safe transport
+(PY-06, part of PY-08); all 58 backend tests passed (16.577s).
+Browser storage/rejection/cleanup passed without provider delivery. Preview startup
+now verifies its launcher/serving-process identity and synthetic-only readiness.
+Owner approved PY-32 paid/trial-time preservation on 2026-10-16, exactly rules
+1 and 2 in docs/PURCHASE_VALUE_APPROVAL.md; indefinite-grant payment handling
+remains a separate pending decision. Next: implement and verify these calculations;
+remaining payment reconciliation/checkout validation follows separately.
 Apply small technical batches with automated and browser verification. Reuse
 existing local tools from .git/priceyard-local-recovery-20261015; do not reinstall
 or read private configuration. Runtime is tools/local-test/runtime (ignored).
@@ -51,9 +56,9 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
 | PY-03 | Google ownership and safe account linking | Pending; new linking UI requires approval |
 | PY-04 | Password reset and login revocation | Complete in batch 5; actual HTTP/browser and PostgreSQL reset/logout races passed |
 | PY-05 | Referral abuse protection | Pending; preserve original rewards/qualification; policy changes require approval |
-| PY-06 | Safe push notification destinations | Pending |
+| PY-06 | Safe push notification destinations | Application-side complete in batch 13; known-provider/key validation, bounded TLS transport, no redirects; live provider compatibility remains operational verification |
 | PY-07 | Shared-device/session safety | Partial: server logout/reset/disable revocation and stale UI protection; JS token storage/push cleanup/offline limits remain |
-| PY-08 | Input/upload/request abuse bounds | Pending |
+| PY-08 | Input/upload/request abuse bounds | Partial: push endpoint/key/query bounds verified; broader input/upload/request bounds pending |
 | PY-09 | Concurrent security-action safety | Complete for identified reset/logout/last-Admin cases in batches 5/6; six PostgreSQL cases passed |
 | PY-10 | Spreadsheet export safety | Complete in batch 3; text/numeric regressions and original browser download/access checks passed |
 | PY-11 | Correct saved administrator price state | Complete in batch 10; actual create/approve/correct/outdated/reject/reload browser regression passed |
@@ -77,7 +82,7 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
 | PY-29 | Stable identities and dependent records | Pending; no automatic merge |
 | PY-30 | Isolated automated/browser verification | Partial: baseline guards, 12 original tests, six real browser workflows passed; expand with each batch |
 | PY-31 | Confirmed payment activation and recovery | Partial: atomic activation, missing-subscription preservation and retry/replay tested; provider verification/reconciliation pending; schema additions require approval |
-| PY-32 | Preserve unused purchased/trial time | Pending owner approval of docs/PURCHASE_VALUE_APPROVAL.md; original calculations unchanged |
+| PY-32 | Preserve unused purchased/trial time | Owner approved dated renewals and remaining trial preservation on 2026-10-16; implementation next; indefinite-grant payment handling pending |
 | PY-33 | Validate payment evidence | Partial: signed evidence and duplicate provider-ID binding verified; checkout/reconciliation checks pending |
 | PY-34 | Expiry without unintended staff-role loss | Complete in batch 2; 18 backend tests and two expired-Reporter browser cases passed |
 | PY-35 | Operational readiness and dependency evidence | Pending; production checks outside current scope |
@@ -450,3 +455,32 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
   only after Publish, and Hide removes it from their public FAQ list.
 - Evidence: tools/local-test/evidence/batch-12-*.json. Eight IDs complete;
   28 remain partial/pending. Paid/trial-value business approval still pending.
+
+### Batch 13 — PY-06; part of PY-08
+
+- Validate browser push service destinations and real P-256/authentication-key
+  shapes before storage and again before delivery of legacy rows. Unsafe legacy
+  rows are preserved and skipped. Requests use TLS, bounded connect/read timeouts,
+  no implicit proxy/netrc credentials and no redirects. Logs exclude secret errors.
+  No product forms, CSS, notification wording, markets or measurements changed.
+- Seven new security tests cover destination/key rejection, recognized browser
+  providers, legacy preservation, authenticated storage and mocked transport.
+  All 58 backend tests passed, zero failures/errors/skips, 16.577s.
+- Browser checks passed: three unsafe destinations rejected with 422, valid fake
+  subscription saved and removed with 204, zero external page requests. No real
+  notification was delivered; vendor delivery/compatibility remains unverified.
+  Known-provider restrictions may require a reviewed update for future providers.
+- Fixed test startup only: Windows venv Python launches a child interpreter.
+  Verify both exact executable/script/parent identities before stopping the old
+  synthetic process; verify literal loopback status and serving PID before success.
+  Windows CIM requires local process-metadata permission. Replaced the failing
+  Stop-Process host path with verified Process.Kill/WaitForExit. Fresh startup
+  passed on resumption (launcher 36836, serving PID 26164); the preview had stopped
+  during interruption, so the first resumed browser attempt refused connection.
+  Restarted only the synthetic preview and the browser recheck passed.
+- Manual: http://127.0.0.1:55446/__test__/push. Separate test controls never
+  request native notification permission or contact a delivery provider.
+- Evidence: tools/local-test/evidence/batch-13-*.json. Nine application-side IDs
+  complete; 27 pending/partial. PY-07 shared-device ownership/cleanup remains open.
+- Owner subsequently approved rules 1/2 in docs/PURCHASE_VALUE_APPROVAL.md;
+  that approval is recorded for the next batch, not claimed implemented here.

@@ -1,0 +1,30 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Local notification safety checks</title></head>
+<body style="font:18px system-ui;max-width:760px;margin:32px auto;padding:16px">
+<h1>Local notification safety checks</h1>
+<p>Fabricated accounts only. No notification is delivered and no provider is contacted. This page is separate from PriceYard.</p>
+<ol><li><a href="/login" target="_blank">Log into the original app</a> as free@example.com, password PriceYardDemo8!.</li><li>Run the checks. Private/arbitrary addresses must reject; valid synthetic subscription storage and cleanup must succeed.</li></ol>
+<button id="run">Run safety checks</button><pre id="result" role="status"></pre>
+<script>
+document.querySelector('#run').onclick=async()=>{
+ const button=document.querySelector('#run');button.disabled=true;
+ try{
+  const token=localStorage.getItem('priceyard_access_token')||sessionStorage.getItem('priceyard_access_token');
+  const headers={Authorization:'Bearer '+token,'Content-Type':'application/json'};
+  const user=await fetch('/api/auth/me',{headers}).then(r=>r.json());
+  if(!user.email?.endsWith('@example.com'))throw Error('Please sign into a fabricated @example.com account first.');
+  const key=await crypto.subtle.generateKey({name:'ECDH',namedCurve:'P-256'},true,['deriveBits']);
+  const encode=value=>btoa(String.fromCharCode(...new Uint8Array(value))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  const keys={p256dh:encode(await crypto.subtle.exportKey('raw',key.publicKey)),auth:encode(crypto.getRandomValues(new Uint8Array(16)))};
+  const results=[];
+  for(const endpoint of ['http://127.0.0.1/private','https://169.254.169.254/latest/meta-data','https://example.invalid/push']){
+   const response=await fetch('/api/push/subscribe',{method:'POST',headers,body:JSON.stringify({endpoint,keys})});results.push(response.status);
+  }
+  const endpoint='https://fcm.googleapis.com/fcm/send/synthetic-browser-'+crypto.randomUUID();
+  const accepted=(await fetch('/api/push/subscribe',{method:'POST',headers,body:JSON.stringify({endpoint,keys})})).status;
+  const cleanup=(await fetch('/api/push/unsubscribe',{method:'POST',headers,body:JSON.stringify({endpoint})})).status;
+  const status=await fetch('/__test__/status').then(r=>r.json());
+  window.__pushSafetyResult={complete:true,rejected_statuses:results,valid_storage:accepted,cleanup,providers_disabled:status.providers==='disabled',passed:results.every(x=>x===422)&&accepted===204&&cleanup===204&&status.providers==='disabled'};
+  document.querySelector('#result').textContent=JSON.stringify(window.__pushSafetyResult,null,2);
+ }catch(error){document.querySelector('#result').textContent=error.message;}finally{button.disabled=false;}
+};
+</script></body></html>

@@ -1,0 +1,9 @@
+{
+  "tests_run": 5,
+  "failures": 23,
+  "errors": 0,
+  "skipped": 0,
+  "duration_seconds": 0.525,
+  "pattern": "test_push_security.py",
+  "runtime": "in-process synthetic SQLite; TCP and DNS denied"
+}

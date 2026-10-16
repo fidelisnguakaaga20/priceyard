@@ -11,6 +11,7 @@ from app.config import get_settings
 from app.models.push_subscription import PushSubscription
 from app.models.user import User
 from app.schemas.push_schema import PushSubscriptionCreate
+from app.utils.push_validation import SafePushSession
 
 logger = logging.getLogger(__name__)
 
@@ -58,15 +59,19 @@ def send_push_to_user(db: Session, user_id: int, *, title: str, body: str, url: 
     sent = 0
     for subscription in subscriptions:
         try:
-            webpush(
-                subscription_info={
+            info = PushSubscriptionCreate.model_validate({
                     "endpoint": subscription.endpoint,
                     "keys": {"p256dh": subscription.p256dh, "auth": subscription.auth},
-                },
-                data=payload,
-                vapid_private_key=settings.vapid_private_key,
-                vapid_claims={"sub": f"mailto:{settings.vapid_claim_email}"},
-            )
+            })
+            with SafePushSession() as transport:
+                webpush(
+                    subscription_info=info.model_dump(),
+                    data=payload,
+                    vapid_private_key=settings.vapid_private_key,
+                    vapid_claims={"sub": f"mailto:{settings.vapid_claim_email}"},
+                    timeout=7,
+                    requests_session=transport,
+                )
             sent += 1
         except WebPushException as exc:
             status_code = exc.response.status_code if exc.response is not None else None
@@ -74,7 +79,7 @@ def send_push_to_user(db: Session, user_id: int, *, title: str, body: str, url: 
                 db.delete(subscription)
                 db.commit()
             else:
-                logger.warning("Push send failed for subscription %s: %s", subscription.id, exc)
-        except Exception as exc:
-            logger.warning("Push send failed for subscription %s: %s", subscription.id, exc)
+                logger.warning("Push send failed for subscription %s", subscription.id)
+        except Exception:
+            logger.warning("Push send failed for subscription %s", subscription.id)
     return sent

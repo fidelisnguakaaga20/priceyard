@@ -2,6 +2,7 @@
 import asyncio
 from html import escape
 import json
+import os
 import hashlib
 import hmac
 import re
@@ -95,7 +96,10 @@ class PreviewFiles(StaticFiles):
         return await StaticFiles(directory=str(current_snapshot / "dist")).get_response(path, scope)
 
 async def status(request):
-    return JSONResponse({"synthetic_only": True, "database": "fresh memory SQLite", "providers": "disabled", "grades": False, "fixture": "original Egusi/Kwali Market/1 bag; bag size unknown", "isolation": isolation})
+    return JSONResponse({"synthetic_only": True, "process_id": os.getpid(), "database": "fresh memory SQLite", "providers": "disabled", "grades": False, "fixture": "original Egusi/Kwali Market/1 bag; bag size unknown", "isolation": isolation})
+
+async def push_controls(request):
+    return HTMLResponse((LAB / "push_controls.html").read_text(encoding="utf-8"))
 
 async def inbox(request):
     links = "".join('<li><a href="'+escape(item["reset_url"], quote=True)+'">Open reset link for '+escape(item["recipient"])+'</a></li>' for item in local_reset_inbox)
@@ -173,7 +177,7 @@ class LocalOnly:
         else:
             await self.app(scope, receive, secured)
 
-preview = LocalOnly(Starlette(routes=[Route("/__test__/status", status), Route("/__test__/inbox", inbox), Route("/__test__/controls", controls), Route("/__test__/payments", payment_controls), Route("/__test__/payment-event", payment_event, methods=["POST"]), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
+preview = LocalOnly(Starlette(routes=[Route("/__test__/status", status), Route("/__test__/inbox", inbox), Route("/__test__/controls", controls), Route("/__test__/push", push_controls), Route("/__test__/payments", payment_controls), Route("/__test__/payment-event", payment_event, methods=["POST"]), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
 
 if __name__ == "__main__":
     import uvicorn

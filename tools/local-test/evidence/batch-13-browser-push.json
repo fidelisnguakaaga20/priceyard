@@ -1,0 +1,17 @@
+{
+  "checks": {
+    "complete": true,
+    "rejected_statuses": [
+      422,
+      422,
+      422
+    ],
+    "valid_storage": 204,
+    "cleanup": 204,
+    "providers_disabled": true,
+    "passed": true
+  },
+  "external_page_requests": 0,
+  "real_notification_deliveries": 0,
+  "production_connections": 0
+}
