@@ -169,6 +169,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (token) await refreshWithToken(token);
   };
 
+  const logout = useCallback(() => {
+    const currentToken = activeTokenRef.current;
+    clearAuth();
+    if (currentToken) {
+      // Local logout stays immediate. Server revocation needs connectivity;
+      // an old response must never change the newly cleared account state.
+      void apiFetch<void>("/auth/logout", { method: "POST", keepalive: true }, currentToken).catch(() => undefined);
+    }
+  }, [clearAuth]);
+
   const access = computeAccess(user, subscription);
   const value = useMemo<AuthContextValue>(() => ({
     user,
@@ -180,9 +190,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     login,
     loginWithGoogle,
     register,
-    logout: clearAuth,
+    logout,
     refresh,
-  }), [user, subscription, token, loading, access.label, access.full, clearAuth]);
+  }), [user, subscription, token, loading, access.label, access.full, logout]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

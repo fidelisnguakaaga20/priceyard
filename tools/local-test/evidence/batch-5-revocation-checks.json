@@ -1,0 +1,10 @@
+{
+  "result": {
+    "existing_logout_button_revokes_server_credential": true,
+    "original_reset_form_and_local_inbox": true,
+    "password_reset_revokes_existing_login": true,
+    "new_password_login_and_single_use_link": true
+  },
+  "production_connections": 0,
+  "live_emails_sent": 0
+}

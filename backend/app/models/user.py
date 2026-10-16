@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, String, func
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, func, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -35,6 +35,7 @@ class User(Base):
     auth_provider: Mapped[str] = mapped_column(String(20), nullable=False, default="local")
     role: Mapped[str] = mapped_column(String(32), nullable=False, default="free_user", index=True)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, index=True)
+    auth_version: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default=text("0"))
     referral_code: Mapped[str] = mapped_column(String(12), unique=True, nullable=False, index=True)
     referred_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)

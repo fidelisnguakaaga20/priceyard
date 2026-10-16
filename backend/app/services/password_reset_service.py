@@ -86,7 +86,26 @@ def reset_password(db: Session, *, token: str, new_password: str) -> str:
         db.commit()
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Reset link is invalid or expired")
 
-    record.user.password_hash = hash_password(new_password)
+    password_hash = hash_password(new_password)
+    # Always lock the user before claiming reset rows. Two distinct reset links
+    # for one account must not lock each other's token while waiting on the user.
+    db.execute(select(User.id).where(User.id == record.user_id).with_for_update()).scalar_one_or_none()
+    claimed = db.execute(
+        update(PasswordResetToken)
+        .where(PasswordResetToken.id == record.id, PasswordResetToken.used_at.is_(None), PasswordResetToken.expires_at > now)
+        .values(used_at=now)
+        .execution_options(synchronize_session=False)
+    ).rowcount
+    if claimed != 1:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Reset link is invalid or expired")
+    changed = db.execute(
+        update(User).where(User.id == record.user_id, User.is_active.is_(True))
+        .values(password_hash=password_hash, auth_version=User.auth_version + 1)
+    ).rowcount
+    if changed != 1:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Reset link is invalid or expired")
     db.execute(
         update(PasswordResetToken)
         .where(PasswordResetToken.user_id == record.user_id, PasswordResetToken.used_at.is_(None))

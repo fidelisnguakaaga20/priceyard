@@ -25,7 +25,7 @@ def isolate() -> None:
     os.environ.update(preserved)
     os.environ.update({
         "PRICEYARD_TEST_MODE": "isolated", "APP_ENV": "test", "DEBUG": "false",
-        "FRONTEND_URL": "http://127.0.0.1:5173", "CORS_ORIGINS": "http://127.0.0.1:5173",
+        "FRONTEND_URL": "http://127.0.0.1:55446", "CORS_ORIGINS": "http://127.0.0.1:55446",
         "JWT_SECRET": "synthetic-only-not-a-production-credential-" + "x" * 32,
         "GOOGLE_CLIENT_ID": "synthetic-client", "DATABASE_URL": "sqlite+pysqlite:///:memory:",
     })

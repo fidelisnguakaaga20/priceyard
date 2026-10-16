@@ -26,8 +26,9 @@ homepage/current prices clear stale errors after normal successful refresh.
 Batch 2 (PY-34) verified: subscription transitions preserve staff authority and
 subscription listing processes every expired account. Batch 3 (PY-10) verified:
 spreadsheet-safe text export. Batch 4 verified existing account refresh/logout
-races (part of PY-18). Next: approved internal login revocation storage, PY-04
-and related PY-07/PY-09; production and visible business changes remain excluded.
+races (part of PY-18). Batch 5 verified approved internal login revocation storage
+(PY-04 and parts of PY-07/PY-09/PY-28). Next: last-active-Admin concurrency
+protection (remaining PY-09), then other approved technical checklist items.
 Apply small technical batches with automated and browser verification. Reuse
 existing local tools from .git/priceyard-local-recovery-20261015; do not reinstall
 or read private configuration. Runtime is tools/local-test/runtime (ignored).
@@ -39,12 +40,12 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
 | PY-01 | Consistent historical access checks | Pending |
 | PY-02 | Confidential/restricted market information | Pending |
 | PY-03 | Google ownership and safe account linking | Pending; new linking UI requires approval |
-| PY-04 | Password reset and login revocation | Pending; schema additions require approval |
+| PY-04 | Password reset and login revocation | Complete in batch 5; actual HTTP/browser and PostgreSQL reset/logout races passed |
 | PY-05 | Referral abuse protection | Pending; preserve original rewards/qualification; policy changes require approval |
 | PY-06 | Safe push notification destinations | Pending |
-| PY-07 | Shared-device/session safety | Pending; preserve existing login duration |
+| PY-07 | Shared-device/session safety | Partial: server logout/reset/disable revocation and stale UI protection; JS token storage/push cleanup/offline limits remain |
 | PY-08 | Input/upload/request abuse bounds | Pending |
-| PY-09 | Concurrent security-action safety | Pending |
+| PY-09 | Concurrent security-action safety | Partial: same/distinct reset links and duplicate logout verified on PostgreSQL; last-Admin race pending |
 | PY-10 | Spreadsheet export safety | Complete in batch 3; text/numeric regressions and original browser download/access checks passed |
 | PY-11 | Correct saved administrator price state | Pending |
 | PY-12 | Accurate existing quantity/type/market comparisons | Pending; no grades/new measurement fields |
@@ -63,7 +64,7 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
 | PY-25 | Safe and clearly aged offline prices | Pending; visible additions require approval |
 | PY-26 | Complete atomic administrative audit | Pending |
 | PY-27 | Consistent existing editing/password inputs | Pending |
-| PY-28 | Historical record preservation | Pending; no production migrations |
+| PY-28 | Historical record preservation | Partial: approved 0022 tested on fresh/populated synthetic PostgreSQL; future migration/history work pending |
 | PY-29 | Stable identities and dependent records | Pending; no automatic merge |
 | PY-30 | Isolated automated/browser verification | Partial: baseline guards, 12 original tests, six real browser workflows passed; expand with each batch |
 | PY-31 | Confirmed payment activation and recovery | Pending; schema additions require approval |
@@ -202,3 +203,49 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
   tracking without deleting the on-disk files. Browser launch now retains the
   nonsecret SYSTEMDRIVE variable and uses disposable profile/app-data directories;
   the literal cache directory is ignored. Application/business data is unaffected.
+
+### Batch 5 — PY-04; parts of PY-07/PY-09/PY-28
+
+- Implemented only the explicitly approved internal schema: users.auth_version
+  and revoked_access_tokens(token_hash, user_id, expires_at, revoked_at). Public
+  User response excludes these fields. Original forms, CSS, pricing/referrals,
+  14-day trial, Remember me and 90-day access-token lifetime remain unchanged.
+- New signed tokens include version and a random identity so logout revokes
+  only that credential. Legacy original tokens remain valid at version zero
+  until reset/disable/logout; no blanket forced login is introduced.
+- Existing logout button clears local state immediately and requests server
+  revocation. Password reset atomically claims its link, changes the password,
+  increments version and closes outstanding reset links. Disable/re-enable does
+  not restore previously issued credentials. Only credential hashes are stored.
+- PostgreSQL reset locking always takes user before token rows. Same or distinct
+  reset-link races have exactly one winner, without deadlocking. Duplicate
+  logout is idempotent. Offline/unreachable backend cannot guarantee revocation;
+  JavaScript-readable credential storage remains explicitly unresolved.
+- New migration: 0022_login_revocation after original 0021. It adds no market,
+  grade, measurement or subscription/referral field. Evidence-losing downgrade
+  refuses. It was executed only in fresh marked synthetic PostgreSQL schemas.
+- Current backend suite: 29 passed, zero failures/errors/skips, 9.440s. Four
+  PostgreSQL cases passed in 5.550s: populated/fresh upgrade with unchanged user,
+  subscription/payment/catalog/price/source rows, downgrade refusal, same-link
+  and distinct-link reset races, duplicate logout. Wrong hosts/ports rejected;
+  every native connection verifies data directory/system identity before writes.
+- Test cluster only: tools/local-test/runtime/postgres-revocation, literal
+  127.0.0.1:55447, synthetic user priceyard_revocation_test, database
+  priceyard_isolated_test. Identity marker is ignored runtime/postgres-marker.json.
+  No production URL accepted; TLS key discovery disabled for this loopback fixture.
+- Frontend TypeScript/build passed (Vite 1.63s, main 315.67kB/89.04kB gzip; original
+  CSS artifact unchanged). Four browser assertions passed using original logout,
+  forgot/reset/password-login screens and a separate local-only fake inbox. Seven
+  baseline and three account-race checks passed; expired Reporter and Admin CSV
+  checks passed again after authorization changes. No real email/provider call.
+- Browser reset demo: /forgot-password accepts fabricated @example.com accounts;
+  /__test__/inbox shows intercepted local reset links. Fake reset@example.com was
+  used by automated tests and now has UpdatedPassword8! until preview restart.
+  Other demo account passwords remain PriceYardDemo8!.
+- No dependencies installed. Current test environment emits a FastAPI/Starlette
+  httpx deprecation warning; it did not fail tests and is operational follow-up.
+- Read-only sanitized process check found only guarded local-test Python processes
+  for this repository, no original Vite/Uvicorn source watcher using real config.
+- Evidence: tools/local-test/evidence/batch-5-*.json. No live DB migration, push,
+  merge or deployment. Current completed checklist items: PY-04/PY-10/PY-15/PY-34;
+  remaining items include explicitly partial work above, not 36 completed fixes.

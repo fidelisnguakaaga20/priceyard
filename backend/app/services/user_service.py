@@ -1,5 +1,5 @@
 from fastapi import HTTPException, status
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update
 from sqlalchemy.orm import Session
 
 from app.models.user import User
@@ -39,6 +39,8 @@ def update_user(db: Session, user: User, payload: AdminUserUpdate) -> User:
         )
 
     if payload.is_active is not None:
+        if user.is_active and payload.is_active is False:
+            db.execute(update(User).where(User.id == user.id).values(auth_version=User.auth_version + 1))
         user.is_active = payload.is_active
 
     if payload.role == "paid_user":

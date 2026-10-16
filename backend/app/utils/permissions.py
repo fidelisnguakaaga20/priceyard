@@ -7,7 +7,8 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.user import User
-from app.security import decode_access_token
+from app.security import decode_access_claims
+from app.services.login_revocation_service import is_revoked
 from app.services.subscription_service import get_subscription_for_user, has_full_access
 
 bearer_scheme = HTTPBearer(auto_error=False)
@@ -26,7 +27,8 @@ def get_current_user(
         )
 
     try:
-        user_id = decode_access_token(credentials.credentials)
+        claims = decode_access_claims(credentials.credentials)
+        user_id = int(claims["sub"])
     except InvalidTokenError as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -47,6 +49,9 @@ def get_current_user(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="User account is inactive",
         )
+
+    if claims.get("auth_version", 0) != user.auth_version or is_revoked(db, credentials.credentials):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token", headers={"WWW-Authenticate": "Bearer"})
 
     return user
 

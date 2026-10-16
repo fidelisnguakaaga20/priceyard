@@ -13,6 +13,7 @@ from app.models.payment import Payment
 from app.models.price_flag import PriceFlag
 from app.models.push_subscription import PushSubscription
 from app.models.quality_signal import QualitySignal
+from app.models.revoked_access_token import RevokedAccessToken
 from app.models.sell_watch_window import SellWatchWindow
 from app.models.storage_suitability import StorageSuitability
 from app.models.subscription import Subscription
@@ -35,6 +36,7 @@ __all__ = [
     "PriceFlag",
     "PushSubscription",
     "QualitySignal",
+    "RevokedAccessToken",
     "SellWatchWindow",
     "StorageSuitability",
     "Subscription",

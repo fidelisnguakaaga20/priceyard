@@ -1,4 +1,8 @@
-from fastapi import APIRouter, Depends, Request, status
+from datetime import datetime, timezone
+
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi.security import HTTPAuthorizationCredentials
+from jwt import InvalidTokenError
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
@@ -8,11 +12,12 @@ from app.rate_limit import limiter
 from app.services.subscription_service import REFERRAL_REWARD_DAYS
 from app.schemas.auth_schema import ForgotPasswordRequest, GoogleLoginRequest, LoginRequest, MessageResponse, ReferralSummaryResponse, RegisterRequest, ResetPasswordRequest, TokenResponse
 from app.schemas.user_schema import UserResponse
-from app.security import create_access_token
+from app.security import create_access_token, decode_access_claims
+from app.services.login_revocation_service import revoke_token
 from app.services.admin_alert_service import notify_admins
 from app.services.auth_service import authenticate_or_create_google_user, authenticate_user, register_user
 from app.services.password_reset_service import request_password_reset, reset_password
-from app.utils.permissions import get_current_user
+from app.utils.permissions import bearer_scheme, get_current_user
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -33,14 +38,28 @@ def register(request: Request, payload: RegisterRequest, db: Session = Depends(g
 @limiter.limit("5/minute")
 def login(request: Request, payload: LoginRequest, db: Session = Depends(get_db)) -> TokenResponse:
     user = authenticate_user(db, email=str(payload.email), password=payload.password)
-    return TokenResponse(access_token=create_access_token(user_id=user.id))
+    return TokenResponse(access_token=create_access_token(user_id=user.id, auth_version=user.auth_version))
 
 
 @router.post("/google", response_model=TokenResponse)
 @limiter.limit("5/minute")
 def login_with_google(request: Request, payload: GoogleLoginRequest, db: Session = Depends(get_db)) -> TokenResponse:
     user = authenticate_or_create_google_user(db, payload.id_token)
-    return TokenResponse(access_token=create_access_token(user_id=user.id))
+    return TokenResponse(access_token=create_access_token(user_id=user.id, auth_version=user.auth_version))
+
+
+@router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
+def logout(credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme), db: Session = Depends(get_db)) -> Response:
+    if credentials is None or credentials.scheme.lower() != "bearer":
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    try:
+        claims = decode_access_claims(credentials.credentials)
+    except InvalidTokenError:
+        return Response(status_code=204)
+    user = db.get(User, int(claims["sub"]))
+    if user is not None and claims.get("auth_version", 0) == user.auth_version:
+        revoke_token(db, user, credentials.credentials, expires_at=datetime.fromtimestamp(claims["exp"], timezone.utc))
+    return Response(status_code=204)
 
 
 @router.get("/me", response_model=UserResponse)

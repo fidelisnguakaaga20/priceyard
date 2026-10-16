@@ -1,5 +1,6 @@
 """Real original API + original UI, fresh synthetic memory database only."""
 import asyncio
+from html import escape
 import json
 import re
 from datetime import datetime, timedelta, timezone
@@ -31,6 +32,16 @@ from app.models.user import User
 from app.services.subscription_service import build_trial_subscription
 from app.utils.password import hash_password
 from app.main import app as api
+from app.services import password_reset_service
+
+local_reset_inbox = []
+
+def capture_reset_message(*, recipient, reset_url):
+    if not recipient.endswith("@example.com") or not reset_url.startswith("http://127.0.0.1:55446/reset-password?"):
+        raise RuntimeError("Only fabricated local reset messages may be captured")
+    local_reset_inbox.append({"recipient": recipient, "reset_url": reset_url})
+
+password_reset_service.send_password_reset_email = capture_reset_message
 
 engine = get_engine()
 Base.metadata.create_all(engine)
@@ -38,7 +49,7 @@ now = datetime.now(timezone.utc)
 with Session(engine) as db:
     users = {}
     demo_hash = hash_password("PriceYardDemo8!")
-    for name, role, access in (("free", "free_user", "free"), ("trial", "free_user", "trial"), ("paid", "paid_user", "active"), ("reporter", "reporter", "free"), ("admin", "admin", "free"), ("expired-reporter", "reporter", "trial_expired"), ("expired-paid-reporter", "reporter", "paid_expired")):
+    for name, role, access in (("free", "free_user", "free"), ("trial", "free_user", "trial"), ("paid", "paid_user", "active"), ("reporter", "reporter", "free"), ("admin", "admin", "free"), ("expired-reporter", "reporter", "trial_expired"), ("expired-paid-reporter", "reporter", "paid_expired"), ("reset", "free_user", "trial")):
         user = User(full_name=f"Test {name.title()}", email=f"{name}@example.com", password_hash=demo_hash, role=role, is_active=True, referral_code="TEST"+name.upper())
         if access in {"trial", "trial_expired"}:
             user.subscription = build_trial_subscription(user=user, now=now-timedelta(days=15) if access == "trial_expired" else now)
@@ -80,6 +91,10 @@ class PreviewFiles(StaticFiles):
 
 async def status(request):
     return JSONResponse({"synthetic_only": True, "database": "fresh memory SQLite", "providers": "disabled", "grades": False, "fixture": "original Egusi/Kwali Market/1 bag; bag size unknown", "isolation": isolation})
+
+async def inbox(request):
+    links = "".join('<li><a href="'+escape(item["reset_url"], quote=True)+'">Open reset link for '+escape(item["recipient"])+'</a></li>' for item in local_reset_inbox)
+    return HTMLResponse('<!doctype html><html><head><title>Local test inbox</title></head><body style="font:18px system-ui;max-width:760px;margin:32px auto;padding:16px"><h1>Local test inbox</h1><p>Fabricated accounts only. No email was sent. Reset links expire under the original application rules.</p><ul>'+links+'</ul><a href="/forgot-password">Open original password-reset request form</a></body></html>')
 
 outage = {"enabled": False}
 
@@ -124,7 +139,7 @@ class LocalOnly:
         else:
             await self.app(scope, receive, secured)
 
-preview = LocalOnly(Starlette(routes=[Route("/__test__/status", status), Route("/__test__/controls", controls), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
+preview = LocalOnly(Starlette(routes=[Route("/__test__/status", status), Route("/__test__/inbox", inbox), Route("/__test__/controls", controls), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
 
 if __name__ == "__main__":
     import uvicorn
