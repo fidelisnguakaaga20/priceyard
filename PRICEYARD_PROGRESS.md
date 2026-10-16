@@ -40,8 +40,8 @@ part of PY-13). Batch 12 verifies original FAQ draft/publication persistence
 Browser storage/rejection/cleanup passed without provider delivery. Preview startup
 now verifies its launcher/serving-process identity and synthetic-only readiness.
 Owner approved PY-32 paid/trial-time preservation on 2026-10-16, exactly rules
-1 and 2 in docs/PURCHASE_VALUE_APPROVAL.md; indefinite-grant payment handling
-remains a separate pending decision. Batch 14 implements and verifies the approved
+1 and 2 in docs/PURCHASE_VALUE_APPROVAL.md; indefinite-grant handling was separately
+approved and verified in batch 21. Batch 14 implements and verifies the approved
 dated-renewal/trial calculations. Batch 15 verifies checkout validation: 74 backend
 tests and original-button fake-provider browser checks passed. Next: commodity
 detail loading (PY-17) is verified in batch 16: five before/after browser checks
@@ -52,8 +52,8 @@ server revocation. Ten targeted logout/account/reset browser checks passed;
 TypeScript/build passed and original CSS remains unchanged. Next: payment
 verification/reconciliation (PY-31/PY-33), bounded queries (PY-20), remaining
 authorization/source confidentiality, referrals and atomic administrative audits.
-Indefinite manual-grant handling was subsequently approved in the exact scope
-below; implement it next without changing grants or consuming held paid days.
+Indefinite manual-grant handling was subsequently approved and implemented in
+batch 21, preserving grants and held paid days. Do not implement it again.
 Continue from the newest batch status without restarting the audit.
 Apply small technical batches with automated and browser verification. Reuse
 existing local tools from .git/priceyard-local-recovery-20261015; do not reinstall
@@ -86,6 +86,15 @@ push/WhatsApp attempts. Five focused tests, all 107 backend tests and the origin
 Watch/Admin approval browser workflow passed. Fourteen IDs complete, 22 partial/
 pending. Next: atomic price changes/audit and post-commit notification failures.
 
+Batch 25 verified: create/edit/approve/reject/outdated and sanitized audit commit
+together, concurrent edits lock the current price row, and a post-commit alert
+failure cannot misreport a saved change. Four focused tests, all 111 backend
+tests, sixteen pinned PostgreSQL tests, original Admin and notification browser
+workflows passed. Fourteen IDs complete, 22 partial/pending. Next unfinished:
+remaining administrative audit transactions, bounded feedback screenshot decoding/
+requests, Google-claim validation/account-linking decision, and price comparison
+semantics requiring owner approval. No redesign or new measurement assumptions.
+
 ## Checklist — do not repeat the audit
 
 | ID | Improvement | Current status |
@@ -115,7 +124,7 @@ pending. Next: atomic price changes/audit and post-commit notification failures.
 | PY-23 | Preserve layout while fixing mobile overflow | Pending |
 | PY-24 | Keyboard/focus accessibility | Pending |
 | PY-25 | Safe and clearly aged offline prices | Pending; visible additions require approval |
-| PY-26 | Complete atomic administrative audit | Partial: payment confirmation/access/audit share one transaction; remaining administrative writes pending |
+| PY-26 | Complete atomic administrative audit | Partial: payment, registration/referral and price create/edit/approve/reject/outdated share atomic sanitized audits; concurrent price edit trail verified in batch 25; remaining administrative writes pending |
 | PY-27 | Consistent existing editing/password inputs | Pending |
 | PY-28 | Historical record preservation | Partial: approved 0022 tested on fresh/populated synthetic PostgreSQL; future migration/history work pending |
 | PY-29 | Stable identities and dependent records | Pending; no automatic merge |
@@ -847,3 +856,30 @@ pending. Next: atomic price changes/audit and post-commit notification failures.
   operational work; no such production capability is claimed by this local test.
 - Manual: http://127.0.0.1:55446/prices. Existing appearance is preserved; the
   automated notification evidence covers the invisible channel-failure behavior.
+
+### Batch 25 — further PY-26/PY-28; price-save reliability
+
+- Price create/edit/approve/reject/mark-outdated flush inside one transaction with
+  their sanitized audit, then commit together. Audit/commit failures roll back;
+  no alert is attempted for failed changes. Existing service default commit
+  behavior remains available to other callers. No schema or deletion-rule change.
+- Editing/approval/rejection/outdated routes lock and reload the price row before
+  taking the old snapshot. Concurrent edits retain an ordered, continuous audit
+  trail. Existing private source exclusions apply to every snapshot. Notifications
+  remain after commit; a best-effort query/delivery error cannot falsely report
+  a saved approval/correction as failed. Log message contains no source/secret.
+- Four focused HTTP tests reproduced six failing assertions before implementation;
+  all passed afterward, 0.442s. All 111 backend tests passed, 49.894s. Sixteen
+  pinned PostgreSQL cases passed, 20.296s, including concurrent price edits and
+  all prior security/payment races. Native cluster stopped after verification.
+- Original Admin browser create/approve/correct/outdated/reject/reload passed,
+  plus five matching audit records and continuous old/new state. Notification
+  browser regression also passed through original Watch/Admin controls. Initial
+  audit check compared decimal text formatting (209000 vs 209000.00); corrected
+  checks to compare numeric values, preserving existing stored snapshot formats.
+- Manual: http://127.0.0.1:55446/admin/prices, admin@example.com /
+  PriceYardDemo8!. Only fabricated records are present. Original Audit logs show
+  the price actions. No design, terminology, prices, durations, measurements,
+  historical source records or production data changed.
+- Evidence: tools/local-test/evidence/batch-25-*.json. Fourteen IDs complete,
+  22 partial/pending; broader Admin writes and operational checks remain open.

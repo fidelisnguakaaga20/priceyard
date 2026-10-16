@@ -111,7 +111,7 @@ def _approved_price_statement(
     return statement
 
 
-def create_price_update(db: Session, payload: PriceUpdateCreate, creator: User) -> PriceUpdate:
+def create_price_update(db: Session, payload: PriceUpdateCreate, creator: User, *, commit: bool = True) -> PriceUpdate:
     _validate_reference_records(db, payload.commodity_id, payload.market_id)
     values = payload.model_dump()
     if creator.role == "reporter":
@@ -132,19 +132,21 @@ def create_price_update(db: Session, payload: PriceUpdateCreate, creator: User) 
     )
     db.add(price_update)
     try:
-        db.commit()
+        db.commit() if commit else db.flush()
     except IntegrityError as exc:
         db.rollback()
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Price update could not be saved") from exc
     return get_price_update_for_admin(db, price_update.id)
 
 
-def get_price_update_for_admin(db: Session, price_update_id: int) -> PriceUpdate:
+def get_price_update_for_admin(db: Session, price_update_id: int, *, lock: bool = False) -> PriceUpdate:
     statement = (
         select(PriceUpdate)
         .options(*PRICE_UPDATE_LOAD_OPTIONS)
         .where(PriceUpdate.id == price_update_id)
     )
+    if lock:
+        statement = statement.with_for_update().execution_options(populate_existing=True)
     price_update = db.scalar(statement)
     if price_update is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Price update not found")
@@ -275,7 +277,7 @@ def list_market_comparison(
     )
 
 
-def update_price_update(db: Session, price_update: PriceUpdate, payload: PriceUpdateUpdate) -> PriceUpdate:
+def update_price_update(db: Session, price_update: PriceUpdate, payload: PriceUpdateUpdate, *, commit: bool = True) -> PriceUpdate:
     changes = payload.model_dump(exclude_unset=True)
     if not changes:
         return get_price_update_for_admin(db, price_update.id)
@@ -311,30 +313,30 @@ def update_price_update(db: Session, price_update: PriceUpdate, payload: PriceUp
         setattr(price_update, field, value)
 
     try:
-        db.commit()
+        db.commit() if commit else db.flush()
     except IntegrityError as exc:
         db.rollback()
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Price update could not be updated") from exc
     return get_price_update_for_admin(db, price_update.id)
 
 
-def approve_price_update(db: Session, price_update: PriceUpdate, approver: User) -> PriceUpdate:
+def approve_price_update(db: Session, price_update: PriceUpdate, approver: User, *, commit: bool = True) -> PriceUpdate:
     price_update.status = "approved"
     price_update.approved_by = approver.id
-    db.commit()
+    db.commit() if commit else db.flush()
     return get_price_update_for_admin(db, price_update.id)
 
 
-def reject_price_update(db: Session, price_update: PriceUpdate) -> PriceUpdate:
+def reject_price_update(db: Session, price_update: PriceUpdate, *, commit: bool = True) -> PriceUpdate:
     price_update.status = "rejected"
     price_update.approved_by = None
-    db.commit()
+    db.commit() if commit else db.flush()
     return get_price_update_for_admin(db, price_update.id)
 
 
-def mark_price_update_outdated(db: Session, price_update: PriceUpdate) -> PriceUpdate:
+def mark_price_update_outdated(db: Session, price_update: PriceUpdate, *, commit: bool = True) -> PriceUpdate:
     price_update.is_outdated = True
-    db.commit()
+    db.commit() if commit else db.flush()
     return get_price_update_for_admin(db, price_update.id)
 
 

@@ -1,4 +1,5 @@
 from datetime import date
+import logging
 
 from fastapi import APIRouter, Depends, Query, Response, status
 from fastapi.security import HTTPAuthorizationCredentials
@@ -38,6 +39,28 @@ from app.services.watchlist_alert_service import notify_watchlist_subscribers
 from app.utils.permissions import bearer_scheme, get_current_user, require_full_access, require_roles
 
 router = APIRouter(prefix="/price-updates", tags=["price-updates"])
+logger = logging.getLogger(__name__)
+
+
+def _save_audited_price(db: Session, item: PriceUpdate, actor: User, action: str, old_value: dict | None = None) -> None:
+    try:
+        create_audit_log(
+            db, actor=actor, action=action, table_name="price_updates",
+            record_id=item.id, old_value=old_value, new_value=snapshot_model(item), commit=False,
+        )
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+
+
+def _notify_saved_price(db: Session, item: PriceUpdate) -> None:
+    try:
+        notify_watchlist_subscribers(db, item)
+    except Exception:
+        # The business transaction already committed. A best-effort alert/query
+        # failure must not make a successful save look like a failed action.
+        logger.warning("Price change saved; watchlist notification failed")
 
 
 def _require_history_access(
@@ -153,11 +176,8 @@ def add_price_update(
     db: Session = Depends(get_db),
     current_user: User = Depends(require_roles("admin", "reporter")),
 ) -> PriceUpdate:
-    item = create_price_update(db, payload, current_user)
-    create_audit_log(
-        db, actor=current_user, action="price_update.create", table_name="price_updates",
-        record_id=item.id, new_value=snapshot_model(item),
-    )
+    item = create_price_update(db, payload, current_user, commit=False)
+    _save_audited_price(db, item, current_user, "price_update.create")
     return item
 
 
@@ -168,16 +188,13 @@ def edit_price_update(
     db: Session = Depends(get_db),
     current_admin: User = Depends(require_roles("admin")),
 ) -> PriceUpdate:
-    item = get_price_update_for_admin(db, price_update_id)
+    item = get_price_update_for_admin(db, price_update_id, lock=True)
     old_value = snapshot_model(item)
     price_fields_touched = bool({"price_low", "price_high", "average_price"} & payload.model_dump(exclude_unset=True).keys())
-    item = update_price_update(db, item, payload)
-    create_audit_log(
-        db, actor=current_admin, action="price_update.edit", table_name="price_updates",
-        record_id=item.id, old_value=old_value, new_value=snapshot_model(item),
-    )
+    item = update_price_update(db, item, payload, commit=False)
+    _save_audited_price(db, item, current_admin, "price_update.edit", old_value)
     if price_fields_touched and item.status == "approved":
-        notify_watchlist_subscribers(db, item)
+        _notify_saved_price(db, item)
     return item
 
 
@@ -187,14 +204,11 @@ def approve_update(
     db: Session = Depends(get_db),
     current_admin: User = Depends(require_roles("admin")),
 ) -> PriceUpdate:
-    item = get_price_update_for_admin(db, price_update_id)
+    item = get_price_update_for_admin(db, price_update_id, lock=True)
     old_value = snapshot_model(item)
-    item = approve_price_update(db, item, current_admin)
-    create_audit_log(
-        db, actor=current_admin, action="price_update.approve", table_name="price_updates",
-        record_id=item.id, old_value=old_value, new_value=snapshot_model(item),
-    )
-    notify_watchlist_subscribers(db, item)
+    item = approve_price_update(db, item, current_admin, commit=False)
+    _save_audited_price(db, item, current_admin, "price_update.approve", old_value)
+    _notify_saved_price(db, item)
     return item
 
 
@@ -204,13 +218,10 @@ def reject_update(
     db: Session = Depends(get_db),
     current_admin: User = Depends(require_roles("admin")),
 ) -> PriceUpdate:
-    item = get_price_update_for_admin(db, price_update_id)
+    item = get_price_update_for_admin(db, price_update_id, lock=True)
     old_value = snapshot_model(item)
-    item = reject_price_update(db, item)
-    create_audit_log(
-        db, actor=current_admin, action="price_update.reject", table_name="price_updates",
-        record_id=item.id, old_value=old_value, new_value=snapshot_model(item),
-    )
+    item = reject_price_update(db, item, commit=False)
+    _save_audited_price(db, item, current_admin, "price_update.reject", old_value)
     return item
 
 
@@ -241,13 +252,10 @@ def mark_outdated(
     db: Session = Depends(get_db),
     current_admin: User = Depends(require_roles("admin")),
 ) -> PriceUpdate:
-    item = get_price_update_for_admin(db, price_update_id)
+    item = get_price_update_for_admin(db, price_update_id, lock=True)
     old_value = snapshot_model(item)
-    item = mark_price_update_outdated(db, item)
-    create_audit_log(
-        db, actor=current_admin, action="price_update.mark_outdated", table_name="price_updates",
-        record_id=item.id, old_value=old_value, new_value=snapshot_model(item),
-    )
+    item = mark_price_update_outdated(db, item, commit=False)
+    _save_audited_price(db, item, current_admin, "price_update.mark_outdated", old_value)
     return item
 
 

@@ -1,0 +1,13 @@
+{
+  "original_watch_button_and_admin_approval": true,
+  "email_failure_preserves_independent_push_and_whatsapp": true,
+  "approved_record_survives_reload": true,
+  "current_price_visible": true,
+  "attempts": [
+    "email",
+    "push",
+    "whatsapp"
+  ],
+  "external_page_requests": 0,
+  "production_connections": 0
+}

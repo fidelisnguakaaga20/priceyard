@@ -75,7 +75,21 @@ try {
     assert.ok((await row().locator('td').nth(3).innerText()).includes('rejected'));
     assert.ok((await row().locator('td').nth(2).innerText()).includes('210500'));
     assert.equal(await page.getByLabel(/grade/i).count(),0);
-    const report={created_approved_corrected_outdated_rejected_and_reloaded:true,original_fields_preserved:true,bag_weight_not_invented:true,production_connections:0};
+    const audits=await page.evaluate(async id=>{
+      const token=localStorage.getItem('priceyard_access_token')||sessionStorage.getItem('priceyard_access_token');
+      const response=await fetch('/api/audit-logs',{headers:{Authorization:'Bearer '+token}});
+      if(!response.ok)throw Error('Could not verify local audit');
+      return (await response.json()).filter(item=>item.table_name==='price_updates'&&item.record_id===id).sort((a,b)=>a.id-b.id);
+    },created.id);
+    assert.deepEqual(audits.map(item=>item.action),['price_update.create','price_update.approve','price_update.edit','price_update.mark_outdated','price_update.reject']);
+    for(let i=1;i<audits.length;i++){
+      for(const field of ['status','price_low','price_high','is_outdated']){
+        const numeric=field==='price_low'||field==='price_high';
+        assert.equal(numeric?Number(audits[i].old_value[field]):audits[i].old_value[field],numeric?Number(audits[i-1].new_value[field]):audits[i-1].new_value[field]);
+      }
+    }
+    assert.ok(!JSON.stringify(audits).includes('source_1'));
+    const report={created_approved_corrected_outdated_rejected_and_reloaded:true,original_fields_preserved:true,bag_weight_not_invented:true,complete_ordered_sanitized_audit:true,production_connections:0};
     fs.writeFileSync(path.join(lab,'runtime/price-admin-checks.json'),JSON.stringify(report,null,2));
     await page.screenshot({path:path.join(lab,'runtime/price-admin-after.png'),fullPage:true});
     console.log(JSON.stringify(report));

@@ -93,6 +93,7 @@ import unittest
 from unittest.mock import patch
 import uuid
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal
 from alembic import command
 from alembic.config import Config
 from fastapi import HTTPException
@@ -122,6 +123,44 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_concurrent_price_edits_preserve_ordered_atomic_audit(self):
+        from app.models.commodity import Commodity
+        from app.models.market import Market
+        from app.models.price_update import PriceUpdate
+        from app.routes.price_update_routes import edit_price_update
+        from app.schemas.price_update_schema import PriceUpdateUpdate
+        Base.metadata.create_all(self.engine)
+        with Session(self.engine) as db:
+            user = User(full_name="Synthetic editor", email="pgeditor@example.com", password_hash="unused", role="admin", referral_code="PGEDITOR")
+            commodity, market = Commodity(name="Egusi"), Market(name="Kwali Market")
+            db.add_all([user, commodity, market]); db.flush(); user_id = user.id
+            price = PriceUpdate(commodity_id=commodity.id, market_id=market.id, price_low=210000,
+                price_high=220000, average_price=215000, unit="1 bag", bag_size=None,
+                confidence_level="Low confidence", movement="unknown", status="pending",
+                update_date_time=datetime.now(timezone.utc), created_by=user.id,
+                source_1="PG-PRIVATE-FAKE-SOURCE")
+            db.add(price); db.flush(); price_id = price.id; db.commit()
+        barrier = threading.Barrier(2); outcomes = []
+        def worker(low):
+            with Session(self.engine, expire_on_commit=False) as db:
+                user = db.get(User, user_id); barrier.wait(timeout=15)
+                try:
+                    edit_price_update(price_id, PriceUpdateUpdate(price_low=low), db, user)
+                    outcomes.append(200)
+                except BaseException as error:
+                    db.rollback(); outcomes.append(type(error).__name__)
+        threads = [threading.Thread(target=worker, args=(low,)) for low in (209000, 208000)]
+        for thread in threads: thread.start()
+        for thread in threads: thread.join(25)
+        self.assertFalse(any(thread.is_alive() for thread in threads)); self.assertEqual(outcomes, [200, 200])
+        with Session(self.engine) as db:
+            logs = db.scalars(select(AuditLog).order_by(AuditLog.id)).all()
+            self.assertEqual(len(logs), 2)
+            self.assertEqual(float(logs[0].old_value["price_low"]), 210000)
+            self.assertEqual(Decimal(logs[0].new_value["price_low"]), Decimal(logs[1].old_value["price_low"]))
+            self.assertEqual(float(logs[1].new_value["price_low"]), db.get(PriceUpdate, price_id).price_low)
+            self.assertNotIn("PG-PRIVATE-FAKE-SOURCE", str([(log.old_value, log.new_value) for log in logs]))
+
     def test_current_price_ranking_bounds_hydration_without_losing_history(self):
         from sqlalchemy import event, func
         from app.models.commodity import Commodity
