@@ -110,6 +110,8 @@ from app.schemas.push_schema import PushSubscriptionCreate
 from app.security import create_access_token
 from app.services import password_reset_service
 from app.services import payment_service
+from app.services.auth_service import register_user
+from app.schemas.auth_schema import RegisterRequest
 from app.services.push_service import save_subscription
 from app.services.login_revocation_service import is_revoked, revoke_token
 from app.services.subscription_service import build_trial_subscription
@@ -369,6 +371,38 @@ class PostgreSQLSecurityTests(unittest.TestCase):
 
     def test_provider_verification_and_webhook_share_one_credit(self):
         self.payment_race(duplicate_transaction=False,verification=True)
+
+    def referral_race(self, *, same_email):
+        Base.metadata.create_all(self.engine)
+        with Session(self.engine) as db:
+            referrer=User(full_name="Synthetic referral parent",email="pgreferrer@example.com",password_hash="not-used",role="free_user",is_active=True,referral_code="PGREF")
+            referrer.subscription=build_trial_subscription(user=referrer)
+            db.add(referrer);db.commit();referrer_id=referrer.id;original_end=referrer.subscription.trial_ends_at
+        barrier=threading.Barrier(2);outcomes=[]
+        def worker(index):
+            payload=RegisterRequest(full_name="Synthetic referral child",email=f"pgchild{0 if same_email else index}@example.com",password="PriceYardDemo8!",referral_code="PGREF")
+            with Session(self.engine) as db:
+                barrier.wait(timeout=15)
+                try:register_user(db,payload);outcomes.append(201)
+                except HTTPException as error:db.rollback();outcomes.append(error.status_code)
+                except BaseException as error:db.rollback();outcomes.append(type(error).__name__)
+        threads=[threading.Thread(target=worker,args=(index,)) for index in range(2)]
+        for thread in threads:thread.start()
+        for thread in threads:thread.join(25)
+        self.assertFalse(any(thread.is_alive() for thread in threads))
+        self.assertCountEqual(outcomes,[201,409] if same_email else [201,201])
+        expected=1 if same_email else 2
+        with Session(self.engine) as db:
+            self.assertEqual(db.get(User,referrer_id).subscription.trial_ends_at,original_end+timedelta(days=7*expected))
+            children=db.scalars(select(User).where(User.referred_by_id==referrer_id)).all();self.assertEqual(len(children),expected)
+            for child in children:self.assertEqual(child.subscription.trial_ends_at-child.subscription.trial_started_at,timedelta(days=14))
+            self.assertEqual(len(db.scalars(select(AuditLog).where(AuditLog.action=="referral.reward_granted")).all()),expected)
+
+    def test_distinct_simultaneous_registrations_keep_both_referral_rewards(self):
+        self.referral_race(same_email=False)
+
+    def test_duplicate_simultaneous_registration_only_rewards_once(self):
+        self.referral_race(same_email=True)
 
     def test_concurrent_push_registration_cannot_overwrite_other_device_keys(self):
         import base64

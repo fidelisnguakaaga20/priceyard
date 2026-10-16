@@ -52,9 +52,9 @@ server revocation. Ten targeted logout/account/reset browser checks passed;
 TypeScript/build passed and original CSS remains unchanged. Next: payment
 verification/reconciliation (PY-31/PY-33), bounded queries (PY-20), remaining
 authorization/source confidentiality, referrals and atomic administrative audits.
-Indefinite manual-grant payment handling remains a separate business decision;
-do not silently convert or claim that unresolved path safe. Ten checklist IDs
-are complete; 26 remain partial/pending. Continue without restarting the audit.
+Indefinite manual-grant handling was subsequently approved in the exact scope
+below; implement it next without changing grants or consuming held paid days.
+Continue from the newest batch status without restarting the audit.
 Apply small technical batches with automated and browser verification. Reuse
 existing local tools from .git/priceyard-local-recovery-20261015; do not reinstall
 or read private configuration. Runtime is tools/local-test/runtime (ignored).
@@ -67,6 +67,13 @@ and PY-33 identified application defects complete: twelve IDs complete, 24 remai
 partial/pending. Next: atomic referral registration/reward, price query accuracy/
 bounded materialization, remaining source confidentiality and administrative audits.
 
+Batch 20 verified: registration/reward/audit use one transaction; four regression
+tests, all 91 backend tests, thirteen native PostgreSQL cases and original
+registration/referral browser checks passed. Owner approved
+the exact indefinite-grant checkout/held-purchase scope in
+docs/PURCHASE_VALUE_APPROVAL.md on 2026-10-16; implement after this batch. Do not
+leave that newly approved work as awaiting permission or silently convert grants.
+
 ## Checklist — do not repeat the audit
 
 | ID | Improvement | Current status |
@@ -75,7 +82,7 @@ bounded materialization, remaining source confidentiality and administrative aud
 | PY-02 | Confidential/restricted market information | Partial: quality list/detail match existing premium screen; broader source/audit response review pending; public basic guidance unchanged |
 | PY-03 | Google ownership and safe account linking | Pending; new linking UI requires approval |
 | PY-04 | Password reset and login revocation | Complete in batch 5; actual HTTP/browser and PostgreSQL reset/logout races passed |
-| PY-05 | Referral abuse protection | Pending; preserve original rewards/qualification; policy changes require approval |
+| PY-05 | Referral abuse protection | Partial: atomic registration/reward/audit, duplicate-registration safety and concurrent seven-day reward preservation verified in batch 20; qualification/abuse-cap changes require approval and remain unchanged |
 | PY-06 | Safe push notification destinations | Application-side complete in batch 13; known-provider/key validation, bounded TLS transport, no redirects; live provider compatibility remains operational verification |
 | PY-07 | Shared-device/session safety | Partial: server revocation, stale UI protection, possession-based push ownership/concurrent registration and bounded current-device logout cleanup verified; JS token storage/offline cleanup limits remain |
 | PY-08 | Input/upload/request abuse bounds | Partial: push endpoint/key/query bounds verified; broader input/upload/request bounds pending |
@@ -102,7 +109,7 @@ bounded materialization, remaining source confidentiality and administrative aud
 | PY-29 | Stable identities and dependent records | Pending; no automatic merge |
 | PY-30 | Isolated automated/browser verification | Partial: baseline guards, 12 original tests, six real browser workflows passed; expand with each batch |
 | PY-31 | Confirmed payment activation and recovery | Partial: atomic confirmation, retry/replay and owner-only callback recovery from provider evidence verified; unattended recovery, indefinite grants and operational delivery/reconciliation decisions remain |
-| PY-32 | Preserve unused purchased/trial time | Approved dated-renewal/trial scope verified in batch 14; indefinite-grant payment handling still pending owner decision |
+| PY-32 | Preserve unused purchased/trial time | Dated-renewal/trial scope verified in batch 14; owner approved indefinite-grant checkout block/held purchases on 2026-10-16, implementation next |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
 | PY-34 | Expiry without unintended staff-role loss | Complete in batch 2; 18 backend tests and two expired-Reporter browser cases passed |
 | PY-35 | Operational readiness and dependency evidence | Pending; production checks outside current scope |
@@ -700,3 +707,33 @@ bounded materialization, remaining source confidentiality and administrative aud
   refund/chargeback rule or indefinite-manual-grant payment decision is introduced.
 - Evidence: tools/local-test/evidence/batch-19-*.json. Twelve IDs complete;
   24 pending/partial. Progress and commits stay local; master/backup preserved.
+
+### Batch 20 — further PY-05/PY-26
+
+- New registration, seven-day referral extension and sanitized audit commit
+  together. Reward/audit failure rolls back the account and reward, allowing a
+  safe retry instead of reporting failure after creating a partial account.
+  User uniqueness conflict remains 409 and cannot issue another reward.
+- Lock referrer user then subscription before inserting a referred child,
+  preventing lost concurrent days and FK key-share lock-upgrade deadlocks. No
+  intermediate expiry/reward commit releases those locks. Standalone reward
+  helper retains its default commit behavior. Existing qualification, no cap,
+  registration-time seven-day reward, 14-day newcomer trial and staff roles remain.
+- Four new tests reproduced three original failures. Full backend: 91 passed,
+  27.717s, no failures/errors/skips. Thirteen marked PostgreSQL cases passed,
+  16.030s: distinct registrations retain both rewards; duplicate concurrent
+  registration creates/rewards/audits once, without deadlock. Other security and
+  payment-race cases remain passing. Cluster is still isolated for next-batch tests.
+- Browser used the original referral URL, registration/password form and Dashboard:
+  newcomer gets exactly 14 trial days; referrer gains exactly seven days and one
+  referral. Original labels/layout unchanged; no frontend source/build change.
+  Only fabricated user data was added. No provider or external page request.
+- Manual: http://127.0.0.1:55446/register?ref=TESTREFERRER, use a new fabricated
+  @example.com email. Referrer is referrer@example.com / PriceYardDemo8!, and its
+  original Dashboard shows the reward. Automated check already added one referral.
+- Policy-based abuse caps/verified-email qualification/first-payment rewards were
+  not introduced; they require a separate owner decision. Evidence:
+  tools/local-test/evidence/batch-20-*.json. Twelve IDs complete, 24 partial/pending.
+- Owner explicitly approved the exact indefinite-grant checkout/held-payment scope
+  in docs/PURCHASE_VALUE_APPROVAL.md during this batch. Implement it next (batch 21);
+  it is not awaiting approval and is not claimed implemented by this checkpoint.

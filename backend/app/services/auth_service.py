@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.models.user import User
+from app.models.subscription import Subscription
 from app.services.audit_service import create_audit_log, snapshot_model
 from app.services.subscription_service import apply_referral_reward, build_trial_subscription
 from app.schemas.auth_schema import RegisterRequest
@@ -58,14 +59,18 @@ def register_user(db: Session, payload: RegisterRequest) -> User:
         ) from exc
 
     referrer: User | None = None
+    referrer_subscription: Subscription | None = None
     if payload.referral_code:
         code = payload.referral_code.strip().upper()
-        referrer = db.scalar(select(User).where(User.referral_code == code))
+        # Take the parent-user lock before inserting the child referral row;
+        # otherwise concurrent FK key-share locks can deadlock on upgrade.
+        referrer = db.scalar(select(User).where(User.referral_code == code).with_for_update().execution_options(populate_existing=True))
         if referrer is None:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Invalid referral code",
             )
+        referrer_subscription = db.scalar(select(Subscription).where(Subscription.user_id == referrer.id).with_for_update().execution_options(populate_existing=True))
 
     user = User(
         full_name=payload.full_name.strip(),
@@ -81,6 +86,15 @@ def register_user(db: Session, payload: RegisterRequest) -> User:
     db.add(user)
 
     try:
+        db.flush()
+        if referrer is not None:
+            old_value = snapshot_model(referrer_subscription) if referrer_subscription else None
+            if apply_referral_reward(db, referrer, commit=False):
+                create_audit_log(
+                    db, actor=referrer, action="referral.reward_granted", table_name="subscriptions",
+                    record_id=referrer_subscription.id, old_value=old_value,
+                    new_value=snapshot_model(referrer_subscription), commit=False,
+                )
         db.commit()
     except IntegrityError as exc:
         db.rollback()
@@ -88,14 +102,9 @@ def register_user(db: Session, payload: RegisterRequest) -> User:
             status_code=status.HTTP_409_CONFLICT,
             detail="User account already exists",
         ) from exc
-
-    if referrer is not None:
-        old_value = snapshot_model(referrer.subscription) if referrer.subscription else None
-        if apply_referral_reward(db, referrer):
-            create_audit_log(
-                db, actor=referrer, action="referral.reward_granted", table_name="subscriptions",
-                record_id=referrer.subscription.id, old_value=old_value, new_value=snapshot_model(referrer.subscription),
-            )
+    except Exception:
+        db.rollback()
+        raise
 
     # SessionLocal uses expire_on_commit=False and PostgreSQL/SQLAlchemy returns
     # generated fields during INSERT, so avoid a second database round trip after

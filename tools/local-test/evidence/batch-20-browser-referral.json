@@ -1,0 +1,9 @@
+{
+  "original_registration_and_referral_link": true,
+  "new_account_trial_days": 14,
+  "referrer_added_days": 7,
+  "referred_count_increased_once": true,
+  "original_dashboard_wording": true,
+  "external_page_requests": 0,
+  "production_connections": 0
+}

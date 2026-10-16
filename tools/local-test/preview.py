@@ -54,7 +54,7 @@ now = datetime.now(timezone.utc)
 with Session(engine) as db:
     users = {}
     demo_hash = hash_password("PriceYardDemo8!")
-    for name, role, access in (("free", "free_user", "free"), ("trial", "free_user", "trial"), ("paid", "paid_user", "active"), ("reporter", "reporter", "free"), ("admin", "admin", "free"), ("expired-reporter", "reporter", "trial_expired"), ("expired-paid-reporter", "reporter", "paid_expired"), ("reset", "free_user", "trial"), ("payment", "free_user", "free"), ("manual-paid", "paid_user", "manual_active"), ("value-paid", "paid_user", "active"), ("value-trial", "free_user", "trial"), ("verify", "free_user", "free")):
+    for name, role, access in (("free", "free_user", "free"), ("trial", "free_user", "trial"), ("paid", "paid_user", "active"), ("reporter", "reporter", "free"), ("admin", "admin", "free"), ("expired-reporter", "reporter", "trial_expired"), ("expired-paid-reporter", "reporter", "paid_expired"), ("reset", "free_user", "trial"), ("payment", "free_user", "free"), ("manual-paid", "paid_user", "manual_active"), ("value-paid", "paid_user", "active"), ("value-trial", "free_user", "trial"), ("verify", "free_user", "free"), ("referrer", "free_user", "trial")):
         user = User(full_name=f"Test {name.title()}", email=f"{name}@example.com", password_hash=demo_hash, role=role, is_active=True, referral_code="TEST"+name.upper())
         if access in {"trial", "trial_expired"}:
             user.subscription = build_trial_subscription(user=user, now=now-timedelta(days=15) if access == "trial_expired" else now)

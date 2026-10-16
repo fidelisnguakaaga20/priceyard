@@ -206,15 +206,18 @@ def activate_paid_subscription(db: Session, subscription: Subscription, *, plan:
 REFERRAL_REWARD_DAYS = 7
 
 
-def apply_referral_reward(db: Session, referrer: User) -> bool:
+def apply_referral_reward(db: Session, referrer: User, *, commit: bool = True) -> bool:
     """Extend the referrer's trial when someone they referred registers. Only applies
     to trial/free accounts - active/expired/cancelled subscriptions are left untouched
     since extra "trial days" has no meaning for them."""
-    subscription = find_subscription_for_user(db, referrer.id)
+    db.scalar(select(User).where(User.id == referrer.id).with_for_update().execution_options(populate_existing=True))
+    subscription = db.scalar(select(Subscription).where(Subscription.user_id == referrer.id).with_for_update().execution_options(populate_existing=True))
     if subscription is None:
         return False
 
     now = utc_now()
+    trial_expired = apply_trial_expiry(subscription, now=now)
+    paid_expired = apply_paid_expiry(subscription, now=now)
     if subscription.status == "trial":
         current_end = subscription.trial_ends_at or now
         if current_end.tzinfo is None:
@@ -226,10 +229,16 @@ def apply_referral_reward(db: Session, referrer: User) -> bool:
         subscription.trial_started_at = now
         subscription.trial_ends_at = now + timedelta(days=REFERRAL_REWARD_DAYS)
     else:
+        if commit and (trial_expired or paid_expired):
+            db.commit()
+            db.refresh(subscription)
         return False
 
-    db.commit()
-    db.refresh(subscription)
+    if commit:
+        db.commit()
+        db.refresh(subscription)
+    else:
+        db.flush()
     return True
 
 
