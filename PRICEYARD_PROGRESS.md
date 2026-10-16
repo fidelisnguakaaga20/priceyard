@@ -74,6 +74,13 @@ PY-32 now complete: thirteen IDs complete, 23 partial/pending. Next: correct pri
 filter refresh/order behavior, bounded current-price queries, source confidentiality
 and remaining atomic administrative writes. Preserve all original price units.
 
+Batch 22 verified: current-price requests ignore superseded responses;
+automatic refresh uses the last applied filters and skips a pending foreground
+request. Four filter checks, both outage/recovery checks and seven original-browser
+baseline workflows passed; TypeScript/Vite passed. Original JSX/CSS unchanged.
+Batch 23 in progress: database-side current-price ranking passes six focused tests;
+full backend/PostgreSQL/browser verification remains before saving that batch.
+
 ## Checklist — do not repeat the audit
 
 | ID | Improvement | Current status |
@@ -93,7 +100,7 @@ and remaining atomic administrative writes. Preserve all original price units.
 | PY-13 | Consistent Nigerian dates/times | Partial: legacy naive trial timestamps interpreted as UTC consistently with backend; remaining entry/display/filter handling pending; original paid UTC date policy unchanged |
 | PY-14 | Evidence-based movement/confidence | Pending; wording/policy changes require approval |
 | PY-15 | Prices recover after failed loading | Complete in batch 1; before/after browser regression passed |
-| PY-16 | Correct filters and response ordering | Pending |
+| PY-16 | Correct filters and response ordering | Partial: current-price applied/draft filters, stale responses and foreground/background overlap verified in batch 22; remaining history/navigation cases pending |
 | PY-17 | Correct market-detail loading | Complete for identified loading races/combined-failure defect in batch 16; obsolete commodity/account responses ignored and independent successful sections retained |
 | PY-18 | Accurate account/payment/access messages | Complete for identified account/expiry/callback defects in batches 4/11/19; verified return refreshes access, unconfirmed return never claims payment received in title |
 | PY-19 | Existing FAQ draft/hide/publish management | Complete in batch 12; hidden drafts remain available to Admin across reload, public publication boundary verified |
@@ -108,7 +115,7 @@ and remaining atomic administrative writes. Preserve all original price units.
 | PY-28 | Historical record preservation | Partial: approved 0022 tested on fresh/populated synthetic PostgreSQL; future migration/history work pending |
 | PY-29 | Stable identities and dependent records | Pending; no automatic merge |
 | PY-30 | Isolated automated/browser verification | Partial: baseline guards, 12 original tests, six real browser workflows passed; expand with each batch |
-| PY-31 | Confirmed payment activation and recovery | Partial: atomic confirmation, retry/replay and owner-only callback recovery from provider evidence verified; unattended recovery, indefinite grants and operational delivery/reconciliation decisions remain |
+| PY-31 | Confirmed payment activation and recovery | Partial: atomic confirmation, retry/replay, owner-only callback recovery and approved indefinite-grant holds verified; unattended recovery and operational delivery/reconciliation decisions remain |
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches 14/21: carry forward dated paid/trial time; preserve indefinite grants, block new checkout and hold/recover old purchases without consuming days |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
 | PY-34 | Expiry without unintended staff-role loss | Complete in batch 2; 18 backend tests and two expired-Reporter browser cases passed |
@@ -768,3 +775,23 @@ and remaining atomic administrative writes. Preserve all original price units.
 - Evidence: tools/local-test/evidence/batch-21-*.json. Thirteen IDs complete;
   23 pending/partial. All approved purchased-time rules now implemented; unattended
   recovery/operational refund decisions remain separate PY-31/PY-35 work.
+
+### Batch 22 — further PY-16
+
+- An older refresh cannot overwrite applied filters. Background refresh uses the
+  last applied selection, leaving draft controls unchanged until Apply, and skips
+  a pending foreground request. Superseded/unmounted requests cannot update state.
+- Before/after browser checks reproduced and fixed all three defects; foreground
+  loading also finishes. Checker corrections: use original select elements (their
+  implicit labels include option text), hold both ticker/list requests, and wait
+  for new fetches/rendering rather than the one-time networkidle load milestone.
+  Those were test corrections, not application features or markup changes.
+- Original Home/Prices outage recovery and seven baseline workflows passed,
+  including original plans/Admin form, Guest source privacy and 375px overflow.
+  TypeScript/Vite passed, 6.41s; JS 318.88kB/90.11kB gzip. Original CSS artifact
+  index-19youOJ7.css remains identical, 31.58kB/7.09kB gzip. No backend change.
+- Manual: http://127.0.0.1:55446/prices. Select Down, click Apply (the synthetic
+  current row is Up, so no match), then Clear to restore Egusi/Kwali Market.
+  Automated checks cover delayed response/timer races that are hard to time by hand.
+- Evidence: tools/local-test/evidence/batch-22-*.json. Thirteen IDs complete;
+  23 partial/pending. Local only; native PostgreSQL remains stopped.

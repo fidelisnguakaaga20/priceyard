@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Disclaimer, PRICE_DISCLAIMER } from "../components/Disclaimer";
 import { ButtonSpinner, LoadingSpinner } from "../components/LoadingSpinner";
@@ -10,6 +10,7 @@ import { apiFetch } from "../services/api";
 import type { Commodity, Market, PriceUpdate } from "../types/api";
 
 const AUTO_REFRESH_MS = 60_000;
+type PriceFilters = { commodity?: string; market?: string; movement?: string };
 
 export function PricesPage() {
   const { dataSaver } = usePreferences();
@@ -28,33 +29,49 @@ export function PricesPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [filtersLoading, setFiltersLoading] = useState(true);
+  const requestSequence = useRef(0);
+  const foregroundPending = useRef(false);
+  const appliedFilters = useRef<PriceFilters>({ commodity, market });
 
-  const load = async (params?: { commodity?: string; market?: string; movement?: string }, silent = false) => {
-    if (!silent) { setLoading(true); setError(""); }
+  const load = async (params?: PriceFilters, silent = false) => {
+    if (silent && foregroundPending.current) return;
+    const sequence = ++requestSequence.current;
+    if (!silent) {
+      foregroundPending.current = true;
+      appliedFilters.current = params || {};
+      setLoading(true); setError("");
+    }
     const query = new URLSearchParams();
     if (params?.commodity) query.set("commodity", params.commodity);
     if (params?.market) query.set("market", params.market);
     if (params?.movement) query.set("movement", params.movement);
     try {
       const data = await apiFetch<PriceUpdate[]>(`/price-updates${query.size ? `?${query}` : ""}`);
+      if (sequence !== requestSequence.current) return;
       setItems(data);
       setError("");
     } catch (err) {
-      if (!silent) setError((err as Error).message);
+      if (sequence === requestSequence.current && !silent) setError((err as Error).message);
     } finally {
-      if (!silent) setLoading(false);
+      if (sequence === requestSequence.current && !silent) {
+        foregroundPending.current = false;
+        setLoading(false);
+      }
     }
   };
 
   useEffect(() => {
+    let current = true;
     void load({ commodity, market });
     void Promise.all([
       apiFetch<Commodity[]>("/commodities"),
       apiFetch<Market[]>("/markets"),
     ]).then(([commodityItems, marketItems]) => {
+      if (!current) return;
       setCommodities(commodityItems);
       setMarkets(marketItems);
-    }).catch(() => undefined).finally(() => setFiltersLoading(false));
+    }).catch(() => undefined).finally(() => { if (current) setFiltersLoading(false); });
+    return () => { current = false; requestSequence.current++; foregroundPending.current = false; };
   }, []);
 
   // Silently keep the list current while it's open, so an admin's new/edited price
@@ -62,9 +79,9 @@ export function PricesPage() {
   // repeated background fetches cost mobile data that toggle exists to avoid.
   useEffect(() => {
     if (dataSaver) return;
-    const interval = setInterval(() => { void load({ commodity, market, movement }, true); }, AUTO_REFRESH_MS);
+    const interval = setInterval(() => { void load(appliedFilters.current, true); }, AUTO_REFRESH_MS);
     return () => clearInterval(interval);
-  }, [dataSaver, commodity, market, movement]);
+  }, [dataSaver]);
 
   const submit = (event: FormEvent) => { event.preventDefault(); void load({ commodity, market, movement }); };
   const clear = () => { setCommodity(""); setMarket(""); setMovement(""); void load(); };
