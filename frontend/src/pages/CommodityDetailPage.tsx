@@ -19,7 +19,8 @@ export function CommodityDetailPage() {
   const name = decodeURIComponent(commodityName);
   useDocumentTitle(name || "Commodity");
   const { token, user, hasFullAccess } = useAuth();
-  const [prices, setPrices] = useState<PriceUpdate[]>([]);
+  const [priceResult, setPriceResult] = useState<{ name: string; items: PriceUpdate[] }>({ name: "", items: [] });
+  const prices = priceResult.name === name ? priceResult.items : [];
   const [signals, setSignals] = useState<MarketSignal[]>([]);
   const [quality, setQuality] = useState<QualitySignal[]>([]);
   const [zones, setZones] = useState<BuyingZone[]>([]);
@@ -28,55 +29,70 @@ export function CommodityDetailPage() {
   const [costs, setCosts] = useState<CostBreakdown[]>([]);
   const [markets, setMarkets] = useState<Market[]>([]);
   const [error, setError] = useState("");
+  const [intelligenceError, setIntelligenceError] = useState("");
   const [loading, setLoading] = useState(true);
   const [intelligenceLoading, setIntelligenceLoading] = useState(false);
   const marketMap = useMemo(() => new Map(markets.map((m) => [m.id, m.name])), [markets]);
   const marketLabel = (marketId: number) => marketMap.get(marketId) || `Market #${marketId}`;
 
   useEffect(() => {
+    let current = true;
     setError("");
     setLoading(true);
     apiFetch<PriceUpdate[]>(`/price-updates?commodity=${encodeURIComponent(name)}`)
-      .then(setPrices)
-      .catch((err: Error) => setError(err.message))
-      .finally(() => setLoading(false));
+      .then((items) => { if (current) setPriceResult({ name, items }); })
+      .catch((err: Error) => { if (current) setError(err.message); })
+      .finally(() => { if (current) setLoading(false); });
+    return () => { current = false; };
   }, [name]);
 
   useEffect(() => {
-    apiFetch<Market[]>("/markets").then(setMarkets).catch(() => undefined);
+    let current = true;
+    apiFetch<Market[]>("/markets").then((items) => { if (current) setMarkets(items); }).catch(() => undefined);
+    return () => { current = false; };
   }, []);
 
   const commodityId = prices[0]?.commodity_id;
 
   useEffect(() => {
+    let current = true;
+    // Clear data belonging to an old commodity/account before another load.
+    setSignals([]); setQuality([]); setZones([]); setSellWatch([]); setStorage([]); setCosts([]);
+    setIntelligenceError("");
     if (!commodityId || !user || !hasFullAccess || !token) {
       setIntelligenceLoading(false);
       return;
     }
     setIntelligenceLoading(true);
-    Promise.all([
+    Promise.allSettled([
       apiFetch<MarketSignal[]>("/market-signals", {}, token),
       apiFetch<QualitySignal[]>("/quality-signals", {}, token),
       apiFetch<BuyingZone[]>("/buying-zones", {}, token),
       apiFetch<SellWatchWindow[]>("/sell-watch-windows", {}, token),
       apiFetch<StorageSuitability[]>("/storage-suitability", {}, token),
       apiFetch<CostBreakdown[]>("/cost-breakdowns", {}, token),
-    ]).then(([marketSignals, qualitySignals, buyingZones, sellWindows, storageItems, costItems]) => {
-      setSignals(marketSignals.filter((item) => item.commodity_id === commodityId));
-      setQuality(qualitySignals.filter((item) => item.commodity_id === commodityId));
-      setZones(buyingZones.filter((item) => item.commodity_id === commodityId));
-      setSellWatch(sellWindows.filter((item) => item.commodity_id === commodityId));
-      setStorage(storageItems.filter((item) => item.commodity_id === commodityId));
-      setCosts(costItems.filter((item) => item.commodity_id === commodityId));
-    }).catch(() => undefined).finally(() => setIntelligenceLoading(false));
-  }, [commodityId, user, hasFullAccess, token]);
+    ]).then((results) => {
+      if (!current) return;
+      const [marketSignals, qualitySignals, buyingZones, sellWindows, storageItems, costItems] = results;
+      if (marketSignals.status === "fulfilled") setSignals(marketSignals.value.filter((item) => item.commodity_id === commodityId));
+      if (qualitySignals.status === "fulfilled") setQuality(qualitySignals.value.filter((item) => item.commodity_id === commodityId));
+      if (buyingZones.status === "fulfilled") setZones(buyingZones.value.filter((item) => item.commodity_id === commodityId));
+      if (sellWindows.status === "fulfilled") setSellWatch(sellWindows.value.filter((item) => item.commodity_id === commodityId));
+      if (storageItems.status === "fulfilled") setStorage(storageItems.value.filter((item) => item.commodity_id === commodityId));
+      if (costItems.status === "fulfilled") setCosts(costItems.value.filter((item) => item.commodity_id === commodityId));
+      const failure = results.find((result) => result.status === "rejected");
+      if (failure?.status === "rejected") setIntelligenceError(failure.reason instanceof Error ? failure.reason.message : String(failure.reason));
+    }).catch((err: Error) => { if (current) setIntelligenceError(err.message); })
+      .finally(() => { if (current) setIntelligenceLoading(false); });
+    return () => { current = false; };
+  }, [commodityId, user?.id, hasFullAccess, token, name]);
 
   return <section className="page page-section">
     <div className="page-title detail-title-row">
       <CommodityImage src={prices[0]?.commodity.image_url} alt={name} className="commodity-image-detail" />
       <div><span className="eyebrow">Commodity intelligence</span><h1 style={{ color: commodityTitleColor(name) }}>{name}</h1><p>Current approved market records plus full-access intelligence where your subscription permits.</p></div>
     </div>
-    {error && <div className="status-box error">{error}</div>}
+    {(error || intelligenceError) && <div className="status-box error">{error || intelligenceError}</div>}
     {loading ? <LoadingSpinner label={`Loading ${name} prices…`} /> : prices.length ? <div className="detail-grid">{prices.map((item) => <article key={item.id} className="card detail-card">
       <div className="card-row"><div><span className="eyebrow">{item.market.name}</span><h2>{money(item.price_low)} – {money(item.price_high)}</h2></div><span className={`movement movement-${item.movement}`}>{movementIcon(item.movement)} {item.movement}</span></div>
       <dl className="data-list"><div><dt>Previous range</dt><dd>{item.previous_price_low !== null ? `${money(item.previous_price_low)} – ${money(item.previous_price_high)}` : "Not confirmed"}</dd></div><div><dt>Average</dt><dd>{money(item.average_price)}</dd></div><div><dt>Unit / bag</dt><dd>{item.unit}{item.bag_size ? ` / ${item.bag_size}` : ""}</dd></div><div><dt>Market day / time</dt><dd>{item.market_day || item.market.market_day || "—"}{item.time_of_day ? ` · ${item.time_of_day}` : ""}</dd></div><div><dt>Status</dt><dd><span className={`confidence-badge ${confidenceClass(item.confidence_level)}`}>{item.confidence_level}</span><ConfidenceInfo /></dd></div><div><dt>Last updated</dt><dd className={agingClass(item.update_date_time)}>{relativeTime(item.update_date_time)}</dd></div></dl>

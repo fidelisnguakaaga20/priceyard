@@ -44,8 +44,10 @@ Owner approved PY-32 paid/trial-time preservation on 2026-10-16, exactly rules
 remains a separate pending decision. Batch 14 implements and verifies the approved
 dated-renewal/trial calculations. Batch 15 verifies checkout validation: 74 backend
 tests and original-button fake-provider browser checks passed. Next: commodity
-detail loading (PY-17), payment reconciliation, shared-device push cleanup and
-other pending technical items.
+detail loading (PY-17) is verified in batch 16: five before/after browser checks
+and TypeScript/build passed; seven baseline browser workflows also passed. Next:
+PY-07 push ownership protection (batch 17), payment reconciliation, shared-device
+push cleanup and other pending technical items.
 Apply small technical batches with automated and browser verification. Reuse
 existing local tools from .git/priceyard-local-recovery-20261015; do not reinstall
 or read private configuration. Runtime is tools/local-test/runtime (ignored).
@@ -70,7 +72,7 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
 | PY-14 | Evidence-based movement/confidence | Pending; wording/policy changes require approval |
 | PY-15 | Prices recover after failed loading | Complete in batch 1; before/after browser regression passed |
 | PY-16 | Correct filters and response ordering | Pending |
-| PY-17 | Correct market-detail loading | Pending |
+| PY-17 | Correct market-detail loading | Complete for identified loading races/combined-failure defect in batch 16; obsolete commodity/account responses ignored and independent successful sections retained |
 | PY-18 | Accurate account/payment/access messages | Partial: stale profile/401/outage fixes plus batch 11 expiry display/timers verified; callback/payment messaging verification pending |
 | PY-19 | Existing FAQ draft/hide/publish management | Complete in batch 12; hidden drafts remain available to Admin across reload, public publication boundary verified |
 | PY-20 | Bounded queries with accessible historical records | Pending |
@@ -548,3 +550,29 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
   reconciliation are not claimed complete. No frontend rebuild needed.
 - Evidence: tools/local-test/evidence/batch-15-*.json. Nine IDs fully complete;
   27 pending/partial. Original master/backup remain preserved; commits local only.
+
+### Batch 16 — PY-17
+
+- Commodity results belong to their requested route. Ignore superseded success,
+  error and loading callbacks; clear intelligence on commodity/account/access
+  changes. One failed intelligence request no longer discards other successful
+  sections. Report its existing API error through the existing error box.
+  Original component layout, labels, CSS, fields, price units and policies remain.
+- Five browser checks reproduce the old behavior and pass afterward: delayed
+  prices, delayed errors, independent-section success, visible failure and delayed
+  old-commodity intelligence. The nonexistent route used for navigation inserts
+  no commodity or market. Delayed prices originate from the real synthetic API;
+  outage/intelligence response fixtures are explicitly fabricated in the browser.
+- The first checker attempted Playwright route.fetch, which the Node transport
+  guard correctly denied before network access. Replaced that with browser-origin
+  synthetic API capture; no guard was relaxed. A later checker read empty section
+  headings before responses settled; it now waits for the actual success/error
+  contents. That checker timing failure was not another application defect.
+- TypeScript/Vite passed (5.63s, main 317.31kB/89.61kB gzip). Original CSS remains
+  index-19youOJ7.css, 31.58kB/7.09kB gzip. Backend unchanged: prior 74-test result
+  remains its baseline, not a new rerun. Seven baseline browser workflows passed,
+  including original cards/filters/plans/Admin form, mobile overflow and rate limit.
+- Manual: http://127.0.0.1:55446/commodities/Egusi. Original detail layout loads
+  for guests; trial@example.com / PriceYardDemo8! retains full-access sections.
+- Evidence: tools/local-test/evidence/batch-16-*.json. Ten IDs complete;
+  26 remain pending/partial. No production services/data or new dependencies.

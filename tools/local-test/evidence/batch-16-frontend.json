@@ -1,0 +1,12 @@
+{
+  "typescript": "passed",
+  "vite": "5.4.11",
+  "build_seconds": 5.63,
+  "modules": 100,
+  "javascript_kb": 317.31,
+  "javascript_gzip_kb": 89.61,
+  "css_artifact": "index-19youOJ7.css",
+  "css_kb": 31.58,
+  "css_gzip_kb": 7.09,
+  "runtime": "guarded synthetic snapshot; existing tools; no credentials or installs"
+}
