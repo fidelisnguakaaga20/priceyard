@@ -1,0 +1,14 @@
+<!doctype html><html><head><title>Local payment recovery testing</title></head>
+<body style="font:18px system-ui;max-width:760px;margin:32px auto;padding:16px">
+<h1>Local payment recovery testing</h1><p>Fabricated replies only. No provider, bank, money or real customer is involved.</p>
+<ol><li>Sign into <a href="/login" target="_blank">the original app</a> as verify@example.com, password PriceYardDemo8!.</li>
+<li>Choose a pending or wrong-amount reply. Open <a href="/payment/callback?reference=py_local_verify_only" target="_blank">the original payment-return page</a>. Go to Dashboard: access stays Free.</li>
+<li>Choose a confirmed reply and open the same return page. The existing account access updates to Active Paid, even without a webhook. Reopening the link must not add days again.</li>
+<li>Disable this fixture when finished.</li></ol>
+<button onclick="mode('pending')">Use pending payment reply</button>
+<button onclick="mode('wrong_amount')">Use wrong-amount payment reply</button>
+<button onclick="mode('valid')">Use confirmed payment reply</button>
+<button onclick="mode('disabled')">Disable verification fixture</button>
+<pre id="result" role="status"></pre>
+<script>async function mode(mode){const response=await fetch('/__test__/verification-mode',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode})});document.querySelector('#result').textContent=JSON.stringify(await response.json(),null,2)}</script>
+</body></html>

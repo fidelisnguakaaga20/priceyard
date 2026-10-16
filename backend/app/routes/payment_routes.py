@@ -1,16 +1,38 @@
 import json
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Path, Request, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.payment import Payment
 from app.models.user import User
 from app.schemas.payment_schema import PaymentInitiateRequest, PaymentInitiateResponse, PaymentResponse
-from app.services.payment_service import handle_webhook_event, initiate_payment, list_payments, verify_webhook_signature
+from app.services.payment_service import handle_webhook_event, initiate_payment, list_payments, verify_recorded_payment, verify_webhook_signature
+from app.rate_limit import limiter
 from app.utils.permissions import get_current_user, require_roles
 
 router = APIRouter(prefix="/payments", tags=["payments"])
+
+
+def _verification_user(request: Request, user: User = Depends(get_current_user)) -> User:
+    request.state.payment_verification_user_id = user.id
+    return user
+
+
+def _verification_key(request: Request) -> str:
+    # Keep customers behind the same mobile/carrier NAT from sharing one quota.
+    return f"{request.client.host if request.client else 'unknown'}:{request.state.payment_verification_user_id}"
+
+
+@router.post("/{reference}/verify", response_model=PaymentResponse)
+@limiter.limit("10/minute", key_func=_verification_key)
+def verify_payment(
+    request: Request,
+    reference: str = Path(min_length=1, max_length=100),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(_verification_user),
+) -> Payment:
+    return verify_recorded_payment(db, current_user, reference)
 
 
 @router.post("/initiate", response_model=PaymentInitiateResponse)

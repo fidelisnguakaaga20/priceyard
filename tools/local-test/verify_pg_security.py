@@ -297,7 +297,7 @@ class PostgreSQLSecurityTests(unittest.TestCase):
     def test_concurrent_last_admin_demotion_keeps_one_admin(self):
         self.admin_race({"role":"free_user"})
 
-    def payment_race(self, *, duplicate_transaction, distinct_purchases=False):
+    def payment_race(self, *, duplicate_transaction, distinct_purchases=False, verification=False):
         Base.metadata.create_all(self.engine)
         with Session(self.engine) as db:
             user=User(full_name="Synthetic payer",email="pgpayment@example.com",password_hash="not-used",role="free_user",is_active=True,referral_code="PGPAY")
@@ -315,20 +315,34 @@ class PostgreSQLSecurityTests(unittest.TestCase):
             if statement.lstrip().upper().startswith("UPDATE PAYMENTS"):
                 time.sleep(0.1)
         sqlalchemy.event.listen(self.engine,"before_cursor_execute",delay_payment_write)
-        def worker(reference):
+        def worker(reference, verify=False):
             transaction_id = 808081 if distinct_purchases and reference == "py_concurrent_two" else 808080
             payload={"event":"charge.success","data":{"reference":reference,"id":transaction_id,"amount":250000,"currency":"NGN","status":"success"}}
             with Session(self.engine) as db:
                 barrier.wait(timeout=15)
                 try:
-                    payment_service.handle_webhook_event(db,payload);outcomes.append(200)
+                    if verify:
+                        payment_service.verify_recorded_payment(db,db.get(User,user_id),reference)
+                    else:
+                        payment_service.handle_webhook_event(db,payload)
+                    outcomes.append(200)
                 except HTTPException as error:
                     db.rollback();outcomes.append(error.status_code)
                 except BaseException as error:
                     db.rollback();outcomes.append(type(error).__name__)
-        with patch.object(payment_service,"notify_admins",return_value=None):
+        import json
+        import requests
+        from types import SimpleNamespace
+        def provider(session, method, url, **kwargs):
+            if method.upper() != "GET" or url != "https://api.paystack.co/transaction/verify/py_concurrent_one":
+                raise RuntimeError("Only a mocked payment verification is allowed")
+            response=requests.Response();response.status_code=200
+            response._content=json.dumps({"status":True,"data":{"reference":"py_concurrent_one","id":808080,"amount":250000,"currency":"NGN","status":"success"}}).encode()
+            return response
+        settings=SimpleNamespace(paystack_secret_key="sk_test_synthetic_pg_only",frontend_url="http://127.0.0.1:55446")
+        with patch.object(payment_service,"notify_admins",return_value=None),patch.object(payment_service,"get_settings",return_value=settings),patch("requests.Session.request",autospec=True,side_effect=provider):
             worker_references=references if duplicate_transaction or distinct_purchases else references*2
-            threads=[threading.Thread(target=worker,args=(reference,)) for reference in worker_references]
+            threads=[threading.Thread(target=worker,args=(reference,verification and index==0)) for index,reference in enumerate(worker_references)]
             for thread in threads:thread.start()
             for thread in threads:thread.join(25)
         sqlalchemy.event.remove(self.engine,"before_cursor_execute",delay_payment_write)
@@ -352,6 +366,9 @@ class PostgreSQLSecurityTests(unittest.TestCase):
 
     def test_one_provider_transaction_cannot_credit_concurrent_purchases(self):
         self.payment_race(duplicate_transaction=True)
+
+    def test_provider_verification_and_webhook_share_one_credit(self):
+        self.payment_race(duplicate_transaction=False,verification=True)
 
     def test_concurrent_push_registration_cannot_overwrite_other_device_keys(self):
         import base64

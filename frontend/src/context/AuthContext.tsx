@@ -118,6 +118,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [clearAuth, navigate, showToast]);
 
   const refreshWithToken = useCallback(async (activeToken: string) => {
+    if (activeTokenRef.current !== activeToken) return;
     const sequence = ++refreshSequence.current;
     const isCurrent = () => sequence === refreshSequence.current && activeTokenRef.current === activeToken;
     if (!profileReady.current) setLoading(true);

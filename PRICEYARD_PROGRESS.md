@@ -59,6 +59,14 @@ Apply small technical batches with automated and browser verification. Reuse
 existing local tools from .git/priceyard-local-recovery-20261015; do not reinstall
 or read private configuration. Runtime is tools/local-test/runtime (ignored).
 
+Batch 19 verified: owner-only provider verification shares the atomic webhook
+confirmation path. Callback recovery refreshes entitlement without changing its
+markup/CSS/guidance. All 87 backend tests, eight final verification/quota tests,
+eleven marked PostgreSQL cases and payment/account browser checks passed. PY-18
+and PY-33 identified application defects complete: twelve IDs complete, 24 remain
+partial/pending. Next: atomic referral registration/reward, price query accuracy/
+bounded materialization, remaining source confidentiality and administrative audits.
+
 ## Checklist — do not repeat the audit
 
 | ID | Improvement | Current status |
@@ -80,7 +88,7 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
 | PY-15 | Prices recover after failed loading | Complete in batch 1; before/after browser regression passed |
 | PY-16 | Correct filters and response ordering | Pending |
 | PY-17 | Correct market-detail loading | Complete for identified loading races/combined-failure defect in batch 16; obsolete commodity/account responses ignored and independent successful sections retained |
-| PY-18 | Accurate account/payment/access messages | Partial: stale profile/401/outage fixes plus batch 11 expiry display/timers verified; callback/payment messaging verification pending |
+| PY-18 | Accurate account/payment/access messages | Complete for identified account/expiry/callback defects in batches 4/11/19; verified return refreshes access, unconfirmed return never claims payment received in title |
 | PY-19 | Existing FAQ draft/hide/publish management | Complete in batch 12; hidden drafts remain available to Admin across reload, public publication boundary verified |
 | PY-20 | Bounded queries with accessible historical records | Pending |
 | PY-21 | Reliable independent alerts | Pending; no new delivery promises |
@@ -93,9 +101,9 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
 | PY-28 | Historical record preservation | Partial: approved 0022 tested on fresh/populated synthetic PostgreSQL; future migration/history work pending |
 | PY-29 | Stable identities and dependent records | Pending; no automatic merge |
 | PY-30 | Isolated automated/browser verification | Partial: baseline guards, 12 original tests, six real browser workflows passed; expand with each batch |
-| PY-31 | Confirmed payment activation and recovery | Partial: atomic activation, missing-subscription preservation and retry/replay tested; provider verification/reconciliation pending; schema additions require approval |
+| PY-31 | Confirmed payment activation and recovery | Partial: atomic confirmation, retry/replay and owner-only callback recovery from provider evidence verified; unattended recovery, indefinite grants and operational delivery/reconciliation decisions remain |
 | PY-32 | Preserve unused purchased/trial time | Approved dated-renewal/trial scope verified in batch 14; indefinite-grant payment handling still pending owner decision |
-| PY-33 | Validate payment evidence | Partial: signed evidence, duplicate provider-ID binding and strict checkout-response/transport validation verified; reconciliation checks pending |
+| PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
 | PY-34 | Expiry without unintended staff-role loss | Complete in batch 2; 18 backend tests and two expired-Reporter browser cases passed |
 | PY-35 | Operational readiness and dependency evidence | Pending; production checks outside current scope |
 | PY-36 | Accurate progress/documentation/maintainability | Progress record established; ongoing |
@@ -648,3 +656,47 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
   26 pending/partial. Preview restart in batch 17 reseeded all payment fixtures,
   so /__test__/purchase-value is ready for a fresh manual demonstration. The reset
   test account now uses UpdatedPassword8! until the next disposable restart.
+
+### Batch 19 — PY-18/PY-33; further PY-31/PY-08
+
+- Owner-only POST /payments/{reference}/verify looks up the recorded purchase
+  before any provider request; Guest denied and other/unknown references 404.
+  Fixed HTTPS Paystack verification destination, no redirects/environment proxy,
+  verified TLS and 3s connect/15s read timeouts. Check response shape, reference,
+  integer kobo, NGN, transaction ID/status and saved plan; never trust callback
+  query parameters as payment evidence. Pending/failed/unconfirmed provider
+  states do not remove trial time or alter saved payment/history records.
+- Confirmed evidence reuses the webhook transaction/locks/audit/replay protection.
+  Can recover a failed-initialization record from a confirmed payment. Already
+  credited purchases do not contact the provider or extend access a second time.
+  Ten requests/minute per authenticated customer/network, preventing a shared
+  carrier NAT from combining different customers into one quota. Original auth
+  limits, prices, durations and 14-day trial remain unchanged. No schema change.
+- Original callback markup, Thank you heading, conditional guidance and Dashboard
+  link remain unchanged. Up to four verification attempts at two-second intervals;
+  confirmed payment refreshes the current account, including an in-flight check
+  finishing after Go to Dashboard. Superseded credentials cannot start refreshes.
+  Browser title uses existing term Payment until confirmed, then Payment received.
+- Six isolation checks passed on resumption. Eight new HTTP tests initially
+  failed 24 assertions because recovery did not exist. Full backend: 87 passed,
+  25.271s. Final customer/network quota refinement: eight focused tests passed,
+  1.050s, including independent quotas for customers sharing an address.
+- Original-browser before check reproduced no recovery and an unverified success
+  title. Afterward: four bounded pending attempts, wrong-amount rejection, recovery
+  without webhook, immediate paid Dashboard/history, unchanged expiry on replay,
+  and conflicting callback reference rejection all passed. Three account race/
+  outage browser regressions passed. Fake provider transport only; zero live calls.
+- Eleven marked PostgreSQL cases passed, 12.691s, including simultaneous provider
+  verification/webhook: one credit and one audit. Cluster stopped afterward.
+  TypeScript/Vite passed (2.05s, main 318.62kB/90.01kB gzip); original CSS artifact
+  remains index-19youOJ7.css, 31.58kB/7.09kB gzip.
+- Manual: http://127.0.0.1:55446/__test__/verification, verify@example.com /
+  PriceYardDemo8!. Automated check already credited this dedicated fabricated
+  purchase; replay cannot add time again. Preview restart reseeds it if needed.
+  Disable the test fixture afterward. No real money/provider/customer involved.
+- Contract source consulted read-only: https://paystack.com/docs/payments/verify-payments/
+  and https://paystack.com/docs/api/transaction/#verify (2026-10-16).
+  No live-provider compatibility/delivery claim, unattended reconciliation job,
+  refund/chargeback rule or indefinite-manual-grant payment decision is introduced.
+- Evidence: tools/local-test/evidence/batch-19-*.json. Twelve IDs complete;
+  24 pending/partial. Progress and commits stay local; master/backup preserved.

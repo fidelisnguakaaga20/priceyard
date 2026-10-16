@@ -54,7 +54,7 @@ now = datetime.now(timezone.utc)
 with Session(engine) as db:
     users = {}
     demo_hash = hash_password("PriceYardDemo8!")
-    for name, role, access in (("free", "free_user", "free"), ("trial", "free_user", "trial"), ("paid", "paid_user", "active"), ("reporter", "reporter", "free"), ("admin", "admin", "free"), ("expired-reporter", "reporter", "trial_expired"), ("expired-paid-reporter", "reporter", "paid_expired"), ("reset", "free_user", "trial"), ("payment", "free_user", "free"), ("manual-paid", "paid_user", "manual_active"), ("value-paid", "paid_user", "active"), ("value-trial", "free_user", "trial")):
+    for name, role, access in (("free", "free_user", "free"), ("trial", "free_user", "trial"), ("paid", "paid_user", "active"), ("reporter", "reporter", "free"), ("admin", "admin", "free"), ("expired-reporter", "reporter", "trial_expired"), ("expired-paid-reporter", "reporter", "paid_expired"), ("reset", "free_user", "trial"), ("payment", "free_user", "free"), ("manual-paid", "paid_user", "manual_active"), ("value-paid", "paid_user", "active"), ("value-trial", "free_user", "trial"), ("verify", "free_user", "free")):
         user = User(full_name=f"Test {name.title()}", email=f"{name}@example.com", password_hash=demo_hash, role=role, is_active=True, referral_code="TEST"+name.upper())
         if access in {"trial", "trial_expired"}:
             user.subscription = build_trial_subscription(user=user, now=now-timedelta(days=15) if access == "trial_expired" else now)
@@ -75,6 +75,7 @@ with Session(engine) as db:
     db.add(Payment(user_id=users["payment"].id, reference="py_local_browser_only", plan="monthly", amount=2500, currency="NGN", status="pending"))
     db.add(Payment(user_id=users["value-paid"].id, reference="py_local_renewal_only", plan="monthly", amount=2500, currency="NGN", status="pending"))
     db.add(Payment(user_id=users["value-trial"].id, reference="py_local_trial_purchase_only", plan="seasonal", amount=6000, currency="NGN", status="pending"))
+    db.add(Payment(user_id=users["verify"].id, reference="py_local_verify_only", plan="monthly", amount=2500, currency="NGN", status="pending"))
     db.commit()
 
 from starlette.applications import Starlette
@@ -154,6 +155,35 @@ async def purchase_value_controls(request):
 
 outage = {"enabled": False}
 checkout_mode = {"mode": "disabled"}
+verification_mode = {"mode": "disabled"}
+
+
+async def verification_controls(request):
+    return HTMLResponse((LAB / "verification_controls.html").read_text(encoding="utf-8"))
+
+
+async def set_verification_mode(request):
+    payload = await request.json()
+    if payload not in ({"mode": "disabled"}, {"mode": "pending"}, {"mode": "wrong_amount"}, {"mode": "valid"}):
+        return JSONResponse({"detail": "Choose a synthetic verification reply"}, status_code=400)
+    verification_mode.update(payload)
+    return JSONResponse({"synthetic_only": True, **verification_mode})
+
+
+async def serve_fake_verification(app, scope, receive, send):
+    import requests
+    from app.config import get_settings
+    def provider(session, method, url, **kwargs):
+        if method.upper() != "GET" or url != "https://api.paystack.co/transaction/verify/py_local_verify_only":
+            raise RuntimeError("Only the fabricated verification transport is permitted")
+        response = requests.Response(); response.status_code = 200
+        response._content = json.dumps({"status": True, "data": {"reference": "py_local_verify_only", "id": 700004,
+            "amount": 249999 if verification_mode["mode"] == "wrong_amount" else 250000, "currency": "NGN",
+            "status": "pending" if verification_mode["mode"] == "pending" else "success"}}).encode()
+        return response
+    fake_settings = get_settings().model_copy(update={"paystack_secret_key": "sk_test_synthetic_verification_only"})
+    with patch("app.services.payment_service.get_settings", return_value=fake_settings), patch("requests.Session.request", autospec=True, side_effect=provider):
+        await app(scope, receive, send)
 
 
 async def checkout_controls(request):
@@ -224,12 +254,14 @@ class LocalOnly:
             async with self.request_lock:
                 if scope.get("path") == "/api/payments/initiate" and checkout_mode["mode"] != "disabled":
                     await serve_fake_checkout(self.app, scope, receive, secured)
+                elif scope.get("path") == "/api/payments/py_local_verify_only/verify" and verification_mode["mode"] != "disabled":
+                    await serve_fake_verification(self.app, scope, receive, secured)
                 else:
                     await self.app(scope, receive, secured)
         else:
             await self.app(scope, receive, secured)
 
-preview = LocalOnly(Starlette(routes=[Route("/__test__/status", status), Route("/__test__/inbox", inbox), Route("/__test__/controls", controls), Route("/__test__/push", push_controls), Route("/__test__/payments", payment_controls), Route("/__test__/purchase-value", purchase_value_controls), Route("/__test__/checkout", checkout_controls), Route("/__test__/checkout-mode", set_checkout_mode, methods=["POST"]), Route("/__test__/payment-event", payment_event, methods=["POST"]), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
+preview = LocalOnly(Starlette(routes=[Route("/__test__/status", status), Route("/__test__/inbox", inbox), Route("/__test__/controls", controls), Route("/__test__/push", push_controls), Route("/__test__/payments", payment_controls), Route("/__test__/purchase-value", purchase_value_controls), Route("/__test__/verification", verification_controls), Route("/__test__/verification-mode", set_verification_mode, methods=["POST"]), Route("/__test__/checkout", checkout_controls), Route("/__test__/checkout-mode", set_checkout_mode, methods=["POST"]), Route("/__test__/payment-event", payment_event, methods=["POST"]), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
 
 if __name__ == "__main__":
     import uvicorn

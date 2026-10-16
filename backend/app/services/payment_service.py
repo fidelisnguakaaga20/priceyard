@@ -5,7 +5,7 @@ import hmac
 import logging
 import secrets
 from decimal import Decimal
-from urllib.parse import urlsplit
+from urllib.parse import quote, urlsplit
 
 import requests
 from fastapi import HTTPException, status
@@ -119,6 +119,50 @@ def verify_webhook_signature(raw_body: bytes, signature: str | None) -> bool:
     return hmac.compare_digest(expected, signature.lower())
 
 
+def _validate_recorded_evidence(payment: Payment, data: dict, *, allow_unconfirmed: bool = False) -> None:
+    amount, transaction_id = data.get("amount"), data.get("id")
+    allowed = {"success", "abandoned", "failed", "ongoing", "pending", "processing", "queued", "reversed"} if allow_unconfirmed else {"success"}
+    if (data.get("reference") != payment.reference
+            or type(amount) is not int or amount <= 0 or Decimal(amount) != payment.amount * 100
+            or data.get("currency") != "NGN" or payment.currency != "NGN"
+            or not isinstance(data.get("status"), str) or data["status"] not in allowed or payment.plan not in PLAN_PRICES
+            or type(transaction_id) is not int or transaction_id <= 0 or len(str(transaction_id)) > 100):
+        raise HTTPException(status_code=422, detail="Payment evidence does not match the recorded purchase")
+
+
+def verify_recorded_payment(db: Session, user: User, reference: str) -> Payment:
+    payment = db.scalar(select(Payment).where(Payment.reference == reference, Payment.user_id == user.id))
+    if payment is None:
+        raise HTTPException(status_code=404, detail="Payment not found")
+    if payment.status == "success":
+        return payment
+    settings = get_settings()
+    if not settings.paystack_secret_key:
+        raise HTTPException(status_code=503, detail="Payments are not configured yet")
+    try:
+        with requests.Session() as transport:
+            transport.trust_env = False
+            response = transport.get(
+                "https://api.paystack.co/transaction/verify/"+quote(reference, safe=""),
+                headers={"Authorization": f"Bearer {settings.paystack_secret_key}"},
+                timeout=(3, 15), allow_redirects=False, verify=True,
+            )
+        body = response.json()
+    except (requests.RequestException, ValueError):
+        raise HTTPException(status_code=502, detail="Could not reach the payment provider") from None
+    if (not 200 <= response.status_code < 300 or not isinstance(body, dict)
+            or body.get("status") is not True or not isinstance(body.get("data"), dict)):
+        raise HTTPException(status_code=502, detail="Could not verify payment")
+    data = body["data"]
+    _validate_recorded_evidence(payment, data, allow_unconfirmed=True)
+    if data["status"] == "success":
+        # Share the webhook's locks/transaction/audit/replay protection. Callback
+        # query parameters themselves are never evidence that money was received.
+        handle_webhook_event(db, {"event": "charge.success", "data": data})
+    db.refresh(payment)
+    return payment
+
+
 def handle_webhook_event(db: Session, payload: dict) -> None:
     if not isinstance(payload, dict):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid webhook payload")
@@ -143,13 +187,8 @@ def handle_webhook_event(db: Session, payload: dict) -> None:
 
     # Compare integer kobo against the amount frozen in the original payment,
     # never browser-supplied prices or a possibly changed current price list.
-    amount = data.get("amount")
     transaction_id = data.get("id")
-    if (type(amount) is not int or amount <= 0 or Decimal(amount) != payment.amount * 100
-            or data.get("currency") != "NGN" or payment.currency != "NGN"
-            or data.get("status") != "success" or payment.plan not in PLAN_PRICES
-            or type(transaction_id) is not int or transaction_id <= 0 or len(str(transaction_id)) > 100):
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Payment evidence does not match the recorded purchase")
+    _validate_recorded_evidence(payment, data)
     if payment.status == "success":
         return
 
