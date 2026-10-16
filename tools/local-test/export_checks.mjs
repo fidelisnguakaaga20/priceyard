@@ -8,7 +8,7 @@ const {chromium}=await import(pathToFileURL(path.join(recovery,'npm-tools-309adb
 const browser=await chromium.launch({headless:true,args:['--disable-background-networking','--disable-component-update','--disable-sync','--no-first-run']});
 const origin='http://127.0.0.1:55446';
 try{
-  const context=await browser.newContext({serviceWorkers:'block'});
+  const context=await browser.newContext({extraHTTPHeaders:{'X-PriceYard-Test-Client':crypto.randomUUID()},serviceWorkers:'block'});
   await context.route('**/*',route=>new URL(route.request().url()).origin===origin?route.continue():route.abort());
   await context.addInitScript(()=>localStorage.setItem('priceyard_onboarding_seen','1'));
   const page=await context.newPage();

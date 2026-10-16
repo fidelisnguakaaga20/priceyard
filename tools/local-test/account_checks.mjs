@@ -10,7 +10,7 @@ const origin='http://127.0.0.1:55446';
 const expectBug=process.argv.includes('--expect-bug');
 const result={};
 async function makePage(){
-  const context=await browser.newContext({serviceWorkers:'block'});
+  const context=await browser.newContext({extraHTTPHeaders:{'X-PriceYard-Test-Client':crypto.randomUUID()},serviceWorkers:'block'});
   await context.route('**/*',route=>new URL(route.request().url()).origin===origin?route.continue():route.abort());
   await context.addInitScript(()=>{
     localStorage.setItem('priceyard_onboarding_seen','1');

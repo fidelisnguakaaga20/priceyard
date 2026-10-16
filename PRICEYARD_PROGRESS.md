@@ -189,3 +189,11 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
 - Owner explicitly approved docs/LOCAL_SECURITY_STORAGE_PROPOSAL.md on 2026-10-16.
   That scope allows internal revocation records only, not new product fields or
   production migration. Evidence: tools/local-test/evidence/batch-4-*.json.
+- Follow-up baseline initially hit the existing five-login/minute quota because
+  all automated browsers shared localhost. The initially copied batch-4 baseline
+  JSON was the earlier passing baseline, not that failed rerun. Replaced with the
+  actual current seven-check passing result after separating fabricated client
+  identities in the test wrapper. No application rate limit was disabled/changed;
+  a new browser check proves five invalid attempts return 401 and the sixth 429.
+  All three account regression cases also passed again. Each test context is
+  independent; normal browser users retain the real localhost quota.

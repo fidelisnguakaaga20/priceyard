@@ -12,7 +12,7 @@ const expectBug=process.argv.includes('--expect-bug');
 const result={};
 try {
   for(const routePath of ['/','/prices']){
-    const context=await browser.newContext({serviceWorkers:'block'});
+    const context=await browser.newContext({extraHTTPHeaders:{'X-PriceYard-Test-Client':crypto.randomUUID()},serviceWorkers:'block'});
     await context.addInitScript(()=>{
       localStorage.setItem('priceyard_onboarding_seen','1');
       const original=window.setInterval.bind(window);

@@ -8,7 +8,7 @@ const recovery = path.join(root, '.git/priceyard-local-recovery-20261015/p00/run
 const { chromium } = await import(pathToFileURL(path.join(recovery, 'npm-tools-309adbe095ff487cb1d6bd447c580c70/node_modules/playwright/index.mjs')));
 const origin = 'http://127.0.0.1:55446';
 const browser = await chromium.launch({headless:true,args:['--disable-background-networking','--disable-component-update','--disable-sync','--no-first-run']});
-let context = await browser.newContext({serviceWorkers:'block',viewport:{width:1366,height:900}});
+let context = await browser.newContext({extraHTTPHeaders:{'X-PriceYard-Test-Client':crypto.randomUUID()},serviceWorkers:'block',viewport:{width:1366,height:900}});
 let externalBlocked = 0;
 await context.route('**/*', route => {
   if (new URL(route.request().url()).origin !== origin) { externalBlocked++; return route.abort(); }
@@ -64,7 +64,7 @@ try {
   result.trial_login_plans_and_history = true;
   // Role fixtures are independent; do not claim this baseline verifies logout.
   await context.close();
-  context = await browser.newContext({serviceWorkers:'block',viewport:{width:1366,height:900}});
+  context = await browser.newContext({extraHTTPHeaders:{'X-PriceYard-Test-Client':crypto.randomUUID()},serviceWorkers:'block',viewport:{width:1366,height:900}});
   await context.route('**/*',route=>new URL(route.request().url()).origin===origin?route.continue():route.abort());
   await context.addInitScript(()=>localStorage.setItem('priceyard_onboarding_seen','1'));
   page=await context.newPage();
@@ -82,6 +82,18 @@ try {
   await page.screenshot({path:path.join(lab,'runtime/original-mobile.png'),fullPage:true});
   result.mobile_original_loaded = true;
   result.mobile_document_overflow = await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth);
+  const quotaContext=await browser.newContext({extraHTTPHeaders:{'X-PriceYard-Test-Client':crypto.randomUUID()},serviceWorkers:'block'});
+  await quotaContext.route('**/*',route=>new URL(route.request().url()).origin===origin?route.continue():route.abort());
+  const quotaPage=await quotaContext.newPage();
+  await quotaPage.goto(origin+'/__test__/status');
+  const attempts=await quotaPage.evaluate(async()=>{
+    const statuses=[];
+    for(let i=0;i<6;i++)statuses.push((await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:'absent@example.com',password:'SyntheticPassword8!'})})).status);
+    return statuses;
+  });
+  assert.deepEqual(attempts,[401,401,401,401,401,429]);
+  result.original_login_rate_limit_preserved=true;
+  await quotaContext.close();
   console.log(JSON.stringify({passed:Object.keys(result).filter(k=>result[k]===true).length,result,external_page_requests_blocked:externalBlocked,production_connections:0}));
   fs.writeFileSync(path.join(lab,'runtime/browser-baseline.json'),JSON.stringify({result,external_page_requests_blocked:externalBlocked,production_connections:0},null,2));
 } catch (error) {

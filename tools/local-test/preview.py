@@ -1,6 +1,7 @@
 """Real original API + original UI, fresh synthetic memory database only."""
 import asyncio
 import json
+import re
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import sys
@@ -104,6 +105,13 @@ class LocalOnly:
             headers = dict(scope.get("headers", []))
             if headers.get(b"host") != b"127.0.0.1:55446" or headers.get(b"origin", b"http://127.0.0.1:55446") != b"http://127.0.0.1:55446":
                 return await JSONResponse({"detail": "Local test only"}, status_code=403)(scope, receive, send)
+            test_client = headers.get(b"x-priceyard-test-client", b"").decode("ascii", errors="ignore")
+            if test_client:
+                if not re.fullmatch(r"[a-zA-Z0-9-]{1,64}", test_client):
+                    return await JSONResponse({"detail": "Invalid test identity"}, status_code=400)(scope, receive, send)
+                # Separate fabricated browser clients, retaining real per-client
+                # login limits. This header exists only in the local wrapper.
+                scope = dict(scope, client=("local-test-"+test_client, 0))
         async def secured(message):
             if message["type"] == "http.response.start":
                 message.setdefault("headers", []).extend([(b"cache-control", b"no-store"), (b"content-security-policy", b"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'")])

@@ -6,7 +6,8 @@
     "trial_login_plans_and_history": true,
     "original_admin_login_and_price_form": true,
     "mobile_original_loaded": true,
-    "mobile_document_overflow": false
+    "mobile_document_overflow": false,
+    "original_login_rate_limit_preserved": true
   },
   "external_page_requests_blocked": 0,
   "production_connections": 0
