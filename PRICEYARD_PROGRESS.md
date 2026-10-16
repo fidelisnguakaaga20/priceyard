@@ -42,8 +42,10 @@ now verifies its launcher/serving-process identity and synthetic-only readiness.
 Owner approved PY-32 paid/trial-time preservation on 2026-10-16, exactly rules
 1 and 2 in docs/PURCHASE_VALUE_APPROVAL.md; indefinite-grant payment handling
 remains a separate pending decision. Batch 14 implements and verifies the approved
-dated-renewal/trial calculations. Next: remaining payment checkout validation and
-reconciliation, shared-device push cleanup and other pending technical items.
+dated-renewal/trial calculations. Batch 15 verifies checkout validation: 74 backend
+tests and original-button fake-provider browser checks passed. Next: commodity
+detail loading (PY-17), payment reconciliation, shared-device push cleanup and
+other pending technical items.
 Apply small technical batches with automated and browser verification. Reuse
 existing local tools from .git/priceyard-local-recovery-20261015; do not reinstall
 or read private configuration. Runtime is tools/local-test/runtime (ignored).
@@ -84,7 +86,7 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
 | PY-30 | Isolated automated/browser verification | Partial: baseline guards, 12 original tests, six real browser workflows passed; expand with each batch |
 | PY-31 | Confirmed payment activation and recovery | Partial: atomic activation, missing-subscription preservation and retry/replay tested; provider verification/reconciliation pending; schema additions require approval |
 | PY-32 | Preserve unused purchased/trial time | Approved dated-renewal/trial scope verified in batch 14; indefinite-grant payment handling still pending owner decision |
-| PY-33 | Validate payment evidence | Partial: signed evidence and duplicate provider-ID binding verified; checkout/reconciliation checks pending |
+| PY-33 | Validate payment evidence | Partial: signed evidence, duplicate provider-ID binding and strict checkout-response/transport validation verified; reconciliation checks pending |
 | PY-34 | Expiry without unintended staff-role loss | Complete in batch 2; 18 backend tests and two expired-Reporter browser cases passed |
 | PY-35 | Operational readiness and dependency evidence | Pending; production checks outside current scope |
 | PY-36 | Accurate progress/documentation/maintainability | Progress record established; ongoing |
@@ -516,3 +518,33 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
   extend them again. Restarting only the disposable preview reseeds the fixtures.
 - Evidence: tools/local-test/evidence/batch-14-*.json. Nine IDs fully complete;
   27 pending/partial, including PY-32's separate indefinite-grant payment decision.
+
+### Batch 15 — further PY-33
+
+- Checkout initialization explicitly requests NGN at unchanged recorded prices.
+  Use a fixed Paystack API destination, verified TLS, 3s connect/15s read timeout,
+  no implicit environment proxy/netrc credentials and no redirect following.
+  Require a 2xx response, a literal boolean success, valid object shape, matching
+  locally generated reference and an HTTPS checkout.paystack.com capability URL.
+  Unsafe links, malformed bodies, reference mismatches and provider redirects
+  return existing controlled errors. Failed purchase rows remain recorded; no
+  checkout response grants access. No plan/reference format, UI or schema change.
+- Seven new HTTP tests reproduced 24 failed assertions/subtests before the fix.
+  All 74 backend tests passed, 43.435s, zero failures/errors/skips. Both plan
+  amounts, recorded pending/failed states, provider timeouts and authorization
+  boundaries are covered with mocked transport, never an actual provider call.
+- Browser used original Dashboard/buttons: both monthly/seasonal unsafe checkout
+  replies rejected 502 with existing toast, retaining Dashboard and Free access.
+  A valid fake response drives the existing navigation, intercepted and fulfilled
+  locally before external connection. Checkout itself still grants no access.
+  Disabled the fake provider afterward; normal isolated initiation returns 503.
+- Manual: http://127.0.0.1:55446/__test__/checkout. Enable the unsafe-link fixture,
+  sign into free@example.com / PriceYardDemo8!, try an original upgrade button,
+  then disable the fixture. Valid checkout navigation is automated-only here.
+- Paystack API contract consulted read-only on 2026-10-16:
+  https://paystack.com/docs/api/transaction/#initialize . No account/API accessed.
+  Deployment requiring an outbound proxy or a future checkout host needs separate
+  reviewed configuration/compatibility verification. Live-provider delivery and
+  reconciliation are not claimed complete. No frontend rebuild needed.
+- Evidence: tools/local-test/evidence/batch-15-*.json. Nine IDs fully complete;
+  27 pending/partial. Original master/backup remain preserved; commits local only.

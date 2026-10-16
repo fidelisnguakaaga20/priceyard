@@ -1,0 +1,14 @@
+<!doctype html><html><head><title>Local checkout safety testing</title></head>
+<body style="font:18px system-ui;max-width:760px;margin:32px auto;padding:16px">
+<h1>Local checkout safety testing</h1>
+<p>Fake provider replies only. No money is charged and no payment provider is contacted.</p>
+<ol><li>Choose the unsafe-link fixture below.</li>
+<li>Log into <a href="/login" target="_blank">the original application</a> as free@example.com, password PriceYardDemo8!.</li>
+<li>Click the original monthly or seasonal upgrade button. It must show the existing checkout error and keep you on Dashboard.</li>
+<li>Return here and disable the fixture when finished.</li></ol>
+<p>The valid checkout fixture is used only by the automated browser, which intercepts navigation with a fabricated page before any external connection. This manual tool offers no live checkout link.</p>
+<button onclick="setMode('unsafe_link')">Use fake unsafe checkout reply</button>
+<button onclick="setMode('disabled')">Disable checkout fixture</button>
+<pre id="result" role="status"></pre>
+<script>async function setMode(mode){const response=await fetch('/__test__/checkout-mode',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode})});document.querySelector('#result').textContent=JSON.stringify(await response.json(),null,2)}</script>
+</body></html>

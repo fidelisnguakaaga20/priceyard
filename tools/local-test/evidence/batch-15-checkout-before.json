@@ -1,0 +1,9 @@
+{
+  "tests_run": 7,
+  "failures": 24,
+  "errors": 0,
+  "skipped": 0,
+  "duration_seconds": 2.168,
+  "pattern": "test_payment_checkout.py",
+  "runtime": "in-process synthetic SQLite; TCP and DNS denied"
+}

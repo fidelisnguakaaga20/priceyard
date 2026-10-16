@@ -5,6 +5,7 @@ import hmac
 import logging
 import secrets
 from decimal import Decimal
+from urllib.parse import urlsplit
 
 import requests
 from fastapi import HTTPException, status
@@ -32,6 +33,20 @@ PLAN_PRICES: dict[str, Decimal] = {
 }
 
 
+def _valid_checkout_url(value: object) -> bool:
+    if (not isinstance(value, str) or not 1 <= len(value) <= 2048
+            or any(ord(char) <= 32 or ord(char) >= 127 for char in value)
+            or "\\" in value or "#" in value):
+        return False
+    try:
+        parsed = urlsplit(value)
+        return (parsed.scheme == "https" and parsed.hostname == "checkout.paystack.com"
+                and parsed.username is None and parsed.password is None
+                and parsed.port in {None, 443} and parsed.path not in {"", "/"})
+    except ValueError:
+        return False
+
+
 def initiate_payment(db: Session, user: User, plan: PaymentPlan) -> PaymentInitiateResponse:
     settings = get_settings()
     if not settings.paystack_secret_key:
@@ -48,30 +63,33 @@ def initiate_payment(db: Session, user: User, plan: PaymentPlan) -> PaymentIniti
     db.commit()
 
     try:
-        response = requests.post(
-            PAYSTACK_INITIALIZE_URL,
-            json={
-                "email": user.email,
-                "amount": int(amount * 100),
-                "reference": reference,
-                "callback_url": f"{settings.frontend_url}/payment/callback",
-            },
-            headers={
-                "Authorization": f"Bearer {settings.paystack_secret_key}",
-                "Content-Type": "application/json",
-            },
-            timeout=15,
-        )
+        with requests.Session() as transport:
+            transport.trust_env = False
+            response = transport.post(
+                PAYSTACK_INITIALIZE_URL,
+                json={
+                    "email": user.email,
+                    "amount": int(amount * 100),
+                    "currency": "NGN",
+                    "reference": reference,
+                    "callback_url": f"{settings.frontend_url}/payment/callback",
+                },
+                headers={
+                    "Authorization": f"Bearer {settings.paystack_secret_key}",
+                    "Content-Type": "application/json",
+                },
+                timeout=(3, 15), allow_redirects=False, verify=True,
+            )
         body = response.json()
-    except (requests.RequestException, ValueError) as exc:
+    except (requests.RequestException, ValueError):
         payment.status = "failed"
         db.commit()
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail="Could not reach the payment provider",
-        ) from exc
+        ) from None
 
-    if not response.ok or not body.get("status"):
+    if not 200 <= response.status_code < 300 or not isinstance(body, dict) or body.get("status") is not True:
         payment.status = "failed"
         db.commit()
         raise HTTPException(
@@ -79,9 +97,9 @@ def initiate_payment(db: Session, user: User, plan: PaymentPlan) -> PaymentIniti
             detail="Could not start payment",
         )
 
-    data = body.get("data") or {}
-    authorization_url = data.get("authorization_url")
-    if not authorization_url:
+    data = body.get("data")
+    authorization_url = data.get("authorization_url") if isinstance(data, dict) else None
+    if not _valid_checkout_url(authorization_url) or data.get("reference") != reference:
         payment.status = "failed"
         db.commit()
         raise HTTPException(

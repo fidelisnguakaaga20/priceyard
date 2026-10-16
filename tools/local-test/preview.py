@@ -153,6 +153,37 @@ async def purchase_value_controls(request):
     return HTMLResponse(html.replace("__STATE__", escape(json.dumps(fixtures, indent=2))))
 
 outage = {"enabled": False}
+checkout_mode = {"mode": "disabled"}
+
+
+async def checkout_controls(request):
+    return HTMLResponse((LAB / "checkout_controls.html").read_text(encoding="utf-8"))
+
+
+async def set_checkout_mode(request):
+    payload = await request.json()
+    if payload not in ({"mode": "disabled"}, {"mode": "unsafe_link"}, {"mode": "valid"}):
+        return JSONResponse({"detail": "Choose an isolated checkout fixture"}, status_code=400)
+    checkout_mode.update(payload)
+    return JSONResponse({"synthetic_only": True, **checkout_mode})
+
+
+async def serve_fake_checkout(app, scope, receive, send):
+    # Called only under the synthetic wrapper's request lock. The entire HTTP
+    # provider transport is replaced; unknown destinations fail before TCP/DNS.
+    import requests
+    from app.config import get_settings
+    def provider(session, method, url, **kwargs):
+        if method.upper() != "POST" or url != "https://api.paystack.co/transaction/initialize":
+            raise RuntimeError("Only the fabricated checkout transport is permitted")
+        checkout = "https://example.invalid/unsafe-checkout" if checkout_mode["mode"] == "unsafe_link" else "https://checkout.paystack.com/priceyard-synthetic-only"
+        response = requests.Response()
+        response.status_code = 200
+        response._content = json.dumps({"status": True, "data": {"authorization_url": checkout, "reference": kwargs["json"]["reference"], "access_code": "priceyard-synthetic-only"}}).encode()
+        return response
+    fake_settings = get_settings().model_copy(update={"paystack_secret_key": "sk_test_synthetic_checkout_only"})
+    with patch("app.services.payment_service.get_settings", return_value=fake_settings), patch("requests.Session.request", autospec=True, side_effect=provider):
+        await app(scope, receive, send)
 
 async def control(request):
     payload = await request.json()
@@ -191,11 +222,14 @@ class LocalOnly:
             return await JSONResponse({"detail": "Synthetic temporary outage"}, status_code=503)(scope, receive, secured)
         if scope["type"] == "http":
             async with self.request_lock:
-                await self.app(scope, receive, secured)
+                if scope.get("path") == "/api/payments/initiate" and checkout_mode["mode"] != "disabled":
+                    await serve_fake_checkout(self.app, scope, receive, secured)
+                else:
+                    await self.app(scope, receive, secured)
         else:
             await self.app(scope, receive, secured)
 
-preview = LocalOnly(Starlette(routes=[Route("/__test__/status", status), Route("/__test__/inbox", inbox), Route("/__test__/controls", controls), Route("/__test__/push", push_controls), Route("/__test__/payments", payment_controls), Route("/__test__/purchase-value", purchase_value_controls), Route("/__test__/payment-event", payment_event, methods=["POST"]), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
+preview = LocalOnly(Starlette(routes=[Route("/__test__/status", status), Route("/__test__/inbox", inbox), Route("/__test__/controls", controls), Route("/__test__/push", push_controls), Route("/__test__/payments", payment_controls), Route("/__test__/purchase-value", purchase_value_controls), Route("/__test__/checkout", checkout_controls), Route("/__test__/checkout-mode", set_checkout_mode, methods=["POST"]), Route("/__test__/payment-event", payment_event, methods=["POST"]), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
 
 if __name__ == "__main__":
     import uvicorn
