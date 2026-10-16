@@ -81,7 +81,9 @@ try{
     await page.route('**/api/auth/me',route=>{if(route.request().headers()['x-local-test-sequence']==='1'){held=route;return;}return route.continue()});
     await login(page);
     await page.getByRole('button',{name:'Log out',exact:true}).click();
-    await page.getByRole('heading',{name:'Log in to PriceYard',exact:true}).waitFor();
+    // Layout's existing logout handler finishes on the homepage. A transient
+    // protected-route redirect to Login is not a stable navigation contract.
+    await page.waitForURL(origin+'/');
     await page.getByRole('link',{name:'Log in',exact:true}).click();
     await login(page,'admin@example.com',false);
     await page.getByRole('heading',{name:'Welcome, Test Admin',exact:true}).waitFor();

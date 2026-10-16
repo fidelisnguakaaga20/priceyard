@@ -64,3 +64,35 @@ export async function disablePushAlerts(token: string): Promise<void> {
   await subscription.unsubscribe();
   await apiFetch("/push/unsubscribe", { method: "POST", body: JSON.stringify({ endpoint }) }, token);
 }
+
+/** Best-effort current-device cleanup, bounded so a broken worker/provider
+ * cannot indefinitely delay server logout. No VAPID setting or new permission
+ * is needed to remove an already existing browser subscription. */
+export async function finishLogout(token: string, isStillLoggedOut: () => boolean): Promise<void> {
+  const controller = new AbortController();
+  let current = true;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const deadline = new Promise<void>((resolve) => { timer = setTimeout(resolve, 1000); });
+  const cleanup = async () => {
+    if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) return;
+    const registration = await navigator.serviceWorker.getRegistration();
+    if (!current || !isStillLoggedOut() || !registration) return;
+    const subscription = await registration.pushManager.getSubscription();
+    if (!current || !isStillLoggedOut() || !subscription) return;
+    const native = Promise.resolve().then(() => subscription.unsubscribe()).catch(() => undefined);
+    const endpoint = subscription.endpoint;
+    const remove = typeof endpoint === "string" && endpoint.length > 0 && endpoint.length <= 500
+      ? apiFetch("/push/unsubscribe", { method: "POST", body: JSON.stringify({ endpoint }), keepalive: true, signal: controller.signal }, token).catch(() => undefined)
+      : Promise.resolve();
+    await Promise.all([native, remove]);
+  };
+  try {
+    await Promise.race([cleanup().catch(() => undefined), deadline]);
+  } finally {
+    current = false;
+    clearTimeout(timer);
+    controller.abort();
+    // Always attempt revocation, even if native lookup/removal fails or hangs.
+    await apiFetch<void>("/auth/logout", { method: "POST", keepalive: true }, token).catch(() => undefined);
+  }
+}

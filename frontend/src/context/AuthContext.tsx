@@ -5,6 +5,7 @@ import { useToast } from "./ToastContext";
 import type { Subscription, User } from "../types/api";
 import { accessExpiresAt, computeAccess } from "../services/access";
 import type { AccessLabel } from "../services/access";
+import { finishLogout } from "../services/push";
 
 type AuthContextValue = {
   user: User | null;
@@ -182,9 +183,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const currentToken = activeTokenRef.current;
     clearAuth();
     if (currentToken) {
-      // Local logout stays immediate. Server revocation needs connectivity;
-      // an old response must never change the newly cleared account state.
-      void apiFetch<void>("/auth/logout", { method: "POST", keepalive: true }, currentToken).catch(() => undefined);
+      // Local logout stays immediate. Only this device is cleaned up, and a
+      // late worker lookup must never disable a newly signed-in account.
+      void finishLogout(currentToken, () => activeTokenRef.current === null);
     }
   }, [clearAuth]);
 

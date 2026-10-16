@@ -46,8 +46,15 @@ dated-renewal/trial calculations. Batch 15 verifies checkout validation: 74 back
 tests and original-button fake-provider browser checks passed. Next: commodity
 detail loading (PY-17) is verified in batch 16: five before/after browser checks
 and TypeScript/build passed; seven baseline browser workflows also passed. Next:
-PY-07 push ownership protection is verified in batch 17. Next: shared-device
-logout cleanup, payment reconciliation and other pending technical items.
+PY-07 push ownership protection is verified in batch 17. Batch 18 verifies
+current-device logout cleanup with a one-second maximum cleanup wait before
+server revocation. Ten targeted logout/account/reset browser checks passed;
+TypeScript/build passed and original CSS remains unchanged. Next: payment
+verification/reconciliation (PY-31/PY-33), bounded queries (PY-20), remaining
+authorization/source confidentiality, referrals and atomic administrative audits.
+Indefinite manual-grant payment handling remains a separate business decision;
+do not silently convert or claim that unresolved path safe. Ten checklist IDs
+are complete; 26 remain partial/pending. Continue without restarting the audit.
 Apply small technical batches with automated and browser verification. Reuse
 existing local tools from .git/priceyard-local-recovery-20261015; do not reinstall
 or read private configuration. Runtime is tools/local-test/runtime (ignored).
@@ -62,7 +69,7 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
 | PY-04 | Password reset and login revocation | Complete in batch 5; actual HTTP/browser and PostgreSQL reset/logout races passed |
 | PY-05 | Referral abuse protection | Pending; preserve original rewards/qualification; policy changes require approval |
 | PY-06 | Safe push notification destinations | Application-side complete in batch 13; known-provider/key validation, bounded TLS transport, no redirects; live provider compatibility remains operational verification |
-| PY-07 | Shared-device/session safety | Partial: server revocation, stale UI protection and possession-based push ownership transfer/concurrent registration verified; JS token storage/logout push cleanup/offline limits remain |
+| PY-07 | Shared-device/session safety | Partial: server revocation, stale UI protection, possession-based push ownership/concurrent registration and bounded current-device logout cleanup verified; JS token storage/offline cleanup limits remain |
 | PY-08 | Input/upload/request abuse bounds | Partial: push endpoint/key/query bounds verified; broader input/upload/request bounds pending |
 | PY-09 | Concurrent security-action safety | Complete for identified reset/logout/last-Admin cases in batches 5/6; six PostgreSQL cases passed |
 | PY-10 | Spreadsheet export safety | Complete in batch 3; text/numeric regressions and original browser download/access checks passed |
@@ -603,3 +610,41 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
 - Evidence: tools/local-test/evidence/batch-17-*.json. Ten IDs complete;
   26 pending/partial. Logout push cleanup and JavaScript token storage remain
   separate PY-07 work; this does not claim complete shared-device safety.
+
+### Batch 18 — further PY-07
+
+- Existing Logout clears account state immediately, then makes a best-effort
+  cleanup of only the current browser subscription using the existing unsubscribe
+  API before revocation. No VAPID configuration/new permission is needed to find
+  an already-existing subscription. Other subscribed devices stay unchanged.
+- Worker/native/server cleanup gets at most one second before revocation is
+  attempted, even if cleanup hangs or fails. Discard late worker lookups after
+  timeout or another login, avoiding changes to a new session's device. Existing
+  token lifetime, Remember me, UI/CSS and all business policies remain unchanged.
+  No new endpoint, request field, schema/storage or backend source change.
+- Three browser scenarios were checked before and after: ordinary cleanup,
+  native unsubscribe failure and a hung lookup released after a new login.
+  Normal/failure cases remove the current server subscription, preserve another
+  device and revoke the old JWT (401). A timed-out lookup still revokes the JWT,
+  then leaves the late device/new session alone. Native calls are local mocks;
+  real provider unsubscribe/delivery is not claimed verified.
+- Four existing logout/reset browser checks passed, including original forms,
+  fake inbox, old-login revocation, new password and link single use. All three
+  account race/outage checks passed. One older checker initially timed out while
+  waiting for a transient Login heading after logout. Original Layout finishes
+  on the homepage; fixed the checker to await that stable existing destination.
+  No product navigation change was made to satisfy the check.
+- TypeScript/Vite passed (5.50s, main 318.04kB/89.79kB gzip). Original CSS remains
+  index-19youOJ7.css. Backend unchanged: 79-test backend and ten-case PostgreSQL
+  results from batch 17 remain their verified baseline, not new rerun claims.
+  The marked PostgreSQL cluster is stopped; synthetic SQLite preview is running.
+- Limits: offline/tab termination/browser API failure cannot guarantee server or
+  provider cleanup/revocation. A timed-out lookup deliberately preserves that
+  subscription. JavaScript-readable tokens remain a separate unresolved concern.
+- Manual: http://127.0.0.1:55446/login. Sign into a fabricated account and use
+  the original Logout button; account state clears immediately. Provider-native
+  cleanup requires the automated mock checks here, not live notification access.
+- Evidence: tools/local-test/evidence/batch-18-*.json. Ten IDs complete;
+  26 pending/partial. Preview restart in batch 17 reseeded all payment fixtures,
+  so /__test__/purchase-value is ready for a fresh manual demonstration. The reset
+  test account now uses UpdatedPassword8! until the next disposable restart.

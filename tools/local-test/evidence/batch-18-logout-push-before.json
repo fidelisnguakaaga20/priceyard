@@ -1,0 +1,33 @@
+{
+  "checks": [
+    {
+      "scenario": "normal",
+      "old_token_status": 401,
+      "current_device_retained": true,
+      "other_device_preserved": true,
+      "native_calls": 0,
+      "new_session_status": 200
+    },
+    {
+      "scenario": "native_failure",
+      "old_token_status": 401,
+      "current_device_retained": true,
+      "other_device_preserved": true,
+      "native_calls": 0,
+      "new_session_status": 200
+    },
+    {
+      "scenario": "late_lookup",
+      "old_token_status": 401,
+      "current_device_retained": true,
+      "other_device_preserved": true,
+      "native_calls": 0,
+      "new_session_status": 200
+    }
+  ],
+  "expected_original_bug": true,
+  "native_calls_are_local_mocks": true,
+  "real_notifications": 0,
+  "external_page_requests": 0,
+  "production_connections": 0
+}

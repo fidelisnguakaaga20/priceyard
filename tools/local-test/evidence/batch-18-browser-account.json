@@ -1,0 +1,17 @@
+{
+  "expected_original_defects": false,
+  "result": {
+    "delayed_profile_after_logout": {
+      "reproduced": false,
+      "logout_stays_visible_as_guest": true
+    },
+    "temporary_account_outage": {
+      "stored_session_preserved": true,
+      "recovers_without_new_password": true
+    },
+    "old_token_rejection_after_account_switch": {
+      "new_account_remains_signed_in": true
+    }
+  },
+  "production_connections": 0
+}
