@@ -17,9 +17,11 @@ export function useCommodityMarketPairs() {
   const [pairs, setPairs] = useState<Map<string, Set<string>>>(new Map());
 
   useEffect(() => {
+    let current = true;
     apiFetch<PriceUpdate[]>("/price-updates")
-      .then((items) => setPairs(buildPairs(items)))
+      .then((items) => { if (current) setPairs(buildPairs(items)); })
       .catch(() => undefined);
+    return () => { current = false; };
   }, []);
 
   return pairs;
@@ -30,10 +32,13 @@ export function useHistoricalCommodityMarketPairs(token: string | null | undefin
   const [pairs, setPairs] = useState<Map<string, Set<string>>>(new Map());
 
   useEffect(() => {
+    let current = true;
+    setPairs(new Map());
     if (!token) return;
     apiFetch<PriceUpdate[]>("/price-updates/history", {}, token)
-      .then((items) => setPairs(buildPairs(items)))
+      .then((items) => { if (current) setPairs(buildPairs(items)); })
       .catch(() => undefined);
+    return () => { current = false; };
   }, [token]);
 
   return pairs;

@@ -61,8 +61,15 @@ export function PricesPage() {
   };
 
   useEffect(() => {
-    let current = true;
+    const commodity = searchParams.get("commodity") || "";
+    const market = searchParams.get("market") || "";
+    setCommodity(commodity); setMarket(market); setMovement("");
     void load({ commodity, market });
+    return () => { requestSequence.current++; foregroundPending.current = false; };
+  }, [searchParams]);
+
+  useEffect(() => {
+    let current = true;
     void Promise.all([
       apiFetch<Commodity[]>("/commodities"),
       apiFetch<Market[]>("/markets"),
@@ -71,7 +78,7 @@ export function PricesPage() {
       setCommodities(commodityItems);
       setMarkets(marketItems);
     }).catch(() => undefined).finally(() => { if (current) setFiltersLoading(false); });
-    return () => { current = false; requestSequence.current++; foregroundPending.current = false; };
+    return () => { current = false; };
   }, []);
 
   // Silently keep the list current while it's open, so an admin's new/edited price

@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { Disclaimer, PRICE_DISCLAIMER } from "../components/Disclaimer";
 import { ButtonSpinner, LoadingSpinner } from "../components/LoadingSpinner";
 import { PremiumGate } from "../components/PremiumGate";
@@ -18,15 +18,19 @@ export function PriceHistoryPage() {
   const [markets, setMarkets] = useState<Market[]>([]);
   const [commodity, setCommodity] = useState("Egusi");
   const [market, setMarket] = useState("");
-  const commodityMarketPairs = useHistoricalCommodityMarketPairs(token);
+  const commodityMarketPairs = useHistoricalCommodityMarketPairs(hasFullAccess ? token : null);
   const availableMarkets = commodity && commodityMarketPairs.has(commodity)
     ? markets.filter((item) => commodityMarketPairs.get(commodity)!.has(item.name))
     : markets;
   const [timeOfDay, setTimeOfDay] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const requestSequence = useRef(0);
+  const activeAccess = useRef({ token, hasFullAccess });
+  activeAccess.current = { token, hasFullAccess };
 
   const load = async () => {
+    const sequence = ++requestSequence.current;
     if (!token || !hasFullAccess) {
       setItems([]);
       setLoading(false);
@@ -34,32 +38,41 @@ export function PriceHistoryPage() {
     }
 
     setLoading(true);
+    setError("");
+    const isCurrent = () => sequence === requestSequence.current && token === activeAccess.current.token && activeAccess.current.hasFullAccess;
     const query = new URLSearchParams();
     if (commodity) query.set("commodity", commodity);
     if (market) query.set("market", market);
     if (timeOfDay) query.set("time_of_day", timeOfDay);
 
     try {
-      setItems(await apiFetch<PriceUpdate[]>(`/price-updates/history?${query}`, {}, token));
+      const data = await apiFetch<PriceUpdate[]>(`/price-updates/history?${query}`, {}, token);
+      if (!isCurrent()) return;
+      setItems(data);
       setError("");
     } catch (err) {
-      setError((err as Error).message);
+      if (isCurrent()) setError((err as Error).message);
     } finally {
-      setLoading(false);
+      if (isCurrent()) setLoading(false);
     }
   };
 
   useEffect(() => {
+    let current = true;
     if (!authLoading && hasFullAccess) {
       void load();
       void Promise.all([
         apiFetch<Commodity[]>("/commodities"),
         apiFetch<Market[]>("/markets"),
       ]).then(([commodityItems, marketItems]) => {
+        if (!current) return;
         setCommodities(commodityItems);
         setMarkets(marketItems);
       }).catch(() => undefined);
+    } else if (!authLoading) {
+      setItems([]); setError(""); setLoading(false);
     }
+    return () => { current = false; requestSequence.current++; };
   }, [authLoading, hasFullAccess, token]);
 
   const submit = (event: FormEvent) => {

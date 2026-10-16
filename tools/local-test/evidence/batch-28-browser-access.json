@@ -1,0 +1,53 @@
+{
+  "result": {
+    "guest": {
+      "historical_status": 401,
+      "alternate_routes_protected": true,
+      "original_current_cards": true,
+      "original_detail_page": true
+    },
+    "free": {
+      "historical_status": 403,
+      "alternate_routes_protected": true,
+      "original_current_cards": true,
+      "original_detail_page": true
+    },
+    "trial": {
+      "historical_status": 200,
+      "alternate_routes_protected": true,
+      "original_current_cards": true,
+      "original_detail_page": true
+    },
+    "paid": {
+      "historical_status": 200,
+      "alternate_routes_protected": true,
+      "original_current_cards": true,
+      "original_detail_page": true
+    },
+    "reporter": {
+      "historical_status": 403,
+      "alternate_routes_protected": true,
+      "original_current_cards": true,
+      "original_detail_page": true
+    },
+    "admin": {
+      "historical_status": 200,
+      "alternate_routes_protected": true,
+      "original_current_cards": true,
+      "original_detail_page": true
+    },
+    "expired-reporter": {
+      "historical_status": 403,
+      "alternate_routes_protected": true,
+      "original_current_cards": true,
+      "original_detail_page": true
+    },
+    "expired-paid-reporter": {
+      "historical_status": 403,
+      "alternate_routes_protected": true,
+      "original_current_cards": true,
+      "original_detail_page": true
+    }
+  },
+  "production_connections": 0
+}

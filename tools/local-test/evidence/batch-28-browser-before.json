@@ -1,0 +1,11 @@
+{
+  "checks": {
+    "navigation_updates_existing_filter_controls": false,
+    "old_url_error_cannot_replace_new_navigation": false,
+    "old_history_rows_do_not_replace_latest_filters": false,
+    "old_history_error_is_ignored": false
+  },
+  "expected_original_bug": true,
+  "external_page_requests": 0,
+  "production_connections": 0
+}

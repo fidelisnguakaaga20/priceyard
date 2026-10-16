@@ -109,6 +109,14 @@ six browser/API/account checks passed. Fifteen IDs complete, 21 partial/pending.
 Next: history/navigation response ordering, existing date-entry consistency,
 dashboard query/totals efficiency and remaining administrative transactions.
 
+Batch 28 verified: current URL navigation updates filters; old history requests/
+errors and metadata cannot overwrite newer state. Four before/after browser,
+four current-filter regressions and eight access-role cases passed; TypeScript/
+Vite passed, original CSS unchanged. Backend unchanged (latest 126 backend/20
+native PG from batch 27). PY-16 identified scope complete: sixteen complete,
+20 partial/pending. Next: bounded dashboard metric aggregation, then remaining
+date-entry consistency, administrative audits and history-query efficiency.
+
 ## Checklist — do not repeat the audit
 
 | ID | Improvement | Current status |
@@ -128,7 +136,7 @@ dashboard query/totals efficiency and remaining administrative transactions.
 | PY-13 | Consistent Nigerian dates/times | Partial: legacy naive trial timestamps interpreted as UTC consistently with backend; remaining entry/display/filter handling pending; original paid UTC date policy unchanged |
 | PY-14 | Evidence-based movement/confidence | Pending; wording/policy changes require approval |
 | PY-15 | Prices recover after failed loading | Complete in batch 1; before/after browser regression passed |
-| PY-16 | Correct filters and response ordering | Partial: current-price applied/draft filters, stale responses and foreground/background overlap verified in batch 22; remaining history/navigation cases pending |
+| PY-16 | Correct filters and response ordering | Complete for identified current/history/navigation scope in batches 22/28: applied filters, overlap, URL navigation, stale history/error/metadata and access-role browser regressions verified |
 | PY-17 | Correct market-detail loading | Complete for identified loading races/combined-failure defect in batch 16; obsolete commodity/account responses ignored and independent successful sections retained |
 | PY-18 | Accurate account/payment/access messages | Complete for identified account/expiry/callback defects in batches 4/11/19; verified return refreshes access, unconfirmed return never claims payment received in title |
 | PY-19 | Existing FAQ draft/hide/publish management | Complete in batch 12; hidden drafts remain available to Admin across reload, public publication boundary verified |
@@ -962,3 +970,26 @@ dashboard query/totals efficiency and remaining administrative transactions.
   https://developers.google.com/identity/gsi/web/guides/verify-google-id-token
   consulted 2026-10-16. Fifteen IDs complete; 21 partial/pending. Native synthetic
   PG remains running for the next batch; production/master/backup untouched.
+
+### Batch 28 — PY-16 identified navigation/history scope
+
+- Current-price query parameters update the original commodity/market controls
+  on native navigation and invalidate the prior request. Apply/Clear behavior,
+  existing URL parameter names and filter markup remain unchanged.
+- History accepts only the latest request's rows/error/loading result for the
+  active entitlement/token. Metadata lookups ignore obsolete/unmounted results;
+  no history-pair request is made without the existing full-access entitlement.
+  Existing roles, quantity rules and complete historical data remain unchanged.
+- Four before/after browser checks reproduced/fixed query navigation, obsolete
+  URL errors, old history rows and old history errors. History overlap was forced
+  with two native form events; normal disabled buttons already prevent most
+  accidental duplicates. No broader ordinary double-click failure is claimed.
+- Four previous current-filter checks and eight Guest/Free/Trial/Paid/Reporter/
+  Admin/expired-role browser cases also passed. TypeScript/Vite passed, 5.67s;
+  JS319.45kB/90.35kB gzip. Original CSS artifact index-19youOJ7.css unchanged.
+- Frontend-only batch; latest unchanged backend evidence is 126 tests/twenty
+  pinned PG cases from batch 27, not claimed rerun here. PG remains running for
+  the next backend batch. Evidence: tools/local-test/evidence/batch-28-*.json.
+- Manual: http://127.0.0.1:55446/prices?commodity=Egusi&market=Kwali+Market;
+  original controls match the URL. Trial login still opens original Price History.
+  Sixteen IDs complete; twenty partial/pending. No production or schema change.
