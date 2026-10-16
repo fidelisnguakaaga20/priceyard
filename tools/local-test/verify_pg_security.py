@@ -294,13 +294,13 @@ class PostgreSQLSecurityTests(unittest.TestCase):
     def test_concurrent_last_admin_demotion_keeps_one_admin(self):
         self.admin_race({"role":"free_user"})
 
-    def payment_race(self, *, duplicate_transaction):
+    def payment_race(self, *, duplicate_transaction, distinct_purchases=False):
         Base.metadata.create_all(self.engine)
         with Session(self.engine) as db:
             user=User(full_name="Synthetic payer",email="pgpayment@example.com",password_hash="not-used",role="free_user",is_active=True,referral_code="PGPAY")
             user.subscription=build_trial_subscription(user=user,now=datetime(2000,1,1,tzinfo=timezone.utc))
             db.add(user);db.flush()
-            references=["py_concurrent_one","py_concurrent_two"] if duplicate_transaction else ["py_concurrent_one"]
+            references=["py_concurrent_one","py_concurrent_two"] if duplicate_transaction or distinct_purchases else ["py_concurrent_one"]
             for reference in references:
                 db.add(Payment(user_id=user.id,reference=reference,plan="monthly",amount=2500,currency="NGN",status="pending"))
             db.commit();user_id=user.id
@@ -313,7 +313,8 @@ class PostgreSQLSecurityTests(unittest.TestCase):
                 time.sleep(0.1)
         sqlalchemy.event.listen(self.engine,"before_cursor_execute",delay_payment_write)
         def worker(reference):
-            payload={"event":"charge.success","data":{"reference":reference,"id":808080,"amount":250000,"currency":"NGN","status":"success"}}
+            transaction_id = 808081 if distinct_purchases and reference == "py_concurrent_two" else 808080
+            payload={"event":"charge.success","data":{"reference":reference,"id":transaction_id,"amount":250000,"currency":"NGN","status":"success"}}
             with Session(self.engine) as db:
                 barrier.wait(timeout=15)
                 try:
@@ -323,7 +324,7 @@ class PostgreSQLSecurityTests(unittest.TestCase):
                 except BaseException as error:
                     db.rollback();outcomes.append(type(error).__name__)
         with patch.object(payment_service,"notify_admins",return_value=None):
-            worker_references=references if duplicate_transaction else references*2
+            worker_references=references if duplicate_transaction or distinct_purchases else references*2
             threads=[threading.Thread(target=worker,args=(reference,)) for reference in worker_references]
             for thread in threads:thread.start()
             for thread in threads:thread.join(25)
@@ -332,11 +333,16 @@ class PostgreSQLSecurityTests(unittest.TestCase):
         self.assertCountEqual(outcomes,[200,409] if duplicate_transaction else [200,200])
         with Session(self.engine) as db:
             payments=db.scalars(select(Payment)).all()
-            self.assertEqual(sum(payment.status=="success" for payment in payments),1)
-            self.assertEqual(len(db.scalars(select(AuditLog).where(AuditLog.action=="payment.success")).all()),1)
+            expected_count = 2 if distinct_purchases else 1
+            self.assertEqual(sum(payment.status=="success" for payment in payments),expected_count)
+            self.assertEqual(len(db.scalars(select(AuditLog).where(AuditLog.action=="payment.success")).all()),expected_count)
             subscription=db.get(User,user_id).subscription
             self.assertEqual(subscription.status,"active")
             self.assertIn(subscription.payment_reference,references)
+            self.assertEqual(subscription.end_date, datetime.now(timezone.utc).date()+timedelta(days=30*expected_count))
+
+    def test_concurrent_distinct_purchases_preserve_both_durations(self):
+        self.payment_race(duplicate_transaction=False, distinct_purchases=True)
 
     def test_concurrent_payment_replay_applies_access_and_audit_once(self):
         self.payment_race(duplicate_transaction=False)

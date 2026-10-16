@@ -54,7 +54,7 @@ now = datetime.now(timezone.utc)
 with Session(engine) as db:
     users = {}
     demo_hash = hash_password("PriceYardDemo8!")
-    for name, role, access in (("free", "free_user", "free"), ("trial", "free_user", "trial"), ("paid", "paid_user", "active"), ("reporter", "reporter", "free"), ("admin", "admin", "free"), ("expired-reporter", "reporter", "trial_expired"), ("expired-paid-reporter", "reporter", "paid_expired"), ("reset", "free_user", "trial"), ("payment", "free_user", "free"), ("manual-paid", "paid_user", "manual_active")):
+    for name, role, access in (("free", "free_user", "free"), ("trial", "free_user", "trial"), ("paid", "paid_user", "active"), ("reporter", "reporter", "free"), ("admin", "admin", "free"), ("expired-reporter", "reporter", "trial_expired"), ("expired-paid-reporter", "reporter", "paid_expired"), ("reset", "free_user", "trial"), ("payment", "free_user", "free"), ("manual-paid", "paid_user", "manual_active"), ("value-paid", "paid_user", "active"), ("value-trial", "free_user", "trial")):
         user = User(full_name=f"Test {name.title()}", email=f"{name}@example.com", password_hash=demo_hash, role=role, is_active=True, referral_code="TEST"+name.upper())
         if access in {"trial", "trial_expired"}:
             user.subscription = build_trial_subscription(user=user, now=now-timedelta(days=15) if access == "trial_expired" else now)
@@ -73,6 +73,8 @@ with Session(engine) as db:
         db.add(PriceUpdate(commodity_id=commodity.id, market_id=market.id, price_low=low, price_high=low+10000, average_price=low+5000, previous_price_low=210000 if day == 0 else None, previous_price_high=220000 if day == 0 else None, unit="1 bag", bag_size=None, movement="up" if day == 0 else "unknown", confidence_level="Low confidence", update_date_time=now-timedelta(days=day), status="approved", created_by=users["admin"].id, approved_by=users["admin"].id, notes="Fabricated local test price; bag size not supplied.", source_1="LOCAL-PRIVATE-SOURCE"))
     db.add(FAQItem(question="Local testing question", answer="Fabricated test entry only.", category="Local testing", is_published=True, created_by=users["admin"].id))
     db.add(Payment(user_id=users["payment"].id, reference="py_local_browser_only", plan="monthly", amount=2500, currency="NGN", status="pending"))
+    db.add(Payment(user_id=users["value-paid"].id, reference="py_local_renewal_only", plan="monthly", amount=2500, currency="NGN", status="pending"))
+    db.add(Payment(user_id=users["value-trial"].id, reference="py_local_trial_purchase_only", plan="seasonal", amount=6000, currency="NGN", status="pending"))
     db.commit()
 
 from starlette.applications import Starlette
@@ -113,9 +115,13 @@ async def payment_event(request):
     from app.config import get_settings
     from sqlalchemy import select
     payload = await request.json()
-    if payload not in ({"event": "wrong_amount"}, {"event": "valid"}, {"event": "activation_failure"}):
+    if payload not in ({"event": "wrong_amount"}, {"event": "valid"}, {"event": "activation_failure"}, {"event": "value_paid"}, {"event": "value_trial"}):
         return JSONResponse({"detail": "Choose a fabricated local payment event"}, status_code=400)
     event = {"event": "charge.success", "data": {"reference": "py_local_browser_only", "id": 700001, "amount": 249999 if payload["event"] == "wrong_amount" else 250000, "currency": "NGN", "status": "success"}}
+    if payload["event"] == "value_paid":
+        event["data"].update(reference="py_local_renewal_only", id=700002)
+    elif payload["event"] == "value_trial":
+        event["data"].update(reference="py_local_trial_purchase_only", id=700003, amount=600000)
     raw = json.dumps(event).encode()
     key = "sk_test_priceyard_local_browser_only"
     signature = hmac.new(key.encode(), raw, hashlib.sha512).hexdigest()
@@ -128,11 +134,23 @@ async def payment_event(request):
         async with httpx.AsyncClient(transport=httpx.ASGITransport(app=api, raise_app_exceptions=False), base_url="http://synthetic-asgi-only") as client:
             response = await client.post("/payments/webhook", content=raw, headers={"x-paystack-signature": signature})
     with Session(engine) as db:
-        payment = db.scalar(select(Payment).where(Payment.reference == "py_local_browser_only"))
+        payment = db.scalar(select(Payment).where(Payment.reference == event["data"]["reference"]))
         return JSONResponse({"synthetic_only": True, "webhook_status": response.status_code, "payment_status": payment.status, "subscription_status": payment.user.subscription.status, "end_date": str(payment.user.subscription.end_date) if payment.user.subscription.end_date else None})
 
 async def payment_controls(request):
     return HTMLResponse('''<!doctype html><html><head><title>Local payment testing</title></head><body style="font:18px system-ui;max-width:760px;margin:32px auto;padding:16px"><h1>Local payment testing</h1><p>Fabricated payment@example.com account only. Password: PriceYardDemo8! No money is charged and no provider is contacted. These controls are separate from PriceYard.</p><ol><li>Sign in as payment@example.com in <a href="/login" target="_blank">the original application</a>.</li><li>Send the wrong-amount event, then simulate an activation failure. Access must remain Free and payment pending.</li><li>Send the valid event. Reload the original Dashboard to see Active Paid. Repeating it keeps the same expiry.</li></ol><button onclick="sendEvent('wrong_amount')">Send wrong-amount test event</button> <button onclick="sendEvent('activation_failure')">Simulate activation failure</button> <button onclick="sendEvent('valid')">Send valid test event</button><pre id="result" role="status"></pre><script>async function sendEvent(event){const response=await fetch('/__test__/payment-event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({event})});document.querySelector('#result').textContent=JSON.stringify(await response.json(),null,2)}</script></body></html>''')
+
+async def purchase_value_controls(request):
+    from sqlalchemy import select
+    with Session(engine) as db:
+        fixtures = {}
+        for name in ("value-paid", "value-trial"):
+            user = db.scalar(select(User).where(User.email == name+"@example.com"))
+            subscription = user.subscription
+            fixtures[name] = {"paid_end": str(subscription.end_date) if subscription.end_date else None,
+                              "trial_end": str(subscription.trial_ends_at) if subscription.trial_ends_at else None}
+    html = (LAB / "purchase_value_controls.html").read_text(encoding="utf-8")
+    return HTMLResponse(html.replace("__STATE__", escape(json.dumps(fixtures, indent=2))))
 
 outage = {"enabled": False}
 
@@ -177,7 +195,7 @@ class LocalOnly:
         else:
             await self.app(scope, receive, secured)
 
-preview = LocalOnly(Starlette(routes=[Route("/__test__/status", status), Route("/__test__/inbox", inbox), Route("/__test__/controls", controls), Route("/__test__/push", push_controls), Route("/__test__/payments", payment_controls), Route("/__test__/payment-event", payment_event, methods=["POST"]), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
+preview = LocalOnly(Starlette(routes=[Route("/__test__/status", status), Route("/__test__/inbox", inbox), Route("/__test__/controls", controls), Route("/__test__/push", push_controls), Route("/__test__/payments", payment_controls), Route("/__test__/purchase-value", purchase_value_controls), Route("/__test__/payment-event", payment_event, methods=["POST"]), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
 
 if __name__ == "__main__":
     import uvicorn

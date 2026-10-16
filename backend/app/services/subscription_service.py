@@ -177,10 +177,22 @@ def activate_paid_subscription(db: Session, subscription: Subscription, *, plan:
     end_date matching what was actually paid for."""
     current_time = now or utc_now()
     duration_days = PAID_PLAN_DURATIONS_DAYS[plan]
+    anchor_date = current_time.date()
+    # Owner-approved carry-forward only for currently usable, dated access.
+    # Ignore stale dates on free/expired/cancelled subscriptions. Manual-grant
+    # payment handling is a separate business decision; no new rule here.
+    if subscription.status == "active" and subscription.end_date is not None:
+        anchor_date = max(anchor_date, subscription.end_date)
+    elif subscription.status == "trial" and subscription.trial_ends_at is not None:
+        trial_end = subscription.trial_ends_at
+        if trial_end.tzinfo is None:
+            trial_end = trial_end.replace(tzinfo=timezone.utc)
+        if trial_end > current_time:
+            anchor_date = max(anchor_date, trial_end.astimezone(timezone.utc).date())
     subscription.plan_name = f"paid_{plan}"
     subscription.status = "active"
     subscription.start_date = current_time.date()
-    subscription.end_date = current_time.date() + timedelta(days=duration_days)
+    subscription.end_date = anchor_date + timedelta(days=duration_days)
     if subscription.user.role not in {"admin", "reporter"}:
         subscription.user.role = "paid_user"
     if commit:

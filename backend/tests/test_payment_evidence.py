@@ -1,5 +1,5 @@
 from copy import deepcopy
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 import hashlib
 import hmac
@@ -153,3 +153,36 @@ class PaymentEvidenceTests(unittest.TestCase):
         with Session(self.engine) as db:
             self.assertEqual(db.scalar(select(Payment)).status, "success")
             self.assertEqual(db.get(User, self.user_id).subscription.status, "active")
+
+    def test_trial_credit_preserves_original_trial_and_replay_does_not_extend(self):
+        with Session(self.engine) as db:
+            subscription = db.get(User, self.user_id).subscription
+            trial_end = subscription.trial_ends_at
+            trial_start = subscription.trial_started_at
+        expected_end = trial_end.date()+timedelta(days=30)
+        self.assertEqual(self.send(self.payload()).status_code, 200)
+        self.assertEqual(self.send(self.payload()).status_code, 200)
+        with Session(self.engine) as db:
+            subscription = db.get(User, self.user_id).subscription
+            self.assertEqual(subscription.end_date, expected_end)
+            self.assertEqual(subscription.trial_started_at, trial_start)
+            self.assertEqual(subscription.trial_ends_at, trial_end)
+
+    def test_renewal_audit_failure_keeps_paid_days_then_retry_credits_once(self):
+        prior_end = datetime.now(timezone.utc).date()+timedelta(days=10)
+        with Session(self.engine) as db:
+            user = db.get(User, self.user_id)
+            user.role = "paid_user"
+            user.subscription.status = "active"
+            user.subscription.plan_name = "paid_monthly"
+            user.subscription.end_date = prior_end
+            db.commit()
+        with patch("app.services.payment_service.create_audit_log", side_effect=RuntimeError("Synthetic audit outage")):
+            self.assertEqual(self.send(self.payload()).status_code, 500)
+        with Session(self.engine) as db:
+            self.assertEqual(db.get(User, self.user_id).subscription.end_date, prior_end)
+            self.assertEqual(db.scalar(select(Payment)).status, "pending")
+        self.assertEqual(self.send(self.payload()).status_code, 200)
+        self.assertEqual(self.send(self.payload()).status_code, 200)
+        with Session(self.engine) as db:
+            self.assertEqual(db.get(User, self.user_id).subscription.end_date, prior_end+timedelta(days=30))

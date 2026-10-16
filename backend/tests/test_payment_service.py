@@ -77,7 +77,7 @@ class PaymentServiceTests(unittest.TestCase):
         subscription = self.db.scalar(select(self.user.subscription.__class__).where(self.user.subscription.__class__.user_id == self.user.id))
         self.assertEqual(subscription.status, "active")
         self.assertEqual(subscription.plan_name, "paid_monthly")
-        self.assertEqual(subscription.end_date, date.today() + timedelta(days=30))
+        self.assertEqual(subscription.end_date, subscription.trial_ends_at.date() + timedelta(days=30))
         self.db.refresh(self.user)
         self.assertEqual(self.user.role, "paid_user")
 

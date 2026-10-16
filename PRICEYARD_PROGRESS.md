@@ -41,8 +41,9 @@ Browser storage/rejection/cleanup passed without provider delivery. Preview star
 now verifies its launcher/serving-process identity and synthetic-only readiness.
 Owner approved PY-32 paid/trial-time preservation on 2026-10-16, exactly rules
 1 and 2 in docs/PURCHASE_VALUE_APPROVAL.md; indefinite-grant payment handling
-remains a separate pending decision. Next: implement and verify these calculations;
-remaining payment reconciliation/checkout validation follows separately.
+remains a separate pending decision. Batch 14 implements and verifies the approved
+dated-renewal/trial calculations. Next: remaining payment checkout validation and
+reconciliation, shared-device push cleanup and other pending technical items.
 Apply small technical batches with automated and browser verification. Reuse
 existing local tools from .git/priceyard-local-recovery-20261015; do not reinstall
 or read private configuration. Runtime is tools/local-test/runtime (ignored).
@@ -82,7 +83,7 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
 | PY-29 | Stable identities and dependent records | Pending; no automatic merge |
 | PY-30 | Isolated automated/browser verification | Partial: baseline guards, 12 original tests, six real browser workflows passed; expand with each batch |
 | PY-31 | Confirmed payment activation and recovery | Partial: atomic activation, missing-subscription preservation and retry/replay tested; provider verification/reconciliation pending; schema additions require approval |
-| PY-32 | Preserve unused purchased/trial time | Owner approved dated renewals and remaining trial preservation on 2026-10-16; implementation next; indefinite-grant payment handling pending |
+| PY-32 | Preserve unused purchased/trial time | Approved dated-renewal/trial scope verified in batch 14; indefinite-grant payment handling still pending owner decision |
 | PY-33 | Validate payment evidence | Partial: signed evidence and duplicate provider-ID binding verified; checkout/reconciliation checks pending |
 | PY-34 | Expiry without unintended staff-role loss | Complete in batch 2; 18 backend tests and two expired-Reporter browser cases passed |
 | PY-35 | Operational readiness and dependency evidence | Pending; production checks outside current scope |
@@ -484,3 +485,34 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
   complete; 27 pending/partial. PY-07 shared-device ownership/cleanup remains open.
 - Owner subsequently approved rules 1/2 in docs/PURCHASE_VALUE_APPROVAL.md;
   that approval is recorded for the next batch, not claimed implemented here.
+
+### Batch 14 — approved portion of PY-32
+
+- Active dated renewals append the purchased 30/90 days after the current end
+  date. A remaining trial anchors paid expiry after its final UTC date, preserving
+  its original timestamps and inclusive paid-date boundary. Expired/free/cancelled
+  access starts from today; stale future fields on those states do not grant time.
+  Existing start_date remains the confirmation date. Prices, 14-day trial,
+  referrals, original frontend and historical successful purchases are unchanged.
+- Indefinite manual-grant administration/expiry is unchanged. Payment handling
+  for those grants is not fixed by this scope and remains a known pending owner
+  decision; do not claim that case or commercial readiness complete.
+- Seven new focused tests reproduced seven failed assertions/subtests before
+  the fix. Added two real-webhook tests for trial preservation/replay and paid
+  renewal audit-failure rollback/retry. Updated the old trial-purchase expectation
+  to the approved rule. All 67 backend tests passed, 24.142s, no failures/errors/skips.
+- All nine marked native PostgreSQL tests passed, 18.965s, including a new
+  simultaneous-two-distinct-purchases case: both successful, two audits and all
+  60 paid days retained. Existing replay/duplicate-ID/reset/Admin/migration
+  preservation checks passed. Synthetic cluster was stopped afterward.
+- Browser original Dashboard verified real local API state for a paid monthly
+  renewal (2026-11-15 -> 2026-12-15) and a seasonal trial purchase (trial final
+  date 2026-10-30 -> paid final date 2027-01-28). Both keep history access and
+  ignore a replay; live payment initiation remains disabled (503). No external
+  page requests or provider calls. No frontend change or new build needed.
+- Manual: http://127.0.0.1:55446/__test__/purchase-value. Separate fake controls,
+  value-paid@example.com / value-trial@example.com, password PriceYardDemo8!.
+  Automated checks have already applied those two fake purchases; replay will not
+  extend them again. Restarting only the disposable preview reseeds the fixtures.
+- Evidence: tools/local-test/evidence/batch-14-*.json. Nine IDs fully complete;
+  27 pending/partial, including PY-32's separate indefinite-grant payment decision.

@@ -1,0 +1,26 @@
+<!doctype html>
+<html><head><title>Local purchased-time testing</title></head>
+<body style="font:18px system-ui;max-width:760px;margin:32px auto;padding:16px">
+<h1>Local purchased-time testing</h1>
+<p>Fabricated accounts only. No money, email or payment provider is involved.
+These controls are separate from PriceYard. Common password: <b>PriceYardDemo8!</b>.</p>
+<ol>
+<li>Sign into <a href="/login" target="_blank">the original application</a> as
+<b>value-paid@example.com</b>. Note its saved paid_end below.
+Click the monthly renewal: the result's end_date increases by 30 days.</li>
+<li>Sign out, then sign in as <b>value-trial@example.com</b>. Note the trial expiry.
+Click the seasonal purchase below: the result's paid expiry is 90 days after the trial's final date.
+Reload the original Dashboard to confirm Active Paid and history access.</li>
+<li>Repeat either button. The same recorded purchase must not add days again.</li>
+</ol>
+<p>The original 14-day trial, NGN 2,500 monthly and NGN 6,000 seasonal plans remain unchanged.</p>
+<p>Saved synthetic dates when this control page opened:</p><pre id="fixtures">__STATE__</pre>
+<button onclick="sendEvent('value_paid')">Confirm fake monthly renewal</button>
+<button onclick="sendEvent('value_trial')">Confirm fake seasonal trial purchase</button>
+<pre id="result" role="status"></pre>
+<script>
+async function sendEvent(event) {
+  const response=await fetch('/__test__/payment-event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({event})});
+  document.querySelector('#result').textContent=JSON.stringify(await response.json(),null,2);
+}
+</script></body></html>
