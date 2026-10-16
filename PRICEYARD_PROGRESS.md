@@ -32,7 +32,8 @@ concurrency protection. Batch 7 verified historical URL/access boundaries (PY-01
 and quality-signal access matching the existing full-access screen (part of PY-02).
 Batch 8 verifies strict signed payment evidence (part of PY-33). Batch 9 verifies
 atomic payment/access/audit writes and concurrent replay/provider-ID protection
-(parts of PY-31/PY-33/PY-26). Next: remaining account-access accuracy and payment
+(parts of PY-31/PY-33/PY-26). Batch 10 verifies saved Admin price state (PY-11).
+Next: remaining account-access accuracy and payment
 reconciliation/checkout validation. PY-32 business calculation approval is pending
 in docs/PURCHASE_VALUE_APPROVAL.md; continue independent technical work meanwhile.
 Apply small technical batches with automated and browser verification. Reuse
@@ -53,7 +54,7 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
 | PY-08 | Input/upload/request abuse bounds | Pending |
 | PY-09 | Concurrent security-action safety | Complete for identified reset/logout/last-Admin cases in batches 5/6; six PostgreSQL cases passed |
 | PY-10 | Spreadsheet export safety | Complete in batch 3; text/numeric regressions and original browser download/access checks passed |
-| PY-11 | Correct saved administrator price state | Pending |
+| PY-11 | Correct saved administrator price state | Complete in batch 10; actual create/approve/correct/outdated/reject/reload browser regression passed |
 | PY-12 | Accurate existing quantity/type/market comparisons | Pending; no grades/new measurement fields |
 | PY-13 | Consistent Nigerian dates/times | Pending |
 | PY-14 | Evidence-based movement/confidence | Pending; wording/policy changes require approval |
@@ -367,3 +368,27 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
   already been credited by tests; a preview restart reseeds it for another run.
   Evidence: tools/local-test/evidence/batch-9-*.json. Six complete checklist IDs;
   other 30 remain partial/pending. Local-only commits; no production contact.
+
+### Batch 10 — PY-11
+
+- Removed the duplicate created-record cache that overrode newly loaded server
+  values. A successful creation updates the existing authoritative list; later
+  approvals/corrections/status changes use saved server results after reload.
+  Existing forms, labels, selectors, CSS, fields and backend behavior are unchanged.
+- Browser reproduced the original bug first: server approved, screen pending.
+  After the fix, real API/browser creation, approval, price correction, outdated
+  status, rejection and full reload all agree. No record was deleted by this test.
+- The original creation schema requires nonempty free-text bag_size; the test
+  explicitly supplies "Unknown" for its fabricated record, with existing unit
+  "1 bag". No measured weight/grade/new market is invented and no production
+  record is touched. Original nullable-size fixture rows remain unchanged.
+- TypeScript and Vite build passed (2.51s, main 315.61kB/89.04kB gzip). Original
+  CSS stays index-19youOJ7.css, 31.58kB/7.09kB gzip. Backend source unchanged;
+  the prior 47-test backend result remains its baseline, not a new rerun claim.
+- Checker-only label ambiguity was resolved by selecting the original named
+  controls. No product labels were edited to make tests pass.
+- Manual: http://127.0.0.1:55446/admin/prices, admin@example.com / PriceYardDemo8!.
+  Original record rows should reflect saved approval/correction immediately.
+  Synthetic PostgreSQL stopped; browser SQLite preview remains running.
+- Evidence: tools/local-test/evidence/batch-10-*.json. Seven IDs complete;
+  29 remain pending/partial. Remaining paid/trial-time approval is still pending.
