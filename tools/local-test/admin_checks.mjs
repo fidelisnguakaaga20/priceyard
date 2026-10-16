@@ -1,0 +1,38 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath,pathToFileURL} from 'node:url';
+const lab=path.dirname(fileURLToPath(import.meta.url));
+const recovery=path.resolve(lab,'../../.git/priceyard-local-recovery-20261015/p00/runtime');
+const {chromium}=await import(pathToFileURL(path.join(recovery,'npm-tools-309adbe095ff487cb1d6bd447c580c70/node_modules/playwright/index.mjs')));
+const browser=await chromium.launch({headless:true,args:['--disable-background-networking','--disable-component-update','--disable-sync','--no-first-run']});
+const origin='http://127.0.0.1:55446';
+try{
+  const context=await browser.newContext({extraHTTPHeaders:{'X-PriceYard-Test-Client':crypto.randomUUID()},serviceWorkers:'block'});
+  await context.route('**/*',route=>new URL(route.request().url()).origin===origin?route.continue():route.abort());
+  await context.addInitScript(()=>localStorage.setItem('priceyard_onboarding_seen','1'));
+  const page=await context.newPage();page.setDefaultTimeout(10000);
+  await page.goto(origin+'/login');
+  await page.getByLabel('Email',{exact:true}).fill('admin@example.com');
+  await page.getByLabel('Password',{exact:true}).fill('PriceYardDemo8!');
+  await page.getByRole('button',{name:'Log in',exact:true}).click();
+  await page.waitForURL('**/dashboard');
+  await page.getByRole('heading',{name:/^Welcome, Test /}).waitFor();
+  await page.goto(origin+'/admin/users');
+  const row=page.locator('.admin-table tbody tr').filter({hasText:'admin@example.com'});
+  await row.waitFor();
+  const rejection=page.waitForResponse(response=>new URL(response.url()).pathname==='/api/users/5');
+  await row.getByRole('button',{name:'Deactivate',exact:true}).click();
+  assert.equal((await rejection).status(),409);
+  await page.locator('.status-box.error').filter({hasText:'Cannot deactivate or demote the last active admin account'}).waitFor();
+  const demotion=page.waitForResponse(response=>new URL(response.url()).pathname==='/api/users/5');
+  await row.locator('select').selectOption('free_user');
+  assert.equal((await demotion).status(),409);
+  assert.equal(await row.locator('select').inputValue(),'admin');
+  await page.reload();
+  await row.getByRole('button',{name:'Deactivate',exact:true}).waitFor();
+  assert.equal(await row.locator('select').inputValue(),'admin');
+  const report={original_users_screen:true,last_admin_deactivation_rejected:true,last_admin_demotion_rejected:true,administrator_survives_reload:true,production_connections:0};
+  fs.writeFileSync(path.join(lab,'runtime/admin-checks.json'),JSON.stringify(report,null,2));
+  console.log(JSON.stringify(report));
+}finally{await browser.close()}

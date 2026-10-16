@@ -1,10 +1,11 @@
 from fastapi import HTTPException, status
-from sqlalchemy import func, select, update
+from sqlalchemy import func, select, text, update
 from sqlalchemy.orm import Session
 
 from app.models.user import User
+from app.models.subscription import Subscription
 from app.schemas.user_schema import AdminUserUpdate
-from app.services.subscription_service import get_subscription_for_user, update_subscription_status
+from app.services.subscription_service import update_subscription_status
 
 
 def list_users(db: Session) -> list[User]:
@@ -30,6 +31,11 @@ def _is_last_active_admin(db: Session, user: User) -> bool:
 
 
 def update_user(db: Session, user: User, payload: AdminUserUpdate) -> User:
+    if db.get_bind().dialect.name == "postgresql":
+        # Serialize privileged role/activity edits across API workers. Keep this
+        # transaction open through the final user/subscription change.
+        db.execute(text("SELECT pg_advisory_xact_lock(741523, 1)"))
+        db.refresh(user)
     would_deactivate = payload.is_active is False
     would_demote = payload.role is not None and payload.role != "admin"
     if (would_deactivate or would_demote) and _is_last_active_admin(db, user):
@@ -43,24 +49,17 @@ def update_user(db: Session, user: User, payload: AdminUserUpdate) -> User:
             db.execute(update(User).where(User.id == user.id).values(auth_version=User.auth_version + 1))
         user.is_active = payload.is_active
 
-    if payload.role == "paid_user":
-        subscription = get_subscription_for_user(db, user.id)
-        update_subscription_status(db, subscription, "active")
-        user.role = "paid_user"
-        db.commit()
-    elif payload.role == "free_user":
-        subscription = get_subscription_for_user(db, user.id)
-        update_subscription_status(db, subscription, "free")
-        user.role = "free_user"
-        db.commit()
-    elif payload.role == "admin":
-        user.role = "admin"
-        db.commit()
-    elif payload.role == "reporter":
-        user.role = "reporter"
-        db.commit()
-    else:
-        db.commit()
+    if payload.role in {"paid_user", "free_user"}:
+        # Avoid expiry helpers that commit independently and release the guard.
+        subscription = db.scalar(select(Subscription).where(Subscription.user_id == user.id))
+        if subscription is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
+        update_subscription_status(db, subscription, "active" if payload.role == "paid_user" else "free", commit=False)
+        user.role = payload.role
+    elif payload.role in {"admin", "reporter"}:
+        user.role = payload.role
+
+    db.commit()
 
     db.refresh(user)
     return user

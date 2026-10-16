@@ -106,6 +106,9 @@ from app.models.user import User
 from app.security import create_access_token
 from app.services import password_reset_service
 from app.services.login_revocation_service import is_revoked, revoke_token
+from app.services.subscription_service import build_trial_subscription
+from app.services.user_service import update_user
+from app.schemas.user_schema import AdminUserUpdate
 from app.utils.password import hash_password
 
 
@@ -250,6 +253,43 @@ class PostgreSQLSecurityTests(unittest.TestCase):
         with Session(self.engine) as db:
             self.assertEqual(db.get(User,user_id).auth_version,1)
             self.assertTrue(all(token.used_at is not None for token in db.scalars(select(PasswordResetToken))))
+
+    def admin_race(self, payload):
+        Base.metadata.create_all(self.engine)
+        with Session(self.engine) as db:
+            admins=[]
+            for index in range(2):
+                user=User(full_name="Synthetic admin",email=f"admin{index}@example.com",password_hash="not-used",role="admin",is_active=True,referral_code=f"PGADMIN{index}")
+                # Past trials catch accidental commits by expiry helpers too.
+                user.subscription=build_trial_subscription(user=user,now=datetime(2000,1,1,tzinfo=timezone.utc))
+                db.add(user);admins.append(user)
+            db.commit();ids=[user.id for user in admins]
+        barrier=threading.Barrier(2)
+        outcomes=[]
+        def worker(user_id):
+            with Session(self.engine) as db:
+                user=db.get(User,user_id)
+                barrier.wait(timeout=15)
+                try:
+                    update_user(db,user,AdminUserUpdate(**payload));outcomes.append(200)
+                except HTTPException as error:
+                    db.rollback();outcomes.append(error.status_code)
+                except BaseException as error:
+                    db.rollback();outcomes.append(type(error).__name__)
+        threads=[threading.Thread(target=worker,args=(user_id,)) for user_id in ids]
+        for thread in threads:thread.start()
+        for thread in threads:thread.join(25)
+        self.assertFalse(any(thread.is_alive() for thread in threads))
+        self.assertCountEqual(outcomes,[200,409])
+        with Session(self.engine) as db:
+            remaining=db.scalars(select(User).where(User.role=="admin",User.is_active.is_(True))).all()
+            self.assertEqual(len(remaining),1)
+
+    def test_concurrent_last_admin_deactivation_is_prevented(self):
+        self.admin_race({"is_active":False})
+
+    def test_concurrent_last_admin_demotion_keeps_one_admin(self):
+        self.admin_race({"role":"free_user"})
 
 
 if __name__ == "__main__":

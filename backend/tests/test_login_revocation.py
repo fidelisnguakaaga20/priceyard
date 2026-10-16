@@ -124,3 +124,22 @@ class LoginRevocationTests(unittest.TestCase):
             token = self.legacy_token(auth_version=version)
             self.assertEqual(self.client.get("/auth/me", headers={"Authorization": "Bearer "+token}).status_code, 401)
         self.assertEqual(self.client.post("/auth/logout").status_code, 401)
+
+    def test_manual_role_changes_preserve_existing_access_rules(self):
+        admin_headers = {"Authorization": "Bearer "+create_access_token(user_id=self.admin_id)}
+        for role, expected_status in (("paid_user", "active"), ("free_user", "free")):
+            response = self.client.patch(f"/users/{self.user_id}", headers=admin_headers, json={"role": role})
+            self.assertEqual(response.status_code, 200, response.text)
+            self.assertEqual(response.json()["role"], role)
+            subscription = self.client.get(f"/subscriptions/{self.user_id}", headers=admin_headers)
+            self.assertEqual(subscription.json()["status"], expected_status)
+            self.assertIsNone(subscription.json()["end_date"])
+
+    def test_last_admin_rejection_keeps_account_and_credential_working(self):
+        admin_headers = {"Authorization": "Bearer "+create_access_token(user_id=self.admin_id)}
+        for payload in ({"is_active": False}, {"role": "free_user"}):
+            self.assertEqual(self.client.patch(f"/users/{self.admin_id}", headers=admin_headers, json=payload).status_code, 409)
+        profile = self.client.get("/auth/me", headers=admin_headers)
+        self.assertEqual(profile.status_code, 200)
+        self.assertEqual(profile.json()["role"], "admin")
+        self.assertTrue(profile.json()["is_active"])

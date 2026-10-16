@@ -27,8 +27,9 @@ Batch 2 (PY-34) verified: subscription transitions preserve staff authority and
 subscription listing processes every expired account. Batch 3 (PY-10) verified:
 spreadsheet-safe text export. Batch 4 verified existing account refresh/logout
 races (part of PY-18). Batch 5 verified approved internal login revocation storage
-(PY-04 and parts of PY-07/PY-09/PY-28). Next: last-active-Admin concurrency
-protection (remaining PY-09), then other approved technical checklist items.
+(PY-04 and parts of PY-07/PY-09/PY-28). Batch 6 verified remaining PY-09 last-Admin
+concurrency protection. Next: historical URL/access boundaries (PY-01) and align
+quality-signal access with the existing full-access screen (part of PY-02).
 Apply small technical batches with automated and browser verification. Reuse
 existing local tools from .git/priceyard-local-recovery-20261015; do not reinstall
 or read private configuration. Runtime is tools/local-test/runtime (ignored).
@@ -45,7 +46,7 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
 | PY-06 | Safe push notification destinations | Pending |
 | PY-07 | Shared-device/session safety | Partial: server logout/reset/disable revocation and stale UI protection; JS token storage/push cleanup/offline limits remain |
 | PY-08 | Input/upload/request abuse bounds | Pending |
-| PY-09 | Concurrent security-action safety | Partial: same/distinct reset links and duplicate logout verified on PostgreSQL; last-Admin race pending |
+| PY-09 | Concurrent security-action safety | Complete for identified reset/logout/last-Admin cases in batches 5/6; six PostgreSQL cases passed |
 | PY-10 | Spreadsheet export safety | Complete in batch 3; text/numeric regressions and original browser download/access checks passed |
 | PY-11 | Correct saved administrator price state | Pending |
 | PY-12 | Accurate existing quantity/type/market comparisons | Pending; no grades/new measurement fields |
@@ -249,3 +250,27 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
 - Evidence: tools/local-test/evidence/batch-5-*.json. No live DB migration, push,
   merge or deployment. Current completed checklist items: PY-04/PY-10/PY-15/PY-34;
   remaining items include explicitly partial work above, not 36 completed fixes.
+
+### Batch 6 — remaining PY-09; part of transactional user administration
+
+- Serialize privileged user-role/activity changes with a PostgreSQL transaction
+  advisory lock. Refresh the target before checking the original last-active-
+  Admin rule. Role/subscription changes now use one final commit; avoid expiry
+  helper commits that would release the lock before the role change completes.
+- Existing standalone subscription administration still commits by default.
+  Explicit manual paid/free grants retain their original statuses/dates. No
+  schema/field, frontend, business policy or wording change in this batch.
+- Six native PostgreSQL cases passed in 7.134s, including concurrent last-Admin
+  deactivation and demotion with expired prior trials. Exactly one succeeds and
+  one returns 409; one active Admin remains. These validate identified races on
+  the marked default-isolation test cluster, not every hosting/isolation setup.
+- All 31 backend tests passed, 9.892s, including actual HTTP manual-role behavior
+  and sequential last-Admin rejection. Original Users browser screen passed:
+  self-deactivation and self-demotion reject, account/role survive reload. Reporter
+  expiry browser checks passed again. No frontend rebuild needed.
+- Manual: log in as admin@example.com / PriceYardDemo8! at
+  http://127.0.0.1:55446/admin/users; attempting to deactivate the sole Test Admin
+  must show the existing last-admin error and keep that account active.
+- Evidence: tools/local-test/evidence/batch-6-*.json. Five checklist items fully
+  verified so far (PY-04, PY-09, PY-10, PY-15, PY-34); other items remain pending
+  or explicitly partial. Production still untouched.

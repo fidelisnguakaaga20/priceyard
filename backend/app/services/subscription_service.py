@@ -117,7 +117,7 @@ def list_subscriptions(db: Session) -> list[Subscription]:
     return subscriptions
 
 
-def update_subscription_status(db: Session, subscription: Subscription, new_status: str) -> Subscription:
+def update_subscription_status(db: Session, subscription: Subscription, new_status: str, *, commit: bool = True) -> Subscription:
     now = utc_now()
 
     if new_status == "trial":
@@ -159,8 +159,11 @@ def update_subscription_status(db: Session, subscription: Subscription, new_stat
             detail="Invalid subscription status",
         )
 
-    db.commit()
-    db.refresh(subscription)
+    if commit:
+        db.commit()
+        db.refresh(subscription)
+    else:
+        db.flush()
     return subscription
 
 
