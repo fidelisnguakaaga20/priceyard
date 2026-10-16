@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { apiFetch, ApiError, setUnauthorizedHandler } from "../services/api";
 import { useToast } from "./ToastContext";
 import type { Subscription, User } from "../types/api";
-
-type AccessLabel = "Guest" | "Free" | "Trial" | "Active Paid" | "Admin";
+import { accessExpiresAt, computeAccess } from "../services/access";
+import type { AccessLabel } from "../services/access";
 
 type AuthContextValue = {
   user: User | null;
@@ -57,17 +57,6 @@ function clearStoredToken(): void {
   }
 }
 
-function computeAccess(user: User | null, subscription: Subscription | null): { label: AccessLabel; full: boolean } {
-  if (!user) return { label: "Guest", full: false };
-  if (user.role === "admin") return { label: "Admin", full: true };
-  if (subscription?.status === "trial") {
-    const active = !subscription.trial_ends_at || new Date(subscription.trial_ends_at).getTime() > Date.now();
-    return active ? { label: "Trial", full: true } : { label: "Free", full: false };
-  }
-  if (subscription?.status === "active" || user.role === "paid_user") return { label: "Active Paid", full: true };
-  return { label: "Free", full: false };
-}
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -79,6 +68,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const activeTokenRef = useRef(token);
   const refreshSequence = useRef(0);
   const profileReady = useRef(false);
+  const [accessTick, setAccessTick] = useState(0);
+  const access = computeAccess(user, subscription);
+
+  useEffect(() => {
+    const updateAccess = () => setAccessTick((tick) => tick + 1);
+    const expiresAt = accessExpiresAt(subscription);
+    // Passive effects can run after the deadline crossed during rendering.
+    // Recheck once instead of leaving the last active render without a timer.
+    if (expiresAt !== null && Number.isFinite(expiresAt) && expiresAt <= Date.now() && access.full && user?.role !== "admin") updateAccess();
+    const timer = expiresAt !== null && Number.isFinite(expiresAt) && expiresAt > Date.now()
+      ? window.setTimeout(updateAccess, Math.min(expiresAt - Date.now() + 1, 2_147_000_000))
+      : undefined;
+    window.addEventListener("focus", updateAccess);
+    document.addEventListener("visibilitychange", updateAccess);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("focus", updateAccess);
+      document.removeEventListener("visibilitychange", updateAccess);
+    };
+  }, [subscription, accessTick, access.full, user?.role]);
 
   const clearAuth = useCallback(() => {
     ++refreshSequence.current;
@@ -179,7 +188,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [clearAuth]);
 
-  const access = computeAccess(user, subscription);
   const value = useMemo<AuthContextValue>(() => ({
     user,
     subscription,

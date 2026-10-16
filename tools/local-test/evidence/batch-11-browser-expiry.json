@@ -1,0 +1,15 @@
+{
+  "result": {
+    "trial": {
+      "client_deadline_timer_hides_history_without_reload": true
+    },
+    "paid": {
+      "client_deadline_timer_hides_history_without_reload": true
+    },
+    "manual-paid": {
+      "indefinite_original_grant_preserved": true
+    }
+  },
+  "scope": "Browser clock only; backend clock unchanged. Backend expiry separately tested.",
+  "production_connections": 0
+}

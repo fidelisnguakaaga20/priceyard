@@ -53,13 +53,13 @@ now = datetime.now(timezone.utc)
 with Session(engine) as db:
     users = {}
     demo_hash = hash_password("PriceYardDemo8!")
-    for name, role, access in (("free", "free_user", "free"), ("trial", "free_user", "trial"), ("paid", "paid_user", "active"), ("reporter", "reporter", "free"), ("admin", "admin", "free"), ("expired-reporter", "reporter", "trial_expired"), ("expired-paid-reporter", "reporter", "paid_expired"), ("reset", "free_user", "trial"), ("payment", "free_user", "free")):
+    for name, role, access in (("free", "free_user", "free"), ("trial", "free_user", "trial"), ("paid", "paid_user", "active"), ("reporter", "reporter", "free"), ("admin", "admin", "free"), ("expired-reporter", "reporter", "trial_expired"), ("expired-paid-reporter", "reporter", "paid_expired"), ("reset", "free_user", "trial"), ("payment", "free_user", "free"), ("manual-paid", "paid_user", "manual_active")):
         user = User(full_name=f"Test {name.title()}", email=f"{name}@example.com", password_hash=demo_hash, role=role, is_active=True, referral_code="TEST"+name.upper())
         if access in {"trial", "trial_expired"}:
             user.subscription = build_trial_subscription(user=user, now=now-timedelta(days=15) if access == "trial_expired" else now)
         else:
-            paid = access in {"active", "paid_expired"}
-            user.subscription = Subscription(status="active" if paid else access, plan_name="paid_monthly" if paid else "free", start_date=(now-timedelta(days=31)).date() if access == "paid_expired" else now.date() if paid else None, end_date=(now-timedelta(days=1)).date() if access == "paid_expired" else (now+timedelta(days=30)).date() if paid else None)
+            paid = access in {"active", "paid_expired", "manual_active"}
+            user.subscription = Subscription(status="active" if paid else access, plan_name="paid" if access == "manual_active" else "paid_monthly" if paid else "free", start_date=(now-timedelta(days=31)).date() if access == "paid_expired" else now.date() if paid else None, end_date=None if access == "manual_active" else (now-timedelta(days=1)).date() if access == "paid_expired" else (now+timedelta(days=30)).date() if paid else None)
         db.add(user)
         users[name] = user
     commodity = Commodity(name="Egusi", is_active=True)

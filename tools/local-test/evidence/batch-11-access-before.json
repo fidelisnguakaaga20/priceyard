@@ -1,0 +1,14 @@
+{
+  "cases": 18,
+  "passed": 11,
+  "failures": [
+    "missing trial deadline",
+    "legacy naive trial means UTC",
+    "expired paid date",
+    "cancelled with old paid role",
+    "expired with old paid role",
+    "missing subscription with paid role",
+    "invalid date fails closed"
+  ],
+  "production_connections": 0
+}

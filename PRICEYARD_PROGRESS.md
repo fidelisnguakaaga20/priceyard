@@ -33,8 +33,9 @@ and quality-signal access matching the existing full-access screen (part of PY-0
 Batch 8 verifies strict signed payment evidence (part of PY-33). Batch 9 verifies
 atomic payment/access/audit writes and concurrent replay/provider-ID protection
 (parts of PY-31/PY-33/PY-26). Batch 10 verifies saved Admin price state (PY-11).
-Next: remaining account-access accuracy and payment
-reconciliation/checkout validation. PY-32 business calculation approval is pending
+Batch 11 verifies account expiry display/timers (further PY-18; legacy UTC parsing
+part of PY-13). Next: remaining payment reconciliation/checkout validation and
+existing FAQ administration persistence. PY-32 business calculation approval is pending
 in docs/PURCHASE_VALUE_APPROVAL.md; continue independent technical work meanwhile.
 Apply small technical batches with automated and browser verification. Reuse
 existing local tools from .git/priceyard-local-recovery-20261015; do not reinstall
@@ -56,12 +57,12 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
 | PY-10 | Spreadsheet export safety | Complete in batch 3; text/numeric regressions and original browser download/access checks passed |
 | PY-11 | Correct saved administrator price state | Complete in batch 10; actual create/approve/correct/outdated/reject/reload browser regression passed |
 | PY-12 | Accurate existing quantity/type/market comparisons | Pending; no grades/new measurement fields |
-| PY-13 | Consistent Nigerian dates/times | Pending |
+| PY-13 | Consistent Nigerian dates/times | Partial: legacy naive trial timestamps interpreted as UTC consistently with backend; remaining entry/display/filter handling pending; original paid UTC date policy unchanged |
 | PY-14 | Evidence-based movement/confidence | Pending; wording/policy changes require approval |
 | PY-15 | Prices recover after failed loading | Complete in batch 1; before/after browser regression passed |
 | PY-16 | Correct filters and response ordering | Pending |
 | PY-17 | Correct market-detail loading | Pending |
-| PY-18 | Accurate account/payment/access messages | Partial: batch 4 fixes stale profile/401 and outage logout; payment/expiry display verification pending |
+| PY-18 | Accurate account/payment/access messages | Partial: stale profile/401/outage fixes plus batch 11 expiry display/timers verified; callback/payment messaging verification pending |
 | PY-19 | Existing FAQ draft/hide/publish management | Pending |
 | PY-20 | Bounded queries with accessible historical records | Pending |
 | PY-21 | Reliable independent alerts | Pending; no new delivery promises |
@@ -392,3 +393,35 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
   Synthetic PostgreSQL stopped; browser SQLite preview remains running.
 - Evidence: tools/local-test/evidence/batch-10-*.json. Seven IDs complete;
   29 remain pending/partial. Remaining paid/trial-time approval is still pending.
+
+### Batch 11 — further PY-18; part of PY-13
+
+- Existing access labels follow subscription entitlement: an old paid_user role
+  alone does not override missing/expired/cancelled access, missing trial end is
+  not unlimited access, paid dates stay valid through their existing inclusive
+  UTC date. Active end_date=NULL manual grants remain indefinite. No database
+  value, price, duration, referral/registration rule or product wording changed.
+- Legacy naive trial timestamps are interpreted as UTC, matching the backend's
+  existing explicit behavior. Deadline/focus/visibility checks update the access
+  gate without page reload. Long timeouts are bounded/rearmed; an effect delayed
+  across a deadline rechecks the last active render once instead of looping.
+- Eighteen source-level cases reproduced seven original failures, then all 18
+  passed. Browser checks verified trial and dated-paid expiry without reload and
+  an indefinite manual grant after a simulated year. Browser clock only changes;
+  the separate backend expiry tests remain the server-authorization evidence.
+- Initial browser expiry checks used Node's Lagos parsing for an offset-less UTC
+  timestamp and therefore checked one hour early. This was a checker mistake,
+  corrected to explicit UTC. The earlier commentary suspected a timer race;
+  the diagnostic mismatch itself was not proof of that product defect. Temporary
+  instrumentation removed. Tests run the final seconds near the true deadline.
+- TypeScript/Vite passed (3.73s, main 316.55kB/89.31kB gzip, 100 modules). Original
+  CSS stays index-19youOJ7.css. Seven baseline browser workflows and three account
+  race/outage checks passed during this batch; the final timer safeguard was
+  additionally covered by the passing targeted expiry browser checks.
+- Testing wrapper adds manual-paid@example.com / PriceYardDemo8! solely to
+  demonstrate the existing indefinite-grant behavior. Preview restarted with
+  fresh synthetic records; unknown-size administrative test records were reset.
+- Manual: http://127.0.0.1:55446/history using trial@example.com, paid@example.com
+  or manual-paid@example.com. All retain the original entitlement screens.
+  Evidence: tools/local-test/evidence/batch-11-*.json. Seven IDs complete;
+  29 remain partial/pending. No production access or deployment.
