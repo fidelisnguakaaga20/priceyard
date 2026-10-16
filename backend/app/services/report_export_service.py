@@ -105,6 +105,18 @@ def list_exportable_price_updates(
     return list(db.scalars(statement).all())
 
 
+def _spreadsheet_safe(value: object) -> object:
+    """Export untrusted text literally; retain typed numeric price values."""
+    if not isinstance(value, str) or not value:
+        return value
+    candidate = value.lstrip()
+    while candidate.startswith("\ufeff"):
+        candidate = candidate[1:].lstrip()
+    if value.startswith(("\t", "\r", "\n")) or candidate.startswith(("=", "+", "-", "@")):
+        return "'" + value
+    return value
+
+
 def build_price_report_csv(items: list[PriceUpdate]) -> str:
     output = StringIO(newline="")
     writer = csv.writer(output)
@@ -112,7 +124,7 @@ def build_price_report_csv(items: list[PriceUpdate]) -> str:
 
     for item in items:
         writer.writerow(
-            [
+            [_spreadsheet_safe(value) for value in [
                 item.commodity.name,
                 item.market.name,
                 item.price_low,
@@ -126,7 +138,7 @@ def build_price_report_csv(items: list[PriceUpdate]) -> str:
                 item.suggested_action or "",
                 _format_market_signals(item),
                 _format_quality_signals(item),
-            ]
+            ]]
         )
 
     return output.getvalue()

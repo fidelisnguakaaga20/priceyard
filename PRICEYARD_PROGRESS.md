@@ -21,7 +21,8 @@ Schema additions and visible/business changes require specific approval.
 Baseline browser/isolation verification passed. Batch 1 (PY-15) verified:
 homepage/current prices clear stale errors after normal successful refresh.
 Batch 2 (PY-34) verified: subscription transitions preserve staff authority and
-subscription listing processes every expired account. Next: CSV safety (PY-10).
+subscription listing processes every expired account. Batch 3 (PY-10) verified:
+spreadsheet-safe text export. Next: existing account refresh/logout races (PY-18).
 Apply small technical batches with automated and browser verification. Reuse
 existing local tools from .git/priceyard-local-recovery-20261015; do not reinstall
 or read private configuration. Runtime is tools/local-test/runtime (ignored).
@@ -39,7 +40,7 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
 | PY-07 | Shared-device/session safety | Pending; preserve existing login duration |
 | PY-08 | Input/upload/request abuse bounds | Pending |
 | PY-09 | Concurrent security-action safety | Pending |
-| PY-10 | Spreadsheet export safety | Pending |
+| PY-10 | Spreadsheet export safety | Complete in batch 3; text/numeric regressions and original browser download/access checks passed |
 | PY-11 | Correct saved administrator price state | Pending |
 | PY-12 | Accurate existing quantity/type/market comparisons | Pending; no grades/new measurement fields |
 | PY-13 | Consistent Nigerian dates/times | Pending |
@@ -138,3 +139,21 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
   PriceYardDemo8!. Reporting remains available; full history stays restricted.
 - Evidence: tools/local-test/evidence/batch-2-*.json. Restarted only the disposable
   preview to load backend code/new fake account fixtures; no original DB touched.
+
+### Batch 3 — PY-10
+
+- CSV export treats formula-like text as literal text, including leading spacing,
+  control characters and BOM. Typed numeric prices, headers, ordinary Unicode,
+  CSV quoting and all application screens/fields are preserved. No source record
+  is rewritten. No spreadsheet program or external formula was executed.
+- Five regression tests reproduced 11 failing assertions/subtests before the
+  fix. Current consolidated backend suite has 23 tests; final output recorded in
+  tools/local-test/evidence/batch-3-backend-tests.json.
+- Real-browser original Admin CSV export/download passed: two synthetic rows,
+  original headers and exact numeric prices; private source absent. Guest request
+  rejected 401 and Trial rejected 403. No frontend change/build needed.
+- Manual check: log into http://127.0.0.1:55446 as admin@example.com with
+  PriceYardDemo8!, then open /admin/export and click the existing Download CSV.
+- Evidence: tools/local-test/evidence/batch-3-*.json. Existing real spreadsheets
+  and customer data were not accessed; real spreadsheet-product compatibility is
+  not claimed from string/export checks.

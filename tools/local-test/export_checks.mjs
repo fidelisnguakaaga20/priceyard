@@ -1,0 +1,46 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath,pathToFileURL} from 'node:url';
+const lab=path.dirname(fileURLToPath(import.meta.url));
+const recovery=path.resolve(lab,'../../.git/priceyard-local-recovery-20261015/p00/runtime');
+const {chromium}=await import(pathToFileURL(path.join(recovery,'npm-tools-309adbe095ff487cb1d6bd447c580c70/node_modules/playwright/index.mjs')));
+const browser=await chromium.launch({headless:true,args:['--disable-background-networking','--disable-component-update','--disable-sync','--no-first-run']});
+const origin='http://127.0.0.1:55446';
+try{
+  const context=await browser.newContext({serviceWorkers:'block'});
+  await context.route('**/*',route=>new URL(route.request().url()).origin===origin?route.continue():route.abort());
+  await context.addInitScript(()=>localStorage.setItem('priceyard_onboarding_seen','1'));
+  const page=await context.newPage();
+  page.setDefaultTimeout(10000);
+  await page.goto(origin+'/login');
+  await page.getByLabel('Email',{exact:true}).fill('admin@example.com');
+  await page.getByLabel('Password',{exact:true}).fill('PriceYardDemo8!');
+  await page.getByRole('button',{name:'Log in',exact:true}).click();
+  await page.waitForURL('**/dashboard');
+  await page.getByRole('heading',{name:/^Welcome, Test /}).waitFor();
+  await page.goto(origin+'/admin/export');
+  await page.getByRole('heading',{name:'CSV export',exact:true}).waitFor();
+  const pending=page.waitForEvent('download');
+  await page.getByRole('button',{name:'Download CSV',exact:true}).click();
+  const download=await pending;
+  const file=path.join(lab,'runtime/export-check.csv');
+  await download.saveAs(file);
+  const content=fs.readFileSync(file,'utf8');
+  assert.ok(content.startsWith('commodity,market,price_low,price_high,'));
+  assert.equal(content.trim().split('\n').length,3);
+  assert.ok(content.includes('Egusi,Kwali Market,211000.00,221000.00'));
+  assert.ok(!content.includes('LOCAL-PRIVATE-SOURCE'));
+  assert.ok(!content.includes('grade'));
+  const access=await page.evaluate(async()=>{
+    const guest=await fetch('/api/reports/prices.csv');
+    const response=await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:'trial@example.com',password:'PriceYardDemo8!'})});
+    const trial=await response.json();
+    const restricted=await fetch('/api/reports/prices.csv',{headers:{Authorization:'Bearer '+trial.access_token}});
+    return {guest:guest.status,trial:restricted.status};
+  });
+  assert.deepEqual(access,{guest:401,trial:403});
+  const report={original_export_screen_and_download:true,original_headers_and_numeric_prices_preserved:true,private_sources_absent:true,access,production_connections:0};
+  fs.writeFileSync(path.join(lab,'runtime/export-checks.json'),JSON.stringify(report,null,2));
+  console.log(JSON.stringify(report));
+}finally{await browser.close()}

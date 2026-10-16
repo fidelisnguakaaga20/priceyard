@@ -1,0 +1,9 @@
+{
+  "tests_run": 5,
+  "failures": 11,
+  "errors": 0,
+  "skipped": 0,
+  "duration_seconds": 0.055,
+  "pattern": "test_report_export_safety.py",
+  "runtime": "in-process synthetic SQLite; TCP and DNS denied"
+}
