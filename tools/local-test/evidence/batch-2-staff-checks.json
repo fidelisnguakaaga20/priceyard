@@ -1,0 +1,17 @@
+{
+  "result": {
+    "expired-reporter": {
+      "status": "expired",
+      "role": "reporter",
+      "history_status": 403,
+      "existing_report_form_visible": true
+    },
+    "expired-paid-reporter": {
+      "status": "expired",
+      "role": "reporter",
+      "history_status": 403,
+      "existing_report_form_visible": true
+    }
+  },
+  "production_connections": 0
+}

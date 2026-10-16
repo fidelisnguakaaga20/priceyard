@@ -20,7 +20,8 @@ Schema additions and visible/business changes require specific approval.
 
 Baseline browser/isolation verification passed. Batch 1 (PY-15) verified:
 homepage/current prices clear stale errors after normal successful refresh.
-Next: batch 2, PY-34 subscription expiry without accidental staff-role loss.
+Batch 2 (PY-34) verified: subscription transitions preserve staff authority and
+subscription listing processes every expired account. Next: CSV safety (PY-10).
 Apply small technical batches with automated and browser verification. Reuse
 existing local tools from .git/priceyard-local-recovery-20261015; do not reinstall
 or read private configuration. Runtime is tools/local-test/runtime (ignored).
@@ -62,7 +63,7 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
 | PY-31 | Confirmed payment activation and recovery | Pending; schema additions require approval |
 | PY-32 | Preserve unused purchased/trial time | Pending |
 | PY-33 | Validate payment evidence | Pending |
-| PY-34 | Expiry without unintended staff-role loss | Pending |
+| PY-34 | Expiry without unintended staff-role loss | Complete in batch 2; 18 backend tests and two expired-Reporter browser cases passed |
 | PY-35 | Operational readiness and dependency evidence | Pending; production checks outside current scope |
 | PY-36 | Accurate progress/documentation/maintainability | Progress record established; ongoing |
 
@@ -117,3 +118,23 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
   profile-response race. Independent role fixtures pass; deterministic logout
   verification remains part of PY-18/PY-07. Do not claim logout protection complete.
 - Evidence: tools/local-test/evidence/batch-1-*.json. No production/provider access.
+
+### Batch 2 — PY-34
+
+- Subscription expiry/purchase/administration preserves existing Admin/Reporter
+  authority. Ordinary paid-user expiry and indefinite manual grants retain their
+  existing behavior. Staff authority does not grant paid historical access.
+- Replaced short-circuit expiry processing so all applicable accounts are handled,
+  not just the first changed subscription. No schema, dates/durations/pricing,
+  referral, frontend, wording or design changes in this batch.
+- New regression suite reproduced nine failing assertions/subtests across six
+  tests before the fix. Afterward all 18 backend tests passed, 17.802s.
+- Two real-browser/API workflows passed: expired-trial Reporter and expired-paid
+  Reporter both remain Reporter, both have expired subscriptions/history 403,
+  and both can open the existing reporting form. Browser assertions use original
+  endpoint names and original heading `Report a market price`.
+- Manual check: log into http://127.0.0.1:55446 as
+  expired-reporter@example.com or expired-paid-reporter@example.com, password
+  PriceYardDemo8!. Reporting remains available; full history stays restricted.
+- Evidence: tools/local-test/evidence/batch-2-*.json. Restarted only the disposable
+  preview to load backend code/new fake account fixtures; no original DB touched.

@@ -38,7 +38,7 @@ def apply_trial_expiry(subscription: Subscription, *, now: datetime | None = Non
         return False
 
     subscription.status = "expired"
-    if subscription.user.role != "admin":
+    if subscription.user.role not in {"admin", "reporter"}:
         subscription.user.role = "free_user"
     return True
 
@@ -55,7 +55,7 @@ def apply_paid_expiry(subscription: Subscription, *, now: datetime | None = None
         return False
 
     subscription.status = "expired"
-    if subscription.user.role != "admin":
+    if subscription.user.role not in {"admin", "reporter"}:
         subscription.user.role = "free_user"
     return True
 
@@ -105,7 +105,11 @@ def find_subscription_for_user(db: Session, user_id: int) -> Subscription | None
 def list_subscriptions(db: Session) -> list[Subscription]:
     subscriptions = list(db.scalars(select(Subscription).order_by(Subscription.id)).all())
     now = utc_now()
-    changed = any(apply_trial_expiry(item, now=now) | apply_paid_expiry(item, now=now) for item in subscriptions)
+    changed = False
+    for item in subscriptions:
+        trial_changed = apply_trial_expiry(item, now=now)
+        paid_changed = apply_paid_expiry(item, now=now)
+        changed = trial_changed or paid_changed or changed
     if changed:
         db.commit()
         for item in subscriptions:
@@ -123,14 +127,14 @@ def update_subscription_status(db: Session, subscription: Subscription, new_stat
         subscription.trial_ends_at = now + timedelta(days=TRIAL_DURATION_DAYS)
         subscription.start_date = None
         subscription.end_date = None
-        if subscription.user.role != "admin":
+        if subscription.user.role not in {"admin", "reporter"}:
             subscription.user.role = "free_user"
     elif new_status == "active":
         subscription.plan_name = "paid"
         subscription.status = "active"
         subscription.start_date = now.date()
         subscription.end_date = None
-        if subscription.user.role != "admin":
+        if subscription.user.role not in {"admin", "reporter"}:
             subscription.user.role = "paid_user"
     elif new_status == "free":
         subscription.plan_name = "free"
@@ -139,15 +143,15 @@ def update_subscription_status(db: Session, subscription: Subscription, new_stat
         subscription.trial_ends_at = None
         subscription.start_date = None
         subscription.end_date = None
-        if subscription.user.role != "admin":
+        if subscription.user.role not in {"admin", "reporter"}:
             subscription.user.role = "free_user"
     elif new_status == "expired":
         subscription.status = "expired"
-        if subscription.user.role != "admin":
+        if subscription.user.role not in {"admin", "reporter"}:
             subscription.user.role = "free_user"
     elif new_status == "cancelled":
         subscription.status = "cancelled"
-        if subscription.user.role != "admin":
+        if subscription.user.role not in {"admin", "reporter"}:
             subscription.user.role = "free_user"
     else:
         raise HTTPException(
@@ -174,7 +178,7 @@ def activate_paid_subscription(db: Session, subscription: Subscription, *, plan:
     subscription.status = "active"
     subscription.start_date = current_time.date()
     subscription.end_date = current_time.date() + timedelta(days=duration_days)
-    if subscription.user.role != "admin":
+    if subscription.user.role not in {"admin", "reporter"}:
         subscription.user.role = "paid_user"
     db.commit()
     db.refresh(subscription)
