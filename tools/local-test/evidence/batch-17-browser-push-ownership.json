@@ -1,0 +1,17 @@
+{
+  "checks": {
+    "complete": true,
+    "saved": 204,
+    "rejected": 409,
+    "original_owner_preserved": true,
+    "legitimate_handoff": 204,
+    "handoff_verified": true,
+    "other_owner_cannot_remove": true,
+    "cleanup": 204,
+    "removed": true,
+    "passed": true
+  },
+  "external_page_requests": 0,
+  "real_notification_deliveries": 0,
+  "production_connections": 0
+}

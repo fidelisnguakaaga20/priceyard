@@ -46,8 +46,8 @@ dated-renewal/trial calculations. Batch 15 verifies checkout validation: 74 back
 tests and original-button fake-provider browser checks passed. Next: commodity
 detail loading (PY-17) is verified in batch 16: five before/after browser checks
 and TypeScript/build passed; seven baseline browser workflows also passed. Next:
-PY-07 push ownership protection (batch 17), payment reconciliation, shared-device
-push cleanup and other pending technical items.
+PY-07 push ownership protection is verified in batch 17. Next: shared-device
+logout cleanup, payment reconciliation and other pending technical items.
 Apply small technical batches with automated and browser verification. Reuse
 existing local tools from .git/priceyard-local-recovery-20261015; do not reinstall
 or read private configuration. Runtime is tools/local-test/runtime (ignored).
@@ -62,7 +62,7 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
 | PY-04 | Password reset and login revocation | Complete in batch 5; actual HTTP/browser and PostgreSQL reset/logout races passed |
 | PY-05 | Referral abuse protection | Pending; preserve original rewards/qualification; policy changes require approval |
 | PY-06 | Safe push notification destinations | Application-side complete in batch 13; known-provider/key validation, bounded TLS transport, no redirects; live provider compatibility remains operational verification |
-| PY-07 | Shared-device/session safety | Partial: server logout/reset/disable revocation and stale UI protection; JS token storage/push cleanup/offline limits remain |
+| PY-07 | Shared-device/session safety | Partial: server revocation, stale UI protection and possession-based push ownership transfer/concurrent registration verified; JS token storage/logout push cleanup/offline limits remain |
 | PY-08 | Input/upload/request abuse bounds | Partial: push endpoint/key/query bounds verified; broader input/upload/request bounds pending |
 | PY-09 | Concurrent security-action safety | Complete for identified reset/logout/last-Admin cases in batches 5/6; six PostgreSQL cases passed |
 | PY-10 | Spreadsheet export safety | Complete in batch 3; text/numeric regressions and original browser download/access checks passed |
@@ -576,3 +576,30 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
   for guests; trial@example.com / PriceYardDemo8! retains full-access sections.
 - Evidence: tools/local-test/evidence/batch-16-*.json. Ten IDs complete;
   26 remain pending/partial. No production services/data or new dependencies.
+
+### Batch 17 — further PY-07
+
+- An endpoint URL alone no longer transfers another account's notification
+  subscription. Require matching device public/authentication keys, comparing
+  decoded bytes in constant time so equivalent base64 padding remains compatible.
+  Legitimate shared-device transfer and the current owner's key refresh still
+  work. Other accounts cannot remove the subscription. Invalid legacy rows are
+  preserved and cannot be claimed using replacement keys.
+- Lock existing rows while checking ownership. Concurrent first registrations
+  recover only the existing unique-endpoint conflict in a savepoint, then apply
+  the same ownership check. No ownership overwrite, duplicate row or raw 500.
+  No schema, product field, UI, token/session-duration or notification policy change.
+- Five new HTTP tests reproduced three original failures. Full backend suite:
+  79 passed, 45.238s, zero failures/errors/skips. Ten marked native PostgreSQL
+  cases passed, 20.742s, including two simultaneous registrations with different
+  secrets: exactly one success, one 409 and the winner's original keys preserved.
+- Browser separate notification tool passed real synthetic API storage,
+  endpoint-only rejection, legitimate transfer, owner-only removal and cleanup.
+  Zero external page requests or real notifications; no native permissions used.
+  Original application login/session is unaffected by the helper's fabricated
+  temporary API logins. No frontend source change/build in this batch.
+- Manual: http://127.0.0.1:55446/__test__/push, click Check device ownership
+  protection. Existing login rate limits remain enforced. No keys/tokens printed.
+- Evidence: tools/local-test/evidence/batch-17-*.json. Ten IDs complete;
+  26 pending/partial. Logout push cleanup and JavaScript token storage remain
+  separate PY-07 work; this does not claim complete shared-device safety.

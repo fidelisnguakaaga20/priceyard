@@ -105,9 +105,12 @@ from app.models.revoked_access_token import RevokedAccessToken
 from app.models.user import User
 from app.models.payment import Payment
 from app.models.audit_log import AuditLog
+from app.models.push_subscription import PushSubscription
+from app.schemas.push_schema import PushSubscriptionCreate
 from app.security import create_access_token
 from app.services import password_reset_service
 from app.services import payment_service
+from app.services.push_service import save_subscription
 from app.services.login_revocation_service import is_revoked, revoke_token
 from app.services.subscription_service import build_trial_subscription
 from app.services.user_service import update_user
@@ -349,6 +352,40 @@ class PostgreSQLSecurityTests(unittest.TestCase):
 
     def test_one_provider_transaction_cannot_credit_concurrent_purchases(self):
         self.payment_race(duplicate_transaction=True)
+
+    def test_concurrent_push_registration_cannot_overwrite_other_device_keys(self):
+        import base64
+        from cryptography.hazmat.primitives import serialization
+        from cryptography.hazmat.primitives.asymmetric import ec
+        Base.metadata.create_all(self.engine)
+        with Session(self.engine) as db:
+            users=[]
+            for index in range(2):
+                user=User(full_name="Synthetic push race",email=f"pgrace{index}@example.com",password_hash="not-used",role="free_user",is_active=True,referral_code=f"PGPUSH{index}")
+                db.add(user);db.flush();users.append(user.id)
+            db.commit()
+        encode=lambda value:base64.urlsafe_b64encode(value).decode().rstrip("=")
+        public=ec.generate_private_key(ec.SECP256R1()).public_key().public_bytes(serialization.Encoding.X962,serialization.PublicFormat.UncompressedPoint)
+        payloads=[PushSubscriptionCreate(endpoint="https://fcm.googleapis.com/fcm/send/synthetic-race",keys={"p256dh":encode(public),"auth":encode(bytes([index])*16)}) for index in range(2)]
+        barrier=threading.Barrier(2);outcomes=[]
+        def worker(index):
+            with Session(self.engine) as db:
+                user=db.get(User,users[index]);barrier.wait(timeout=15)
+                try:
+                    save_subscription(db,user,payloads[index]);outcomes.append((index,204))
+                except HTTPException as error:
+                    db.rollback();outcomes.append((index,error.status_code))
+                except BaseException as error:
+                    db.rollback();outcomes.append((index,type(error).__name__))
+        threads=[threading.Thread(target=worker,args=(index,)) for index in range(2)]
+        for thread in threads:thread.start()
+        for thread in threads:thread.join(25)
+        self.assertFalse(any(thread.is_alive() for thread in threads))
+        self.assertCountEqual([status for _,status in outcomes],[204,409])
+        winner=next(index for index,status in outcomes if status==204)
+        with Session(self.engine) as db:
+            rows=db.scalars(select(PushSubscription)).all();self.assertEqual(len(rows),1)
+            self.assertEqual(rows[0].user_id,users[winner]);self.assertEqual(rows[0].auth,payloads[winner].keys.auth)
 
 
 if __name__ == "__main__":

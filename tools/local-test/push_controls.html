@@ -4,6 +4,10 @@
 <p>Fabricated accounts only. No notification is delivered and no provider is contacted. This page is separate from PriceYard.</p>
 <ol><li><a href="/login" target="_blank">Log into the original app</a> as free@example.com, password PriceYardDemo8!.</li><li>Run the checks. Private/arbitrary addresses must reject; valid synthetic subscription storage and cleanup must succeed.</li></ol>
 <button id="run">Run safety checks</button><pre id="result" role="status"></pre>
+<p>Ownership check: use two fabricated accounts to reject an endpoint-only claim,
+then verify legitimate same-device transfer and owner-only cleanup. This does not
+change the account signed into the original application.</p>
+<button id="run-ownership">Check device ownership protection</button><pre id="ownership-result" role="status"></pre>
 <script>
 document.querySelector('#run').onclick=async()=>{
  const button=document.querySelector('#run');button.disabled=true;
@@ -26,5 +30,33 @@ document.querySelector('#run').onclick=async()=>{
   window.__pushSafetyResult={complete:true,rejected_statuses:results,valid_storage:accepted,cleanup,providers_disabled:status.providers==='disabled',passed:results.every(x=>x===422)&&accepted===204&&cleanup===204&&status.providers==='disabled'};
   document.querySelector('#result').textContent=JSON.stringify(window.__pushSafetyResult,null,2);
  }catch(error){document.querySelector('#result').textContent=error.message;}finally{button.disabled=false;}
+};
+document.querySelector('#run-ownership').onclick=async()=>{
+ const button=document.querySelector('#run-ownership');button.disabled=true;
+ try{
+  async function login(email){
+   const response=await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:'PriceYardDemo8!'})});
+   if(!response.ok)throw Error('Fake account login failed; the original rate limit may require waiting one minute.');
+   return (await response.json()).access_token;
+  }
+  const owner=await login('free@example.com'),other=await login('reporter@example.com');
+  const key=await crypto.subtle.generateKey({name:'ECDH',namedCurve:'P-256'},true,['deriveBits']);
+  const encode=value=>btoa(String.fromCharCode(...new Uint8Array(value))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  const keys={p256dh:encode(await crypto.subtle.exportKey('raw',key.publicKey)),auth:encode(crypto.getRandomValues(new Uint8Array(16)))};
+  const endpoint='https://fcm.googleapis.com/fcm/send/synthetic-ownership-'+crypto.randomUUID();
+  async function post(token,path,body){return fetch('/api/push/'+path,{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify(body)});}
+  async function owned(token){const response=await fetch('/api/push/subscribed?endpoint='+encodeURIComponent(endpoint),{headers:{Authorization:'Bearer '+token}});return (await response.json()).subscribed;}
+  const saved=(await post(owner,'subscribe',{endpoint,keys})).status;
+  const wrong={...keys,auth:encode(crypto.getRandomValues(new Uint8Array(16)))};
+  const rejected=(await post(other,'subscribe',{endpoint,keys:wrong})).status;
+  const originalPreserved=await owned(owner)&&!await owned(other);
+  const handoff=(await post(other,'subscribe',{endpoint,keys})).status;
+  const handoffVerified=!await owned(owner)&&await owned(other);
+  await post(owner,'unsubscribe',{endpoint});const otherProtected=await owned(other);
+  const cleanup=(await post(other,'unsubscribe',{endpoint})).status;
+  const removed=!await owned(other);
+  window.__pushOwnershipResult={complete:true,saved,rejected,original_owner_preserved:originalPreserved,legitimate_handoff:handoff,handoff_verified:handoffVerified,other_owner_cannot_remove:otherProtected,cleanup,removed,passed:saved===204&&rejected===409&&originalPreserved&&handoff===204&&handoffVerified&&otherProtected&&cleanup===204&&removed};
+  document.querySelector('#ownership-result').textContent=JSON.stringify(window.__pushOwnershipResult,null,2);
+ }catch(error){document.querySelector('#ownership-result').textContent=error.message;}finally{button.disabled=false;}
 };
 </script></body></html>
