@@ -27,7 +27,7 @@ export function HomePage() {
 
   const loadPrices = (silent = false) => {
     apiFetch<PriceUpdate[]>("/price-updates")
-      .then((items) => { setPrices(items.slice(0, 3)); setRecordCount(items.length); })
+      .then((items) => { setPrices(items.slice(0, 3)); setRecordCount(items.length); setError(""); })
       .catch((err: Error) => { if (!silent) setError(err.message); })
       .finally(() => { if (!silent) setLoading(false); });
   };

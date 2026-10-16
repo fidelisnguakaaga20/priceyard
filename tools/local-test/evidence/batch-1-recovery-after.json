@@ -1,0 +1,16 @@
+{
+  "expected_original_defect": false,
+  "result": {
+    "/": {
+      "initial_failure_visible": true,
+      "real_api_recovered": true,
+      "error_cleared": true
+    },
+    "/prices": {
+      "initial_failure_visible": true,
+      "real_api_recovered": true,
+      "error_cleared": true
+    }
+  },
+  "production_connections": 0
+}

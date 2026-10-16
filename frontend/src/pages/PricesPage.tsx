@@ -38,7 +38,7 @@ export function PricesPage() {
     try {
       const data = await apiFetch<PriceUpdate[]>(`/price-updates${query.size ? `?${query}` : ""}`);
       setItems(data);
-      if (!silent) setError("");
+      setError("");
     } catch (err) {
       if (!silent) setError((err as Error).message);
     } finally {

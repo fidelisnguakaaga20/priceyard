@@ -8,14 +8,14 @@ const recovery = path.join(root, '.git/priceyard-local-recovery-20261015/p00/run
 const { chromium } = await import(pathToFileURL(path.join(recovery, 'npm-tools-309adbe095ff487cb1d6bd447c580c70/node_modules/playwright/index.mjs')));
 const origin = 'http://127.0.0.1:55446';
 const browser = await chromium.launch({headless:true,args:['--disable-background-networking','--disable-component-update','--disable-sync','--no-first-run']});
-const context = await browser.newContext({serviceWorkers:'block',viewport:{width:1366,height:900}});
+let context = await browser.newContext({serviceWorkers:'block',viewport:{width:1366,height:900}});
 let externalBlocked = 0;
 await context.route('**/*', route => {
   if (new URL(route.request().url()).origin !== origin) { externalBlocked++; return route.abort(); }
   return route.continue();
 });
 await context.addInitScript(() => localStorage.setItem('priceyard_onboarding_seen','1'));
-const page = await context.newPage();
+let page = await context.newPage();
 page.setDefaultTimeout(12000);
 page.setDefaultNavigationTimeout(12000);
 const result = {};
@@ -62,7 +62,14 @@ try {
   await page.goto(origin+'/history');
   await page.getByRole('heading',{name:/^Price history$/i}).waitFor();
   result.trial_login_plans_and_history = true;
-  await page.getByRole('button',{name:'Log out',exact:true}).click();
+  // Role fixtures are independent; do not claim this baseline verifies logout.
+  await context.close();
+  context = await browser.newContext({serviceWorkers:'block',viewport:{width:1366,height:900}});
+  await context.route('**/*',route=>new URL(route.request().url()).origin===origin?route.continue():route.abort());
+  await context.addInitScript(()=>localStorage.setItem('priceyard_onboarding_seen','1'));
+  page=await context.newPage();
+  page.setDefaultTimeout(12000);
+  page.setDefaultNavigationTimeout(12000);
   await login('admin@example.com');
   await page.goto(origin+'/admin/prices');
   await page.getByRole('heading',{name:/^Price updates$/i}).waitFor();

@@ -1,4 +1,5 @@
 """Real original API + original UI, fresh synthetic memory database only."""
+import asyncio
 import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -59,21 +60,40 @@ from starlette.staticfiles import StaticFiles
 
 class PreviewFiles(StaticFiles):
     async def get_response(self, path, scope):
+        current = json.loads((LAB / "runtime/frontend.json").read_text())
+        current_snapshot = Path(current["path"]).resolve()
+        if current.get("purpose") != "synthetic-only-no-application-credentials" or not current_snapshot.is_relative_to((LAB / "runtime").resolve()):
+            raise RuntimeError("Unapproved frontend build")
         if path in {"sw.js", "service-worker.js"}:
             return JSONResponse({"local_test": "Service workers disabled for uncached review"}, status_code=404)
         if path in {"", "."} or path.endswith("/") or "." not in Path(path).name:
-            html = (snapshot / "dist/index.html").read_text(encoding="utf-8")
+            html = (current_snapshot / "dist/index.html").read_text(encoding="utf-8")
             notice = '<aside style="padding:6px 12px;background:#fff3c4;color:#352600;font:14px system-ui" role="status">LOCAL TEST ONLY — fabricated accounts/prices; real payments and messages disabled.</aside>'
             safety = '''<script>window.open=()=>null;if(navigator.share)navigator.share=async()=>{throw Error('Disabled in local test')};if(window.Notification)Notification.requestPermission=async()=> 'denied';if(window.PushManager)PushManager.prototype.subscribe=async()=>{throw Error('Disabled in local test')};if(navigator.serviceWorker)navigator.serviceWorker.register=async()=>{throw Error('Disabled in local test')};document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[href]');if(a&&new URL(a.href,location.href).origin!==location.origin){e.preventDefault();alert('External links are disabled in local testing.')}},true);</script>'''
             return HTMLResponse(html.replace("<body>", "<body>"+notice+safety))
-        return await super().get_response(path, scope)
+        return await StaticFiles(directory=str(current_snapshot / "dist")).get_response(path, scope)
 
 async def status(request):
     return JSONResponse({"synthetic_only": True, "database": "fresh memory SQLite", "providers": "disabled", "grades": False, "fixture": "original Egusi/Kwali Market/1 bag; bag size unknown", "isolation": isolation})
 
+outage = {"enabled": False}
+
+async def control(request):
+    payload = await request.json()
+    if set(payload) != {"enabled"} or not isinstance(payload["enabled"], bool):
+        return JSONResponse({"detail": "Expected one boolean enabled value"}, status_code=400)
+    outage["enabled"] = payload["enabled"]
+    return JSONResponse(outage)
+
+async def controls(request):
+    return HTMLResponse('''<!doctype html><html><head><title>PriceYard local testing controls</title></head><body style="font:18px system-ui;max-width:760px;margin:32px auto;padding:16px"><h1>Local testing controls</h1><p>These controls affect fabricated local test prices only. They are separate from the PriceYard application.</p><ol><li>Click <b>Simulate connection problem</b>.</li><li>Open <a href="/" target="_blank">the homepage</a> in another tab. Its existing error message should appear.</li><li>Return here and click <b>Restore connection</b>.</li><li>Return to the homepage. With Data saver Off, the normal refresh should show prices and remove the error within one minute.</li></ol><button onclick="setOutage(true)">Simulate connection problem</button> <button onclick="setOutage(false)">Restore connection</button><p id="status" role="status"></p><script>async function setOutage(enabled){const response=await fetch('/__test__/outage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({enabled})});if(!response.ok)throw Error('Control failed');document.querySelector('#status').textContent=enabled?'Simulated price outage enabled.':'Connection restored. Prices will refresh normally.'}</script></body></html>''')
+
 class LocalOnly:
     def __init__(self, app):
         self.app = app
+        # SQLite StaticPool shares a memory connection. Serialize fixture HTTP
+        # requests; this preview is not evidence of production concurrency.
+        self.request_lock = asyncio.Lock()
 
     async def __call__(self, scope, receive, send):
         if scope["type"] == "http":
@@ -84,9 +104,15 @@ class LocalOnly:
             if message["type"] == "http.response.start":
                 message.setdefault("headers", []).extend([(b"cache-control", b"no-store"), (b"content-security-policy", b"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'")])
             await send(message)
-        await self.app(scope, receive, secured)
+        if scope["type"] == "http" and scope.get("path") == "/api/price-updates" and outage["enabled"]:
+            return await JSONResponse({"detail": "Synthetic temporary outage"}, status_code=503)(scope, receive, secured)
+        if scope["type"] == "http":
+            async with self.request_lock:
+                await self.app(scope, receive, secured)
+        else:
+            await self.app(scope, receive, secured)
 
-preview = LocalOnly(Starlette(routes=[Route("/__test__/status", status), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
+preview = LocalOnly(Starlette(routes=[Route("/__test__/status", status), Route("/__test__/controls", controls), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
 
 if __name__ == "__main__":
     import uvicorn

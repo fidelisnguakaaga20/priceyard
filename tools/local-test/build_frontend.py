@@ -27,7 +27,9 @@ def main():
         if result.returncode:
             return result.returncode
     manifest = {"path": str(target), "purpose": "synthetic-only-no-application-credentials"}
-    (RUNTIME / "frontend.json").write_text(json.dumps(manifest))
+    staged = RUNTIME / "frontend.next.json"
+    staged.write_text(json.dumps(manifest))
+    staged.replace(RUNTIME / "frontend.json")
     print(json.dumps(manifest))
     return 0
 

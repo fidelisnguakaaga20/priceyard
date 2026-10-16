@@ -18,9 +18,10 @@ Schema additions and visible/business changes require specific approval.
 
 ## Status and next step
 
-Baseline browser/isolation verification passed. No application-source fix
-has yet been applied. Next: batch 1, PY-15 price-refresh recovery, with unchanged
-screens/wording. Apply small technical batches with automated and browser verification. Reuse
+Baseline browser/isolation verification passed. Batch 1 (PY-15) verified:
+homepage/current prices clear stale errors after normal successful refresh.
+Next: batch 2, PY-34 subscription expiry without accidental staff-role loss.
+Apply small technical batches with automated and browser verification. Reuse
 existing local tools from .git/priceyard-local-recovery-20261015; do not reinstall
 or read private configuration. Runtime is tools/local-test/runtime (ignored).
 
@@ -42,7 +43,7 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
 | PY-12 | Accurate existing quantity/type/market comparisons | Pending; no grades/new measurement fields |
 | PY-13 | Consistent Nigerian dates/times | Pending |
 | PY-14 | Evidence-based movement/confidence | Pending; wording/policy changes require approval |
-| PY-15 | Prices recover after failed loading | Pending |
+| PY-15 | Prices recover after failed loading | Complete in batch 1; before/after browser regression passed |
 | PY-16 | Correct filters and response ordering | Pending |
 | PY-17 | Correct market-detail loading | Pending |
 | PY-18 | Accurate account/payment/access messages | Pending |
@@ -94,3 +95,25 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
 - Browser page requests allow only the literal test origin; service workers,
   native sharing/push and external links are disabled in this wrapper. This is
   focused UI/API evidence, not full PWA/provider/VM isolation certification.
+
+### Batch 1 — PY-15
+
+- Two production-source lines changed: successful homepage and Current Prices
+  refreshes clear an old error even during automatic refresh. No JSX, CSS,
+  wording, fields, units, filtering, prices or subscription/referral rules changed.
+- Browser fault/recovery checks reproduced both original defects first, then
+  passed after the fix against real local API recovery responses. Timer checks
+  invoke the application's registered 60-second callbacks without a minute wait.
+- TypeScript/build passed (Vite 2.32s); CSS artifact hash unchanged. Six baseline
+  browser workflows passed again. The original 12 backend tests remain the
+  unchanged-backend baseline; no backend source changed in this batch.
+- Manual check: http://127.0.0.1:55446/__test__/controls — simulate an outage,
+  open homepage, restore connection and allow normal refresh with Data saver Off.
+  This control page is external test tooling, not a production application feature.
+- Harness correction: serialize fixture HTTP requests because a StaticPool memory
+  database shares one connection. This avoids test-only concurrent SQLite errors;
+  it is not evidence of production concurrency safety. Process guards remain.
+- A reused-page Trial/logout/Admin browser check showed a possible existing late
+  profile-response race. Independent role fixtures pass; deterministic logout
+  verification remains part of PY-18/PY-07. Do not claim logout protection complete.
+- Evidence: tools/local-test/evidence/batch-1-*.json. No production/provider access.
