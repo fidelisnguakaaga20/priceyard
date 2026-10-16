@@ -33,3 +33,4 @@ Thumbs.db
 
 # Disposable, synthetic-only local verification
 /tools/local-test/runtime/
+/tools/local-test/%SystemDrive%/

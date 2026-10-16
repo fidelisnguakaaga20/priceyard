@@ -6,7 +6,11 @@ import sys
 
 LAB = Path(__file__).resolve().parent
 ROOT = LAB.parents[1]
-env = {name: os.environ[name] for name in ("SYSTEMROOT", "WINDIR", "TEMP", "TMP", "PATH") if name in os.environ}
+env = {name: os.environ[name] for name in ("SYSTEMROOT", "SYSTEMDRIVE", "WINDIR", "TEMP", "TMP", "PATH") if name in os.environ}
+for name, suffix in (("LOCALAPPDATA", "Local"), ("APPDATA", "Roaming"), ("USERPROFILE", "Profile")):
+    location = LAB / "runtime/browser-support" / suffix
+    location.mkdir(parents=True, exist_ok=True)
+    env[name] = str(location)
 env["PLAYWRIGHT_BROWSERS_PATH"] = str(ROOT / ".git/priceyard-local-recovery-20261015/p00/runtime/browser-binaries")
 script = sys.argv[1] if len(sys.argv) > 1 else "browser_checks.mjs"
 if Path(script).name != script or not script.endswith(".mjs"):

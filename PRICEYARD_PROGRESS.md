@@ -197,3 +197,8 @@ or read private configuration. Runtime is tools/local-test/runtime (ignored).
   a new browser check proves five invalid attempts return 401 and the sixth 429.
   All three account regression cases also passed again. Each test context is
   independent; normal browser users retain the real localhost quota.
+- Checkpoint 3db1b1d unintentionally included three native browser/Windows cache
+  files under a literal %SystemDrive% directory. They are being removed from Git
+  tracking without deleting the on-disk files. Browser launch now retains the
+  nonsecret SYSTEMDRIVE variable and uses disposable profile/app-data directories;
+  the literal cache directory is ignored. Application/business data is unaffected.
