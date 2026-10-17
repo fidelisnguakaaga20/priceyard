@@ -14,8 +14,11 @@ def list_commodities(db: Session, *, active_only: bool = False) -> list[Commodit
     return list(db.scalars(statement.order_by(Commodity.name)).all())
 
 
-def get_commodity(db: Session, commodity_id: int) -> Commodity:
-    commodity = db.get(Commodity, commodity_id)
+def get_commodity(db: Session, commodity_id: int, *, lock: bool = False) -> Commodity:
+    statement = select(Commodity).where(Commodity.id == commodity_id)
+    if lock:
+        statement = statement.with_for_update().execution_options(populate_existing=True)
+    commodity = db.scalar(statement)
     if commodity is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Commodity not found")
     return commodity
@@ -29,20 +32,19 @@ def _ensure_unique_name(db: Session, name: str, *, exclude_id: int | None = None
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Commodity already exists")
 
 
-def create_commodity(db: Session, payload: CommodityCreate) -> Commodity:
+def create_commodity(db: Session, payload: CommodityCreate, *, commit: bool = True) -> Commodity:
     _ensure_unique_name(db, payload.name)
     commodity = Commodity(**payload.model_dump())
     db.add(commodity)
     try:
-        db.commit()
+        db.commit() if commit else db.flush()
     except IntegrityError as exc:
         db.rollback()
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Commodity already exists") from exc
-    db.refresh(commodity)
     return commodity
 
 
-def update_commodity(db: Session, commodity: Commodity, payload: CommodityUpdate) -> Commodity:
+def update_commodity(db: Session, commodity: Commodity, payload: CommodityUpdate, *, commit: bool = True) -> Commodity:
     changes = payload.model_dump(exclude_unset=True)
     if "name" in changes and changes["name"] is None:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Commodity name cannot be null")
@@ -54,15 +56,14 @@ def update_commodity(db: Session, commodity: Commodity, payload: CommodityUpdate
     for field, value in changes.items():
         setattr(commodity, field, value)
 
-    db.commit()
-    db.refresh(commodity)
+    db.commit() if commit else db.flush()
     return commodity
 
 
-def delete_commodity(db: Session, commodity: Commodity) -> None:
+def delete_commodity(db: Session, commodity: Commodity, *, commit: bool = True) -> None:
     db.delete(commodity)
     try:
-        db.commit()
+        db.commit() if commit else db.flush()
     except IntegrityError as exc:
         db.rollback()
         raise HTTPException(

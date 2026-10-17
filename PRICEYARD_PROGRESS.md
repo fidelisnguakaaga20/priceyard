@@ -153,6 +153,14 @@ Frontend unchanged. Seventeen complete, nineteen partial/pending. Next unfinishe
 other Admin catalog/editorial/feedback/audit transactions, compatible list bounds,
 remaining mobile/accessibility and explicitly pending business/operational cases.
 
+Batch 34 verified: commodity/market create/edit/delete and sanitized audit commit
+together; existing-row writes lock before snapshots. Four focused tests, all 147
+backend tests, 27 pinned PG cases and original catalog/browser/history/dashboard
+regressions pass. No frontend/schema/business-rule changes. Seventeen of 36 IDs
+complete; nineteen partial/pending. Native synthetic PG stopped and status verified;
+browser preview remains http://127.0.0.1:55446. Resume with other Admin writers,
+then remaining compatible performance, mobile/accessibility and pending decisions.
+
 ## Checklist — do not repeat the audit
 
 | ID | Improvement | Current status |
@@ -182,11 +190,11 @@ remaining mobile/accessibility and explicitly pending business/operational cases
 | PY-23 | Preserve layout while fixing mobile overflow | Pending |
 | PY-24 | Keyboard/focus accessibility | Pending |
 | PY-25 | Safe and clearly aged offline prices | Pending; visible additions require approval |
-| PY-26 | Complete atomic administrative audit | Partial: payment, registration/referral, price create/edit/approve/reject/outdated, Admin user/subscription/access changes and FAQ create/edit/publication/delete share atomic sanitized audits; concurrent price/status/FAQ trails and rollback verified; other administrative writes pending |
+| PY-26 | Complete atomic administrative audit | Partial: payment, registration/referral, price create/edit/approve/reject/outdated, Admin user/subscription/access, FAQ and commodity/market create/edit/delete share atomic sanitized audits; concurrent price/status/FAQ/catalog trails and rollback verified; other administrative writes pending |
 | PY-27 | Consistent existing editing/password inputs | Partial: feedback file replacement/removal/async ordering fixed without form changes in batch 26; remaining editing/password cases pending |
 | PY-28 | Historical record preservation | Partial: approved 0022 tested on fresh/populated synthetic PostgreSQL; future migration/history work pending |
-| PY-29 | Stable identities and dependent records | Pending; no automatic merge |
-| PY-30 | Isolated automated/browser verification | Partial/ongoing: guarded 143 backend tests, 26 identity-pinned synthetic PostgreSQL cases, real original-browser workflows and before/after evidence verified through batch 33; expand with remaining work, live services forbidden |
+| PY-29 | Stable identities and dependent records | Partial: catalog IDs/fields and referenced-price deletion rejection verified with atomic audit writes in batch 34; broader identity/duplicate/rename issues pending, no automatic merge |
+| PY-30 | Isolated automated/browser verification | Partial/ongoing: guarded 147 backend tests, 27 identity-pinned synthetic PostgreSQL cases, real original-browser workflows and before/after evidence verified through batch 34; expand with remaining work, live services forbidden |
 | PY-31 | Confirmed payment activation and recovery | Partial: atomic confirmation, retry/replay, owner-only callback recovery and approved indefinite-grant holds verified; unattended recovery and operational delivery/reconciliation decisions remain |
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches 14/21: carry forward dated paid/trial time; preserve indefinite grants, block new checkout and hold/recover old purchases without consuming days |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
@@ -1157,3 +1165,37 @@ remaining mobile/accessibility and explicitly pending business/operational cases
 - Manual: http://127.0.0.1:55446/admin/faq, admin@example.com / PriceYardDemo8!.
   Evidence: batch-33-*.json. Seventeen IDs complete, nineteen partial/pending;
   PY-26 remains partial for other Admin writers. No production/schema changes.
+
+### Batch 34 — further PY-26/PY-28/PY-29 (2026-10-17)
+
+- Original commodity and market create/edit/delete now share a transaction with
+  their sanitized audit. Failure rolls back both; row locks refresh existing
+  records before snapshots, preserving ordered trails across concurrent edits.
+  Service default commits and existing validation/duplicate-name behavior retained.
+  No new catalog entries, identity merge, schema, fields, UI or deletion policy.
+- Four focused tests reproduced six before audit failures (0.896s), then passed
+  (1.366s); all 147 backend tests pass, 85.656s during parallel local verification.
+  Original actions/permissions and inactive/public visibility remain unchanged.
+- Twenty-seven pinned native PG cases pass, 54.939s: failed catalog audit rolls
+  back edits, simultaneous edits keep continuous snapshots, original referenced
+  deletion returns 409 and complete historical price rows/IDs remain unchanged.
+  Prior security/payment/referral/FAQ/status/time/history cases remain passing.
+- Browser original commodity/market Edit/Save/Delete controls pass. Only existing
+  synthetic descriptions are temporarily changed then restored. Original names,
+  IDs and fields remain; referenced deletion stays denied; all historical price
+  values survive; four continuous audits recorded. No new market/commodity added.
+  Checker initially matched an exact textarea label that included its saved text;
+  switched to its existing name attribute and reseeded only the synthetic preview.
+  Product frontend was unchanged. No rebuild needed.
+- Dashboard regression still matches all fourteen original labels/totals, zero
+  list downloads, one summary request and outage/reload recovery. Manual local
+  preview: http://127.0.0.1:55446/login, admin@example.com / PriceYardDemo8!;
+  inspect Admin Dashboard, Commodities or Markets using the original navigation.
+- Evidence: batch-34-*.json. Seventeen IDs complete, nineteen partial/pending.
+  Native synthetic PostgreSQL was stopped cleanly after offline system-identity
+  verification; pg_ctl status reports no server running. Browser preview remains
+  synthetic-only, launcher 65012 / serving PID 64184 at this checkpoint.
+- Master remains 76dbd27588de4aa37f3163d8b263d4b72a2cff32 and previous backup remains
+  258991019e5af8b36eff407a8efa2c9fd03dd644. No production access, private configuration
+  reads, dependency installations, push, merge or deployment. Resume unfinished
+  Admin editorial/feedback/flag/price-delete audits next, preserving current work.

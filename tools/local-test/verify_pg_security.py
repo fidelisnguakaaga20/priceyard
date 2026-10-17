@@ -123,6 +123,50 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_catalog_audit_rollback_concurrent_edits_and_referenced_history_protection(self):
+        from app.models.commodity import Commodity
+        from app.models.market import Market
+        from app.models.price_update import PriceUpdate
+        from app.routes import commodity_routes, market_routes
+        from app.schemas.commodity_schema import CommodityUpdate
+        from app.schemas.market_schema import MarketUpdate
+        from app.services.audit_service import snapshot_model
+        Base.metadata.create_all(self.engine)
+        with Session(self.engine) as db:
+            admin=User(full_name="Synthetic catalog admin",email="pg-catalog@example.com",password_hash="unused",role="admin",referral_code="PGCATALOG")
+            commodity,market=Commodity(name="Egusi"),Market(name="Kwali Market")
+            db.add_all([admin,commodity,market]);db.flush();admin_id,commodity_id,market_id=admin.id,commodity.id,market.id
+            db.add(PriceUpdate(commodity_id=commodity.id,market_id=market.id,price_low=210000,price_high=220000,
+                unit="1 bag",bag_size=None,movement="unknown",confidence_level="Low confidence",status="approved",
+                update_date_time=datetime.now(timezone.utc),created_by=admin.id));db.commit()
+            history_before=db.execute(select(PriceUpdate.__table__)).all()
+        for kind,model,item_id,route,schema in (("commodity",Commodity,commodity_id,commodity_routes,CommodityUpdate),("market",Market,market_id,market_routes,MarketUpdate)):
+            edit=getattr(route,'edit_'+kind)
+            with Session(self.engine) as db:
+                admin=db.get(User,admin_id);before=snapshot_model(db.get(model,item_id))
+                with patch.object(route,"create_audit_log",side_effect=RuntimeError("Synthetic catalog audit failure")),self.assertRaisesRegex(RuntimeError,"Synthetic catalog audit failure"):
+                    edit(item_id,schema(description="Synthetic failed edit",is_active=False),db,admin)
+                self.assertEqual(snapshot_model(db.get(model,item_id)),before)
+            barrier=threading.Barrier(2);outcomes=[]
+            def worker(index):
+                with Session(self.engine) as db:
+                    admin=db.get(User,admin_id);barrier.wait(timeout=15)
+                    try:edit(item_id,schema(description=f"Synthetic corrected description {index}"),db,admin);outcomes.append(200)
+                    except BaseException as error:db.rollback();outcomes.append(type(error).__name__)
+            threads=[threading.Thread(target=worker,args=(index,)) for index in range(2)]
+            for thread in threads:thread.start()
+            for thread in threads:thread.join(25)
+            self.assertFalse(any(thread.is_alive() for thread in threads));self.assertEqual(outcomes,[200,200])
+            with Session(self.engine) as db:
+                logs=db.scalars(select(AuditLog).where(AuditLog.action==kind+'.edit').order_by(AuditLog.id)).all()
+                self.assertEqual(len(logs),2);self.assertEqual(logs[0].old_value,before)
+                self.assertEqual(logs[1].old_value,logs[0].new_value);self.assertEqual(logs[1].new_value,snapshot_model(db.get(model,item_id)))
+                admin=db.get(User,admin_id)
+                with self.assertRaises(HTTPException) as failure:getattr(route,'remove_'+kind)(item_id,db,admin)
+                self.assertEqual(failure.exception.status_code,409);self.assertIsNotNone(db.get(model,item_id))
+                self.assertEqual(db.execute(select(PriceUpdate.__table__)).all(),history_before)
+                self.assertEqual(len(db.scalars(select(AuditLog).where(AuditLog.action.like(kind+'.%'))).all()),2)
+
     def test_faq_failed_delete_and_concurrent_edits_preserve_record_and_audit(self):
         from app.models.faq_item import FAQItem
         from app.routes import faq_routes

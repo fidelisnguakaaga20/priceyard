@@ -18,6 +18,16 @@ from app.utils.permissions import require_roles
 router = APIRouter(prefix="/commodities", tags=["commodities"])
 
 
+def _save_catalog_audit(db: Session, admin: User, action: str, record_id: int, *, old_value: dict | None = None, new_value: dict | None = None) -> None:
+    try:
+        create_audit_log(db, actor=admin, action=action, table_name="commodities", record_id=record_id,
+                         old_value=old_value, new_value=new_value, commit=False)
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+
+
 @router.get("", response_model=list[CommodityResponse])
 def get_commodities(db: Session = Depends(get_db)) -> list[Commodity]:
     return list_commodities(db, active_only=True)
@@ -45,11 +55,8 @@ def add_commodity(
     db: Session = Depends(get_db),
     admin: User = Depends(require_roles("admin")),
 ) -> Commodity:
-    item = create_commodity(db, payload)
-    create_audit_log(
-        db, actor=admin, action="commodity.create", table_name="commodities",
-        record_id=item.id, new_value=snapshot_model(item),
-    )
+    item = create_commodity(db, payload, commit=False)
+    _save_catalog_audit(db, admin, "commodity.create", item.id, new_value=snapshot_model(item))
     return item
 
 
@@ -60,13 +67,10 @@ def edit_commodity(
     db: Session = Depends(get_db),
     admin: User = Depends(require_roles("admin")),
 ) -> Commodity:
-    item = get_commodity(db, commodity_id)
+    item = get_commodity(db, commodity_id, lock=True)
     old_value = snapshot_model(item)
-    item = update_commodity(db, item, payload)
-    create_audit_log(
-        db, actor=admin, action="commodity.edit", table_name="commodities",
-        record_id=item.id, old_value=old_value, new_value=snapshot_model(item),
-    )
+    item = update_commodity(db, item, payload, commit=False)
+    _save_catalog_audit(db, admin, "commodity.edit", item.id, old_value=old_value, new_value=snapshot_model(item))
     return item
 
 
@@ -76,12 +80,9 @@ def remove_commodity(
     db: Session = Depends(get_db),
     admin: User = Depends(require_roles("admin")),
 ) -> Response:
-    item = get_commodity(db, commodity_id)
+    item = get_commodity(db, commodity_id, lock=True)
     old_value = snapshot_model(item)
     record_id = item.id
-    delete_commodity(db, item)
-    create_audit_log(
-        db, actor=admin, action="commodity.delete", table_name="commodities",
-        record_id=record_id, old_value=old_value,
-    )
+    delete_commodity(db, item, commit=False)
+    _save_catalog_audit(db, admin, "commodity.delete", record_id, old_value=old_value)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

@@ -14,8 +14,11 @@ def list_markets(db: Session, *, active_only: bool = False) -> list[Market]:
     return list(db.scalars(statement.order_by(Market.name)).all())
 
 
-def get_market(db: Session, market_id: int) -> Market:
-    market = db.get(Market, market_id)
+def get_market(db: Session, market_id: int, *, lock: bool = False) -> Market:
+    statement = select(Market).where(Market.id == market_id)
+    if lock:
+        statement = statement.with_for_update().execution_options(populate_existing=True)
+    market = db.scalar(statement)
     if market is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Market not found")
     return market
@@ -36,16 +39,15 @@ def _ensure_unique_market(db: Session, name: str, state_value: str | None, *, ex
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Market already exists")
 
 
-def create_market(db: Session, payload: MarketCreate) -> Market:
+def create_market(db: Session, payload: MarketCreate, *, commit: bool = True) -> Market:
     _ensure_unique_market(db, payload.name, payload.state)
     market = Market(**payload.model_dump())
     db.add(market)
-    db.commit()
-    db.refresh(market)
+    db.commit() if commit else db.flush()
     return market
 
 
-def update_market(db: Session, market: Market, payload: MarketUpdate) -> Market:
+def update_market(db: Session, market: Market, payload: MarketUpdate, *, commit: bool = True) -> Market:
     changes = payload.model_dump(exclude_unset=True)
     if "name" in changes and changes["name"] is None:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Market name cannot be null")
@@ -62,15 +64,14 @@ def update_market(db: Session, market: Market, payload: MarketUpdate) -> Market:
     for field, value in changes.items():
         setattr(market, field, value)
 
-    db.commit()
-    db.refresh(market)
+    db.commit() if commit else db.flush()
     return market
 
 
-def delete_market(db: Session, market: Market) -> None:
+def delete_market(db: Session, market: Market, *, commit: bool = True) -> None:
     db.delete(market)
     try:
-        db.commit()
+        db.commit() if commit else db.flush()
     except IntegrityError as exc:
         db.rollback()
         raise HTTPException(

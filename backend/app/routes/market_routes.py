@@ -12,6 +12,16 @@ from app.utils.permissions import require_roles
 router = APIRouter(prefix="/markets", tags=["markets"])
 
 
+def _save_catalog_audit(db: Session, admin: User, action: str, record_id: int, *, old_value: dict | None = None, new_value: dict | None = None) -> None:
+    try:
+        create_audit_log(db, actor=admin, action=action, table_name="markets", record_id=record_id,
+                         old_value=old_value, new_value=new_value, commit=False)
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+
+
 @router.get("", response_model=list[MarketResponse])
 def get_markets(db: Session = Depends(get_db)) -> list[Market]:
     return list_markets(db, active_only=True)
@@ -39,8 +49,8 @@ def add_market(
     db: Session = Depends(get_db),
     admin: User = Depends(require_roles("admin")),
 ) -> Market:
-    item = create_market(db, payload)
-    create_audit_log(db, actor=admin, action="market.create", table_name="markets", record_id=item.id, new_value=snapshot_model(item))
+    item = create_market(db, payload, commit=False)
+    _save_catalog_audit(db, admin, "market.create", item.id, new_value=snapshot_model(item))
     return item
 
 
@@ -51,10 +61,10 @@ def edit_market(
     db: Session = Depends(get_db),
     admin: User = Depends(require_roles("admin")),
 ) -> Market:
-    item = get_market(db, market_id)
+    item = get_market(db, market_id, lock=True)
     old_value = snapshot_model(item)
-    item = update_market(db, item, payload)
-    create_audit_log(db, actor=admin, action="market.edit", table_name="markets", record_id=item.id, old_value=old_value, new_value=snapshot_model(item))
+    item = update_market(db, item, payload, commit=False)
+    _save_catalog_audit(db, admin, "market.edit", item.id, old_value=old_value, new_value=snapshot_model(item))
     return item
 
 
@@ -64,9 +74,9 @@ def remove_market(
     db: Session = Depends(get_db),
     admin: User = Depends(require_roles("admin")),
 ) -> Response:
-    item = get_market(db, market_id)
+    item = get_market(db, market_id, lock=True)
     old_value = snapshot_model(item)
     record_id = item.id
-    delete_market(db, item)
-    create_audit_log(db, actor=admin, action="market.delete", table_name="markets", record_id=record_id, old_value=old_value)
+    delete_market(db, item, commit=False)
+    _save_catalog_audit(db, admin, "market.delete", record_id, old_value=old_value)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
