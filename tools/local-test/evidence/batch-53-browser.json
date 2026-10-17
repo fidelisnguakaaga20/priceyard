@@ -1,0 +1,14 @@
+{
+  "checks": {
+    "out_of_range_uses_existing_form_error": true,
+    "target_is_not_silently_rounded": true,
+    "invalid_targets_leave_existing_watchlist_unchanged": true,
+    "original_whole_naira_target_still_saves": true,
+    "target_survives_page_reload": true,
+    "original_watchlist_and_prices_preserved": true
+  },
+  "failures": [],
+  "expected_original_bug": false,
+  "external_page_requests": 0,
+  "production_connections": 0
+}

@@ -148,6 +148,12 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_watchlist_targets_match_existing_numeric_storage(self):
+        spec = importlib.util.spec_from_file_location("local_watchlist_storage", ROOT / "backend/tests/test_watchlist_storage_bounds.py")
+        cases = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cases)
+        cases.exercise_watchlist_storage(self, self.engine, ("1000000000000", "1e100", "210000.001", "0.009"))
+
     def test_intelligence_commodity_scope_bounds_hydration_without_losing_history(self):
         from sqlalchemy import event
         from app.models.price_update import PriceUpdate

@@ -291,6 +291,14 @@ Next unfinished IDs02,05,07,08,13,14,20,28,29,30,31,35,36. Preserve existing
 policy/visible-change approval boundaries; no production/provider claims or new
 full native-suite claim. Resume from these results, not earlier historical status.
 
+Batch53 further PY-08: watchlist target validation now matches the original
+NUMERIC(14,2) storage. Before: actual native PostgreSQL500 for overflow and SQLite
+silently rounded sub-kobo input. After: two targeted backend tests, five alert
+regressions, one native workflow and six browser checks pass; valid/unset/zero/max
+targets and owner isolation preserved. Frontend unchanged; snapshot from batch52
+reused. Exactly23 complete /13 partial or pending; smaller fixture53/80 schemas,
+stopped. Latest full backend196 remains batch52, not a claimed full198 run.
+
 | ID | Improvement | Current status |
 |---|---|---|
 | PY-01 | Consistent historical access checks | Complete in batch 7; date/comparison/ID routes enforce existing history entitlement; current summaries preserved |
@@ -300,7 +308,7 @@ full native-suite claim. Resume from these results, not earlier historical statu
 | PY-05 | Referral abuse protection | Partial: atomic registration/reward/audit, duplicate-registration safety and concurrent seven-day reward preservation verified in batch 20; qualification/abuse-cap changes require approval and remain unchanged |
 | PY-06 | Safe push notification destinations | Application-side complete in batch 13; known-provider/key validation, bounded TLS transport, no redirects; live provider compatibility remains operational verification |
 | PY-07 | Shared-device/session safety | Partial: server revocation, stale UI protection, possession-based push ownership/concurrent registration and bounded current-device logout cleanup verified; JS token storage/offline cleanup limits remain |
-| PY-08 | Input/upload/request abuse bounds | Partial: push endpoint/key/query bounds and feedback pre-decode 2MB screenshot bound verified; broader request bounds pending |
+| PY-08 | Input/upload/request abuse bounds | Partial: push endpoint/key/query bounds, feedback pre-decode 2MB screenshot bound and watchlist target validation against existing NUMERIC(14,2) storage verified (batch53); broader request/text/body limits remain pending |
 | PY-09 | Concurrent security-action safety | Complete for identified reset/logout/last-Admin cases in batches 5/6; six PostgreSQL cases passed |
 | PY-10 | Spreadsheet export safety | Complete in batch 3; text/numeric regressions and original browser download/access checks passed |
 | PY-11 | Correct saved administrator price state | Complete in batch 10; actual create/approve/correct/outdated/reject/reload browser regression passed |
@@ -322,7 +330,7 @@ full native-suite claim. Resume from these results, not earlier historical statu
 | PY-27 | Consistent existing editing/password inputs | Complete for identified scope: feedback selection in batch26, existing Unicode/72-byte password rules and reset validation in batch46, owner-approved six Admin edit forms in batches50–52. Saved values/costs, one-field edits, reload, explicit clearing, switching/unknown/blank IDs and creation verified in61 actual browser checks |
 | PY-28 | Historical record preservation | Partial: approved 0022 tested on fresh/populated synthetic PostgreSQL; future migration/history work pending |
 | PY-29 | Stable identities and dependent records | Partial: catalog IDs/fields and referenced-price deletion rejection verified with atomic audit writes in batch 34; broader identity/duplicate/rename issues pending, no automatic merge |
-| PY-30 | Isolated automated/browser verification | Partial/ongoing: guarded196 backend tests pass in batch52; six relevant native cases pass across batches50–52; full40-case baseline passed batch47.61 editing, five detail and14-card dashboard browser checks pass. Native fixture51/80 schemas, stopped; heavy checks serialized and one dependency snapshot reused. Native browser workers/providers disabled; expand with remaining work, live services forbidden |
+| PY-30 | Isolated automated/browser verification | Partial/ongoing: full196 backend tests pass in batch52; batch53 adds two passing target tests plus five existing alert regressions, one native workflow and six browser checks. Full40 native baseline remains batch47;61 editing, five detail and14-card dashboard regressions passed batch52. Fixture53/80 schemas, stopped; serialized heavy phases, reused dependencies; native browser workers/providers disabled, live services forbidden |
 | PY-31 | Confirmed payment activation and recovery | Partial: atomic confirmation, retry/replay, owner-only callback recovery and approved indefinite-grant holds verified; unattended recovery and operational delivery/reconciliation decisions remain |
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches 14/21: carry forward dated paid/trial time; preserve indefinite grants, block new checkout and hold/recover old purchases without consuming days |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
@@ -1855,3 +1863,32 @@ full native-suite claim. Resume from these results, not earlier historical statu
   ID to edit: existing saved fields populate. Alter one field, save and re-enter
   the ID after reloading to confirm other fields remain. Do not use real customer
   data. Trial14 days, NGN2500/30 days, NGN6000/90 days and approved policies retained.
+
+### Batch 53 — Existing watchlist storage bounds (2026-10-17)
+
+- PY-08 technical validation only: target_price now matches the existing PostgreSQL
+  NUMERIC(14,2) column, like original price/cost amounts. No new field, screen,
+  measurement, cap on stored valid values, subscription/referral rule or schema.
+  Reject nonrepresentable input before writing instead of overflow500 or silently
+  changing the intended target. Original whole-naira UI/step/layout unchanged.
+- Before: both backend workflow cases fail; SQLite accepts an out-of-range target
+  and silently rounds210000.001 to210000.00. Native PostgreSQL reproduces HTTP500
+  on1000000000000 in one pinned synthetic schema (51 to52). Evidence records the
+  expected failing baseline; no production contacted or existing data changed.
+- After: both backend cases pass,0.394s, and the native workflow passes1/1,1.168s
+  (schemas52 to53). Unset/zero/ordinary/max representable targets persist exactly;
+  duplicates409, guest401, other-owner listing/deletion protection, valid deletion
+  and invalid-request nonmutation all verified. Overflow/excess precision now422.
+- Existing five watchlist notification regressions pass,7.792s, with fake delivery;
+  independent channels/deduplication remain. Native fixture stopped gracefully
+  before backend/browser work. Six actual original-browser checks pass: existing
+  form error, no silent rounding, no invalid writes, valid save, reload and unchanged
+  original watchlist/prices. A select-label test locator was corrected; no UI
+  markup changed. Invalid browser fixtures cleaned using existing own-delete API.
+- Frontend source unchanged; reused verified batch52 TypeScript/Vite snapshot,
+  original CSS index-BEBH-Ai6.css. No dependency copies/installations. Full196 backend
+  baseline remains batch52; do not claim the full198 suite was executed here. New
+  native case extends coverage; last full40-case native run remains batch47.
+  Evidence tools/local-test/evidence/batch-53-*.json. Exactly23 complete /13 partial
+  or pending. Broader body/text limits and remaining owner/operational choices stay
+  open. No production, push, merge or deployment.

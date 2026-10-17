@@ -12,7 +12,8 @@ class WatchlistCreate(BaseModel):
 
     commodity_id: int | None = Field(default=None, gt=0)
     market_id: int | None = Field(default=None, gt=0)
-    target_price: Decimal | None = Field(default=None, ge=0)
+    # Match the existing NUMERIC(14, 2) column: no overflow or silent rounding.
+    target_price: Decimal | None = Field(default=None, ge=0, max_digits=14, decimal_places=2)
     target_direction: TargetDirection | None = None
 
     @model_validator(mode="after")
