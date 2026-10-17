@@ -266,6 +266,15 @@ snapshot reused rather than copied. Exactly22 complete /14 partial or pending;
 next compatible remaining work includes Storage suitability query scope and
 remaining editing/input/security items. No production, push, merge or deployment.
 
+Batch49 completes the same optional SQL commodity scope for Storage suitability;
+all six original intelligence requests now avoid unrelated commodity records.
+Twelve relevant backend tests, two native cases and actual planning/detail/14-card
+dashboard browser regressions pass; retained PG schemas43 to45. No new full suite
+claim (latest full backend194 in batch48, full native40 in batch47). Existing build
+dependencies reused; CSS unchanged. Exactly22 complete /14 partial or pending.
+PY-27 Admin ID-to-edit forms still do not load saved optional values; owner approval
+requested for docs/ADMIN_EDIT_PREFILL_APPROVAL.md before changing visible editing.
+
 | ID | Improvement | Current status |
 |---|---|---|
 | PY-01 | Consistent historical access checks | Complete in batch 7; date/comparison/ID routes enforce existing history entitlement; current summaries preserved |
@@ -287,7 +296,7 @@ remaining editing/input/security items. No production, push, merge or deployment
 | PY-17 | Correct market-detail loading | Complete for identified loading races/combined-failure defect in batch 16; obsolete commodity/account responses ignored and independent successful sections retained |
 | PY-18 | Accurate account/payment/access messages | Complete for identified account/expiry/callback defects in batches 4/11/19; verified return refreshes access, unconfirmed return never claims payment received in title |
 | PY-19 | Existing FAQ draft/hide/publish management | Complete in batch 12; hidden drafts remain available to Admin across reload, public publication boundary verified |
-| PY-20 | Bounded queries with accessible historical records | Partial: current-price DB ranking (batch23), single-query dashboard summary (batch29), compact protected DISTINCT history filter metadata (batch32), SQL commodity scoping for market/quality/cost (batch47) and Buying zone/Sell-watch (batch48) detail requests with complete default Admin lists; full history, Storage suitability and other unbounded lists remain pending |
+| PY-20 | Bounded queries with accessible historical records | Partial: current-price DB ranking (batch23), single-query dashboard summary (batch29), protected DISTINCT history metadata (batch32), SQL commodity scoping for all six intelligence detail requests (batches47–49), complete default Admin lists preserved; full history and other unbounded lists remain pending |
 | PY-21 | Reliable independent alerts | Application-side identified channel dependency complete in batch 24: failed email no longer skips push/WhatsApp; per-user/channel failures isolated; existing deduplication/count semantics retained. Delivery/retry operations remain PY-35 |
 | PY-22 | Efficient loading and accurate dashboard totals | Complete for identified dashboard scope in batch 29: all 14 original metrics preserved; one Admin-only aggregate API/DB snapshot, zero entity hydration; backend/PG/browser totals and outage recovery verified |
 | PY-23 | Preserve layout while fixing mobile overflow | Complete for identified original critical-layout/price-card overflow scope in batches 42/43: 78 normal and twelve long-name viewport checks, 320–1366px, Easy reading both modes; ordinary card/badge geometry and all fourteen Admin cards preserved |
@@ -1725,3 +1734,28 @@ remaining editing/input/security items. No production, push, merge or deployment
   suitability, full history and other unbounded lists. Continue approved technical
   work; do not invent new business/source/session policies to inflate completion.
   No production access, push, merge or deployment.
+
+### Batch 49 — Storage suitability query scope (2026-10-17)
+
+- Added optional positive commodity_id filtering to the existing Storage suitability
+  GET list/service and current-detail request; original access/order/default complete
+  Admin list retained. Existing fields, validation and linked-price checks unchanged.
+  No measurements, form fields, business records or appearance changes.
+- Twelve scope tests before reproduce one failed HTTP selection and one missing
+  service keyword error; all12 pass after,1.758s. Existing native scope case now
+  checks all six resource types; it and Storage audit/rollback/concurrency pass2/2,
+  1.676s. Small pinned fixture retained schemas43 to45, of80; stopped before build.
+  Latest full backend194 passed batch48; latest full native40 passed batch47.
+- Credential-free snapshot rebuilt with --reuse, no dependency copy/install.
+  TypeScript/Vite1.19s/102modules; JS323.90kB/91.95kB gzip, original CSS
+  index-BEBH-Ai6.css unchanged. Actual browser verifies all three planning scopes,
+  default Admin lists, excluded unrelated rows and unchanged full price history.
+  Reseeded only the disposable memory preview afterward. Five detail regressions
+  and all14 Admin cards, one summary request and outage recovery pass.
+- Added a local stop_preview.ps1 helper using exact script/executable/parent and
+  synthetic marker checks; verified it stops only the disposable preview and checks
+  its port unbound. This preserves the launcher safeguards and avoids generic kills.
+- Evidence: tools/local-test/evidence/batch-49-*.json. All heavy checks sequential;
+  native cluster stopped. Manual local commodity detail keeps the same six section
+  headings/design. Exactly22 complete /14 partial or pending; PY-20 broader lists/
+  history and remaining policies/operations still open. Local commits only.

@@ -20,6 +20,7 @@ try {
   if(!palm){const response=await api('/commodities','POST',{name:'Palm oil'});assert.equal(response.status,201);palm=response.body;}
   const marker='Synthetic planning '+crypto.randomUUID();
   const resources=[
+    ['storage-suitability',{suitability_status:'watch',summary:marker+' Egusi storage'},{suitability_status:'watch',summary:marker+' Palm storage'}],
     ['buying-zones',{price_low:210000,price_high:220000,reason:marker+' Egusi buying',confidence:'Low confidence'},{price_low:310000,price_high:320000,reason:marker+' Palm buying',confidence:'Low confidence'}],
     ['sell-watch-windows',{start_period:'Recorded period',observation:marker+' Egusi selling',confidence:'Low confidence'},{start_period:'Recorded period',observation:marker+' Palm selling',confidence:'Low confidence'}],
   ];
@@ -31,12 +32,13 @@ try {
   const pending=[],captures=[];
   page.on('response',response=>{const url=new URL(response.url());if(resources.some(([endpoint])=>url.pathname==='/api/'+endpoint)&&response.request().method()==='GET')pending.push(response.json().then(rows=>captures.push({endpoint:url.pathname,scope:url.searchParams.get('commodity_id'),status:response.status(),rows})));});
   await page.goto(origin+'/commodities/Egusi');
-  await page.getByText(marker+' Egusi buying',{exact:true}).waitFor();await page.getByText(marker+' Egusi selling',{exact:true}).waitFor();await Promise.all(pending);
-  assert.equal(new Set(captures.map(row=>row.endpoint)).size,2);
+  await page.getByText(marker+' Egusi buying',{exact:true}).waitFor();await page.getByText(marker+' Egusi selling',{exact:true}).waitFor();await page.getByText(marker+' Egusi storage',{exact:true}).waitFor();await Promise.all(pending);
+  assert.equal(new Set(captures.map(row=>row.endpoint)).size,3);
   for(const result of captures){assert.equal(result.status,200);assert.equal(result.scope,String(egusi.id));assert.ok(result.rows.length&&result.rows.every(row=>row.commodity_id===egusi.id));}
   assert.equal(await page.getByText(marker+' Palm buying',{exact:true}).count(),0);assert.equal(await page.getByText(marker+' Palm selling',{exact:true}).count(),0);
+  assert.equal(await page.getByText(marker+' Palm storage',{exact:true}).count(),0);
   assert.deepEqual((await api('/price-updates/admin/history')).body,history);
   assert.equal(outside,0);
-  const report={two_planning_requests_scoped_in_real_browser:true,unfiltered_admin_lists_complete:true,unrelated_rows_not_downloaded_or_displayed:true,original_price_history_unchanged:true,no_new_delete_feature:true,disposable_preview_reseed_required:true,external_page_requests:outside,production_connections:0};
+  const report={three_planning_requests_scoped_in_real_browser:true,unfiltered_admin_lists_complete:true,unrelated_rows_not_downloaded_or_displayed:true,original_price_history_unchanged:true,no_new_delete_feature:true,disposable_preview_reseed_required:true,external_page_requests:outside,production_connections:0};
   fs.writeFileSync(path.join(lab,'runtime/planning-scope-checks.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report));
 } finally {await browser.close();}

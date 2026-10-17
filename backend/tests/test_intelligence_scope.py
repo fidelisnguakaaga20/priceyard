@@ -13,6 +13,7 @@ from app.main import app
 from app.models.commodity import Commodity
 from app.models.buying_zone import BuyingZone
 from app.models.sell_watch_window import SellWatchWindow
+from app.models.storage_suitability import StorageSuitability
 from app.models.cost_breakdown import CostBreakdown
 from app.models.market import Market
 from app.models.market_signal import MarketSignal
@@ -23,6 +24,8 @@ from app.models.user import User
 from app.security import create_access_token
 
 RESOURCES = (
+    ("storage_suitability", "storage-suitability", StorageSuitability,
+     {"suitability_status": "watch", "summary": "Synthetic scope observation"}, {}),
     ("buying_zone", "buying-zones", BuyingZone,
      {"price_low": 210000, "price_high": 220000, "reason": "Synthetic scope observation", "confidence": "Low confidence"}, {}),
     ("sell_watch_window", "sell-watch-windows", SellWatchWindow,
@@ -56,7 +59,7 @@ def seed_scope_records(db):
                       "created_at": now + timedelta(seconds=index)}
             if kind == "cost_breakdown":
                 fields.update(total_additional_cost=200, total_estimated_landing_storage_cost=210200)
-            else:
+            elif kind != "storage_suitability":
                 fields["created_by"] = admin.id
             item = model(**fields)
             db.add(item)
@@ -111,7 +114,7 @@ class IntelligenceScopeTests(unittest.TestCase):
     def bounded_hydration(self, resource):
         kind, _, model, _, _ = resource
         service = importlib.import_module("app.services." + kind + "_service")
-        name = {"market_signal": "list_market_signals", "quality_signal": "list_quality_signals", "cost_breakdown": "list_cost_breakdowns", "buying_zone": "list_buying_zones", "sell_watch_window": "list_sell_watch_windows"}[kind]
+        name = {"market_signal": "list_market_signals", "quality_signal": "list_quality_signals", "cost_breakdown": "list_cost_breakdowns", "buying_zone": "list_buying_zones", "sell_watch_window": "list_sell_watch_windows", "storage_suitability": "list_storage_suitability"}[kind]
         with Session(self.engine) as db:
             loaded = []
             event.listen(db, "loaded_as_persistent", lambda session, item: loaded.append(item.id) if isinstance(item, model) else None)

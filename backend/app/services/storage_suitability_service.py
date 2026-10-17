@@ -64,10 +64,13 @@ def get_storage_suitability(db: Session, item_id: int, *, lock: bool = False) ->
     return item
 
 
-def list_storage_suitability(db: Session) -> list[StorageSuitability]:
+def list_storage_suitability(db: Session, *, commodity_id: int | None = None) -> list[StorageSuitability]:
+    statement = select(StorageSuitability)
+    if commodity_id is not None:
+        statement = statement.where(StorageSuitability.commodity_id == commodity_id)
     return list(
         db.scalars(
-            select(StorageSuitability).order_by(
+            statement.order_by(
                 StorageSuitability.created_at.desc(), StorageSuitability.id.desc()
             )
         ).all()

@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, status
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -25,8 +27,9 @@ router = APIRouter(prefix="/storage-suitability", tags=["storage-suitability"])
 def get_items(
     db: Session = Depends(get_db),
     _: User = Depends(require_full_access),
+    commodity_id: Annotated[int | None, Query(gt=0)] = None,
 ) -> list[StorageSuitability]:
-    return list_storage_suitability(db)
+    return list_storage_suitability(db, commodity_id=commodity_id)
 
 
 @router.get("/{item_id}", response_model=StorageSuitabilityResponse)

@@ -1,0 +1,10 @@
+{
+  "three_planning_requests_scoped_in_real_browser": true,
+  "unfiltered_admin_lists_complete": true,
+  "unrelated_rows_not_downloaded_or_displayed": true,
+  "original_price_history_unchanged": true,
+  "no_new_delete_feature": true,
+  "disposable_preview_reseed_required": true,
+  "external_page_requests": 0,
+  "production_connections": 0
+}

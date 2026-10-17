@@ -160,7 +160,7 @@ class PostgreSQLSecurityTests(unittest.TestCase):
         for kind,_,model,_,_ in cases.RESOURCES:
             with Session(self.engine) as db:
                 service=importlib.import_module("app.services."+kind+"_service")
-                method={"market_signal":"list_market_signals","quality_signal":"list_quality_signals","cost_breakdown":"list_cost_breakdowns","buying_zone":"list_buying_zones","sell_watch_window":"list_sell_watch_windows"}[kind]
+                method={"market_signal":"list_market_signals","quality_signal":"list_quality_signals","cost_breakdown":"list_cost_breakdowns","buying_zone":"list_buying_zones","sell_watch_window":"list_sell_watch_windows","storage_suitability":"list_storage_suitability"}[kind]
                 loaded=[]
                 event.listen(db,"loaded_as_persistent",lambda session,item:loaded.append(item.id) if isinstance(item,model) else None)
                 rows=getattr(service,method)(db,commodity_id=fixture["commodity"])

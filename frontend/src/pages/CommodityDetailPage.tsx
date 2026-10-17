@@ -70,7 +70,7 @@ export function CommodityDetailPage() {
       apiFetch<QualitySignal[]>(`/quality-signals?commodity_id=${commodityId}`, {}, token),
       apiFetch<BuyingZone[]>(`/buying-zones?commodity_id=${commodityId}`, {}, token),
       apiFetch<SellWatchWindow[]>(`/sell-watch-windows?commodity_id=${commodityId}`, {}, token),
-      apiFetch<StorageSuitability[]>("/storage-suitability", {}, token),
+      apiFetch<StorageSuitability[]>(`/storage-suitability?commodity_id=${commodityId}`, {}, token),
       apiFetch<CostBreakdown[]>(`/cost-breakdowns?commodity_id=${commodityId}`, {}, token),
     ]).then((results) => {
       if (!current) return;
