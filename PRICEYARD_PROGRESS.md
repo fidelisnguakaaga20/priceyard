@@ -375,7 +375,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-17 | Correct market-detail loading | Complete for identified loading races/combined-failure defect in batch 16; obsolete commodity/account responses ignored and independent successful sections retained |
 | PY-18 | Accurate account/payment/access messages | Complete for identified account/expiry/callback defects in batches 4/11/19; verified return refreshes access, unconfirmed return never claims payment received in title |
 | PY-19 | Existing FAQ draft/hide/publish management | Complete in batch 12; hidden drafts remain available to Admin across reload, public publication boundary verified |
-| PY-20 | Bounded queries with accessible historical records | Partial: current-price DB ranking (batch23), single-query dashboard summary (batch29), protected DISTINCT history metadata (batch32), SQL commodity scoping for all six intelligence detail requests (batches47–49), complete default Admin lists preserved; full history and other unbounded lists remain pending |
+| PY-20 | Bounded queries with accessible historical records | Partial: current-price DB ranking (batch23), single-query dashboard summary (batch29), protected DISTINCT history metadata (batch32), SQL commodity scoping for all six intelligence detail requests (batches47–49), streamed complete CSV export with bounded ORM batches and disconnect cleanup (batch60); complete default Admin lists preserved; full JSON history and other unbounded lists remain pending |
 | PY-21 | Reliable independent alerts | Application-side identified channel dependency complete in batch 24: failed email no longer skips push/WhatsApp; per-user/channel failures isolated; existing deduplication/count semantics retained. Delivery/retry operations remain PY-35 |
 | PY-22 | Efficient loading and accurate dashboard totals | Complete for identified dashboard scope in batch 29: all 14 original metrics preserved; one Admin-only aggregate API/DB snapshot, zero entity hydration; backend/PG/browser totals and outage recovery verified |
 | PY-23 | Preserve layout while fixing mobile overflow | Complete for identified original critical-layout/price-card overflow scope in batches 42/43: 78 normal and twelve long-name viewport checks, 320–1366px, Easy reading both modes; ordinary card/badge geometry and all fourteen Admin cards preserved |
@@ -2143,3 +2143,38 @@ No expansion of completed null-guard/account/UI scopes is needed.
   PY-36 documentation/maintainability; preserve remaining owner-policy gates.
 - Evidence batch-59-*.json. Master/backup retained; no production databases,
   credentials, services, migrations, push, merge or deployment accessed/performed.
+
+### Batch 60 — bounded complete CSV export (2026-10-17)
+
+- Resumed clean from556cf6b on the existing original-preserved branch; no audit,
+  resets or previous completed-item expansion. PY-20 export no longer materializes
+  every ORM record and the complete CSV string before responding. Server cursor
+  fetches100 price records at a time; observed transient handoff at most200 live
+  price objects. Related signal collections and individual text sizes remain
+  proportional to each record, not a byte-size guarantee. No record-count cap.
+- Original Admin-only route, filename,13 columns, numeric values, approved-only
+  selection, inclusive UTC date filters, complete chronological/id order,
+  inactive-catalog/outdated history and formula neutralization preserved. Private
+  sources remain absent. No frontend, design, fields, policies or records changed.
+- Stream owns its database session; success, partial close, failed send and
+  cancellation cleanup close cursor/session. Invalid date range returns422 before
+  response starts. Later database/network errors interrupt the download rather
+  than silently truncate a successful complete file.
+- Full221 backend tests pass33.824s. Five new tests cover multi-batch completeness,
+  ordering, unchanged stored records, filters/empty exports, route permissions,
+  validation and connection cleanup. First targeted run exposed the expected
+  two-batch handoff; corrected the test's bound instead of claiming one-batch
+  peak memory. Existing five spreadsheet-injection tests still pass.
+- Focused native PostgreSQL case passes3.405s, all251 approved rows retained,
+  all253 stored rows unchanged, bounded hydration and partial-stream connection
+  return verified. Initial native attempt had a test-helper import-path error;
+  corrected explicit local import, retained failure evidence. Fixture69->70 on
+  failed harness setup,70->71 on passing case, of80; stopped before browser work.
+- Actual original CSV screen/download and Guest401/Trial403 checks pass; original
+  headings, filename/data, source exclusion and no grades verified. Existing
+  compiled frontend reused; no build, dependency install or dependency copy.
+- Evidence batch-60-*.json.25 complete /11 partial or pending remain:
+  02,05,07,08,13,14,20,29,30,35,36. PY-20 is still partial for full JSON history/
+  other lists; do not claim all query work complete. Next finite task: PY-36
+  current documentation and behavior-preserving readability of existing forms.
+- No production contact/data/migration, credential reads, push, merge or deploy.

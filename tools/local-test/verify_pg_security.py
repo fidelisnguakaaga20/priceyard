@@ -148,6 +148,12 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_streamed_export_preserves_all_history_and_releases_connections(self):
+        spec = importlib.util.spec_from_file_location("local_export_stream", ROOT / "backend/tests/test_report_export_streaming.py")
+        cases = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cases)
+        cases.check_streaming_export(self, self.engine)
+
     def test_populated_legacy_migration_stops_before_historical_changes(self):
         command.upgrade(self.config(), "0005_stage13_watchlists")
         with self.engine.begin() as connection:

@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import csv
+from collections.abc import Iterable, Iterator
 from datetime import date, datetime, time, timedelta, timezone
 from io import StringIO
 
 from fastapi import HTTPException, status
 from sqlalchemy import select
+from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, selectinload
 
 from app.models.commodity import Commodity
@@ -58,14 +60,13 @@ def _format_quality_signals(item: PriceUpdate) -> str:
     return " || ".join(part for part in parts if part)
 
 
-def list_exportable_price_updates(
-    db: Session,
+def _export_statement(
     *,
     commodity_search: str | None = None,
     market_search: str | None = None,
     date_from: date | None = None,
     date_to: date | None = None,
-) -> list[PriceUpdate]:
+):
     if date_from is not None and date_to is not None and date_from > date_to:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
@@ -101,8 +102,23 @@ def list_exportable_price_updates(
         end = datetime.combine(date_to, time.min, tzinfo=timezone.utc) + timedelta(days=1)
         statement = statement.where(PriceUpdate.update_date_time < end)
 
-    statement = statement.order_by(PriceUpdate.update_date_time.asc(), PriceUpdate.id.asc())
-    return list(db.scalars(statement).all())
+    return statement.order_by(PriceUpdate.update_date_time.asc(), PriceUpdate.id.asc())
+
+
+def stream_price_report_csv(engine: Engine, **filters) -> Iterator[str]:
+    # Validate filters before the response starts. The stream owns its session;
+    # authentication's request session may already be closed by the framework.
+    statement = _export_statement(**filters).execution_options(yield_per=100)
+
+    def content():
+        with Session(engine) as db:
+            result = db.scalars(statement)
+            try:
+                yield from iter_price_report_csv(result)
+            finally:
+                result.close()
+
+    return content()
 
 
 def _spreadsheet_safe(value: object) -> object:
@@ -117,12 +133,15 @@ def _spreadsheet_safe(value: object) -> object:
     return value
 
 
-def build_price_report_csv(items: list[PriceUpdate]) -> str:
+def iter_price_report_csv(items: Iterable[PriceUpdate]) -> Iterator[str]:
     output = StringIO(newline="")
     writer = csv.writer(output)
     writer.writerow(CSV_HEADERS)
+    yield output.getvalue()
 
     for item in items:
+        output.seek(0)
+        output.truncate(0)
         writer.writerow(
             [_spreadsheet_safe(value) for value in [
                 item.commodity.name,
@@ -140,5 +159,9 @@ def build_price_report_csv(items: list[PriceUpdate]) -> str:
                 _format_quality_signals(item),
             ]]
         )
+        yield output.getvalue()
 
-    return output.getvalue()
+
+def build_price_report_csv(items: Iterable[PriceUpdate]) -> str:
+    """Compatibility helper for callers needing a string, not the HTTP path."""
+    return "".join(iter_price_report_csv(items))
