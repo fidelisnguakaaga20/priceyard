@@ -1,0 +1,16 @@
+{
+  "tests": 2,
+  "failures": 0,
+  "errors": 0,
+  "seconds": 1.74,
+  "cluster_identity_verified": true,
+  "production_contacts": 0,
+  "cluster_profile": "postgres-recovery-20261017",
+  "schemas_before": 49,
+  "schema_budget": 80,
+  "single_native_suite": true,
+  "selected_tests": [
+    "test_storage_audit_rollback_and_concurrent_history",
+    "test_cost_reference_audit_rollback_and_concurrent_history"
+  ]
+}

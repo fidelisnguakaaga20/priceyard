@@ -25,3 +25,9 @@ explicit clearing, ID switching, unknown IDs and original creation still work.
 
 This specific approval covers loading/replacing values in existing editing forms.
 It does not approve new fields, screens, business rules or production changes.
+
+Implemented and locally verified in batches50–52: all six original forms. The
+61-check browser suite covers saved values, single-field edits, reload, explicit
+clearing, unsaved-value replacement on ID switching, unknown/blank IDs, creation
+and original cost totals/zero values. Original appearance and price history remain.
+No production authorization or migration is implied by these results.

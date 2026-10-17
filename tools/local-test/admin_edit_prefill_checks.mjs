@@ -12,18 +12,27 @@ await context.route('**/*',route=>{if(new URL(route.request().url()).origin===or
 await context.addInitScript(()=>localStorage.setItem('priceyard_onboarding_seen','1'));
 const page=await context.newPage();page.setDefaultTimeout(10000);
 async function api(endpoint,method='GET',body){return page.evaluate(async({endpoint,method,body})=>{const response=await fetch('/api'+endpoint,{method,headers:{Authorization:'Bearer '+localStorage.getItem('priceyard_access_token'),'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});return {status:response.status,body:response.status===204?null:await response.json()};},{endpoint,method,body});}
+function sameValue(actual,expected){return typeof expected==='number'?actual!==null&&actual!==''&&Number(actual)===expected:actual===expected;}
+async function waitForField(name,value,numeric){
+  await page.waitForFunction(({name,value,numeric})=>{
+    const actual=document.querySelector('form.admin-form [name='+name+']').value;
+    return numeric?actual!==''&&Number(actual)===Number(value):actual===String(value);
+  },{name,value,numeric:!!numeric});
+}
 const cases=[
   {endpoint:'market-signals',route:'market-signals',heading:'Market signals',button:'Save market signal',values:{signal_type:'Synthetic saved type',signal_description:'Synthetic saved description',possible_meaning:'Synthetic saved optional note',suggested_action:'Investigate'},edit:'signal_description',clear:'possible_meaning'},
   {endpoint:'quality-signals',route:'quality-signals',heading:'Quality signals',button:'Save quality signal',values:{quality_status:'Synthetic saved status',moisture_status:'Synthetic saved moisture',storage_readiness:'Synthetic saved readiness',risk_note:'Synthetic saved risk'},edit:'quality_status',clear:'risk_note'},
   {endpoint:'buying-zones',route:'buying-zones',heading:'Buying zones',button:'Save buying zone',values:{price_low:100,price_high:200,reason:'Synthetic saved reason',valid_from:'2026-10-01',valid_to:'2026-10-31',confidence:'Synthetic confidence'},edit:'reason',clear:'valid_to',linkedPrice:false,canDelete:false},
   {endpoint:'sell-watch-windows',route:'sell-watch',heading:'Sell-watch windows',button:'Save sell-watch window',values:{start_period:'Synthetic start',end_period:'Synthetic saved end',observation:'Synthetic saved observation',confidence:'Synthetic confidence'},edit:'observation',clear:'end_period',linkedPrice:false,canDelete:false},
+  {endpoint:'storage-suitability',route:'storage',heading:'Storage suitability',button:'Save storage suitability',values:{suitability_status:'watch',import_risk:'Synthetic import note',oversupply_risk:'Synthetic supply note',spoilage_risk:'Synthetic spoilage note',buyer_availability:'Synthetic buyer note',quality_storage_notes:'Synthetic saved storage note',summary:'Synthetic saved summary'},edit:'summary',clear:'quality_storage_notes',canDelete:false},
+  {endpoint:'cost-breakdowns',route:'costs',heading:'Cost breakdown',button:'Save cost breakdown',values:{transport:120.50,warehouse:80.25,security:0,market_charges:20.75,loading_offloading:30,other_costs:10.10,purchase_price_reference:210000},edit:'transport',clear:'warehouse',linkedPrice:false,numeric:true},
 ];
 try {
   await page.goto(origin+'/login');await page.getByLabel('Email',{exact:true}).fill('admin@example.com');await page.getByLabel('Password',{exact:true}).fill('PriceYardDemo8!');await page.getByRole('button',{name:'Log in',exact:true}).click();await page.waitForURL('**/dashboard');
   const prices=(await api('/price-updates/admin/history')).body,price=prices[0];
   for(const test of cases){
     const base={commodity_id:price.commodity_id,market_id:price.market_id,...(test.linkedPrice===false?{}:{price_update_id:price.id}),...test.values};
-    const rows=[];for(const suffix of ['one','two']){const result=await api('/'+test.endpoint,'POST',{...base,[test.edit]:test.values[test.edit]+' '+suffix});assert.equal(result.status,201);rows.push(result.body);created.push([test.endpoint,result.body.id,test.canDelete!==false]);}
+    const rows=[];for(const suffix of ['one','two']){const result=await api('/'+test.endpoint,'POST',{...base,[test.edit]:test.numeric?test.values[test.edit]+(suffix==='one'?1:2):test.values[test.edit]+' '+suffix});assert.equal(result.status,201);rows.push(result.body);created.push([test.endpoint,result.body.id,test.canDelete!==false]);}
     const known=(await api('/'+test.endpoint)).body;
     let release;const held=new Promise(resolve=>{release=resolve;});
     await context.route('**/api/'+test.endpoint,async route=>{await held;await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(known)});},{times:1});
@@ -31,28 +40,35 @@ try {
     const form=page.locator('form.admin-form'),id=form.locator('[name=id]');
     await id.fill(String(rows[0].id));
     checks[test.endpoint+'_blocks_until_list_loaded']=await id.evaluate(input=>!input.checkValidity());
-    release();await page.getByText('Loading '+test.heading.toLowerCase()+'…',{exact:true}).waitFor({state:'hidden'});
+    release();
     const field=form.locator('[name='+test.edit+']');
     await page.waitForFunction(()=>document.querySelector('form.admin-form [name=id]').validationMessage!=='Wait for the selected record to load.');
-    checks[test.endpoint+'_loads_saved_values']=await field.inputValue()===rows[0][test.edit]&&await form.locator('[name='+test.clear+']').inputValue()===rows[0][test.clear];
+    checks[test.endpoint+'_loads_saved_values']=sameValue(await field.inputValue(),test.numeric?Number(rows[0][test.edit]):rows[0][test.edit])&&sameValue(await form.locator('[name='+test.clear+']').inputValue(),test.numeric?Number(rows[0][test.clear]):rows[0][test.clear]);
     if(!checks[test.endpoint+'_loads_saved_values'])continue;
-    const changed='Synthetic changed only one field';await field.fill(changed);
+    const changed=test.numeric?321.75:'Synthetic changed only one field';await field.fill(String(changed));
     let response=page.waitForResponse(response=>response.request().method()==='PATCH'&&new URL(response.url()).pathname==='/api/'+test.endpoint+'/'+rows[0].id);
     await form.getByRole('button',{name:test.button,exact:true}).click();assert.equal((await response).status(),200);
     const saved=(await api('/'+test.endpoint+'/'+rows[0].id)).body;
     checks[test.endpoint+'_single_field_edit_preserves_other_values']=Object.keys(base).every(key=>{
       const expected=key===test.edit?changed:base[key];
-      return typeof expected==='number'?Number(saved[key])===expected:saved[key]===expected;
+      return sameValue(saved[key],expected);
     });
-    await page.reload();await id.fill(String(rows[0].id));await page.waitForFunction(({name,value})=>document.querySelector('form.admin-form [name='+name+']').value===value,{name:test.edit,value:changed});
-    checks[test.endpoint+'_reload_preserves_saved_edit']=await form.locator('[name='+test.clear+']').inputValue()===base[test.clear];
+    if(test.numeric){
+      const extra=['transport','warehouse','security','market_charges','loading_offloading','other_costs'].reduce((sum,key)=>sum+Number(saved[key]),0);
+      checks[test.endpoint+'_existing_totals_and_zero_cost_preserved']=Number(saved.security)===0&&Math.abs(Number(saved.total_additional_cost)-extra)<0.000001&&Math.abs(Number(saved.total_estimated_landing_storage_cost)-Number(saved.purchase_price_reference)-extra)<0.000001;
+    }
+    await page.reload();await id.fill(String(rows[0].id));await waitForField(test.edit,changed,test.numeric);
+    checks[test.endpoint+'_reload_preserves_saved_edit']=sameValue(await form.locator('[name='+test.clear+']').inputValue(),base[test.clear]);
     await form.locator('[name='+test.clear+']').fill('');response=page.waitForResponse(response=>response.request().method()==='PATCH'&&new URL(response.url()).pathname==='/api/'+test.endpoint+'/'+rows[0].id);await form.getByRole('button',{name:test.button,exact:true}).click();assert.equal((await response).status(),200);
-    checks[test.endpoint+'_explicit_clearing_remains_possible']=(await api('/'+test.endpoint+'/'+rows[0].id)).body[test.clear]===null;
-    await id.fill(String(rows[1].id));await page.waitForFunction(({name,value})=>document.querySelector('form.admin-form [name='+name+']').value===value,{name:test.edit,value:rows[1][test.edit]});
-    checks[test.endpoint+'_switching_id_loads_other_record']=await form.locator('[name='+test.clear+']').inputValue()===base[test.clear];
+    const cleared=(await api('/'+test.endpoint+'/'+rows[0].id)).body[test.clear];
+    checks[test.endpoint+'_explicit_clearing_remains_possible']=test.numeric?sameValue(cleared,0):cleared===null;
+    await field.fill(test.numeric?'999.50':'Synthetic unsaved value');
+    await id.fill(String(rows[1].id));await waitForField(test.edit,rows[1][test.edit],test.numeric);
+    checks[test.endpoint+'_switching_id_loads_other_record']=sameValue(await form.locator('[name='+test.clear+']').inputValue(),base[test.clear]);
+    checks[test.endpoint+'_switch_discards_only_unsaved_changes']=sameValue((await api('/'+test.endpoint+'/'+rows[0].id)).body[test.edit],changed);
     await id.fill('999999');await page.locator('main .status-box.error').filter({hasText:'Record not found. Enter an existing ID or leave it blank to create.'}).waitFor();
-    checks[test.endpoint+'_unknown_id_blocks_wrong_record_submit']=await id.evaluate(input=>!input.checkValidity())&&await field.inputValue()==='';
-    await id.fill('');checks[test.endpoint+'_blank_id_restores_creation_defaults']=await field.inputValue()===''&&await id.evaluate(input=>input.checkValidity());
+    checks[test.endpoint+'_unknown_id_blocks_wrong_record_submit']=await id.evaluate(input=>!input.checkValidity())&&await field.inputValue()===(test.numeric?'0':'');
+    await id.fill('');checks[test.endpoint+'_blank_id_restores_creation_defaults']=await field.inputValue()===(test.numeric?'0':'')&&await id.evaluate(input=>input.checkValidity());
     for(const [key,value] of Object.entries(base)){
       const control=form.locator('[name='+key+']');
       if(await control.evaluate(element=>element.tagName==='SELECT'))await control.selectOption(String(value));else await control.fill(String(value));

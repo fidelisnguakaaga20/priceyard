@@ -1,0 +1,13 @@
+{
+  "checks": {
+    "late_price_does_not_replace_new_route": true,
+    "late_error_does_not_poison_new_route": true,
+    "one_failed_section_keeps_successful_sections": true,
+    "failed_section_shows_existing_error_box": true,
+    "late_intelligence_does_not_follow_old_commodity": true
+  },
+  "expected_original_bug": false,
+  "external_page_requests": 0,
+  "production_connections": 0,
+  "extra_commodities_or_markets_created": 0
+}

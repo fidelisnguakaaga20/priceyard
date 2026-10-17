@@ -283,6 +283,14 @@ All36 browser editing checks, nine backend and two focused native cases pass;
 Storage/Cost remain. Exactly22 complete /14 partial or pending. Native schemas49
 of80, cluster stopped; original CSS/fields/measurements/policies unchanged.
 
+Batch52 completes the approved six-form editing safeguard with Storage/Cost.
+All196 backend tests, two focused native cases,61 browser editing checks, five
+detail regressions and all14 dashboard cards pass. PY-27 identified scope complete:
+exactly23 complete /13 partial or pending. Native fixture schemas51 of80, stopped.
+Next unfinished IDs02,05,07,08,13,14,20,28,29,30,31,35,36. Preserve existing
+policy/visible-change approval boundaries; no production/provider claims or new
+full native-suite claim. Resume from these results, not earlier historical status.
+
 | ID | Improvement | Current status |
 |---|---|---|
 | PY-01 | Consistent historical access checks | Complete in batch 7; date/comparison/ID routes enforce existing history entitlement; current summaries preserved |
@@ -311,10 +319,10 @@ of80, cluster stopped; original CSS/fields/measurements/policies unchanged.
 | PY-24 | Keyboard/focus accessibility | Complete for identified original keyboard/focus scope in batches 42/45: selectable records and named role/status controls, menu/help Escape with trigger focus restoration, welcome-dialog initial/wrapped focus and original Skip/Next/Back behavior; 36 browser keyboard cases and all fourteen dashboard cards verified |
 | PY-25 | Safe and clearly aged offline prices | Complete for owner-approved application scope in batch 44: public-only explicit configured-API caching, timestamped saved copies, truthful original-view warnings, legacy/private/history exclusion and fresh-response recovery verified using actual worker source with fake network and actual browser UI with synthetic metadata. Native deployed PWA compatibility remains PY-35; no new age cutoff |
 | PY-26 | Complete atomic administrative audit | Complete for identified business-record writers through batch 40: payment/referral, price/moderation/flags, account/subscription, FAQ/catalog and all six intelligence resources save sanitized audits atomically; native concurrent edits and failed-audit rollback verified. External delivery operations remain PY-35 |
-| PY-27 | Consistent existing editing/password inputs | Partial: feedback async file selection fixed in batch26; existing password rules preserved in batch46. Owner-approved saved-value loading verified for Market/Quality/Buying/Sell-watch forms in batches50/51; Storage/Cost remain |
+| PY-27 | Consistent existing editing/password inputs | Complete for identified scope: feedback selection in batch26, existing Unicode/72-byte password rules and reset validation in batch46, owner-approved six Admin edit forms in batches50–52. Saved values/costs, one-field edits, reload, explicit clearing, switching/unknown/blank IDs and creation verified in61 actual browser checks |
 | PY-28 | Historical record preservation | Partial: approved 0022 tested on fresh/populated synthetic PostgreSQL; future migration/history work pending |
 | PY-29 | Stable identities and dependent records | Partial: catalog IDs/fields and referenced-price deletion rejection verified with atomic audit writes in batch 34; broader identity/duplicate/rename issues pending, no automatic merge |
-| PY-30 | Isolated automated/browser verification | Partial/ongoing: guarded194 backend tests and three focused native cases pass in batch48; full40-case PG baseline passed batch47. Original-browser regressions pass; native suites serialized, schema budget80, smaller fixture and sequential heavy checks; reuse isolated dependency snapshot rather than duplicating it. Actual worker source fake transport only, native browser workers/providers disabled; expand with remaining work, live services forbidden |
+| PY-30 | Isolated automated/browser verification | Partial/ongoing: guarded196 backend tests pass in batch52; six relevant native cases pass across batches50–52; full40-case baseline passed batch47.61 editing, five detail and14-card dashboard browser checks pass. Native fixture51/80 schemas, stopped; heavy checks serialized and one dependency snapshot reused. Native browser workers/providers disabled; expand with remaining work, live services forbidden |
 | PY-31 | Confirmed payment activation and recovery | Partial: atomic confirmation, retry/replay, owner-only callback recovery and approved indefinite-grant holds verified; unattended recovery and operational delivery/reconciliation decisions remain |
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches 14/21: carry forward dated paid/trial time; preserve indefinite grants, block new checkout and hold/recover old purchases without consuming days |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
@@ -1812,3 +1820,38 @@ of80, cluster stopped; original CSS/fields/measurements/policies unchanged.
   next restart. Price history unchanged; zero external browser/provider contacts.
   Evidence batch-51-*.json. Exactly22 complete /14 partial or pending; remaining
   approved forms are Storage/Cost. No production, push, merge or deployment.
+
+### Batch 52 — Approved Storage/Cost editing safeguard; PY-27 complete (2026-10-17)
+
+- Last two approved forms now use the same existing-control saved-value loader.
+  Storage status/notes/linked-price values and all saved costs load from the
+  existing authorized list. Original blank-ID creation defaults, explicit clearing
+  (blank cost remains zero), formulas, inputs, layout, access and policies remain.
+- Before build: four loading/prefill failures reproduced for Storage/Cost; previous
+  four forms remain passing. Final actual browser suite61/61 passes across all six:
+  one-field edit preserves other details, reload, explicit clearing, switched IDs
+  replace only unsaved changes, unknown IDs block submit, blank IDs restore defaults,
+  original creation, saved zero costs and accurate cost totals. Cost assertions were
+  corrected for existing decimal string/number formatting; no application amount
+  conversion or calculation changed. Price history unchanged; zero external requests.
+- Full196 backend tests pass,30.855s, synthetic SQLite with TCP/DNS denied. Two native
+  Storage/Cost-reference audit rollback/concurrency cases pass,1.740s. An unknown
+  test name was rejected before execution; corrected to the existing case without
+  changing any guard. Small pinned fixture schemas49 to51 of80, stopped gracefully.
+  Full40 native baseline remains batch47; do not relabel focused tests as full suite.
+- Reused snapshot build TypeScript/Vite passes2.02s/103modules, JS325.48kB/92.51kB
+  gzip; original CSS index-BEBH-Ai6.css unchanged.14 original dashboard labels/totals,
+  one summary request/outage recovery and five detail failure/race regressions pass.
+  Browser scenarios/PG/backend/build run sequentially. No new dependency copies or
+  installs. Reseed only the disposable memory preview to clear temporary planning
+  records; no unsupported deletes or production/database changes.
+- Evidence tools/local-test/evidence/batch-52-*.json. PY-27 identified scope complete.
+  Exactly23 complete /13 partial or pending:02,05,07,08,13,14,20,28,29,30,31,35,36.
+  Those still include owner policy choices, broader compatible bounds/history work
+  and operational/live-provider verification; none claimed complete by this batch.
+  Local commits only; master and preserved backup stay unchanged. No push/merge/deploy.
+- Manual check: http://127.0.0.1:55446, admin@example.com / PriceYardDemo8!. In an
+  original Admin section, create a synthetic entry and enter its displayed ID in
+  ID to edit: existing saved fields populate. Alter one field, save and re-enter
+  the ID after reloading to confirm other fields remain. Do not use real customer
+  data. Trial14 days, NGN2500/30 days, NGN6000/90 days and approved policies retained.
