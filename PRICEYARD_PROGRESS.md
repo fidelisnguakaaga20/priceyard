@@ -2054,3 +2054,41 @@ preflight, not more expansion of already completed account/input/UI improvements
   remain unchanged. Local verified commits only; no credentials read, production
   services/data, production migrations, push, merge or deployment. Routine local
   work remains authorized; Windows/Git sandbox restrictions are still enforced.
+
+### Batch 58 — PY-31 bounded missed-payment recovery complete locally (2026-10-17)
+
+- Focused a remaining item: pending/failed purchases now have an explicitly invoked
+  recovery job when webhook and customer return were missed. Reuses existing strict
+  provider verification and atomic activation; no charging, guessed evidence,
+  successful-legacy re-credit, new subscription/referral policy, schema or UI.
+  CLI defaults to read-only preview; --apply is explicit. Nothing auto-starts and
+  no scheduler/production config was installed. See docs/PAYMENT_RECONCILIATION.md.
+- Serial bounded pages default25/max100, fixed ceiling and resume cursor, soft time
+  budget, generic ID/outcome reporting. PostgreSQL session lock permits one applying
+  worker, released/invalidated in finally. One failed purchase does not stop others.
+  Existing paid/trial carry-forward and manual-grant review holds are unchanged.
+  Completed sweep does not mean every purchase was confirmed; the future scheduler
+  must retain the cursor so unconfirmed older purchases cannot starve later ones.
+- Seven new backend workflows pass0.390s: dry-run immutability, missed success and
+  failed-init recovery, paid/trial time, indefinite holds/replay, mismatched evidence,
+  missing subscription, bounded pages/snapshot, audit rollback/retry, per-customer
+  outage isolation, time budget, safe command default and redacted failure reporting.
+  Existing eight HTTP verification tests pass1.065s. Full211 backend baseline passed
+  30.107s before final CLI-error test; do not claim a full212 run from that alone.
+- Two focused native cases pass1.531s: same recovery/value/evidence workflow and
+  overlapping second-worker exclusion plus simultaneous webhook. Exactly one
+  activation/audit; job lock released. Schemas64 to66 of80, cluster stopped before
+  backend/browser. Full native suite remains historical baseline only.
+- Actual isolated browser proves preview never verifies, wrong amount stays Free/
+  pending, recovery grants existing original Dashboard/history access without a
+  checkout callback, and repeat makes no new verification/extra days. Existing
+  wrong-amount/activation-failure/replay payment workflow and all14 dashboard cards,
+  one summary request/outage recovery pass. All providers fake; zero external
+  requests. New test-harness endpoint is scoped to the existing fabricated verify
+  account/purchase, not a production API or product screen.
+- Frontend original files/build untouched; existing verified snapshot reused.
+  Evidence batch-58-*.json; native tests serialized and no dependencies installed.
+  PY-31 application scope complete:24 complete /12 partial or pending:
+  02,05,07,08,13,14,20,28,29,30,35,36. PY-35 retains live scheduling/checkpoint,
+  provider/host operations and evidence-based legacy repair approval boundaries.
+  No production, push, merge or deployment. Next PY-28 migration preservation.

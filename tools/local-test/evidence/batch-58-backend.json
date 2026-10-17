@@ -1,9 +1,9 @@
 {
-  "tests_run": 6,
+  "tests_run": 7,
   "failures": 0,
   "errors": 0,
   "skipped": 0,
-  "duration_seconds": 0.404,
+  "duration_seconds": 0.39,
   "pattern": "test_payment_reconciliation.py",
   "runtime": "in-process synthetic SQLite; TCP and DNS denied"
 }
