@@ -204,6 +204,13 @@ credential and screenshot fields without rewriting original stored evidence.
 All 180 backend/38 pinned PG cases and original audit-screen privacy checks pass.
 Nineteen complete; seventeen partial/pending. Next: mobile/keyboard checks.
 
+Batch 42 verified existing Admin selection is now keyboard reachable, Enter/Space
+matches the original click action, focused rows/cards have a keyboard-only outline,
+and role/subscription selects have accessible names. Twenty browser checks and 78
+normal viewport/Easy-reading checks pass; five relevant backend/38 pinned PG
+compatibility cases pass. Nineteen complete; seventeen partial/pending. Next:
+long-content mobile stress checks and remaining keyboard/offline safeguards.
+
 ## Checklist — do not repeat the audit
 
 | ID | Improvement | Current status |
@@ -230,8 +237,8 @@ Nineteen complete; seventeen partial/pending. Next: mobile/keyboard checks.
 | PY-20 | Bounded queries with accessible historical records | Partial: current-price DB ranking (batch 23), single-query dashboard summary (batch 29), compact protected DISTINCT history filter metadata (batch 32); complete history and other unbounded lists remain unchanged/pending |
 | PY-21 | Reliable independent alerts | Application-side identified channel dependency complete in batch 24: failed email no longer skips push/WhatsApp; per-user/channel failures isolated; existing deduplication/count semantics retained. Delivery/retry operations remain PY-35 |
 | PY-22 | Efficient loading and accurate dashboard totals | Complete for identified dashboard scope in batch 29: all 14 original metrics preserved; one Admin-only aggregate API/DB snapshot, zero entity hydration; backend/PG/browser totals and outage recovery verified |
-| PY-23 | Preserve layout while fixing mobile overflow | Pending |
-| PY-24 | Keyboard/focus accessibility | Pending |
+| PY-23 | Preserve layout while fixing mobile overflow | Partial: original critical screens fit 320/375/768px in normal/Easy-reading modes (78 checks), all fourteen Admin cards retained; long-content stress cases pending |
+| PY-24 | Keyboard/focus accessibility | Partial: price-row and published/hidden FAQ selection now supports Tab/Enter/Space with visible keyboard focus; original mouse actions retained and user-role/subscription selects named. Remaining navigation/popover checks pending |
 | PY-25 | Safe and clearly aged offline prices | Pending; visible additions require approval |
 | PY-26 | Complete atomic administrative audit | Complete for identified business-record writers through batch 40: payment/referral, price/moderation/flags, account/subscription, FAQ/catalog and all six intelligence resources save sanitized audits atomically; native concurrent edits and failed-audit rollback verified. External delivery operations remain PY-35 |
 | PY-27 | Consistent existing editing/password inputs | Partial: feedback file replacement/removal/async ordering fixed without form changes in batch 26; remaining editing/password cases pending |
@@ -1410,3 +1417,26 @@ Nineteen complete; seventeen partial/pending. Next: mobile/keyboard checks.
   Manual: http://127.0.0.1:55446/admin/audit, admin@example.com / PriceYardDemo8!.
 - Nineteen IDs complete; seventeen partial/pending. Remaining source policy review,
   mobile/keyboard issues and operational/business decisions are not claimed complete.
+
+### Batch 42 — further PY-23/PY-24 original Admin usability (2026-10-17)
+
+- Real browser before checks reproduce fifteen keyboard/name failures. Existing
+  price rows and published/hidden FAQ cards now offer Tab/Enter/Space selection
+  with a keyboard-only focus outline. Selection sets the original Record/FAQ ID;
+  it never saves, approves or publishes. Mouse selection remains unchanged.
+- Original desktop/mobile role controls and subscription status selects now have
+  accessible names identifying their user. Visible wording, option values, form
+  fields and account/subscription actions are unchanged. No policy/schema changes.
+- Twenty after browser checks pass, including mouse parity, no unintended writes
+  and unchanged price history. Seventy-eight normal mobile cases pass across
+  thirteen original critical screens, 320/375/768px and both Easy-reading modes;
+  no out-of-bounds controls and all fourteen Admin cards retained. No mobile CSS
+  redesign was needed for those fixtures; long-content stress tests remain next.
+- TypeScript/Vite passes, 1.70s/101 modules; JS320.89kB/90.90kB gzip. CSS changed
+  only by the keyboard focus-outline rule (31.72kB/7.13kB gzip). Backend unchanged:
+  five targeted Admin access/audit compatibility tests pass, 0.503s; all 38 pinned
+  PostgreSQL cases pass, 37.888s. Latest full backend remains 180 passes in batch 41.
+- Evidence: tools/local-test/evidence/batch-42-*.json. Manual: /admin/prices or
+  /admin/faq at http://127.0.0.1:55446 as demo Admin; Tab to a record, press Enter
+  or Space, and confirm its ID is selected without saving. Nineteen IDs complete,
+  seventeen partial/pending. No production access, push, merge or deployment.

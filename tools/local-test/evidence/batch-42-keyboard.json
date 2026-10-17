@@ -1,0 +1,28 @@
+{
+  "before": false,
+  "checks": {
+    "price_row_tab_stop": true,
+    "price_row_enter": true,
+    "price_row_space": true,
+    "price_row_visible_focus": true,
+    "price_row_mouse_selection_preserved": true,
+    "published_faq_tab_stop": true,
+    "published_faq_enter": true,
+    "published_faq_space": true,
+    "published_faq_visible_focus": true,
+    "published_faq_mouse_selection_preserved": true,
+    "hidden_faq_tab_stop": true,
+    "hidden_faq_enter": true,
+    "hidden_faq_space": true,
+    "hidden_faq_visible_focus": true,
+    "hidden_faq_mouse_selection_preserved": true,
+    "desktop_role_names": true,
+    "mobile_role_names": true,
+    "subscription_status_names": true,
+    "selection_does_not_save_or_publish": true,
+    "history_unchanged": true
+  },
+  "failures": [],
+  "external_page_requests": 0,
+  "production_connections": 0
+}

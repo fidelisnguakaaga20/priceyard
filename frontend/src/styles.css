@@ -144,6 +144,7 @@ html.easy-reading .confidence-badge, html.easy-reading .movement { font-weight: 
 .admin-table { min-width: 860px; }
 .admin-table tr[onClick] { cursor: pointer; }
 .admin-table tr[onClick]:hover { background: var(--color-hover-surface); }
+.admin-table tr[tabindex]:focus-visible, .admin-card-list [role="button"]:focus-visible { outline: 3px solid var(--color-link); outline-offset: -3px; }
 .admin-table select { min-width: 130px; }
 @media (max-width: 900px) { .admin-metric-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }.admin-action-panel { align-items: stretch; flex-direction: column; }.admin-action-panel label { min-width: 0; width: 100%; } }
 @media (max-width: 640px) { .admin-page { width: 100%; max-width: 100%; padding-inline: 12px; }.admin-nav { flex-wrap: wrap; max-width: 100%; gap: 6px; padding: 10px; }.admin-nav a { flex: 0 0 auto; padding: 7px 9px; font-size: .8rem; }.admin-metric-grid { grid-template-columns: minmax(0,1fr) minmax(0,1fr); }.admin-content, .admin-content > div, .admin-form, .admin-action-panel { min-width: 0; max-width: 100%; }.admin-action-panel .button-row { width: 100%; }.admin-action-panel .button { flex: 1; min-width: 120px; }.admin-table { min-width: 760px; } }

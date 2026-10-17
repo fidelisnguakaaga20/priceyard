@@ -1,0 +1,41 @@
+{
+  "before": true,
+  "checks": {
+    "price_row_tab_stop": false,
+    "price_row_enter": false,
+    "price_row_space": false,
+    "price_row_visible_focus": false,
+    "published_faq_tab_stop": false,
+    "published_faq_enter": false,
+    "published_faq_space": false,
+    "published_faq_visible_focus": false,
+    "hidden_faq_tab_stop": false,
+    "hidden_faq_enter": false,
+    "hidden_faq_space": false,
+    "hidden_faq_visible_focus": false,
+    "desktop_role_names": false,
+    "mobile_role_names": false,
+    "subscription_status_names": false,
+    "selection_does_not_save_or_publish": true,
+    "history_unchanged": true
+  },
+  "failures": [
+    "price_row_tab_stop",
+    "price_row_enter",
+    "price_row_space",
+    "price_row_visible_focus",
+    "published_faq_tab_stop",
+    "published_faq_enter",
+    "published_faq_space",
+    "published_faq_visible_focus",
+    "hidden_faq_tab_stop",
+    "hidden_faq_enter",
+    "hidden_faq_space",
+    "hidden_faq_visible_focus",
+    "desktop_role_names",
+    "mobile_role_names",
+    "subscription_status_names"
+  ],
+  "external_page_requests": 0,
+  "production_connections": 0
+}
