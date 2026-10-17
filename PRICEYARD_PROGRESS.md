@@ -278,6 +278,11 @@ nine backend tests, two focused native cases and all14 dashboard cards pass. Fou
 approved forms remain for sequential batches. Exactly22 complete /14 partial or
 pending; original design, fields and policies retained, native fixture stopped.
 
+Batch51 extends the approved safeguard to Buying zones and Sell-watch windows.
+All36 browser editing checks, nine backend and two focused native cases pass;
+Storage/Cost remain. Exactly22 complete /14 partial or pending. Native schemas49
+of80, cluster stopped; original CSS/fields/measurements/policies unchanged.
+
 | ID | Improvement | Current status |
 |---|---|---|
 | PY-01 | Consistent historical access checks | Complete in batch 7; date/comparison/ID routes enforce existing history entitlement; current summaries preserved |
@@ -306,7 +311,7 @@ pending; original design, fields and policies retained, native fixture stopped.
 | PY-24 | Keyboard/focus accessibility | Complete for identified original keyboard/focus scope in batches 42/45: selectable records and named role/status controls, menu/help Escape with trigger focus restoration, welcome-dialog initial/wrapped focus and original Skip/Next/Back behavior; 36 browser keyboard cases and all fourteen dashboard cards verified |
 | PY-25 | Safe and clearly aged offline prices | Complete for owner-approved application scope in batch 44: public-only explicit configured-API caching, timestamped saved copies, truthful original-view warnings, legacy/private/history exclusion and fresh-response recovery verified using actual worker source with fake network and actual browser UI with synthetic metadata. Native deployed PWA compatibility remains PY-35; no new age cutoff |
 | PY-26 | Complete atomic administrative audit | Complete for identified business-record writers through batch 40: payment/referral, price/moderation/flags, account/subscription, FAQ/catalog and all six intelligence resources save sanitized audits atomically; native concurrent edits and failed-audit rollback verified. External delivery operations remain PY-35 |
-| PY-27 | Consistent existing editing/password inputs | Partial: feedback async file selection fixed in batch26; existing password rules preserved in batch46. Owner-approved saved-value loading verified for Market/Quality forms in batch50; Buying/Sell-watch/Storage/Cost forms remain |
+| PY-27 | Consistent existing editing/password inputs | Partial: feedback async file selection fixed in batch26; existing password rules preserved in batch46. Owner-approved saved-value loading verified for Market/Quality/Buying/Sell-watch forms in batches50/51; Storage/Cost remain |
 | PY-28 | Historical record preservation | Partial: approved 0022 tested on fresh/populated synthetic PostgreSQL; future migration/history work pending |
 | PY-29 | Stable identities and dependent records | Partial: catalog IDs/fields and referenced-price deletion rejection verified with atomic audit writes in batch 34; broader identity/duplicate/rename issues pending, no automatic merge |
 | PY-30 | Isolated automated/browser verification | Partial/ongoing: guarded194 backend tests and three focused native cases pass in batch48; full40-case PG baseline passed batch47. Original-browser regressions pass; native suites serialized, schema budget80, smaller fixture and sequential heavy checks; reuse isolated dependency snapshot rather than duplicating it. Actual worker source fake transport only, native browser workers/providers disabled; expand with remaining work, live services forbidden |
@@ -1786,3 +1791,24 @@ pending; original design, fields and policies retained, native fixture stopped.
   Next Buying/Sell-watch, then Storage/Cost in batches of two. Synthetic-only
   preview http://127.0.0.1:55446; existing admin@example.com / PriceYardDemo8!.
   No production access, dependencies installed, push, merge or deployment.
+
+### Batch 51 — Approved Buying/Sell-watch editing safeguard (2026-10-17)
+
+- Applied the approved shared saved-value loader to only Buying zones and Sell-watch
+  windows. Existing controls, date/period semantics, full list, layout, validation,
+  create/PATCH endpoints and audit behavior retained. No new fields or policies.
+- Before build, four browser loading/prefill failures reproduced for these forms;
+  previous Market/Quality checks remain passing. After:36 browser checks pass for
+  all four forms, one-field preservation/reload, explicit clearing, switching IDs,
+  unknown/blank IDs and original creation. Decimal assertions compare numeric
+  amounts, respecting existing API decimal strings (100 versus100.00).
+- Nine planning audit backend tests pass,0.748s; two existing native Buying/Sell-watch
+  audit rollback/concurrency tests pass,1.625s. Pinned small fixture schemas47 to49
+  of80, stopped before build. Reused build passes TypeScript/Vite2.17s/103modules,
+  JS325.33kB/92.58kB gzip, unchanged original CSS index-BEBH-Ai6.css. No dependency
+  copies/installations. Fourteen dashboard cards/totals and outage recovery pass.
+- Synthetic planning fixtures have no original delete endpoint; test does not add
+  one or issue unsupported deletes. Reseed only the disposable memory preview at
+  next restart. Price history unchanged; zero external browser/provider contacts.
+  Evidence batch-51-*.json. Exactly22 complete /14 partial or pending; remaining
+  approved forms are Storage/Cost. No production, push, merge or deployment.

@@ -1,0 +1,37 @@
+{
+  "checks": {
+    "market-signals_blocks_until_list_loaded": true,
+    "market-signals_loads_saved_values": true,
+    "market-signals_single_field_edit_preserves_other_values": true,
+    "market-signals_reload_preserves_saved_edit": true,
+    "market-signals_explicit_clearing_remains_possible": true,
+    "market-signals_switching_id_loads_other_record": true,
+    "market-signals_unknown_id_blocks_wrong_record_submit": true,
+    "market-signals_blank_id_restores_creation_defaults": true,
+    "market-signals_original_creation_still_works": true,
+    "quality-signals_blocks_until_list_loaded": true,
+    "quality-signals_loads_saved_values": true,
+    "quality-signals_single_field_edit_preserves_other_values": true,
+    "quality-signals_reload_preserves_saved_edit": true,
+    "quality-signals_explicit_clearing_remains_possible": true,
+    "quality-signals_switching_id_loads_other_record": true,
+    "quality-signals_unknown_id_blocks_wrong_record_submit": true,
+    "quality-signals_blank_id_restores_creation_defaults": true,
+    "quality-signals_original_creation_still_works": true,
+    "buying-zones_blocks_until_list_loaded": false,
+    "buying-zones_loads_saved_values": false,
+    "sell-watch-windows_blocks_until_list_loaded": false,
+    "sell-watch-windows_loads_saved_values": false
+  },
+  "failures": [
+    "buying-zones_blocks_until_list_loaded",
+    "buying-zones_loads_saved_values",
+    "sell-watch-windows_blocks_until_list_loaded",
+    "sell-watch-windows_loads_saved_values"
+  ],
+  "expected_original_bug": true,
+  "original_price_history_unchanged": true,
+  "disposable_preview_reseed_required": true,
+  "external_page_requests": 0,
+  "production_connections": 0
+}

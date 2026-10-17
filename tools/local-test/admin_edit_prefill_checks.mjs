@@ -15,13 +15,15 @@ async function api(endpoint,method='GET',body){return page.evaluate(async({endpo
 const cases=[
   {endpoint:'market-signals',route:'market-signals',heading:'Market signals',button:'Save market signal',values:{signal_type:'Synthetic saved type',signal_description:'Synthetic saved description',possible_meaning:'Synthetic saved optional note',suggested_action:'Investigate'},edit:'signal_description',clear:'possible_meaning'},
   {endpoint:'quality-signals',route:'quality-signals',heading:'Quality signals',button:'Save quality signal',values:{quality_status:'Synthetic saved status',moisture_status:'Synthetic saved moisture',storage_readiness:'Synthetic saved readiness',risk_note:'Synthetic saved risk'},edit:'quality_status',clear:'risk_note'},
+  {endpoint:'buying-zones',route:'buying-zones',heading:'Buying zones',button:'Save buying zone',values:{price_low:100,price_high:200,reason:'Synthetic saved reason',valid_from:'2026-10-01',valid_to:'2026-10-31',confidence:'Synthetic confidence'},edit:'reason',clear:'valid_to',linkedPrice:false,canDelete:false},
+  {endpoint:'sell-watch-windows',route:'sell-watch',heading:'Sell-watch windows',button:'Save sell-watch window',values:{start_period:'Synthetic start',end_period:'Synthetic saved end',observation:'Synthetic saved observation',confidence:'Synthetic confidence'},edit:'observation',clear:'end_period',linkedPrice:false,canDelete:false},
 ];
 try {
   await page.goto(origin+'/login');await page.getByLabel('Email',{exact:true}).fill('admin@example.com');await page.getByLabel('Password',{exact:true}).fill('PriceYardDemo8!');await page.getByRole('button',{name:'Log in',exact:true}).click();await page.waitForURL('**/dashboard');
   const prices=(await api('/price-updates/admin/history')).body,price=prices[0];
   for(const test of cases){
-    const base={commodity_id:price.commodity_id,market_id:price.market_id,price_update_id:price.id,...test.values};
-    const rows=[];for(const suffix of ['one','two']){const result=await api('/'+test.endpoint,'POST',{...base,[test.edit]:test.values[test.edit]+' '+suffix});assert.equal(result.status,201);rows.push(result.body);created.push([test.endpoint,result.body.id]);}
+    const base={commodity_id:price.commodity_id,market_id:price.market_id,...(test.linkedPrice===false?{}:{price_update_id:price.id}),...test.values};
+    const rows=[];for(const suffix of ['one','two']){const result=await api('/'+test.endpoint,'POST',{...base,[test.edit]:test.values[test.edit]+' '+suffix});assert.equal(result.status,201);rows.push(result.body);created.push([test.endpoint,result.body.id,test.canDelete!==false]);}
     const known=(await api('/'+test.endpoint)).body;
     let release;const held=new Promise(resolve=>{release=resolve;});
     await context.route('**/api/'+test.endpoint,async route=>{await held;await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(known)});},{times:1});
@@ -38,7 +40,10 @@ try {
     let response=page.waitForResponse(response=>response.request().method()==='PATCH'&&new URL(response.url()).pathname==='/api/'+test.endpoint+'/'+rows[0].id);
     await form.getByRole('button',{name:test.button,exact:true}).click();assert.equal((await response).status(),200);
     const saved=(await api('/'+test.endpoint+'/'+rows[0].id)).body;
-    checks[test.endpoint+'_single_field_edit_preserves_other_values']=Object.keys(base).every(key=>String(saved[key])===String(key===test.edit?changed:base[key]));
+    checks[test.endpoint+'_single_field_edit_preserves_other_values']=Object.keys(base).every(key=>{
+      const expected=key===test.edit?changed:base[key];
+      return typeof expected==='number'?Number(saved[key])===expected:saved[key]===expected;
+    });
     await page.reload();await id.fill(String(rows[0].id));await page.waitForFunction(({name,value})=>document.querySelector('form.admin-form [name='+name+']').value===value,{name:test.edit,value:changed});
     checks[test.endpoint+'_reload_preserves_saved_edit']=await form.locator('[name='+test.clear+']').inputValue()===base[test.clear];
     await form.locator('[name='+test.clear+']').fill('');response=page.waitForResponse(response=>response.request().method()==='PATCH'&&new URL(response.url()).pathname==='/api/'+test.endpoint+'/'+rows[0].id);await form.getByRole('button',{name:test.button,exact:true}).click();assert.equal((await response).status(),200);
@@ -52,10 +57,10 @@ try {
       const control=form.locator('[name='+key+']');
       if(await control.evaluate(element=>element.tagName==='SELECT'))await control.selectOption(String(value));else await control.fill(String(value));
     }
-    response=page.waitForResponse(response=>response.request().method()==='POST'&&new URL(response.url()).pathname==='/api/'+test.endpoint);await form.getByRole('button',{name:test.button,exact:true}).click();const added=await response;assert.equal(added.status(),201);created.push([test.endpoint,(await added.json()).id]);checks[test.endpoint+'_original_creation_still_works']=true;
+    response=page.waitForResponse(response=>response.request().method()==='POST'&&new URL(response.url()).pathname==='/api/'+test.endpoint);await form.getByRole('button',{name:test.button,exact:true}).click();const added=await response;assert.equal(added.status(),201);created.push([test.endpoint,(await added.json()).id,test.canDelete!==false]);checks[test.endpoint+'_original_creation_still_works']=true;
   }
   assert.deepEqual((await api('/price-updates/admin/history')).body,prices);assert.equal(outside,0);
   const failures=Object.entries(checks).filter(([,value])=>!value).map(([name])=>name);
-  const report={checks,failures,expected_original_bug:expectBug,original_price_history_unchanged:true,external_page_requests:outside,production_connections:0};fs.writeFileSync(path.join(lab,'runtime/admin-edit-prefill-checks.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report));
+  const report={checks,failures,expected_original_bug:expectBug,original_price_history_unchanged:true,disposable_preview_reseed_required:created.some(([, ,canDelete])=>!canDelete),external_page_requests:outside,production_connections:0};fs.writeFileSync(path.join(lab,'runtime/admin-edit-prefill-checks.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report));
   if(expectBug)assert.ok(failures.length>0);else assert.deepEqual(failures,[]);
-} finally {for(const [endpoint,id] of created.reverse())await api('/'+endpoint+'/'+id,'DELETE').catch(()=>{});await browser.close();}
+} finally {for(const [endpoint,id,canDelete] of created.reverse())if(canDelete)await api('/'+endpoint+'/'+id,'DELETE').catch(()=>{});await browser.close();}
