@@ -184,6 +184,13 @@ PY-12 approved comparison scope complete: eighteen complete, eighteen partial/
 pending. Cost-reference unit inference is a separate PY-29 decision pending in
 docs/COST_REFERENCE_UNIT_APPROVAL.md. Next: missing editorial audits and usability.
 
+Batch 38 verified: owner-approved cost-unit wording removes unsupported inference
+from the first market price. Saved amounts, formula, quantity control and original
+records stay unchanged. All 159 backend tests, 31 pinned PG cases, TypeScript/build
+and actual before/after calculator browser checks pass. Eighteen complete, eighteen
+partial/pending. Unit-label approval is recorded in the cost proposal; no unit field
+or data backfill. Next: missing intelligence-resource audits (three related writers).
+
 ## Checklist — do not repeat the audit
 
 | ID | Improvement | Current status |
@@ -1305,3 +1312,26 @@ docs/COST_REFERENCE_UNIT_APPROVAL.md. Next: missing editorial audits and usabili
   saved unit; existing inference from the first market price remains unmodified
   pending separate visible-label approval in docs/COST_REFERENCE_UNIT_APPROVAL.md.
   Remaining audits for six editorial/intelligence resource writers still open.
+
+### Batch 38 — approved cost-reference label, further PY-29 (2026-10-17)
+
+- Owner explicitly approved "Approve the honest unit label" before implementation.
+  Stop borrowing bag size/unit from the first current price for a cost reference
+  that has no saved quantity. Existing calculator area now says "Unit not recorded"
+  and "Confirm the unit for this cost reference before using this estimate."
+  Original quantity input, calculations and saved monetary figures unchanged.
+- Before browser reproduces the unsupported "Priced per 1 bag" label. After browser
+  verifies approved wording, two reference units still give purchase 420,000,
+  additional 400 and total 420,400, unchanged saved record and restored initial
+  cost list after deleting only the new synthetic test reference. No new fields,
+  business amounts, quantities, schema, price linkage or historical backfill.
+- Required compatibility runs: all 159 backend tests pass, 30.987s; 31 pinned PG
+  cases pass, 29.744s. Backend unchanged; no backend defect or new backend unit-test
+  count claimed. TypeScript/Vite passes, 2.19s, 101 modules, JS320.21kB/90.70kB gzip;
+  original index-19youOJ7.css unchanged. Evidence: batch-38-*.json.
+- Manual: original Cost breakdown area on http://127.0.0.1:55446/commodities/Egusi
+  when an existing synthetic cost reference is present; Trial login unchanged.
+  No fabricated monetary reference is left after automated checks.
+- Eighteen IDs complete; eighteen partial/pending. Broader stable identity and
+  missing intelligence audits remain. New next-batch intelligence audit tests
+  are intentionally outside this verified frontend commit until fixed/verified.

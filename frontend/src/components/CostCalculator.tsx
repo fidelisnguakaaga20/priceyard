@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { CostBreakdown } from "../types/api";
 import { money } from "../utils";
 
-export function CostCalculator({ breakdown, unitLabel }: { breakdown: CostBreakdown; unitLabel: string }) {
+export function CostCalculator({ breakdown }: { breakdown: CostBreakdown }) {
   const [quantity, setQuantity] = useState("1");
   const safeQuantity = Math.max(0, Number(quantity) || 0);
 
@@ -13,7 +13,8 @@ export function CostCalculator({ breakdown, unitLabel }: { breakdown: CostBreakd
   return (
     <div className="cost-calculator">
       <h4>💰 Cost Calculator</h4>
-      <p className="muted">Priced per {unitLabel}. Enter how many you're buying to see your total cost.</p>
+      <p className="muted">Unit not recorded. Confirm the unit for this cost reference before using this estimate.</p>
+      <p className="muted">Enter how many reference units you're buying to see your total cost.</p>
       <div className="form-stack">
         <label>How many are you buying?
           <input type="number" min="0" step="1" value={quantity} onChange={(e) => setQuantity(e.target.value)} />

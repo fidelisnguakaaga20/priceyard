@@ -111,12 +111,10 @@ export function CommodityDetailPage() {
         <article className="card"><h3>Sell-watch window</h3>{sellWatch.length ? sellWatch.map((x) => { const inSeason = isWithinSeasonalMonths(x.start_period, x.end_period); return <div className="stack-item" key={x.id}><span className="eyebrow">{marketLabel(x.market_id)}</span><strong>{x.start_period}{x.end_period ? ` – ${x.end_period}` : ""}</strong><p>{x.observation}</p><small>Confidence: {x.confidence}</small>{inSeason === false && <small className="season-note">Not currently in season</small>}</div>; }) : <p className="muted">No sell-watch observation currently available.</p>}</article>
         <article className="card"><h3>Storage suitability</h3>{storage.length ? storage.map((x) => <div className="stack-item" key={x.id}><span className="eyebrow">{marketLabel(x.market_id)}</span><strong>{x.suitability_status.replace(/_/g, " ")}</strong><p>{x.summary || x.quality_storage_notes || "No summary supplied."}</p><small>Spoilage risk: {x.spoilage_risk || "—"} · Buyer availability: {x.buyer_availability || "—"}</small></div>) : <p className="muted">No storage-suitability observation currently available.</p>}<Disclaimer>{STORAGE_DISCLAIMER}</Disclaimer></article>
         <article className="card"><h3>Cost breakdown</h3>{costs.length ? costs.map((x) => {
-          const relatedPrice = prices.find((p) => p.commodity_id === x.commodity_id && p.market_id === x.market_id);
-          const unitLabel = relatedPrice?.bag_size || relatedPrice?.unit || "unit";
           return <div className="stack-item" key={x.id}>
             <span className="eyebrow">{marketLabel(x.market_id)}</span>
-            <CostCalculator breakdown={x} unitLabel={unitLabel} />
-            <p className="cost-reference-label">Reference breakdown (per {unitLabel})</p>
+            <CostCalculator breakdown={x} />
+            <p className="cost-reference-label">Reference breakdown (Unit not recorded)</p>
             <p>Purchase reference: {money(x.purchase_price_reference)} · Additional costs: {money(x.total_additional_cost)}</p>
             <small>Transport {money(x.transport)} · Warehouse {money(x.warehouse)} · Market charges {money(x.market_charges)}</small>
           </div>;

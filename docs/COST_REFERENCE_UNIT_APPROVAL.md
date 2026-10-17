@@ -1,4 +1,4 @@
-# Cost reference quantity — owner decision required
+# Cost reference quantity — approved for local implementation
 
 Current cost records store commodity, market and monetary amounts, but no unit,
 bag size or linked price record. CommodityDetailPage currently labels a cost
@@ -20,4 +20,5 @@ Acceptance: unlike current-price variants cannot relabel saved cost figures;
 original totals/quantity calculation remain unchanged; the uncertainty message
 appears in the original calculator area and no new measurement is invented.
 
-Status: awaiting explicit owner approval for this visible wording/label change.
+Owner explicitly approved on 2026-10-17: "Approve the honest unit label".
+Only the above visible wording/label correction is authorized; no production work.
