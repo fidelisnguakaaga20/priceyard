@@ -86,7 +86,12 @@ def reset_password(db: Session, *, token: str, new_password: str) -> str:
         db.commit()
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Reset link is invalid or expired")
 
-    password_hash = hash_password(new_password)
+    try:
+        password_hash = hash_password(new_password)
+    except ValueError as exc:
+        # Match registration's existing password-limit response. Hashing happens
+        # before the link is claimed, so the user can correct and retry it.
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
     # Always lock the user before claiming reset rows. Two distinct reset links
     # for one account must not lock each other's token while waiting on the user.
     db.execute(select(User.id).where(User.id == record.user_id).with_for_update()).scalar_one_or_none()

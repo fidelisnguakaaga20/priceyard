@@ -1,0 +1,13 @@
+{
+  "native_forms_reject_before_post": true,
+  "direct_overlong_request_is_422": true,
+  "rejected_attempt_preserves_link_and_old_login": true,
+  "same_link_accepts_exact_utf8_boundary": true,
+  "previous_token_revoked_after_success": true,
+  "link_remains_single_use": true,
+  "original_login_form_accepts_unicode_password": true,
+  "subscription_value_unchanged": true,
+  "synthetic_fixture_reseed_required": true,
+  "external_page_requests": 0,
+  "production_connections": 0
+}

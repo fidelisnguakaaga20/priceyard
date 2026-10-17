@@ -123,6 +123,36 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_password_utf8_rejection_preserves_reset_link_paid_access_and_retry(self):
+        from app.utils.password import verify_password
+        from app.utils.permissions import get_current_user
+        from fastapi.security import HTTPAuthorizationCredentials
+        Base.metadata.create_all(self.engine)
+        raw="synthetic-pg-password-boundary-token-0123456789"
+        now=datetime.now(timezone.utc)
+        with Session(self.engine) as db:
+            user=User(full_name="Synthetic password boundary",email="pg-password-boundary@example.com",password_hash=hash_password("SyntheticOldPassword8!"),role="paid_user",referral_code="PGPWBOUNDARY")
+            db.add(user);db.flush();user_id=user.id
+            db.add(Subscription(user_id=user_id,status="active",plan_name="paid_monthly",start_date=now.date(),end_date=(now+timedelta(days=30)).date()))
+            db.add(PasswordResetToken(user_id=user_id,token_hash=hashlib.sha256(raw.encode()).hexdigest(),expires_at=now+timedelta(minutes=20)))
+            db.commit();previous_token=create_access_token(user_id=user_id)
+            before={model.__tablename__:db.execute(select(model.__table__)).all() for model in (User,Subscription,PasswordResetToken)}
+            with self.assertRaises(HTTPException) as failure:
+                password_reset_service.reset_password(db,token=raw,new_password="好"*25)
+            self.assertEqual(failure.exception.status_code,422)
+            self.assertEqual(failure.exception.detail,"Password is too long")
+            self.assertEqual({model.__tablename__:db.execute(select(model.__table__)).all() for model in (User,Subscription,PasswordResetToken)},before)
+            password_reset_service.reset_password(db,token=raw,new_password="好"*24)
+            db.refresh(user);self.assertTrue(verify_password("好"*24,user.password_hash));self.assertFalse(verify_password("好"*25,user.password_hash))
+            self.assertEqual(user.auth_version,1);self.assertEqual(user.role,"paid_user")
+            self.assertEqual(db.execute(select(Subscription.__table__)).all(),before["subscriptions"])
+            with self.assertRaises(HTTPException) as revoked:
+                get_current_user(HTTPAuthorizationCredentials(scheme="Bearer",credentials=previous_token),db)
+            self.assertEqual(revoked.exception.status_code,401)
+            with self.assertRaises(HTTPException) as reused:
+                password_reset_service.reset_password(db,token=raw,new_password="AnotherSynthetic8!")
+            self.assertEqual(reused.exception.status_code,400)
+
     def test_legacy_audit_response_privacy_preserves_original_json(self):
         from app.schemas.audit_log_schema import AuditLogResponse
         from app.routes.audit_log_routes import get_logs, get_log

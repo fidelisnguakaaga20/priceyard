@@ -12,7 +12,13 @@ type PasswordFieldProps = {
 export function PasswordField({ id, value, onChange, visible, onToggle, autoComplete, minLength, maxLength }: PasswordFieldProps) {
   const label = visible ? "Hide password" : "Show password";
   return <div className="password-field">
-    <input id={id} type={visible ? "text" : "password"} required minLength={minLength} maxLength={maxLength} autoComplete={autoComplete} value={value} onChange={(event) => onChange(event.target.value)} />
+    <input id={id} type={visible ? "text" : "password"} required minLength={minLength} maxLength={maxLength} autoComplete={autoComplete} value={value} onChange={(event) => {
+      const input = event.currentTarget;
+      const message = new TextEncoder().encode(input.value).length > 72 ? "Password is too long"
+        : input.value && minLength && Array.from(input.value).length < minLength ? `String should have at least ${minLength} characters` : "";
+      input.setCustomValidity(message);
+      onChange(input.value);
+    }} />
     <button type="button" className="password-toggle" onClick={onToggle} aria-controls={id} aria-pressed={visible} aria-label={label} title={label}>
       {visible ? <EyeOffIcon /> : <EyeIcon />}
     </button>

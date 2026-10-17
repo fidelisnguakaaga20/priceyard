@@ -236,6 +236,14 @@ failed; a subsequent explicitly reviewed guarded build succeeded. No bypass.
 Next: existing password/input consistency, bounded detail queries and remaining
 approved technical safeguards; business-rule and live-operation decisions remain.
 
+Batch 46 verifies password input/reset boundaries without changing existing rules:
+UTF-8 values beyond the existing bcrypt72-byte limit return422 instead of500;
+the link/access remain usable, and original forms validate the same limits without
+altering typed passwords. All184 backend/39 pinned PG,32 browser input and full
+reset/retry/login/revocation cases pass. Twenty-two complete, fourteen partial/
+pending; PY-27 still includes remaining edit consistency. Preview reseeded only
+in memory after tests; reset-request cooldown and real records remain unchanged.
+
 ## Checklist — do not repeat the audit
 
 | ID | Improvement | Current status |
@@ -266,10 +274,10 @@ approved technical safeguards; business-rule and live-operation decisions remain
 | PY-24 | Keyboard/focus accessibility | Complete for identified original keyboard/focus scope in batches 42/45: selectable records and named role/status controls, menu/help Escape with trigger focus restoration, welcome-dialog initial/wrapped focus and original Skip/Next/Back behavior; 36 browser keyboard cases and all fourteen dashboard cards verified |
 | PY-25 | Safe and clearly aged offline prices | Complete for owner-approved application scope in batch 44: public-only explicit configured-API caching, timestamped saved copies, truthful original-view warnings, legacy/private/history exclusion and fresh-response recovery verified using actual worker source with fake network and actual browser UI with synthetic metadata. Native deployed PWA compatibility remains PY-35; no new age cutoff |
 | PY-26 | Complete atomic administrative audit | Complete for identified business-record writers through batch 40: payment/referral, price/moderation/flags, account/subscription, FAQ/catalog and all six intelligence resources save sanitized audits atomically; native concurrent edits and failed-audit rollback verified. External delivery operations remain PY-35 |
-| PY-27 | Consistent existing editing/password inputs | Partial: feedback file replacement/removal/async ordering fixed without form changes in batch 26; remaining editing/password cases pending |
+| PY-27 | Consistent existing editing/password inputs | Partial: feedback async file selection fixed in batch26; original password forms now enforce the existing Unicode-character/72-byte rules without truncating input, reset byte rejection is422 and preserves the link/access (batch46). Remaining edit consistency pending |
 | PY-28 | Historical record preservation | Partial: approved 0022 tested on fresh/populated synthetic PostgreSQL; future migration/history work pending |
 | PY-29 | Stable identities and dependent records | Partial: catalog IDs/fields and referenced-price deletion rejection verified with atomic audit writes in batch 34; broader identity/duplicate/rename issues pending, no automatic merge |
-| PY-30 | Isolated automated/browser verification | Partial/ongoing: guarded 180 backend tests, 38 identity-pinned synthetic PostgreSQL cases, real original-browser workflows and before/after evidence verified through batch 45; offline worker tested with fake transport only, native browser workers/providers disabled; expand with remaining work, live services forbidden |
+| PY-30 | Isolated automated/browser verification | Partial/ongoing: guarded184 backend tests,39 identity-pinned synthetic PostgreSQL cases, original-browser workflows and before/after evidence verified through batch46; actual worker source uses fake transport only, native browser workers/providers disabled; expand with remaining work, live services forbidden |
 | PY-31 | Confirmed payment activation and recovery | Partial: atomic confirmation, retry/replay, owner-only callback recovery and approved indefinite-grant holds verified; unattended recovery and operational delivery/reconciliation decisions remain |
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches 14/21: carry forward dated paid/trial time; preserve indefinite grants, block new checkout and hold/recover old purchases without consuming days |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
@@ -1561,3 +1569,34 @@ approved technical safeguards; business-rule and live-operation decisions remain
 - Twenty-two IDs complete; fourteen partial/pending. Remaining editing/query,
   security/business and operational work is not claimed complete. No production
   data access, push, merge or deployment. Preview remains synthetic-only.
+
+### Batch 46 — further PY-04/PY-08/PY-27 password boundaries (2026-10-17)
+
+- Confirmed reset accepts a schema-valid Unicode string that exceeds the existing
+  bcrypt72-byte limit, then raises uncaught ValueError/HTTP500. Return the same422
+  and existing “Password is too long” text as registration, before claiming the
+  link. No new password policy, storage/hash algorithm, account field or data repair.
+- Original Login/Register/Reset/Confirmation controls validate that same existing
+  byte limit and Python/Unicode minimum character count before submission. Typed
+  values are never trimmed, normalized or truncated; Show/Hide, single-character
+  login, eight-character registration/reset and72-byte ASCII/Unicode boundaries
+  stay unchanged. Existing server messages reused; no forms/design changes.
+- Four before backend cases reproduce one500 failure (1.113s); all pass after
+  (1.093s). Thirty-two browser input checks reproduce eleven mismatches before,
+  all pass after. All184 backend tests pass,32.865s;39 pinned PG cases pass,41.348s,
+  including rejected-reset persistence, paid-access preservation, exact-byte retry,
+  old-token revocation and one-use links against native PostgreSQL.
+- Actual original browser reset rejects overlong input before POST; direct invalid
+  request is422 and leaves old login/link usable. Same link resets to an accepted
+  exact-boundary password, invalidates old login, stays single-use and signs in
+  through the original Login form, with the original subscription unchanged.
+- First browser cleanup incorrectly requested another link during the existing
+  reset cooldown. Preserve that rule: revised test requires only a disposable
+  in-memory preview reseed afterward, restoring default fabricated passwords.
+  The passing workflow never requires changing cooldown or production records.
+- TypeScript/Vite passes,1.45s/102modules;JS323.79kB/91.93kB gzip; original CSS
+  index-BEBH-Ai6.css unchanged. Evidence: tools/local-test/evidence/batch-46-*.json.
+  Manual: /register at http://127.0.0.1:55446; original password form/visibility
+  remain. Demo reset requests use only /__test__/inbox; no email is delivered.
+- Twenty-two IDs complete; fourteen partial/pending. Remaining edit/query/security
+  and owner/operational decisions remain. No production, push, merge or deployment.

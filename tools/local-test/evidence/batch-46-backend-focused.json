@@ -1,0 +1,9 @@
+{
+  "tests_run": 4,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "duration_seconds": 1.093,
+  "pattern": "test_password_input_boundaries.py",
+  "runtime": "in-process synthetic SQLite; TCP and DNS denied"
+}
