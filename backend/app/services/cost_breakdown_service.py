@@ -18,6 +18,8 @@ _COST_FIELDS = (
     "other_costs",
 )
 _ZERO = Decimal("0.00")
+# Existing NUMERIC(14, 2) storage for both calculated totals.
+_MAX_TOTAL = Decimal("999999999999.99")
 
 
 def _validate_commodity(db: Session, commodity_id: int) -> None:
@@ -33,6 +35,8 @@ def _validate_market(db: Session, market_id: int) -> None:
 def _calculate_totals(values: dict[str, Decimal]) -> tuple[Decimal, Decimal]:
     additional = sum((values.get(field, _ZERO) for field in _COST_FIELDS), _ZERO)
     total = values["purchase_price_reference"] + additional
+    if additional > _MAX_TOTAL or total > _MAX_TOTAL:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Calculated cost total exceeds the existing storage limit")
     return additional, total
 
 
@@ -85,6 +89,10 @@ def update_cost_breakdown(
     commit: bool = True,
 ) -> CostBreakdown:
     changes = payload.model_dump(exclude_unset=True)
+    # Every editable cost column is non-nullable. Omitted values keep their
+    # saved values; an explicit zero remains a valid way to clear a cost.
+    if any(value is None for value in changes.values()):
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Cost breakdown values cannot be null")
     commodity_id = int(changes.get("commodity_id", item.commodity_id))
     market_id = int(changes.get("market_id", item.market_id))
     _validate_commodity(db, commodity_id)

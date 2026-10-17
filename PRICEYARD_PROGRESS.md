@@ -15,6 +15,10 @@ approved. No grade field, grade labels, guessed quantities or additional markets
 No production credentials, dotenv reads, production services/data, migrations,
 push, merge or deployment. Local commits of verified batches are authorized.
 Schema additions and visible/business changes require specific approval.
+2026-10-17 owner clarified: continue routine authorized local commands, commits,
+builds and isolated tests without repeatedly asking; use automatic approval where
+eligible. Production/deployment, destructive and security-sensitive actions retain
+explicit approval boundaries. This does not bypass platform sandbox restrictions.
 Owner approved the specific internal auth_version/revoked_access_tokens scope on
 2026-10-16; see docs/LOCAL_SECURITY_STORAGE_PROPOSAL.md. No other schema/business
 scope is inferred from that approval. Production migrations remain forbidden.
@@ -299,6 +303,13 @@ targets and owner isolation preserved. Frontend unchanged; snapshot from batch52
 reused. Exactly23 complete /13 partial or pending; smaller fixture53/80 schemas,
 stopped. Latest full backend196 remains batch52, not a claimed full198 run.
 
+Batch54 further PY-08: Cost breakdown rejects explicit nulls for required stored
+values and calculated totals exceeding its existing NUMERIC(14,2) columns before
+any write. Two backend validation tests, nine audit regressions, two native cases,
+seven cost-browser checks and61 editing regressions pass.84 frontend source/config
+hashes match the existing verified build; no frontend changes or dependency copies.
+Native fixture56/80 schemas, stopped. Exactly23 complete /13 partial or pending.
+
 | ID | Improvement | Current status |
 |---|---|---|
 | PY-01 | Consistent historical access checks | Complete in batch 7; date/comparison/ID routes enforce existing history entitlement; current summaries preserved |
@@ -308,7 +319,7 @@ stopped. Latest full backend196 remains batch52, not a claimed full198 run.
 | PY-05 | Referral abuse protection | Partial: atomic registration/reward/audit, duplicate-registration safety and concurrent seven-day reward preservation verified in batch 20; qualification/abuse-cap changes require approval and remain unchanged |
 | PY-06 | Safe push notification destinations | Application-side complete in batch 13; known-provider/key validation, bounded TLS transport, no redirects; live provider compatibility remains operational verification |
 | PY-07 | Shared-device/session safety | Partial: server revocation, stale UI protection, possession-based push ownership/concurrent registration and bounded current-device logout cleanup verified; JS token storage/offline cleanup limits remain |
-| PY-08 | Input/upload/request abuse bounds | Partial: push endpoint/key/query bounds, feedback pre-decode 2MB screenshot bound and watchlist target validation against existing NUMERIC(14,2) storage verified (batch53); broader request/text/body limits remain pending |
+| PY-08 | Input/upload/request abuse bounds | Partial: push endpoint/key/query bounds, feedback pre-decode 2MB screenshot bound, existing watchlist numeric limits (batch53), Cost breakdown required values/calculated storage limits (batch54) verified; broader request/text/body limits remain pending |
 | PY-09 | Concurrent security-action safety | Complete for identified reset/logout/last-Admin cases in batches 5/6; six PostgreSQL cases passed |
 | PY-10 | Spreadsheet export safety | Complete in batch 3; text/numeric regressions and original browser download/access checks passed |
 | PY-11 | Correct saved administrator price state | Complete in batch 10; actual create/approve/correct/outdated/reject/reload browser regression passed |
@@ -1892,3 +1903,33 @@ stopped. Latest full backend196 remains batch52, not a claimed full198 run.
   Evidence tools/local-test/evidence/batch-53-*.json. Exactly23 complete /13 partial
   or pending. Broader body/text limits and remaining owner/operational choices stay
   open. No production, push, merge or deployment.
+
+### Batch 54 — Required cost values and calculated storage limits (2026-10-17)
+
+- Further PY-08/PY-28 protection: reject nulls for non-nullable Cost breakdown
+  columns before coercion/calculation; omitted values still retain saved values,
+  and explicit zero still clears an individual cost. Validate the sum against
+  existing NUMERIC(14,2) total columns before setting any values or saving audits.
+  Original formulas, appearance, fields, measurements and policies stay unchanged.
+- Before: two HTTP/backend failures (required-value500; SQLite accepts total beyond
+  PostgreSQL capacity); native PostgreSQL independently reproduces null-edit500.
+  After: two validation workflows pass0.240s and nine intelligence audit regressions
+  pass0.725s. New native preservation workflow plus existing Cost audit rollback/
+  concurrency case pass2/2,2.539s. Invalid requests leave raw costs, historical
+  prices and audit records unchanged; valid corrections/zeros/max total still save.
+- Seven actual cost-browser checks and61 existing six-form editing regressions
+  pass. Rejected create/edit uses the existing error presentation, saved details
+  and audit evidence remain unchanged, original save/zero clearing/reload works.
+  Compare fetched records before/after to respect existing POST-versus-GET decimal
+  formatting. Zero external requests. Synthetic planning fixtures from the editing
+  regression require only disposable-memory preview reseeding at next restart.
+-84 frontend source/public/config file hashes match the existing verified build;
+  original CSS index-BEBH-Ai6.css retained. No build/dependency copy needed for this
+  backend-only change. Small native fixture schemas53 to54 for expected failing
+  baseline, then54 to56 for passing cases; cap80 retained, cluster stopped. Heavy
+  phases serialized. Runtime Windows sandbox refused process-identity inspection
+  and a stop signal; used the required platform approval mechanism without bypassing
+  identity checks or touching unrelated processes. Routine work already authorized.
+- Evidence batch-54-*.json. Exactly23 complete /13 partial or pending. Next existing
+  Buying/Sell-watch required-value validation; no new business/source/session policy.
+  No production access, migrations, dependency installs, push, merge or deployment.

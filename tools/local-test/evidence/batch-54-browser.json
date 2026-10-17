@@ -1,0 +1,14 @@
+{
+  "checks": {
+    "invalid_total_uses_existing_form_error": true,
+    "rejected_creation_does_not_change_records": true,
+    "original_cost_calculation_preserved": true,
+    "rejected_edit_preserves_saved_details_and_audits": true,
+    "null_cost_is_validation_error": true,
+    "original_explicit_zero_and_prefill_reload_preserved": true,
+    "original_prices_and_costs_unchanged": true
+  },
+  "failures": [],
+  "external_page_requests": 0,
+  "production_connections": 0
+}

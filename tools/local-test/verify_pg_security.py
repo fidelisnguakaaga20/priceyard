@@ -148,6 +148,13 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_cost_validation_preserves_saved_totals_and_audit(self):
+        spec = importlib.util.spec_from_file_location("local_cost_validation", ROOT / "backend/tests/test_cost_validation.py")
+        cases = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cases)
+        for scenario in ("nulls", "totals"):
+            cases.exercise_cost_validation(self, self.engine, scenario)
+
     def test_watchlist_targets_match_existing_numeric_storage(self):
         spec = importlib.util.spec_from_file_location("local_watchlist_storage", ROOT / "backend/tests/test_watchlist_storage_bounds.py")
         cases = importlib.util.module_from_spec(spec)
