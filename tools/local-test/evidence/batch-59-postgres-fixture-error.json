@@ -1,0 +1,15 @@
+{
+  "tests": 1,
+  "failures": 0,
+  "errors": 1,
+  "seconds": 1.777,
+  "cluster_identity_verified": true,
+  "production_contacts": 0,
+  "cluster_profile": "postgres-recovery-20261017",
+  "schemas_before": 66,
+  "schema_budget": 80,
+  "single_native_suite": true,
+  "selected_tests": [
+    "test_populated_legacy_migration_stops_before_historical_changes"
+  ]
+}

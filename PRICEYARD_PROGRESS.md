@@ -343,6 +343,17 @@ final CLI error-redaction case; targeted seven pass afterward. Exactly24 complet
 12 partial or pending. Native66/80 schemas, stopped. Next PY-28 legacy migration
 preflight, not more expansion of already completed account/input/UI improvements.
 
+Batch59 completes PY-28 current application/migration-preservation scope: read-only
+online preflight refuses populated legacy/unversioned/unknown/forked starts before
+migration steps; reviewed0021-to0022 and empty initialization still work. Existing
+historic migration files and business data are not rewritten/repaired. Full216
+backend tests pass29.966s; two native migration cases pass3.136s; seven original
+browser workflows and all14 dashboard cards pass. Exactly25 complete /11 partial
+or pending:02,05,07,08,13,14,20,29,30,35,36. Native69/80 schemas, stopped.
+Next prioritize finite remaining PY-20 query/history and PY-36 documentation/
+maintainability; owner policy choices and production-only PY-35 checks stay gated.
+No expansion of completed null-guard/account/UI scopes is needed.
+
 | ID | Improvement | Current status |
 |---|---|---|
 | PY-01 | Consistent historical access checks | Complete in batch 7; date/comparison/ID routes enforce existing history entitlement; current summaries preserved |
@@ -372,14 +383,14 @@ preflight, not more expansion of already completed account/input/UI improvements
 | PY-25 | Safe and clearly aged offline prices | Complete for owner-approved application scope in batch 44: public-only explicit configured-API caching, timestamped saved copies, truthful original-view warnings, legacy/private/history exclusion and fresh-response recovery verified using actual worker source with fake network and actual browser UI with synthetic metadata. Native deployed PWA compatibility remains PY-35; no new age cutoff |
 | PY-26 | Complete atomic administrative audit | Complete for identified business-record writers through batch 40: payment/referral, price/moderation/flags, account/subscription, FAQ/catalog and all six intelligence resources save sanitized audits atomically; native concurrent edits and failed-audit rollback verified. External delivery operations remain PY-35 |
 | PY-27 | Consistent existing editing/password inputs | Complete for identified scope: feedback selection in batch26, existing Unicode/72-byte password rules and reset validation in batch46, owner-approved six Admin edit forms in batches50–52. Saved values/costs, one-field edits, reload, explicit clearing, switching/unknown/blank IDs and creation verified in61 actual browser checks |
-| PY-28 | Historical record preservation | Partial: approved 0022 tested on fresh/populated synthetic PostgreSQL; future migration/history work pending |
+| PY-28 | Historical record preservation | Current application-side scope complete in batch59: read-only legacy/unversioned preflight before migration steps, empty/reviewed0021-to0022 paths, unchanged raw history/catalog IDs/active flags/cost links/sources/audits, preserved paid/payment records and0022 downgrade refusal verified. No guesses to repair already-changed historical data; production backup/restore/rollout and any repairs require owner approval under PY-35 |
 | PY-29 | Stable identities and dependent records | Partial: catalog IDs/fields and referenced-price deletion rejection verified with atomic audit writes in batch 34; broader identity/duplicate/rename issues pending, no automatic merge |
-| PY-30 | Isolated automated/browser verification | Partial/ongoing: full205 backend tests pass in batch57; ten focused native cases pass across54–57. Full40 native baseline remains batch47; no new full-native-suite claim.73 editing/API, five detail and14-card dashboard checks pass in57; seven cost-browser checks in54. Fixture64/80 schemas, stopped; serialized heavy phases,84 frontend hashes matched/reused, no copied dependencies; native browser workers/providers disabled, live services forbidden |
+| PY-30 | Isolated automated/browser verification | Partial/ongoing: full216 backend tests pass in59; four focused native recovery/migration cases pass across58–59. Full40 native baseline remains47; no new full-native-suite claim. Actual recovery/payment browser checks pass58; seven original workflows and14-card dashboard pass59. Fixture69/80 schemas, stopped; serialized phases and existing frontend reused; no copied dependencies, native browser workers/providers disabled, live services forbidden |
 | PY-31 | Confirmed payment activation and recovery | Application-side approved scope complete in batch58: atomic confirmation, owner callback and explicit bounded/resumable reconciliation for missed webhook/return; dry-run default, strict existing evidence/activation, single PG worker, error isolation, replay safety and purchased-time/manual-grant preservation verified. Live scheduling/checkpoints/monitoring and ambiguous legacy repairs require owner approval under PY-35 |
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches 14/21: carry forward dated paid/trial time; preserve indefinite grants, block new checkout and hold/recover old purchases without consuming days |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
 | PY-34 | Expiry without unintended staff-role loss | Complete in batch 2; 18 backend tests and two expired-Reporter browser cases passed |
-| PY-35 | Operational readiness and dependency evidence | Pending; production/provider checks outside current scope. Reconciliation scheduling/checkpoint storage/monitoring and any ambiguous historical payment repairs require owner approval; no live job or scheduler enabled |
+| PY-35 | Operational readiness and dependency evidence | Pending; production/provider/backup-restore/rollout checks outside current scope. Reconciliation scheduling/checkpoint storage/monitoring and any ambiguous historical payment or migration-data repair require owner approval; no live job or scheduler enabled |
 | PY-36 | Accurate progress/documentation/maintainability | Progress record established; ongoing |
 
 ## Verified results and batch history
@@ -2092,3 +2103,43 @@ preflight, not more expansion of already completed account/input/UI improvements
   02,05,07,08,13,14,20,28,29,30,35,36. PY-35 retains live scheduling/checkpoint,
   provider/host operations and evidence-based legacy repair approval boundaries.
   No production, push, merge or deployment. Next PY-28 migration preservation.
+
+### Batch 59 — PY-28 current migration-preservation scope complete (2026-10-17)
+
+- Added a read-only online Alembic preflight before migration steps: populated
+  unversioned, unknown, forked or pre0021 starts require reviewed migration. Empty
+  initialization and current reviewed0021/0022 starts remain supported. No bypass
+  flag, auto-stamp, auto-merge, activity reset, guessed cost link, new migration or
+  application field. Original0006/0020 and0022 files remain unchanged. Existing0022
+  downgrade still refuses erasing revocation evidence. Contract:
+  docs/MIGRATION_PRESERVATION.md. Offline SQL needs separate review, not live proof.
+- Two native cases pass3.136s. A populated0005 fixture is refused before old focus/
+  cost-link migrations, with full rows/columns/revision snapshots identical,
+  including active Honey Beans, private source, original price/cost association,
+  paid subscription and audit JSON. Fresh initialization then populated0021-to0022
+  still preserves original users/catalog/prices/sources/payments/purchased access;
+  zero initial revocations and downgrade refusal verified by the existing case.
+- First native attempt had a fixture error:0005 predates the payments table.
+  Removed only that invalid fixture insertion; the separate populated0021 test
+  retains real payment-preservation coverage. This is not claimed as an original
+  application failure. Failed setup schema retained (66 to67); passing cases67
+  to69 of80. Native fixture stopped before remaining tests. No destructive cleanup
+  or full native-suite rerun. Evidence includes the setup error transparently.
+- Full216 backend tests pass29.966s, no failures/errors/skips: seven recovery tests,
+  four new preflight cases plus prior coverage. Preflight tests verify read-only
+  behavior, empty/known-baseline acceptance, unknown/forked/unversioned rejection,
+  unchanged stored values and generic errors without private content.
+- Actual browser: seven original home/Guest/filter/Trial-plan/history/Admin-form/
+  mobile/login-quota workflows pass, no Grade labels, no mobile overflow; all14
+  original dashboard metrics, one summary request and outage recovery pass. No
+  application frontend change. Source hashes/build remain the existing verified
+  snapshot; no dependency installation/copy or expensive rebuild needed.
+- PY-28 finite current application scope complete;25 complete /11 partial or pending:
+  02,05,07,08,13,14,20,29,30,35,36. Do not keep this item open for unspecified future
+  migrations, or claim production preservation from local proof. Historical damage
+  cannot be reconstructed without evidence. Older populated local migrations now
+  intentionally stop for review. PY-35 retains production revision/backup/restore,
+  rollout and any repair approvals. Next finite PY-20 history/query bounds and
+  PY-36 documentation/maintainability; preserve remaining owner-policy gates.
+- Evidence batch-59-*.json. Master/backup retained; no production databases,
+  credentials, services, migrations, push, merge or deployment accessed/performed.

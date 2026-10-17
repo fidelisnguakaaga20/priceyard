@@ -148,6 +148,29 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_populated_legacy_migration_stops_before_historical_changes(self):
+        command.upgrade(self.config(), "0005_stage13_watchlists")
+        with self.engine.begin() as connection:
+            user_id = connection.execute(text("INSERT INTO users(full_name,email,password_hash,role,is_active) VALUES ('Synthetic legacy owner','legacy-preserve@example.com','unchanged-hash','admin',true) RETURNING id")).scalar_one()
+            commodity_id = connection.execute(text("INSERT INTO commodities(name,is_active) VALUES ('Honey Beans',true) RETURNING id")).scalar_one()
+            connection.execute(text("INSERT INTO commodities(name,is_active) VALUES ('Egusi',true)"))
+            market_id = connection.execute(text("INSERT INTO markets(name,state,country,is_active) VALUES ('Kwali Market','FCT','Nigeria',true) RETURNING id")).scalar_one()
+            price_id = connection.execute(text("INSERT INTO price_updates(commodity_id,market_id,price_low,price_high,average_price,unit,movement,confidence_level,source_1,update_date_time,is_outdated,status,created_by) VALUES (:cid,:mid,210000,220000,215000,'1 bag','unknown','Low confidence','SYNTHETIC-PRIVATE-LEGACY-SOURCE','2026-10-15T12:00:00Z',false,'approved',:uid) RETURNING id"), {"cid": commodity_id,"mid": market_id,"uid": user_id}).scalar_one()
+            cost_id = connection.execute(text("INSERT INTO cost_breakdowns(price_update_id,transport,total_additional_cost,purchase_price_reference,total_estimated_landing_storage_cost) VALUES (:pid,120,120,210000,210120) RETURNING id"), {"pid": price_id}).scalar_one()
+            connection.execute(text("INSERT INTO subscriptions(user_id,plan_name,status,start_date,end_date,payment_reference) VALUES (:uid,'paid_monthly','active','2026-10-17','2026-11-16','synthetic-legacy-paid')"), {"uid": user_id})
+            connection.execute(text("INSERT INTO audit_logs(user_id,action,table_name,record_id,new_value) VALUES (:uid,'legacy.saved','cost_breakdowns',:cid,CAST(:payload AS JSON))"), {"uid": user_id,"cid": cost_id,"payload": json.dumps({"source_1":"SYNTHETIC-PRIVATE-LEGACY-SOURCE","saved_cost_id":cost_id})})
+        def snapshot():
+            with self.engine.connect() as connection:
+                tables = sqlalchemy.inspect(connection).get_table_names()
+                quote = connection.dialect.identifier_preparer.quote
+                return {"revision": connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one(),
+                        "columns": {name: [(column["name"],str(column["type"]),column["nullable"]) for column in sqlalchemy.inspect(connection).get_columns(name)] for name in tables},
+                        "rows": {name: connection.execute(text("SELECT to_jsonb(t) FROM "+quote(name)+" t ORDER BY id")).scalars().all() for name in tables if name != "alembic_version"}}
+        before = snapshot()
+        with self.assertRaisesRegex(RuntimeError, "reviewed migration"):
+            command.upgrade(self.config(), "head")
+        self.assertEqual(snapshot(), before)
+
     def test_bounded_payment_reconciliation_preserves_existing_rules(self):
         spec = importlib.util.spec_from_file_location("local_payment_recovery", ROOT / "backend/tests/test_payment_reconciliation.py")
         cases = importlib.util.module_from_spec(spec)

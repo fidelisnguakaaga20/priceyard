@@ -6,6 +6,7 @@ from sqlalchemy import engine_from_config, pool
 from app.config import get_settings
 from app.database import Base
 import app.models  # noqa: F401 -- registers model metadata
+from app.migration_safety import assert_safe_migration_start
 
 config = context.config
 
@@ -50,6 +51,7 @@ def run_migrations_online() -> None:
         context.configure(connection=connection, target_metadata=target_metadata, compare_type=True)
 
         with context.begin_transaction():
+            assert_safe_migration_start(connection, context.get_context().get_current_heads())
             context.run_migrations()
 
 
