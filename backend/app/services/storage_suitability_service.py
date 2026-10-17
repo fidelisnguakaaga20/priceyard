@@ -41,7 +41,7 @@ def _validate_storage_references(
         )
 
 
-def create_storage_suitability(db: Session, payload: StorageSuitabilityCreate) -> StorageSuitability:
+def create_storage_suitability(db: Session, payload: StorageSuitabilityCreate, *, commit: bool = True) -> StorageSuitability:
     _validate_storage_references(
         db,
         commodity_id=payload.commodity_id,
@@ -50,13 +50,15 @@ def create_storage_suitability(db: Session, payload: StorageSuitabilityCreate) -
     )
     item = StorageSuitability(**payload.model_dump())
     db.add(item)
-    db.commit()
-    db.refresh(item)
+    db.commit() if commit else db.flush()
     return item
 
 
-def get_storage_suitability(db: Session, item_id: int) -> StorageSuitability:
-    item = db.get(StorageSuitability, item_id)
+def get_storage_suitability(db: Session, item_id: int, *, lock: bool = False) -> StorageSuitability:
+    statement = select(StorageSuitability).where(StorageSuitability.id == item_id)
+    if lock:
+        statement = statement.with_for_update().execution_options(populate_existing=True)
+    item = db.scalar(statement)
     if item is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Storage suitability not found")
     return item
@@ -76,6 +78,8 @@ def update_storage_suitability(
     db: Session,
     item: StorageSuitability,
     payload: StorageSuitabilityUpdate,
+    *,
+    commit: bool = True,
 ) -> StorageSuitability:
     changes = payload.model_dump(exclude_unset=True)
     commodity_id = int(changes.get("commodity_id", item.commodity_id))
@@ -91,6 +95,5 @@ def update_storage_suitability(
 
     for field, value in changes.items():
         setattr(item, field, value)
-    db.commit()
-    db.refresh(item)
+    db.commit() if commit else db.flush()
     return item

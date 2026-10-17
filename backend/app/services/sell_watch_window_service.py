@@ -24,18 +24,20 @@ def _validate_active_market_scope(db: Session, *, commodity_id: int, market_id: 
 
 
 def create_sell_watch_window(
-    db: Session, payload: SellWatchWindowCreate, admin: User
+    db: Session, payload: SellWatchWindowCreate, admin: User, *, commit: bool = True
 ) -> SellWatchWindow:
     _validate_active_market_scope(db, commodity_id=payload.commodity_id, market_id=payload.market_id)
     window = SellWatchWindow(**payload.model_dump(), created_by=admin.id)
     db.add(window)
-    db.commit()
-    db.refresh(window)
+    db.commit() if commit else db.flush()
     return window
 
 
-def get_sell_watch_window(db: Session, window_id: int) -> SellWatchWindow:
-    window = db.get(SellWatchWindow, window_id)
+def get_sell_watch_window(db: Session, window_id: int, *, lock: bool = False) -> SellWatchWindow:
+    statement = select(SellWatchWindow).where(SellWatchWindow.id == window_id)
+    if lock:
+        statement = statement.with_for_update().execution_options(populate_existing=True)
+    window = db.scalar(statement)
     if window is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Sell-watch window not found")
     return window
@@ -50,7 +52,7 @@ def list_sell_watch_windows(db: Session) -> list[SellWatchWindow]:
 
 
 def update_sell_watch_window(
-    db: Session, window: SellWatchWindow, payload: SellWatchWindowUpdate
+    db: Session, window: SellWatchWindow, payload: SellWatchWindowUpdate, *, commit: bool = True
 ) -> SellWatchWindow:
     changes = payload.model_dump(exclude_unset=True)
     commodity_id = int(changes.get("commodity_id", window.commodity_id))
@@ -59,6 +61,5 @@ def update_sell_watch_window(
 
     for field, value in changes.items():
         setattr(window, field, value)
-    db.commit()
-    db.refresh(window)
+    db.commit() if commit else db.flush()
     return window

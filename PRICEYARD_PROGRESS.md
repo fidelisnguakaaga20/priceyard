@@ -191,6 +191,14 @@ and actual before/after calculator browser checks pass. Eighteen complete, eight
 partial/pending. Unit-label approval is recorded in the cost proposal; no unit field
 or data backfill. Next: missing intelligence-resource audits (three related writers).
 
+Batch 39 verified original Market/Quality signal and Cost reference writes and
+audits commit together: 168 backend/34 pinned PG cases and nine browser audit
+records pass. Batch 40 completes the remaining Buying zone, Sell-watch window
+and Storage suitability create/edit audit writers: 177 backend/37 pinned PG cases
+and all six browser audits pass. PY-26 identified application scope complete.
+Nineteen IDs complete; seventeen partial/pending. Next: remaining source/privacy,
+mobile and keyboard safeguards, retaining original screens and policies.
+
 ## Checklist — do not repeat the audit
 
 | ID | Improvement | Current status |
@@ -220,11 +228,11 @@ or data backfill. Next: missing intelligence-resource audits (three related writ
 | PY-23 | Preserve layout while fixing mobile overflow | Pending |
 | PY-24 | Keyboard/focus accessibility | Pending |
 | PY-25 | Safe and clearly aged offline prices | Pending; visible additions require approval |
-| PY-26 | Complete atomic administrative audit | Partial: payment, registration/referral, price create/edit/approve/reject/outdated, Admin user/subscription/access, FAQ and commodity/market create/edit/delete share atomic sanitized audits; concurrent price/status/FAQ/catalog trails and rollback verified; other administrative writes pending |
+| PY-26 | Complete atomic administrative audit | Complete for identified business-record writers through batch 40: payment/referral, price/moderation/flags, account/subscription, FAQ/catalog and all six intelligence resources save sanitized audits atomically; native concurrent edits and failed-audit rollback verified. External delivery operations remain PY-35 |
 | PY-27 | Consistent existing editing/password inputs | Partial: feedback file replacement/removal/async ordering fixed without form changes in batch 26; remaining editing/password cases pending |
 | PY-28 | Historical record preservation | Partial: approved 0022 tested on fresh/populated synthetic PostgreSQL; future migration/history work pending |
 | PY-29 | Stable identities and dependent records | Partial: catalog IDs/fields and referenced-price deletion rejection verified with atomic audit writes in batch 34; broader identity/duplicate/rename issues pending, no automatic merge |
-| PY-30 | Isolated automated/browser verification | Partial/ongoing: guarded 147 backend tests, 27 identity-pinned synthetic PostgreSQL cases, real original-browser workflows and before/after evidence verified through batch 34; expand with remaining work, live services forbidden |
+| PY-30 | Isolated automated/browser verification | Partial/ongoing: guarded 177 backend tests, 37 identity-pinned synthetic PostgreSQL cases, real original-browser workflows and before/after evidence verified through batch 40; expand with remaining work, live services forbidden |
 | PY-31 | Confirmed payment activation and recovery | Partial: atomic confirmation, retry/replay, owner-only callback recovery and approved indefinite-grant holds verified; unattended recovery and operational delivery/reconciliation decisions remain |
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches 14/21: carry forward dated paid/trial time; preserve indefinite grants, block new checkout and hold/recover old purchases without consuming days |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
@@ -1355,3 +1363,23 @@ or data backfill. Next: missing intelligence-resource audits (three related writ
 - Eighteen IDs complete; eighteen partial/pending. Buying zone, Sell-watch window
   and Storage suitability create/edit audit coverage remains next. No live services,
   production credentials, schema changes, push, merge or deployment.
+
+### Batch 40 — complete identified PY-26 resource writers (2026-10-17)
+
+- Buying zone, Sell-watch window and Storage suitability create/edit now commit
+  with sanitized actor/record/old/new audits. Existing row locks protect concurrent
+  edits; failed audits preserve both records and logs. Original fields, validation,
+  permissions, amounts and price history retained. No deletion endpoints added.
+- Nine before tests reproduce nine failures (0.573s); all nine pass after (0.557s).
+  All 177 backend tests pass, 31.352s; 37 pinned PostgreSQL cases pass, 36.928s,
+  including create/edit rollback and continuous concurrent snapshots for all three.
+- Browser uses the original three forms to create/edit and verifies six audits
+  and unchanged historical prices. These resources originally have no delete
+  control; only the disposable in-memory preview is restarted to remove temporary
+  test entries. No database cleanup against disk/production and no frontend changes.
+  Evidence: tools/local-test/evidence/batch-40-*.json.
+- Manual: http://127.0.0.1:55446/admin/buying-zones, /admin/sell-watch or /admin/storage,
+  using admin@example.com / PriceYardDemo8!. Original forms are unchanged.
+- Nineteen IDs complete; seventeen partial/pending. PY-26 covers identified
+  application business-record writers; live delivery/reconciliation operations
+  remain separate. No production access, migrations, pushes, merges or deployment.

@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.services.audit_service import save_audited_resource, snapshot_model
 from app.models.buying_zone import BuyingZone
 from app.models.user import User
 from app.schemas.buying_zone_schema import BuyingZoneCreate, BuyingZoneResponse, BuyingZoneUpdate
@@ -39,7 +40,9 @@ def add_zone(
     db: Session = Depends(get_db),
     current_admin: User = Depends(require_roles("admin")),
 ) -> BuyingZone:
-    return create_buying_zone(db, payload, current_admin)
+    item = create_buying_zone(db, payload, current_admin, commit=False)
+    save_audited_resource(db, item, current_admin, "buying_zone.create")
+    return item
 
 
 @router.patch("/{zone_id}", response_model=BuyingZoneResponse)
@@ -47,6 +50,10 @@ def edit_zone(
     zone_id: int,
     payload: BuyingZoneUpdate,
     db: Session = Depends(get_db),
-    _: User = Depends(require_roles("admin")),
+    current_admin: User = Depends(require_roles("admin")),
 ) -> BuyingZone:
-    return update_buying_zone(db, get_buying_zone(db, zone_id), payload)
+    item = get_buying_zone(db, zone_id, lock=True)
+    old_value = snapshot_model(item)
+    item = update_buying_zone(db, item, payload, commit=False)
+    save_audited_resource(db, item, current_admin, "buying_zone.edit", old_value=old_value)
+    return item

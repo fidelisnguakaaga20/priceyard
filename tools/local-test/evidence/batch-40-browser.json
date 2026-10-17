@@ -1,0 +1,9 @@
+{
+  "original_buying_sell_watch_storage_create_edit_controls": true,
+  "six_audit_records_verified": true,
+  "historical_price_rows_unchanged": true,
+  "no_new_delete_endpoint": true,
+  "synthetic_preview_reseed_required": true,
+  "external_page_requests": 0,
+  "production_connections": 0
+}

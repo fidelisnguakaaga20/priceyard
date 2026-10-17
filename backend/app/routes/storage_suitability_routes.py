@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.services.audit_service import save_audited_resource, snapshot_model
 from app.models.storage_suitability import StorageSuitability
 from app.models.user import User
 from app.schemas.storage_suitability_schema import (
@@ -41,9 +42,11 @@ def get_item(
 def add_item(
     payload: StorageSuitabilityCreate,
     db: Session = Depends(get_db),
-    _: User = Depends(require_roles("admin")),
+    current_admin: User = Depends(require_roles("admin")),
 ) -> StorageSuitability:
-    return create_storage_suitability(db, payload)
+    item = create_storage_suitability(db, payload, commit=False)
+    save_audited_resource(db, item, current_admin, "storage_suitability.create")
+    return item
 
 
 @router.patch("/{item_id}", response_model=StorageSuitabilityResponse)
@@ -51,6 +54,10 @@ def edit_item(
     item_id: int,
     payload: StorageSuitabilityUpdate,
     db: Session = Depends(get_db),
-    _: User = Depends(require_roles("admin")),
+    current_admin: User = Depends(require_roles("admin")),
 ) -> StorageSuitability:
-    return update_storage_suitability(db, get_storage_suitability(db, item_id), payload)
+    item = get_storage_suitability(db, item_id, lock=True)
+    old_value = snapshot_model(item)
+    item = update_storage_suitability(db, item, payload, commit=False)
+    save_audited_resource(db, item, current_admin, "storage_suitability.edit", old_value=old_value)
+    return item

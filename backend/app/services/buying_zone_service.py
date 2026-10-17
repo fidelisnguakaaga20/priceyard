@@ -44,7 +44,7 @@ def _validate_buying_zone_values(
         )
 
 
-def create_buying_zone(db: Session, payload: BuyingZoneCreate, admin: User) -> BuyingZone:
+def create_buying_zone(db: Session, payload: BuyingZoneCreate, admin: User, *, commit: bool = True) -> BuyingZone:
     _validate_active_market_scope(db, commodity_id=payload.commodity_id, market_id=payload.market_id)
     _validate_buying_zone_values(
         price_low=payload.price_low,
@@ -54,13 +54,15 @@ def create_buying_zone(db: Session, payload: BuyingZoneCreate, admin: User) -> B
     )
     zone = BuyingZone(**payload.model_dump(), created_by=admin.id)
     db.add(zone)
-    db.commit()
-    db.refresh(zone)
+    db.commit() if commit else db.flush()
     return zone
 
 
-def get_buying_zone(db: Session, zone_id: int) -> BuyingZone:
-    zone = db.get(BuyingZone, zone_id)
+def get_buying_zone(db: Session, zone_id: int, *, lock: bool = False) -> BuyingZone:
+    statement = select(BuyingZone).where(BuyingZone.id == zone_id)
+    if lock:
+        statement = statement.with_for_update().execution_options(populate_existing=True)
+    zone = db.scalar(statement)
     if zone is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Buying zone not found")
     return zone
@@ -70,7 +72,7 @@ def list_buying_zones(db: Session) -> list[BuyingZone]:
     return list(db.scalars(select(BuyingZone).order_by(BuyingZone.created_at.desc(), BuyingZone.id.desc())).all())
 
 
-def update_buying_zone(db: Session, zone: BuyingZone, payload: BuyingZoneUpdate) -> BuyingZone:
+def update_buying_zone(db: Session, zone: BuyingZone, payload: BuyingZoneUpdate, *, commit: bool = True) -> BuyingZone:
     changes = payload.model_dump(exclude_unset=True)
     commodity_id = int(changes.get("commodity_id", zone.commodity_id))
     market_id = int(changes.get("market_id", zone.market_id))
@@ -89,6 +91,5 @@ def update_buying_zone(db: Session, zone: BuyingZone, payload: BuyingZoneUpdate)
 
     for field, value in changes.items():
         setattr(zone, field, value)
-    db.commit()
-    db.refresh(zone)
+    db.commit() if commit else db.flush()
     return zone

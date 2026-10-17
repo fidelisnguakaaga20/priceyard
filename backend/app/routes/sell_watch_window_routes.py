@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.services.audit_service import save_audited_resource, snapshot_model
 from app.models.sell_watch_window import SellWatchWindow
 from app.models.user import User
 from app.schemas.sell_watch_window_schema import (
@@ -43,7 +44,9 @@ def add_window(
     db: Session = Depends(get_db),
     current_admin: User = Depends(require_roles("admin")),
 ) -> SellWatchWindow:
-    return create_sell_watch_window(db, payload, current_admin)
+    item = create_sell_watch_window(db, payload, current_admin, commit=False)
+    save_audited_resource(db, item, current_admin, "sell_watch_window.create")
+    return item
 
 
 @router.patch("/{window_id}", response_model=SellWatchWindowResponse)
@@ -51,6 +54,10 @@ def edit_window(
     window_id: int,
     payload: SellWatchWindowUpdate,
     db: Session = Depends(get_db),
-    _: User = Depends(require_roles("admin")),
+    current_admin: User = Depends(require_roles("admin")),
 ) -> SellWatchWindow:
-    return update_sell_watch_window(db, get_sell_watch_window(db, window_id), payload)
+    item = get_sell_watch_window(db, window_id, lock=True)
+    old_value = snapshot_model(item)
+    item = update_sell_watch_window(db, item, payload, commit=False)
+    save_audited_resource(db, item, current_admin, "sell_watch_window.edit", old_value=old_value)
+    return item
