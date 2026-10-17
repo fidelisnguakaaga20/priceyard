@@ -24,8 +24,11 @@ def list_feedback(db: Session, rating: int | None = None) -> list[Feedback]:
     return list(db.scalars(statement).all())
 
 
-def get_feedback(db: Session, feedback_id: int) -> Feedback:
-    item = db.get(Feedback, feedback_id)
+def get_feedback(db: Session, feedback_id: int, *, lock: bool = False) -> Feedback:
+    statement = select(Feedback).where(Feedback.id == feedback_id)
+    if lock:
+        statement = statement.with_for_update().execution_options(populate_existing=True)
+    item = db.scalar(statement)
     if item is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Feedback not found")
     return item
@@ -41,22 +44,21 @@ def feedback_summary(db: Session) -> FeedbackSummaryResponse:
     )
 
 
-def delete_feedback(db: Session, item: Feedback) -> None:
+def delete_feedback(db: Session, item: Feedback, *, commit: bool = True) -> None:
     db.delete(item)
-    db.commit()
+    db.commit() if commit else db.flush()
 
 
 def _testimonial_quote(item: Feedback) -> str | None:
     return item.complaint_or_suggestion or item.comment
 
 
-def set_testimonial_publication(db: Session, item: Feedback, *, is_public: bool, display_name: str | None) -> Feedback:
+def set_testimonial_publication(db: Session, item: Feedback, *, is_public: bool, display_name: str | None, commit: bool = True) -> Feedback:
     if is_public and not _testimonial_quote(item):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="This feedback has no text to display as a testimonial")
     item.is_public_testimonial = is_public
     item.testimonial_display_name = display_name if is_public else item.testimonial_display_name
-    db.commit()
-    db.refresh(item)
+    db.commit() if commit else db.flush()
     return item
 
 

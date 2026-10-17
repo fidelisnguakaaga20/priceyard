@@ -123,6 +123,75 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_moderation_failure_preserves_private_feedback_price_and_flags(self):
+        from app.models.commodity import Commodity
+        from app.models.feedback import Feedback
+        from app.models.market import Market
+        from app.models.price_flag import PriceFlag
+        from app.models.price_update import PriceUpdate
+        from app.routes import feedback_routes,price_update_routes
+        from app.schemas.feedback_schema import TestimonialPublishRequest
+        Base.metadata.create_all(self.engine)
+        with Session(self.engine) as db:
+            admin=User(full_name="Synthetic moderation admin",email="pg-moderation@example.com",password_hash="unused",role="admin",referral_code="PGMOD")
+            commodity,market=Commodity(name="Egusi"),Market(name="Kwali Market");db.add_all([admin,commodity,market]);db.flush()
+            feedback=Feedback(user_id=admin.id,rating=4,comment="Synthetic moderation feedback",screenshot_data="data:image/png;base64,c3ludGhldGlj")
+            price=PriceUpdate(commodity_id=commodity.id,market_id=market.id,unit="1 bag",bag_size=None,price_low=210000,price_high=220000,
+                movement="unknown",confidence_level="Low confidence",status="approved",update_date_time=datetime.now(timezone.utc),created_by=admin.id)
+            db.add_all([feedback,price]);db.flush();db.add(PriceFlag(price_update_id=price.id,user_id=admin.id,reason="Synthetic private flag"));db.commit()
+            admin_id,feedback_id,price_id=admin.id,feedback.id,price.id
+        def snapshot(db):return {table.name:db.execute(select(table)).all() for table in (Feedback.__table__,PriceUpdate.__table__,PriceFlag.__table__,AuditLog.__table__)}
+        for route,operation in ((feedback_routes,lambda db,admin:feedback_routes.publish_testimonial(feedback_id,TestimonialPublishRequest(display_name="Synthetic user"),db,admin)),
+                                (feedback_routes,lambda db,admin:feedback_routes.remove_feedback(feedback_id,db,admin)),
+                                (price_update_routes,lambda db,admin:price_update_routes.remove_price_update(price_id,db,admin)),
+                                (price_update_routes,lambda db,admin:price_update_routes.resolve_price_flags(price_id,db,admin))):
+            with Session(self.engine) as db:
+                before=snapshot(db);admin=db.get(User,admin_id)
+                with patch.object(route,"create_audit_log",side_effect=RuntimeError("Synthetic moderation audit failure")),self.assertRaisesRegex(RuntimeError,"Synthetic moderation audit failure"):
+                    operation(db,admin)
+                self.assertEqual(snapshot(db),before)
+        barrier=threading.Barrier(2);outcomes=[]
+        def worker():
+            with Session(self.engine) as db:
+                admin=db.get(User,admin_id);barrier.wait(timeout=15)
+                try:price_update_routes.resolve_price_flags(price_id,db,admin);outcomes.append(204)
+                except BaseException as error:db.rollback();outcomes.append(type(error).__name__)
+        threads=[threading.Thread(target=worker) for _ in range(2)]
+        for thread in threads:thread.start()
+        for thread in threads:thread.join(25)
+        self.assertFalse(any(thread.is_alive() for thread in threads));self.assertEqual(outcomes,[204,204])
+        with Session(self.engine) as db:
+            logs=db.scalars(select(AuditLog)).all();self.assertEqual(len(logs),1)
+            self.assertEqual(logs[0].new_value,{"unresolved_count":0,"resolved_count":1});self.assertTrue(db.scalar(select(PriceFlag)).resolved)
+
+    def test_concurrent_testimonial_moderation_keeps_private_image_and_continuous_audit(self):
+        from app.models.feedback import Feedback
+        from app.routes import feedback_routes
+        from app.schemas.feedback_schema import TestimonialPublishRequest
+        Base.metadata.create_all(self.engine)
+        with Session(self.engine) as db:
+            admin=User(full_name="Synthetic testimonial admin",email="pg-testimonial@example.com",password_hash="unused",role="admin",referral_code="PGTESTIMONY")
+            db.add(admin);db.flush();item=Feedback(user_id=admin.id,rating=4,comment="Synthetic feedback",screenshot_data="data:image/png;base64,c3ludGhldGlj")
+            db.add(item);db.commit();admin_id,item_id=admin.id,item.id
+        barrier=threading.Barrier(2);outcomes=[]
+        def worker(publish):
+            with Session(self.engine) as db:
+                admin=db.get(User,admin_id);barrier.wait(timeout=15)
+                try:
+                    if publish:feedback_routes.publish_testimonial(item_id,TestimonialPublishRequest(display_name="Synthetic user"),db,admin)
+                    else:feedback_routes.hide_testimonial(item_id,db,admin)
+                    outcomes.append(200)
+                except BaseException as error:db.rollback();outcomes.append(type(error).__name__)
+        threads=[threading.Thread(target=worker,args=(publish,)) for publish in (True,False)]
+        for thread in threads:thread.start()
+        for thread in threads:thread.join(25)
+        self.assertFalse(any(thread.is_alive() for thread in threads));self.assertEqual(outcomes,[200,200])
+        with Session(self.engine) as db:
+            logs=db.scalars(select(AuditLog).order_by(AuditLog.id)).all();self.assertEqual(len(logs),2)
+            self.assertEqual(logs[1].old_value,logs[0].new_value)
+            self.assertNotIn("screenshot_data",str([(row.old_value,row.new_value) for row in logs]))
+            self.assertEqual(db.get(Feedback,item_id).screenshot_data,"data:image/png;base64,c3ludGhldGlj")
+
     def test_catalog_audit_rollback_concurrent_edits_and_referenced_history_protection(self):
         from app.models.commodity import Commodity
         from app.models.market import Market

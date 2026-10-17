@@ -52,11 +52,11 @@ def list_flagged_price_updates(db: Session) -> list[FlaggedPriceSummary]:
     return results
 
 
-def resolve_flags(db: Session, price_update_id: int) -> int:
+def resolve_flags(db: Session, price_update_id: int, *, commit: bool = True) -> int:
     count = (
         db.query(PriceFlag)
         .filter(PriceFlag.price_update_id == price_update_id, PriceFlag.resolved.is_(False))
         .update({"resolved": True})
     )
-    db.commit()
+    db.commit() if commit else db.flush()
     return count

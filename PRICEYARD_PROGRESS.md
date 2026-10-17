@@ -161,6 +161,14 @@ complete; nineteen partial/pending. Native synthetic PG stopped and status verif
 browser preview remains http://127.0.0.1:55446. Resume with other Admin writers,
 then remaining compatible performance, mobile/accessibility and pending decisions.
 
+Batch 35 verified: feedback moderation and price deletion commit with audits;
+flag resolution is atomically audited once per actual resolution. Future feedback
+audits omit private screenshot bytes while original feedback retains them.
+All 152 backend tests, 29 pinned PG cases and original moderation browser workflows
+pass. Seventeen complete, nineteen partial/pending. Comparison proposal awaits
+owner reply in docs/PRICE_COMPARISON_APPROVAL.md; do not infer approval. Next:
+flag input/query bounds and missing editorial/resource audits, then usability.
+
 ## Checklist — do not repeat the audit
 
 | ID | Improvement | Current status |
@@ -1199,3 +1207,29 @@ then remaining compatible performance, mobile/accessibility and pending decision
   258991019e5af8b36eff407a8efa2c9fd03dd644. No production access, private configuration
   reads, dependency installations, push, merge or deployment. Resume unfinished
   Admin editorial/feedback/flag/price-delete audits next, preserving current work.
+
+### Batch 35 — further PY-02/PY-26/PY-28 (2026-10-17)
+
+- Feedback publish/hide/delete and price deletion now commit with their audits;
+  row locks protect old snapshots. Failed audits restore records and dependent
+  flags. Original moderation permissions, publication/deletion controls and public
+  testimonial projection are unchanged. No production records or historical logs
+  rewritten. Future feedback audits omit screenshot bytes; originals remain private
+  in the existing Feedback record. No new fields or schema.
+- Flag review locks the parent price, resolves current reports and records one
+  count-only audit in the same transaction. Repeated/concurrent review returns
+  the existing 204 without duplicate state-change audits; private reasons omitted.
+- Five before tests reproduced seven failures (1.871s); all pass after (1.922s).
+  All 152 backend tests pass, 87.644s. Twenty-nine pinned PostgreSQL cases pass,
+  65.882s: moderation/delete rollback preserves images/prices/dependent flags;
+  concurrent review writes one audit; testimonial edits keep continuous snapshots.
+- Browser original testimonial publish/hide/delete, price create/approve/delete
+  and Mark reviewed controls pass; public testimonials exclude attachments, Admin
+  retains the attachment before deliberate deletion of the new synthetic record.
+  Every preexisting synthetic price-history row is unchanged. No frontend rebuild.
+- Manual: http://127.0.0.1:55446/admin/feedback or /admin/flagged after demo Admin
+  login admin@example.com / PriceYardDemo8!. Evidence: batch-35-*.json.
+- Seventeen IDs complete; nineteen partial/pending. Missing editorial/resource
+  audit coverage remains PY-26 work. A concrete visible price-comparison safeguard
+  awaits explicit approval: docs/PRICE_COMPARISON_APPROVAL.md. No proposed chart,
+  quantity-selection or message changes implemented from that pending proposal.

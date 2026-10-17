@@ -367,10 +367,10 @@ def mark_price_update_outdated(db: Session, price_update: PriceUpdate, *, commit
     return get_price_update_for_admin(db, price_update.id)
 
 
-def delete_price_update(db: Session, price_update: PriceUpdate) -> None:
+def delete_price_update(db: Session, price_update: PriceUpdate, *, commit: bool = True) -> None:
     db.delete(price_update)
     try:
-        db.commit()
+        db.commit() if commit else db.flush()
     except IntegrityError as exc:
         db.rollback()
         raise HTTPException(

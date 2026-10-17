@@ -44,11 +44,11 @@ router = APIRouter(prefix="/price-updates", tags=["price-updates"])
 logger = logging.getLogger(__name__)
 
 
-def _save_audited_price(db: Session, item: PriceUpdate, actor: User, action: str, old_value: dict | None = None) -> None:
+def _save_audited_price(db: Session, item: PriceUpdate, actor: User, action: str, old_value: dict | None = None, *, deleted: bool = False) -> None:
     try:
         create_audit_log(
             db, actor=actor, action=action, table_name="price_updates",
-            record_id=item.id, old_value=old_value, new_value=snapshot_model(item), commit=False,
+            record_id=item.id, old_value=old_value, new_value=None if deleted else snapshot_model(item), commit=False,
         )
         db.commit()
     except Exception:
@@ -252,8 +252,17 @@ def resolve_price_flags(
     db: Session = Depends(get_db),
     current_admin: User = Depends(require_roles("admin")),
 ) -> None:
-    get_price_update_for_admin(db, price_update_id)
-    resolve_flags(db, price_update_id)
+    get_price_update_for_admin(db, price_update_id, lock=True)
+    try:
+        count = resolve_flags(db, price_update_id, commit=False)
+        if count:
+            create_audit_log(db, actor=current_admin, action="price_update.flags_resolve", table_name="price_updates",
+                             record_id=price_update_id, old_value={"unresolved_count": count},
+                             new_value={"unresolved_count": 0, "resolved_count": count}, commit=False)
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
 
 
 @router.patch("/{price_update_id}/mark-outdated", response_model=PriceUpdateAdminResponse)
@@ -275,12 +284,8 @@ def remove_price_update(
     db: Session = Depends(get_db),
     current_admin: User = Depends(require_roles("admin")),
 ) -> Response:
-    item = get_price_update_for_admin(db, price_update_id)
+    item = get_price_update_for_admin(db, price_update_id, lock=True)
     old_value = snapshot_model(item)
-    record_id = item.id
-    delete_price_update(db, item)
-    create_audit_log(
-        db, actor=current_admin, action="price_update.delete", table_name="price_updates",
-        record_id=record_id, old_value=old_value,
-    )
+    delete_price_update(db, item, commit=False)
+    _save_audited_price(db, item, current_admin, "price_update.delete", old_value, deleted=True)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

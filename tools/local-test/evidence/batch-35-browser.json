@@ -1,0 +1,9 @@
+{
+  "original_testimonial_publish_hide_delete_controls": true,
+  "private_image_preserved_until_deliberate_fake_record_delete": true,
+  "new_audits_omit_image": true,
+  "original_flag_review_and_price_delete_controls": true,
+  "preexisting_synthetic_history_unchanged": true,
+  "external_page_requests": 0,
+  "production_connections": 0
+}

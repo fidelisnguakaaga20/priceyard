@@ -29,6 +29,21 @@ router = APIRouter(prefix="/feedback", tags=["feedback"])
 testimonials_router = APIRouter(prefix="/testimonials", tags=["testimonials"])
 
 
+def _feedback_snapshot(item: Feedback) -> dict:
+    # Keep the original private attachment on Feedback, not duplicated in logs.
+    return snapshot_model(item, extra_exclude={"screenshot_data"})
+
+
+def _save_feedback_audit(db: Session, admin: User, action: str, record_id: int, *, old_value: dict, new_value: dict | None = None) -> None:
+    try:
+        create_audit_log(db, actor=admin, action=action, table_name="feedback", record_id=record_id,
+                         old_value=old_value, new_value=new_value, commit=False)
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+
+
 @testimonials_router.get("", response_model=list[TestimonialResponse])
 def get_public_testimonials(db: Session = Depends(get_db)) -> list[TestimonialResponse]:
     return list_public_testimonials(db)
@@ -76,10 +91,10 @@ def publish_testimonial(
     db: Session = Depends(get_db),
     admin: User = Depends(require_roles("admin")),
 ) -> Feedback:
-    item = get_feedback(db, feedback_id)
-    old_value = snapshot_model(item)
-    item = set_testimonial_publication(db, item, is_public=True, display_name=payload.display_name)
-    create_audit_log(db, actor=admin, action="feedback.testimonial_publish", table_name="feedback", record_id=item.id, old_value=old_value, new_value=snapshot_model(item))
+    item = get_feedback(db, feedback_id, lock=True)
+    old_value = _feedback_snapshot(item)
+    item = set_testimonial_publication(db, item, is_public=True, display_name=payload.display_name, commit=False)
+    _save_feedback_audit(db, admin, "feedback.testimonial_publish", item.id, old_value=old_value, new_value=_feedback_snapshot(item))
     return item
 
 
@@ -89,10 +104,10 @@ def hide_testimonial(
     db: Session = Depends(get_db),
     admin: User = Depends(require_roles("admin")),
 ) -> Feedback:
-    item = get_feedback(db, feedback_id)
-    old_value = snapshot_model(item)
-    item = set_testimonial_publication(db, item, is_public=False, display_name=item.testimonial_display_name)
-    create_audit_log(db, actor=admin, action="feedback.testimonial_hide", table_name="feedback", record_id=item.id, old_value=old_value, new_value=snapshot_model(item))
+    item = get_feedback(db, feedback_id, lock=True)
+    old_value = _feedback_snapshot(item)
+    item = set_testimonial_publication(db, item, is_public=False, display_name=item.testimonial_display_name, commit=False)
+    _save_feedback_audit(db, admin, "feedback.testimonial_hide", item.id, old_value=old_value, new_value=_feedback_snapshot(item))
     return item
 
 
@@ -102,9 +117,9 @@ def remove_feedback(
     db: Session = Depends(get_db),
     admin: User = Depends(require_roles("admin")),
 ) -> Response:
-    item = get_feedback(db, feedback_id)
-    old_value = snapshot_model(item)
+    item = get_feedback(db, feedback_id, lock=True)
+    old_value = _feedback_snapshot(item)
     record_id = item.id
-    delete_feedback(db, item)
-    create_audit_log(db, actor=admin, action="feedback.delete", table_name="feedback", record_id=record_id, old_value=old_value)
+    delete_feedback(db, item, commit=False)
+    _save_feedback_audit(db, admin, "feedback.delete", record_id, old_value=old_value)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
