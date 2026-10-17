@@ -1,0 +1,13 @@
+{
+  "checks": {
+    "market-signals_linked_scope_and_saved_data_preserved": true,
+    "quality-signals_linked_scope_and_saved_data_preserved": true,
+    "storage-suitability_linked_scope_and_saved_data_preserved": true
+  },
+  "original_price_history_unchanged": true,
+  "original_admin_price_screen": true,
+  "no_new_measurement_or_form_fields": true,
+  "disposable_preview_reseed_required": true,
+  "external_page_requests": 0,
+  "production_connections": 0
+}

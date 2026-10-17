@@ -11,6 +11,7 @@ from app.models.market import Market
 from app.models.price_update import PriceUpdate
 from app.models.user import User
 from app.schemas.price_update_schema import Movement, PriceUpdateCreate, PriceUpdateUpdate, TimeOfDay
+from app.services.price_scope_service import lock_price_scope, validate_price_scope_change
 
 
 PRICE_UPDATE_LOAD_OPTIONS = (
@@ -335,10 +336,13 @@ def update_price_update(db: Session, price_update: PriceUpdate, payload: PriceUp
                 detail=f"{non_nullable_field} cannot be null",
             )
 
+    if "commodity_id" in changes or "market_id" in changes:
+        price_update = lock_price_scope(db, price_update.id)
     final_commodity_id = int(changes.get("commodity_id", price_update.commodity_id))
     final_market_id = int(changes.get("market_id", price_update.market_id))
     if "commodity_id" in changes or "market_id" in changes:
         _validate_reference_records(db, final_commodity_id, final_market_id)
+        validate_price_scope_change(db, price_update, commodity_id=final_commodity_id, market_id=final_market_id)
 
     _validate_final_ranges(price_update, changes)
 

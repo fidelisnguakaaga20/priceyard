@@ -148,6 +148,12 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_linked_price_scope_races_preserve_existing_observations(self):
+        spec = importlib.util.spec_from_file_location("local_price_scope", ROOT / "backend/tests/test_price_scope.py")
+        cases = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cases)
+        cases.verify_scope_races(self, self.engine)
+
     def test_catalog_duplicate_and_rename_races_preserve_history(self):
         spec = importlib.util.spec_from_file_location("local_catalog_identity", ROOT / "backend/tests/test_catalog_identity.py")
         cases = importlib.util.module_from_spec(spec)

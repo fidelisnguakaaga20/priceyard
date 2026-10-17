@@ -25,18 +25,16 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
-Latest verified: batch63,27 complete /9 partial or pending:
-02,05,07,08,13,14,20,29,35. PY-30's identified local testing-foundation/coverage
-scope is complete with explicit criteria/evidence in docs/TEST_COVERAGE.md;
-this does not complete the other nine items or certify production/providers.
-Batch62 serializes catalog duplicate/rename checks through audited commit/rollback.
-Full230 backend tests, two focused native catalog cases (one setup-timeout retry),
-six isolation probes, original catalog controls/all14 dashboard cards and seven
-original browser workflows pass.84 frontend source/config hashes and JS/CSS
-unchanged. Smaller native fixture73/80 schemas, stopped. Next: remaining PY-20
-full JSON lists and PY-29 filter/link-scope work; owner-policy/production gates
-stay explicit. Future tests belong with each remaining change, not an indefinitely
-open testing-foundation item.
+Latest verified: batch64,27 complete /9 partial or pending:
+02,05,07,08,13,14,20,29,35. PY-29 now preserves same commodity/market across
+price corrections and linked market/quality/storage observations, including
+simultaneous saves. No automatic rewrites; valid unlinked corrections stay.
+Full236 backend tests pass, one focused native case covers six save-order races,
+linked-record browser checks and original price-edit/all14 dashboard checks pass.
+84 frontend source/config hashes unchanged. Small native fixture74/80 schemas,
+stopped. Next: remaining PY-29 stable-filter identity and PY-20 full JSON lists;
+owner-policy/production gates stay explicit. Testing foundation PY-30 stays
+complete; new regression tests belong with their respective improvements.
 Do not reopen completed scope or mistake earlier historical counts for current.
 
 Baseline browser/isolation verification passed. Batch 1 (PY-15) verified:
@@ -398,8 +396,8 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-26 | Complete atomic administrative audit | Complete for identified business-record writers through batch 40: payment/referral, price/moderation/flags, account/subscription, FAQ/catalog and all six intelligence resources save sanitized audits atomically; native concurrent edits and failed-audit rollback verified. External delivery operations remain PY-35 |
 | PY-27 | Consistent existing editing/password inputs | Complete for identified scope: feedback selection in batch26, existing Unicode/72-byte password rules and reset validation in batch46, owner-approved six Admin edit forms in batches50–52. Saved values/costs, one-field edits, reload, explicit clearing, switching/unknown/blank IDs and creation verified in61 actual browser checks |
 | PY-28 | Historical record preservation | Current application-side scope complete in batch59: read-only legacy/unversioned preflight before migration steps, empty/reviewed0021-to0022 paths, unchanged raw history/catalog IDs/active flags/cost links/sources/audits, preserved paid/payment records and0022 downgrade refusal verified. No guesses to repair already-changed historical data; production backup/restore/rollout and any repairs require owner approval under PY-35 |
-| PY-29 | Stable identities and dependent records | Partial: catalog IDs/fields and referenced deletion rejection with atomic audits verified34; normalized-name commodity/market create-versus-create/rename races and rollback lock release verified62 without changing market-state uniqueness or merging legacy duplicates. Remaining filter/link-scope issues pending; no automatic merge or invented cost units |
-| PY-30 | Isolated automated/browser verification | Identified local testing-foundation/coverage scope complete63: explicit criteria/workflow map/evidence, full230 backend tests62, full40 native baseline47 plus later focused cases (catalog commit/rollback62), six isolation probes and seven original browser workflows63; build-resumption/six-form/14-card proofs retained. Native73/80 schemas stopped, phases serialized,84 frontend hashes and compiled JS/CSS preserved without rebuild/copies. Not100% coverage or production/provider certification; future regression tests stay with remaining items, operational checks remain PY-35 |
+| PY-29 | Stable identities and dependent records | Partial: catalog IDs/fields and referenced deletion rejection with atomic audits verified34; duplicate/rename/rollback races62; parent-price and market/quality/storage links share a fresh parent lock and enforce existing same-commodity/market invariant64. Valid unlinked corrections/metadata edits remain. Remaining stable-filter identity pending; no automatic merge, legacy rewrites or invented cost units |
+| PY-30 | Isolated automated/browser verification | Identified local testing-foundation/coverage scope complete63: criteria/workflow map/evidence retained; full236 backend tests64, full40 native baseline47 plus later focused cases (price-scope race64), six isolation probes/seven original browser workflows63; price-edit/14-card browser64. Native74/80 schemas stopped, phases serialized,84 frontend hashes unchanged without rebuild/copies. Not100% coverage or production/provider certification; future tests stay with remaining items, operational checks remain PY-35 |
 | PY-31 | Confirmed payment activation and recovery | Application-side approved scope complete in batch58: atomic confirmation, owner callback and explicit bounded/resumable reconciliation for missed webhook/return; dry-run default, strict existing evidence/activation, single PG worker, error isolation, replay safety and purchased-time/manual-grant preservation verified. Live scheduling/checkpoints/monitoring and ambiguous legacy repairs require owner approval under PY-35 |
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches 14/21: carry forward dated paid/trial time; preserve indefinite grants, block new checkout and hold/recover old purchases without consuming days |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
@@ -2326,3 +2324,43 @@ No expansion of completed null-guard/account/UI scopes is needed.
   rules and all business records preserved. Local commits only; no production
   access/data/migrations/credentials, push, merge or deploy. Guarded preview at
   http://127.0.0.1:55446; PostgreSQL stopped.
+
+### Batch 64 — preserve linked price scope during corrections (2026-10-17)
+
+- Resumed clean fromd0f3862. PY-29 identified parent-side gap: child creation/
+  editing already required matching commodity/market, but correcting the parent
+  price could strand saved observations, including a validate-then-insert race.
+- Market/quality/storage reference validators now share the parent's transaction
+  lock and refresh its committed identity before checking the same existing
+  matching rule. Parent scope corrections use that lock and indexed child-ID
+  existence checks, returning409 before any write if saved linked records would
+  point to a different commodity/market. No child/link rewrites, migrations,
+  fields, market/measurement/policy additions or changes to delete behavior.
+- Valid price-value edits and unlinked commodity/market corrections remain;
+  unchanged identities on metadata edits do not reject legacy observations.
+  Missing/mismatched child links retain existing404/422 behavior. Parent/child
+  rejection preserves business rows and audit history; private sources never
+  enter validation error text.
+- Six focused tests pass0.540s; full236 backend tests pass85.410s, zero failures/
+  errors/skips. All three child types cover blocked commodity/market correction,
+  unchanged rows, unlinked correction, original value edits and rejected stale
+  links. HTTP rejection also preserves stored prices/observations/audits.
+- One selected native PostgreSQL case passes2.058s: three child types, both save
+  orders, at most two owned threads at once. Child-first saves once and conflicting
+  parent gets409; parent-first correction saves once and stale child gets422.
+  All saved links match their parent; six intended audits, sources and identities
+  correct. No failed setup/retry, full native rerun or new fixture.73->74 schemas
+  of80; fixture stopped in finally before browser tests. Durability kept enabled.
+- Actual browser verifies all three saved links/history unchanged on rejection,
+  existing error responses and original Admin price screen. Original create/
+  approve/correct/outdate/reject/reload and complete sanitized audit workflow pass;
+  all14 dashboard labels/totals, one summary request and outage recovery pass.
+  Temporary synthetic Storage observations require preview reseeding afterward;
+  no new DELETE feature added for cleanup. No real customer/business data touched.
+-84 frontend source/public/config hashes match existing verified build; no UI,
+  terminology, fields, bag weights, grades, CSS/build/dependency changes.
+- Evidence batch-64-*.json.27 complete /9 partial or pending remain:
+  02,05,07,08,13,14,20,29,35. PY-29 still needs stable-filter identity; do not
+  claim complete from linked-record protection alone. Next that finite task.
+- Existing trial/prices/referral/session rules preserved. Local commits only;
+  no production credentials/services/data/migrations, push, merge or deployment.
