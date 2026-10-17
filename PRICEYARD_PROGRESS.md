@@ -117,6 +117,13 @@ native PG from batch 27). PY-16 identified scope complete: sixteen complete,
 20 partial/pending. Next: bounded dashboard metric aggregation, then remaining
 date-entry consistency, administrative audits and history-query efficiency.
 
+Batch 29 verified (2026-10-17): all fourteen original dashboard cards/definitions
+use one Admin-only aggregate request and one read-only DB statement. Five focused
+tests, all 131 backend tests, twenty-one pinned PG cases and before/after browser
+totals/loading/recovery passed. Original CSS unchanged. PY-22 identified dashboard
+scope complete: seventeen complete, nineteen partial/pending. Next: atomic Admin
+account/subscription/audit changes, date-entry consistency and remaining checklist.
+
 ## Checklist — do not repeat the audit
 
 | ID | Improvement | Current status |
@@ -142,7 +149,7 @@ date-entry consistency, administrative audits and history-query efficiency.
 | PY-19 | Existing FAQ draft/hide/publish management | Complete in batch 12; hidden drafts remain available to Admin across reload, public publication boundary verified |
 | PY-20 | Bounded queries with accessible historical records | Partial: current/comparison selection ranks in the database and hydrates only latest records; history/access preserved in batch 23; remaining history/admin query bounds pending |
 | PY-21 | Reliable independent alerts | Application-side identified channel dependency complete in batch 24: failed email no longer skips push/WhatsApp; per-user/channel failures isolated; existing deduplication/count semantics retained. Delivery/retry operations remain PY-35 |
-| PY-22 | Efficient loading and accurate dashboard totals | Pending |
+| PY-22 | Efficient loading and accurate dashboard totals | Complete for identified dashboard scope in batch 29: all 14 original metrics preserved; one Admin-only aggregate API/DB snapshot, zero entity hydration; backend/PG/browser totals and outage recovery verified |
 | PY-23 | Preserve layout while fixing mobile overflow | Pending |
 | PY-24 | Keyboard/focus accessibility | Pending |
 | PY-25 | Safe and clearly aged offline prices | Pending; visible additions require approval |
@@ -993,3 +1000,34 @@ date-entry consistency, administrative audits and history-query efficiency.
 - Manual: http://127.0.0.1:55446/prices?commodity=Egusi&market=Kwali+Market;
   original controls match the URL. Trial login still opens original Price History.
   Sixteen IDs complete; twenty partial/pending. No production or schema change.
+
+### Batch 29 — PY-22; further PY-20 (2026-10-17)
+
+- Fourteen original cards, labels, rendering and metric definitions preserved.
+  Replace nine list downloads with Admin-only GET /admin/summary. One read-only
+  aggregate statement uses one PostgreSQL snapshot, hydrates no entities and
+  returns no customer/source/screenshot/payment rows. No database columns,
+  customer-entry fields, pagination cap, history deletion or migration.
+- Reuse the unchanged current-price ranking statement for the latest count.
+  Catalog counts still include inactive entries, active users still means the
+  existing account-active flag, outdated includes all statuses, revenue remains
+  the original successful-payment sum. Seven-day window unchanged, now calculated
+  with the server clock. Trial count reflects existing expiry rules without writes;
+  ordinary authentication/subscription workflows continue handling expiry.
+- Five focused tests passed, 1.161s; all 131 backend passed, 29.098s. Checks cover
+  all fourteen values, denied Guest/non-Admin, empty database, exact seven-day
+  boundary, one SQL statement, no model hydration and unchanged stored rows.
+  Before unit failures reflected an aggregate endpoint not yet implemented; the
+  actual before-browser performance finding was nine full-list requests.
+- Twenty-one pinned PG cases passed, 24.835s, including the aggregate statement
+  over 101 retained historical prices, feedback and original-price purchases.
+  Local cluster's startup wait expired during automatic recovery from an earlier
+  interrupted session; log then confirmed ready and identity-pinned suite passed.
+  No production connection or destructive recovery command was used.
+- Browser before/after preserves fourteen labels/values, reduces list requests
+  9 -> 0 and uses one summary request. Forced summary outage shows the existing
+  error; reload restores all cards. No new UI controls. TypeScript/Vite passed,
+  3.08s; JS318.72kB/90.18kB gzip; original CSS index-19youOJ7.css unchanged.
+- Manual: http://127.0.0.1:55446/admin, admin@example.com / PriceYardDemo8!.
+  Evidence: tools/local-test/evidence/batch-29-*.json. Seventeen IDs complete,
+  nineteen partial/pending. Native synthetic PG is running for the next batch.

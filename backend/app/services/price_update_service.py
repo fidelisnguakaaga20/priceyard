@@ -172,14 +172,13 @@ def get_approved_price_update(db: Session, price_update_id: int) -> PriceUpdate:
     return price_update
 
 
-def list_latest_approved_price_updates(
-    db: Session,
+def _latest_approved_price_statement(
     *,
     commodity_search: str | None = None,
     market_search: str | None = None,
     selected_date: date | None = None,
     movement: Movement | None = None,
-) -> list[PriceUpdate]:
+):
     # Preserve the Stage 7 current-price rule: first identify the latest approved
     # record for each commodity/market pair, then exclude it if it is outdated.
     # This prevents an older non-outdated record from resurfacing as "current".
@@ -210,7 +209,21 @@ def list_latest_approved_price_updates(
     )
     if movement is not None:
         statement = statement.where(PriceUpdate.movement == movement)
-    return list(db.scalars(statement).all())
+    return statement
+
+
+def list_latest_approved_price_updates(
+    db: Session,
+    *,
+    commodity_search: str | None = None,
+    market_search: str | None = None,
+    selected_date: date | None = None,
+    movement: Movement | None = None,
+) -> list[PriceUpdate]:
+    return list(db.scalars(_latest_approved_price_statement(
+        commodity_search=commodity_search, market_search=market_search,
+        selected_date=selected_date, movement=movement,
+    )).all())
 
 
 def list_price_history(

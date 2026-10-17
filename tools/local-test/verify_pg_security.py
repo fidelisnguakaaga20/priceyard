@@ -123,6 +123,44 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_admin_summary_is_one_read_snapshot_without_loading_customer_rows(self):
+        from sqlalchemy import event
+        from app.models.commodity import Commodity
+        from app.models.feedback import Feedback
+        from app.models.market import Market
+        from app.models.price_update import PriceUpdate
+        from app.services.admin_summary_service import get_admin_summary
+        Base.metadata.create_all(self.engine)
+        now = datetime.now(timezone.utc)
+        with Session(self.engine) as db:
+            admin = User(full_name="Synthetic summary admin", email="pgsummaryadmin@example.com", password_hash="unused", role="admin", referral_code="PGSUMADMIN")
+            trial = User(full_name="Synthetic summary trial", email="pgsummarytrial@example.com", password_hash="unused", role="free_user", referral_code="PGSUMTRIAL")
+            trial.subscription = build_trial_subscription(user=trial, now=now)
+            commodity, market = Commodity(name="Egusi"), Market(name="Kwali Market")
+            db.add_all([admin, trial, commodity, market]); db.flush()
+            trial.referred_by_id = admin.id
+            for age in range(100, -1, -1):
+                db.add(PriceUpdate(commodity_id=commodity.id, market_id=market.id, price_low=210000, price_high=220000,
+                    unit="1 bag", bag_size=None, movement="unknown", confidence_level="Low confidence", status="approved",
+                    is_outdated=age==100, update_date_time=now-timedelta(hours=age), created_by=admin.id, source_1="PRIVATE-SUMMARY-SOURCE"))
+            for rating,public in ((4,False),(5,True)):
+                db.add(Feedback(user_id=trial.id, rating=rating, is_public_testimonial=public, comment="Synthetic summary", screenshot_data="data:image/png;base64,WA=="))
+            for index,(status,plan,amount) in enumerate((("success","monthly",2500),("success","seasonal",6000),("pending","monthly",2500))):
+                db.add(Payment(user_id=trial.id, reference="py_pg_summary_"+str(index), status=status, plan=plan, amount=amount, currency="NGN"))
+            db.commit()
+        with Session(self.engine) as db:
+            before = {table:db.execute(select(table)).all() for table in (User.__table__,Subscription.__table__,PriceUpdate.__table__,Feedback.__table__,Payment.__table__)}
+            loaded=[]; statements=[]
+            event.listen(db,"loaded_as_persistent",lambda session,instance:loaded.append(type(instance).__name__))
+            def capture(connection,cursor,statement,parameters,context,many): statements.append(statement)
+            event.listen(self.engine,"before_cursor_execute",capture)
+            summary=get_admin_summary(db)
+            event.remove(self.engine,"before_cursor_execute",capture)
+            self.assertEqual(loaded,[]); self.assertEqual(len(statements),1)
+            self.assertEqual(summary.model_dump(),dict(users=2,commodities=1,markets=1,latest=1,outdated=1,trial=1,active=2,
+                feedback=2,average=4.5,newUsersWeek=2,referralsUsed=1,testimonialsLive=1,successfulPayments=2,revenue=Decimal("8500")))
+            for table,rows in before.items(): self.assertEqual(db.execute(select(table)).all(),rows)
+
     def google_signup_race(self, *, same_subject):
         from app.services.auth_service import authenticate_or_create_google_user
         Base.metadata.create_all(self.engine)
