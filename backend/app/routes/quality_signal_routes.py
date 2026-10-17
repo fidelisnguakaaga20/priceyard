@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.services.audit_service import save_audited_resource, snapshot_model
 from app.models.quality_signal import QualitySignal
 from app.models.user import User
 from app.schemas.quality_signal_schema import QualitySignalCreate, QualitySignalResponse, QualitySignalUpdate
@@ -40,7 +41,9 @@ def add_signal(
     db: Session = Depends(get_db),
     current_admin: User = Depends(require_roles("admin")),
 ) -> QualitySignal:
-    return create_quality_signal(db, payload, current_admin)
+    item = create_quality_signal(db, payload, current_admin, commit=False)
+    save_audited_resource(db, item, current_admin, "quality_signal.create")
+    return item
 
 
 @router.patch("/{signal_id}", response_model=QualitySignalResponse)
@@ -48,16 +51,23 @@ def edit_signal(
     signal_id: int,
     payload: QualitySignalUpdate,
     db: Session = Depends(get_db),
-    _: User = Depends(require_roles("admin")),
+    current_admin: User = Depends(require_roles("admin")),
 ) -> QualitySignal:
-    return update_quality_signal(db, get_quality_signal(db, signal_id), payload)
+    item = get_quality_signal(db, signal_id, lock=True)
+    old_value = snapshot_model(item)
+    item = update_quality_signal(db, item, payload, commit=False)
+    save_audited_resource(db, item, current_admin, "quality_signal.edit", old_value=old_value)
+    return item
 
 
 @router.delete("/{signal_id}", status_code=status.HTTP_204_NO_CONTENT)
 def remove_signal(
     signal_id: int,
     db: Session = Depends(get_db),
-    _: User = Depends(require_roles("admin")),
+    current_admin: User = Depends(require_roles("admin")),
 ) -> Response:
-    delete_quality_signal(db, get_quality_signal(db, signal_id))
+    item = get_quality_signal(db, signal_id, lock=True)
+    old_value = snapshot_model(item)
+    delete_quality_signal(db, item, commit=False)
+    save_audited_resource(db, item, current_admin, "quality_signal.delete", old_value=old_value, deleted=True)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

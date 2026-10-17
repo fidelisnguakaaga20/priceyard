@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.services.audit_service import save_audited_resource, snapshot_model
 from app.models.cost_breakdown import CostBreakdown
 from app.models.user import User
 from app.schemas.cost_breakdown_schema import (
@@ -42,9 +43,11 @@ def get_item(
 def add_item(
     payload: CostBreakdownCreate,
     db: Session = Depends(get_db),
-    _: User = Depends(require_roles("admin")),
+    current_admin: User = Depends(require_roles("admin")),
 ) -> CostBreakdown:
-    return create_cost_breakdown(db, payload)
+    item = create_cost_breakdown(db, payload, commit=False)
+    save_audited_resource(db, item, current_admin, "cost_breakdown.create")
+    return item
 
 
 @router.patch("/{item_id}", response_model=CostBreakdownResponse)
@@ -52,16 +55,23 @@ def edit_item(
     item_id: int,
     payload: CostBreakdownUpdate,
     db: Session = Depends(get_db),
-    _: User = Depends(require_roles("admin")),
+    current_admin: User = Depends(require_roles("admin")),
 ) -> CostBreakdown:
-    return update_cost_breakdown(db, get_cost_breakdown(db, item_id), payload)
+    item = get_cost_breakdown(db, item_id, lock=True)
+    old_value = snapshot_model(item)
+    item = update_cost_breakdown(db, item, payload, commit=False)
+    save_audited_resource(db, item, current_admin, "cost_breakdown.edit", old_value=old_value)
+    return item
 
 
 @router.delete("/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
 def remove_item(
     item_id: int,
     db: Session = Depends(get_db),
-    _: User = Depends(require_roles("admin")),
+    current_admin: User = Depends(require_roles("admin")),
 ) -> Response:
-    delete_cost_breakdown(db, get_cost_breakdown(db, item_id))
+    item = get_cost_breakdown(db, item_id, lock=True)
+    old_value = snapshot_model(item)
+    delete_cost_breakdown(db, item, commit=False)
+    save_audited_resource(db, item, current_admin, "cost_breakdown.delete", old_value=old_value, deleted=True)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

@@ -36,7 +36,7 @@ def _calculate_totals(values: dict[str, Decimal]) -> tuple[Decimal, Decimal]:
     return additional, total
 
 
-def create_cost_breakdown(db: Session, payload: CostBreakdownCreate) -> CostBreakdown:
+def create_cost_breakdown(db: Session, payload: CostBreakdownCreate, *, commit: bool = True) -> CostBreakdown:
     _validate_commodity(db, payload.commodity_id)
     _validate_market(db, payload.market_id)
     values = payload.model_dump()
@@ -47,18 +47,20 @@ def create_cost_breakdown(db: Session, payload: CostBreakdownCreate) -> CostBrea
         total_estimated_landing_storage_cost=total,
     )
     db.add(item)
-    db.commit()
-    db.refresh(item)
+    db.commit() if commit else db.flush()
     return item
 
 
-def delete_cost_breakdown(db: Session, item: CostBreakdown) -> None:
+def delete_cost_breakdown(db: Session, item: CostBreakdown, *, commit: bool = True) -> None:
     db.delete(item)
-    db.commit()
+    db.commit() if commit else db.flush()
 
 
-def get_cost_breakdown(db: Session, item_id: int) -> CostBreakdown:
-    item = db.get(CostBreakdown, item_id)
+def get_cost_breakdown(db: Session, item_id: int, *, lock: bool = False) -> CostBreakdown:
+    statement = select(CostBreakdown).where(CostBreakdown.id == item_id)
+    if lock:
+        statement = statement.with_for_update().execution_options(populate_existing=True)
+    item = db.scalar(statement)
     if item is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Cost breakdown not found")
     return item
@@ -76,6 +78,8 @@ def update_cost_breakdown(
     db: Session,
     item: CostBreakdown,
     payload: CostBreakdownUpdate,
+    *,
+    commit: bool = True,
 ) -> CostBreakdown:
     changes = payload.model_dump(exclude_unset=True)
     commodity_id = int(changes.get("commodity_id", item.commodity_id))
@@ -95,6 +99,5 @@ def update_cost_breakdown(
         setattr(item, field, value)
     item.total_additional_cost = additional
     item.total_estimated_landing_storage_cost = total
-    db.commit()
-    db.refresh(item)
+    db.commit() if commit else db.flush()
     return item

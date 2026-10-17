@@ -42,7 +42,7 @@ def _validate_quality_references(
         )
 
 
-def create_quality_signal(db: Session, payload: QualitySignalCreate, admin: User) -> QualitySignal:
+def create_quality_signal(db: Session, payload: QualitySignalCreate, admin: User, *, commit: bool = True) -> QualitySignal:
     _validate_quality_references(
         db,
         commodity_id=payload.commodity_id,
@@ -51,13 +51,15 @@ def create_quality_signal(db: Session, payload: QualitySignalCreate, admin: User
     )
     signal = QualitySignal(**payload.model_dump(), created_by=admin.id)
     db.add(signal)
-    db.commit()
-    db.refresh(signal)
+    db.commit() if commit else db.flush()
     return signal
 
 
-def get_quality_signal(db: Session, signal_id: int) -> QualitySignal:
-    signal = db.get(QualitySignal, signal_id)
+def get_quality_signal(db: Session, signal_id: int, *, lock: bool = False) -> QualitySignal:
+    statement = select(QualitySignal).where(QualitySignal.id == signal_id)
+    if lock:
+        statement = statement.with_for_update().execution_options(populate_existing=True)
+    signal = db.scalar(statement)
     if signal is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quality signal not found")
     return signal
@@ -67,7 +69,7 @@ def list_quality_signals(db: Session) -> list[QualitySignal]:
     return list(db.scalars(select(QualitySignal).order_by(QualitySignal.created_at.desc(), QualitySignal.id.desc())).all())
 
 
-def update_quality_signal(db: Session, signal: QualitySignal, payload: QualitySignalUpdate) -> QualitySignal:
+def update_quality_signal(db: Session, signal: QualitySignal, payload: QualitySignalUpdate, *, commit: bool = True) -> QualitySignal:
     changes = payload.model_dump(exclude_unset=True)
     commodity_id = int(changes.get("commodity_id", signal.commodity_id))
     market_id = int(changes.get("market_id", signal.market_id))
@@ -82,11 +84,10 @@ def update_quality_signal(db: Session, signal: QualitySignal, payload: QualitySi
 
     for field, value in changes.items():
         setattr(signal, field, value)
-    db.commit()
-    db.refresh(signal)
+    db.commit() if commit else db.flush()
     return signal
 
 
-def delete_quality_signal(db: Session, signal: QualitySignal) -> None:
+def delete_quality_signal(db: Session, signal: QualitySignal, *, commit: bool = True) -> None:
     db.delete(signal)
-    db.commit()
+    db.commit() if commit else db.flush()

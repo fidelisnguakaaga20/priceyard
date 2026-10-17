@@ -123,6 +123,58 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def intelligence_resource_case(self,kind):
+        from app.models.commodity import Commodity
+        from app.models.market import Market
+        from app.models.price_update import PriceUpdate
+        from app.services import audit_service
+        cases_spec=importlib.util.spec_from_file_location("local_intelligence_cases",ROOT/"backend/tests/test_intelligence_audit.py")
+        cases=importlib.util.module_from_spec(cases_spec);cases_spec.loader.exec_module(cases)
+        resource=next(row for row in cases.RESOURCES if row[0]==kind);_,_,model,values,changes=resource
+        schemas=importlib.import_module("app.schemas."+kind+"_schema");stem="".join(word.title() for word in kind.split('_'))
+        create_schema,update_schema=getattr(schemas,stem+"Create"),getattr(schemas,stem+"Update")
+        routes=importlib.import_module("app.routes."+kind+"_routes");suffix="item" if kind=="cost_breakdown" else "signal"
+        create,edit,remove=[getattr(routes,action+'_'+suffix) for action in ('add','edit','remove')]
+        Base.metadata.create_all(self.engine)
+        with Session(self.engine) as db:
+            admin=User(full_name="Synthetic resource admin",email="pg-resource@example.com",password_hash="unused",role="admin",referral_code="PGRESOURCE")
+            commodity,market=Commodity(name="Egusi"),Market(name="Kwali Market");db.add_all([admin,commodity,market]);db.flush();admin_id=admin.id
+            payload={"commodity_id":commodity.id,"market_id":market.id,**values}
+            price=PriceUpdate(commodity_id=commodity.id,market_id=market.id,unit="1 bag",bag_size=None,price_low=210000,price_high=220000,
+                movement="unknown",confidence_level="Low confidence",status="approved",update_date_time=datetime.now(timezone.utc),created_by=admin.id)
+            db.add(price);db.commit();price_before=db.execute(select(PriceUpdate.__table__)).all()
+            if kind!="cost_breakdown":payload["price_update_id"]=price.id
+            with patch.object(audit_service,"create_audit_log",side_effect=RuntimeError("Synthetic resource audit failure")),self.assertRaisesRegex(RuntimeError,"Synthetic resource audit failure"):
+                create(create_schema(**payload),db,admin)
+            self.assertEqual(db.scalars(select(model)).all(),[]);self.assertEqual(db.scalars(select(AuditLog)).all(),[])
+            admin=db.get(User,admin_id);item=create(create_schema(**payload),db,admin);item_id=item.id
+            for operation in (lambda:edit(item_id,update_schema(**changes),db,admin),lambda:remove(item_id,db,admin)):
+                before=db.execute(select(model.__table__)).all();logs_before=db.execute(select(AuditLog.__table__)).all()
+                with patch.object(audit_service,"create_audit_log",side_effect=RuntimeError("Synthetic resource audit failure")),self.assertRaisesRegex(RuntimeError,"Synthetic resource audit failure"):
+                    operation()
+                self.assertEqual(db.execute(select(model.__table__)).all(),before);self.assertEqual(db.execute(select(AuditLog.__table__)).all(),logs_before)
+        barrier=threading.Barrier(2);outcomes=[]
+        def worker(index):
+            values={field:(value+index if isinstance(value,int) else value+' '+str(index)) for field,value in changes.items()}
+            with Session(self.engine) as db:
+                admin=db.get(User,admin_id);barrier.wait(timeout=15)
+                try:edit(item_id,update_schema(**values),db,admin);outcomes.append(200)
+                except BaseException as error:db.rollback();outcomes.append(type(error).__name__)
+        threads=[threading.Thread(target=worker,args=(index,)) for index in range(2)]
+        for thread in threads:thread.start()
+        for thread in threads:thread.join(25)
+        self.assertFalse(any(thread.is_alive() for thread in threads));self.assertEqual(outcomes,[200,200])
+        with Session(self.engine) as db:
+            logs=db.scalars(select(AuditLog).order_by(AuditLog.id)).all();self.assertEqual(len(logs),3)
+            for first,second in zip(logs,logs[1:]):self.assertEqual(cases.audit_values(model,first.new_value),cases.audit_values(model,second.old_value))
+            remove(item_id,db,db.get(User,admin_id));self.assertIsNone(db.get(model,item_id))
+            self.assertEqual(db.execute(select(PriceUpdate.__table__)).all(),price_before)
+            logs=db.scalars(select(AuditLog).order_by(AuditLog.id)).all();self.assertEqual(len(logs),4);self.assertIsNone(logs[-1].new_value)
+
+    def test_market_signal_audit_rollback_and_concurrent_history(self):self.intelligence_resource_case('market_signal')
+    def test_quality_signal_audit_rollback_and_concurrent_history(self):self.intelligence_resource_case('quality_signal')
+    def test_cost_reference_audit_rollback_and_concurrent_history(self):self.intelligence_resource_case('cost_breakdown')
+
     def test_current_price_specifications_preserve_variants_and_dashboard_history(self):
         from sqlalchemy import event
         from app.models.commodity import Commodity

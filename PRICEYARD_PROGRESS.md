@@ -1335,3 +1335,23 @@ or data backfill. Next: missing intelligence-resource audits (three related writ
 - Eighteen IDs complete; eighteen partial/pending. Broader stable identity and
   missing intelligence audits remain. New next-batch intelligence audit tests
   are intentionally outside this verified frontend commit until fixed/verified.
+
+### Batch 39 — further PY-26 intelligence audits (2026-10-17)
+
+- Original Market signal, Quality signal and Cost reference create/edit/delete
+  controls now save their audit in the same transaction. Failed audit insertion
+  rolls back the change; row locks keep concurrent edit snapshots continuous.
+  Existing permissions, fields, money, formulas and price history unchanged.
+- Nine before tests reproduce twelve failures (0.639s); focused after tests pass
+  (0.610s). All 168 backend tests pass, 23.229s; 34 pinned PostgreSQL cases pass,
+  33.734s, including real concurrent edits and rollback for these three resources.
+  Test comparisons treat equal decimal amounts numerically (120 equals 120.00);
+  no stored monetary values or rounding rules were changed to satisfy a test.
+- Browser original three create/edit/delete workflows pass; all nine audit records
+  are verified, starting price history unchanged and temporary rows removed.
+  No frontend rebuild. Evidence: tools/local-test/evidence/batch-39-*.json.
+- Manual: http://127.0.0.1:55446/admin/market-signals, /admin/quality-signals or
+  /admin/costs with admin@example.com / PriceYardDemo8! in the isolated preview.
+- Eighteen IDs complete; eighteen partial/pending. Buying zone, Sell-watch window
+  and Storage suitability create/edit audit coverage remains next. No live services,
+  production credentials, schema changes, push, merge or deployment.

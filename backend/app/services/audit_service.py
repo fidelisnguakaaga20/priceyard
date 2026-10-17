@@ -100,6 +100,18 @@ def create_audit_log(
     return item
 
 
+def save_audited_resource(db: Session, item: Any, actor: User, action: str, *, old_value: dict[str, Any] | None = None, deleted: bool = False) -> None:
+    """Commit an already-flushed resource write with its sanitized audit."""
+    try:
+        create_audit_log(db, actor=actor, action=action, table_name=sa_inspect(item).mapper.local_table.name,
+                         record_id=item.id, old_value=old_value,
+                         new_value=None if deleted else snapshot_model(item), commit=False)
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+
+
 def list_audit_logs(db: Session) -> list[AuditLog]:
     return list(db.scalars(select(AuditLog).order_by(AuditLog.created_at.desc(), AuditLog.id.desc())).all())
 

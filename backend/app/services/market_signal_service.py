@@ -42,7 +42,7 @@ def _validate_signal_references(
         )
 
 
-def create_market_signal(db: Session, payload: MarketSignalCreate, admin: User) -> MarketSignal:
+def create_market_signal(db: Session, payload: MarketSignalCreate, admin: User, *, commit: bool = True) -> MarketSignal:
     _validate_signal_references(
         db,
         commodity_id=payload.commodity_id,
@@ -51,13 +51,15 @@ def create_market_signal(db: Session, payload: MarketSignalCreate, admin: User) 
     )
     signal = MarketSignal(**payload.model_dump(), created_by=admin.id)
     db.add(signal)
-    db.commit()
-    db.refresh(signal)
+    db.commit() if commit else db.flush()
     return signal
 
 
-def get_market_signal(db: Session, signal_id: int) -> MarketSignal:
-    signal = db.get(MarketSignal, signal_id)
+def get_market_signal(db: Session, signal_id: int, *, lock: bool = False) -> MarketSignal:
+    statement = select(MarketSignal).where(MarketSignal.id == signal_id)
+    if lock:
+        statement = statement.with_for_update().execution_options(populate_existing=True)
+    signal = db.scalar(statement)
     if signal is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Market signal not found")
     return signal
@@ -67,7 +69,7 @@ def list_market_signals(db: Session) -> list[MarketSignal]:
     return list(db.scalars(select(MarketSignal).order_by(MarketSignal.created_at.desc(), MarketSignal.id.desc())).all())
 
 
-def update_market_signal(db: Session, signal: MarketSignal, payload: MarketSignalUpdate) -> MarketSignal:
+def update_market_signal(db: Session, signal: MarketSignal, payload: MarketSignalUpdate, *, commit: bool = True) -> MarketSignal:
     changes = payload.model_dump(exclude_unset=True)
     commodity_id = int(changes.get("commodity_id", signal.commodity_id))
     market_id = int(changes.get("market_id", signal.market_id))
@@ -82,11 +84,10 @@ def update_market_signal(db: Session, signal: MarketSignal, payload: MarketSigna
 
     for field, value in changes.items():
         setattr(signal, field, value)
-    db.commit()
-    db.refresh(signal)
+    db.commit() if commit else db.flush()
     return signal
 
 
-def delete_market_signal(db: Session, signal: MarketSignal) -> None:
+def delete_market_signal(db: Session, signal: MarketSignal, *, commit: bool = True) -> None:
     db.delete(signal)
-    db.commit()
+    db.commit() if commit else db.flush()
