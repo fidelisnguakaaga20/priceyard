@@ -29,7 +29,7 @@ export function AdminPriceUpdatesPage() {
 
   async function create(e: FormEvent<HTMLFormElement>) { e.preventDefault(); if (!token || busy) return; const f = new FormData(e.currentTarget); const payload = {
     commodity_id: Number(f.get("commodity_id")), market_id: Number(f.get("market_id")), price_low: Number(f.get("price_low")), price_high: Number(f.get("price_high")), average_price: Number(f.get("average_price")), previous_price_low: String(f.get("previous_price_low") || "") ? Number(f.get("previous_price_low")) : null, previous_price_high: String(f.get("previous_price_high") || "") ? Number(f.get("previous_price_high")) : null,
-    unit: String(f.get("unit")), bag_size: String(f.get("bag_size") || "") || null, commodity_type: String(f.get("commodity_type") || "") || null, market_day: String(f.get("market_day") || "") || null, time_of_day: String(f.get("time_of_day") || "") || null, movement: String(f.get("movement")), confidence_level: String(f.get("confidence_level")), source_type: String(f.get("source_type") || "") || null, source_1: String(f.get("source_1") || "") || null, source_2: String(f.get("source_2") || "") || null, update_date_time: String(f.get("update_date_time")), is_outdated: false, possible_meaning: String(f.get("possible_meaning") || "") || null, suggested_action: String(f.get("suggested_action")), notes: String(f.get("notes") || "") || null,
+    unit: String(f.get("unit")), bag_size: String(f.get("bag_size") || "") || null, commodity_type: String(f.get("commodity_type") || "") || null, market_day: String(f.get("market_day") || "") || null, time_of_day: String(f.get("time_of_day") || "") || null, movement: String(f.get("movement")), confidence_level: String(f.get("confidence_level")), source_type: String(f.get("source_type") || "") || null, source_1: String(f.get("source_1") || "") || null, source_2: String(f.get("source_2") || "") || null, update_date_time: new Date(String(f.get("update_date_time"))).toISOString(), is_outdated: false, possible_meaning: String(f.get("possible_meaning") || "") || null, suggested_action: String(f.get("suggested_action")), notes: String(f.get("notes") || "") || null,
   }; setBusy(true); try { const item = await apiFetch<PriceUpdateAdmin>("/price-updates", { method: "POST", body: JSON.stringify(payload) }, token); setHistory((items) => [item, ...items.filter((existing) => existing.id !== item.id)]); setTargetId(String(item.id)); setMessage(`Price update #${item.id} created pending approval.`); setError(""); } catch (err) { setError(errorText(err)); setMessage(""); } finally { setBusy(false); } }
 
   function prefillFromLast() {
@@ -75,7 +75,9 @@ export function AdminPriceUpdatesPage() {
     const addString = (field: string) => { const value = String(f.get(field) || "").trim(); if (value !== "") payload[field] = value; };
 
     ["price_low", "price_high", "average_price", "previous_price_low", "previous_price_high"].forEach(addNumber);
-    ["unit", "bag_size", "market_day", "time_of_day", "movement", "confidence_level", "update_date_time", "source_type", "possible_meaning", "suggested_action", "notes"].forEach(addString);
+    ["unit", "bag_size", "market_day", "time_of_day", "movement", "confidence_level", "source_type", "possible_meaning", "suggested_action", "notes"].forEach(addString);
+    const dateTime = String(f.get("update_date_time") || "").trim();
+    if (dateTime) payload.update_date_time = new Date(dateTime).toISOString();
 
     if (!Object.keys(payload).length) { setError("Enter at least one field to correct. Blank fields are left unchanged."); setMessage(""); return; }
 

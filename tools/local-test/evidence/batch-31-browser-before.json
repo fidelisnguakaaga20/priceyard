@@ -1,0 +1,21 @@
+{
+  "admin_original_naive_timestamp_reproduced": true,
+  "cases": [
+    {
+      "timezone": "Africa/Lagos",
+      "admin_create_and_correction": true,
+      "saved_after_reload": true,
+      "utc_conversion": false
+    },
+    {
+      "timezone": "UTC",
+      "admin_create_and_correction": true,
+      "saved_after_reload": true,
+      "utc_conversion": false
+    }
+  ],
+  "existing_reporter_utc_behavior_preserved": true,
+  "original_forms_measurements_and_status_preserved": true,
+  "external_page_requests": 0,
+  "production_connections": 0
+}

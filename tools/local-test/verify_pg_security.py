@@ -123,6 +123,32 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_utc_price_entry_round_trip_and_correction_preserve_other_history(self):
+        from app.models.commodity import Commodity
+        from app.models.market import Market
+        from app.models.price_update import PriceUpdate
+        from app.schemas.price_update_schema import PriceUpdateCreate, PriceUpdateUpdate
+        from app.routes.price_update_routes import add_price_update, edit_price_update
+        Base.metadata.create_all(self.engine)
+        with Session(self.engine) as db:
+            admin=User(full_name="Synthetic time admin",email="pg-time@example.com",password_hash="unused",role="admin",referral_code="PGTIME")
+            commodity,market=Commodity(name="Egusi"),Market(name="Kwali Market")
+            db.add_all([admin,commodity,market]);db.flush()
+            payload=dict(commodity_id=commodity.id,market_id=market.id,price_low=210000,price_high=220000,average_price=215000,
+                unit="1 bag",bag_size="Unknown",confidence_level="Low confidence",movement="unknown",suggested_action="Watch")
+            original=PriceUpdate(**payload,update_date_time=datetime(2026,10,15,10,tzinfo=timezone.utc),status="approved",created_by=admin.id)
+            db.add(original);db.commit();original_id=original.id
+            original_values=db.execute(select(PriceUpdate.__table__).where(PriceUpdate.id==original_id)).one()
+            item=add_price_update(PriceUpdateCreate(**payload,update_date_time="2026-10-16T14:30:00.000Z"),db,admin)
+            item_id=item.id;db.expire_all()
+            self.assertEqual(db.get(PriceUpdate,item_id).update_date_time,datetime(2026,10,16,14,30,tzinfo=timezone.utc))
+            edit_price_update(item_id,PriceUpdateUpdate(update_date_time="2026-10-16T15:45:00.000Z"),db,admin)
+            db.expire_all();item=db.get(PriceUpdate,item_id)
+            self.assertEqual(item.update_date_time,datetime(2026,10,16,15,45,tzinfo=timezone.utc))
+            self.assertEqual(item.unit,"1 bag");self.assertEqual(item.bag_size,"Unknown");self.assertEqual(item.status,"pending")
+            self.assertEqual(db.execute(select(PriceUpdate.__table__).where(PriceUpdate.id==original_id)).one(),original_values)
+            self.assertEqual(len(db.scalars(select(AuditLog).where(AuditLog.record_id==item_id,AuditLog.table_name=="price_updates")).all()),2)
+
     def test_admin_access_and_revocation_rollback_with_second_audit_failure(self):
         from app.routes import user_routes, subscription_routes
         from app.schemas.subscription_schema import SubscriptionStatusUpdate

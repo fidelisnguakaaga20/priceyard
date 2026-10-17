@@ -131,6 +131,13 @@ six sanitized audit records / dashboard regression passed. Seventeen complete,
 nineteen partial/pending. Next: existing price date-entry consistency, remaining
 administrative audits and bounded history metadata. No policy, field or UI changes.
 
+Batch 31 verified: original Admin create/correction date-time inputs now send UTC
+like the existing Reporter form. Lagos/UTC browser before/after, Reporter and
+complete original Admin workflow pass; four backend price/audit regressions and
+24 pinned PG cases pass. TypeScript/build passes; original CSS unchanged.
+Seventeen complete, nineteen partial/pending; date display/day-filter decisions
+remain separate. Next: bounded protected history metadata and other Admin audits.
+
 ## Checklist — do not repeat the audit
 
 | ID | Improvement | Current status |
@@ -147,7 +154,7 @@ administrative audits and bounded history metadata. No policy, field or UI chang
 | PY-10 | Spreadsheet export safety | Complete in batch 3; text/numeric regressions and original browser download/access checks passed |
 | PY-11 | Correct saved administrator price state | Complete in batch 10; actual create/approve/correct/outdated/reject/reload browser regression passed |
 | PY-12 | Accurate existing quantity/type/market comparisons | Pending; no grades/new measurement fields |
-| PY-13 | Consistent Nigerian dates/times | Partial: legacy naive trial timestamps interpreted as UTC consistently with backend; remaining entry/display/filter handling pending; original paid UTC date policy unchanged |
+| PY-13 | Consistent Nigerian dates/times | Partial: legacy naive trial timestamps treated as UTC; original Admin create/correction inputs now convert local time to UTC like Reporter, with Lagos/UTC browser and PG persistence verified; remaining display/day-filter semantics pending, original paid UTC policy unchanged |
 | PY-14 | Evidence-based movement/confidence | Pending; wording/policy changes require approval |
 | PY-15 | Prices recover after failed loading | Complete in batch 1; before/after browser regression passed |
 | PY-16 | Correct filters and response ordering | Complete for identified current/history/navigation scope in batches 22/28: applied filters, overlap, URL navigation, stale history/error/metadata and access-role browser regressions verified |
@@ -1063,3 +1070,26 @@ administrative audits and bounded history metadata. No policy, field or UI chang
 - Frontend unchanged; no rebuild needed. Manual: http://127.0.0.1:55446/admin/users,
   admin@example.com / PriceYardDemo8!. Evidence: batch-30-*.json. Seventeen complete,
   nineteen partial/pending; remaining Admin audit transactions are still partial.
+
+### Batch 31 — further PY-13/PY-27 (2026-10-17)
+
+- Original Admin create and optional correction date/time inputs now convert
+  browser-local time to UTC ISO, exactly as the existing Reporter form does.
+  Lagos 15:30 sends 14:30Z; UTC 15:30 sends 15:30Z. Blank correction stays omitted.
+  No timestamp backfill, historical rewrite, day-filter boundary change, new
+  measurement, Grade field, form label, styling or database migration.
+- Actual before/after browser checks cover both Admin forms in Africa/Lagos and
+  UTC, saved values after reload, pending status and unchanged Reporter conversion.
+  Original Admin create/approve/correct/outdated/reject/reload regression passes.
+  Initial checker used the wrong existing Reporter heading; corrected the checker
+  before recording before/after evidence, without changing product wording.
+- TypeScript/Vite passes, 1.65s, 100 modules; JS318.84kB/90.20kB gzip. Original
+  index-19youOJ7.css unchanged. Four focused backend price/audit tests pass, 1.261s;
+  latest full unchanged backend remains 136 tests from batch 30, not rerun here.
+- Twenty-four pinned native PG cases pass, 28.308s: UTC create/correction survives
+  expiration/reload, keeps both audit records and preserves the complete other
+  historical row. Prior security/payment/access races remain passing.
+- Manual: http://127.0.0.1:55446/admin/prices, original Update date/time fields;
+  admin@example.com / PriceYardDemo8!. Evidence: batch-31-*.json. Seventeen IDs
+  complete, nineteen partial/pending. Nigerian calendar-day filter semantics and
+  broader legacy price display remain open; no unapproved historical reinterpretation.
