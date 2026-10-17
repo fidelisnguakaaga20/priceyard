@@ -16,6 +16,12 @@ These process guards do not constitute a virtual machine or certify protection
 against malicious native code. Browser verification also blocks external page
 requests. Never claim production/provider compatibility from these tests.
 
+The current [coverage map and finite PY-30 criteria](../../docs/TEST_COVERAGE.md)
+link executable checks and their evidence. Future regression tests belong with
+each remaining improvement; they do not require reopening the testing-foundation
+item. The secret-file probe uses a nonexistent sentinel, never an application
+dotenv, including when testing a regressed guard.
+
 ## Post-restart resource limits (2026-10-17)
 
 Run heavy phases sequentially. Stop native PostgreSQL before backend/browser

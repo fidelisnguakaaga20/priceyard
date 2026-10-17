@@ -1,0 +1,17 @@
+{
+  "local_testing_foundation_criteria_satisfied": true,
+  "full_backend_tests": 230,
+  "full_native_baseline_tests": 40,
+  "full_native_baseline_batch": 47,
+  "new_full_native_suite_claimed": false,
+  "focused_native_initial_failure_retained": true,
+  "focused_native_retry_verified": true,
+  "isolation_checks": 6,
+  "original_browser_workflows": 7,
+  "documentation_source_evidence_links_checked": 70,
+  "production_validation_claimed": false,
+  "native_schema_budget_used": 73,
+  "native_schema_budget": 80,
+  "application_source_or_database_changes_in_batch63": false,
+  "test_probe_sentinel_changed": true
+}

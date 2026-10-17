@@ -31,6 +31,7 @@ Do not treat the live-app link above as a testing target.
 - [Safe isolated browser/backend/PostgreSQL workflow](docs/LOCAL_DEVELOPMENT.md)
 - [Existing product, security and data-preservation contracts](docs/APPLICATION_CONTRACTS.md)
 - [Current API route reference](docs/api-endpoints.md)
+- [Local regression coverage and evidence](docs/TEST_COVERAGE.md)
 - [Migration preservation](docs/MIGRATION_PRESERVATION.md)
 - [Read-only-by-default payment recovery](docs/PAYMENT_RECONCILIATION.md)
 

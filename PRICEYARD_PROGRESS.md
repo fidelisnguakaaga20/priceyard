@@ -25,15 +25,18 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
-Latest verified: batch62,26 complete /10 partial or pending:
-02,05,07,08,13,14,20,29,30,35. Catalog duplicate/rename races now serialize
-existing checks until audited commit/rollback; no merges or naming changes.
-Full230 backend tests pass; both focused native catalog cases verified (one
-setup-timeout retry through approved runner), original catalog/browser controls
-and all14 dashboard cards pass.84 frontend source/config hashes and compiled
-JS/CSS unchanged. Smaller native fixture73/80 schemas, stopped. Next: finite
-PY-30 coverage/isolation acceptance, remaining PY-20 full JSON lists and PY-29
-filter/link-scope work; keep owner-policy/production gates explicit.
+Latest verified: batch63,27 complete /9 partial or pending:
+02,05,07,08,13,14,20,29,35. PY-30's identified local testing-foundation/coverage
+scope is complete with explicit criteria/evidence in docs/TEST_COVERAGE.md;
+this does not complete the other nine items or certify production/providers.
+Batch62 serializes catalog duplicate/rename checks through audited commit/rollback.
+Full230 backend tests, two focused native catalog cases (one setup-timeout retry),
+six isolation probes, original catalog controls/all14 dashboard cards and seven
+original browser workflows pass.84 frontend source/config hashes and JS/CSS
+unchanged. Smaller native fixture73/80 schemas, stopped. Next: remaining PY-20
+full JSON lists and PY-29 filter/link-scope work; owner-policy/production gates
+stay explicit. Future tests belong with each remaining change, not an indefinitely
+open testing-foundation item.
 Do not reopen completed scope or mistake earlier historical counts for current.
 
 Baseline browser/isolation verification passed. Batch 1 (PY-15) verified:
@@ -396,7 +399,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-27 | Consistent existing editing/password inputs | Complete for identified scope: feedback selection in batch26, existing Unicode/72-byte password rules and reset validation in batch46, owner-approved six Admin edit forms in batches50–52. Saved values/costs, one-field edits, reload, explicit clearing, switching/unknown/blank IDs and creation verified in61 actual browser checks |
 | PY-28 | Historical record preservation | Current application-side scope complete in batch59: read-only legacy/unversioned preflight before migration steps, empty/reviewed0021-to0022 paths, unchanged raw history/catalog IDs/active flags/cost links/sources/audits, preserved paid/payment records and0022 downgrade refusal verified. No guesses to repair already-changed historical data; production backup/restore/rollout and any repairs require owner approval under PY-35 |
 | PY-29 | Stable identities and dependent records | Partial: catalog IDs/fields and referenced deletion rejection with atomic audits verified34; normalized-name commodity/market create-versus-create/rename races and rollback lock release verified62 without changing market-state uniqueness or merging legacy duplicates. Remaining filter/link-scope issues pending; no automatic merge or invented cost units |
-| PY-30 | Isolated automated/browser verification | Partial: full230 backend tests pass62; two focused catalog concurrency/rollback cases verified62 with initial setup timeout retained and only failed case retried through approved runner. Full40 native baseline remains47; no new full-native-suite claim. Build recovery and original browser proof61 retained, catalog/14-card dashboard pass62. Fixture73/80 schemas, stopped;84 current frontend hashes match verified snapshot, no build/copies needed. Next finite current coverage/isolation acceptance; production/provider compatibility remains PY-35 |
+| PY-30 | Isolated automated/browser verification | Identified local testing-foundation/coverage scope complete63: explicit criteria/workflow map/evidence, full230 backend tests62, full40 native baseline47 plus later focused cases (catalog commit/rollback62), six isolation probes and seven original browser workflows63; build-resumption/six-form/14-card proofs retained. Native73/80 schemas stopped, phases serialized,84 frontend hashes and compiled JS/CSS preserved without rebuild/copies. Not100% coverage or production/provider certification; future regression tests stay with remaining items, operational checks remain PY-35 |
 | PY-31 | Confirmed payment activation and recovery | Application-side approved scope complete in batch58: atomic confirmation, owner callback and explicit bounded/resumable reconciliation for missed webhook/return; dry-run default, strict existing evidence/activation, single PG worker, error isolation, replay safety and purchased-time/manual-grant preservation verified. Live scheduling/checkpoints/monitoring and ambiguous legacy repairs require owner approval under PY-35 |
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches 14/21: carry forward dated paid/trial time; preserve indefinite grants, block new checkout and hold/recover old purchases without consuming days |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
@@ -2284,3 +2287,42 @@ No expansion of completed null-guard/account/UI scopes is needed.
   02,05,07,08,13,14,20,29,30,35. PY-29 stays partial for filter/link-scope work;
   do not infer completion of all identity issues from duplicate race tests.
 - No production services/data/credentials/migrations, push, merge or deployment.
+
+### Batch 63 — close identified local testing-foundation scope (2026-10-17)
+
+- PY-30 now has finite acceptance rather than remaining “ongoing” merely because
+  future development will need tests. docs/TEST_COVERAGE.md maps existing executable
+  checks to critical workflows and six requirements: service/API automation,
+  native concurrency, real original-UI browser coverage, transport/config/secret
+  isolation, guarded builds and bounded resumable execution/evidence. Current
+  identified infrastructure/coverage requirements are satisfied; new fixes still
+  require their own tests. This does not mark unfinished business policies or
+  other defects complete, claim100% coverage, run CI/deployment or certify live
+  services. Operational/provider acceptance remains PY-35.
+- Secret-denial probe now targets an asserted-nonexistent synthetic sentinel;
+  it cannot read an application dotenv even if the guard regresses. All six
+  probes pass0.018s: TCP/DNS/native PostgreSQL/engine/persistent SQLite/child/
+  nonlocal-listener denial, fresh memory persistence and cleared provider config.
+  No actual secret contents opened, external connections or child processes launched.
+- Current application/backend/DB source unchanged from verified8f364ac. Reused
+  full230 backend pass62 and focused native catalog evidence, with original
+  setup-timeout report retained; no needless full/backend/native rerun. Full40
+  native baseline is still47, not a newly executed suite.73/80 retained schemas,
+  fixture stopped. No additional PostgreSQL schemas/queries, builds/dependency
+  copies or process overlap for this test-only sentinel/coverage batch.
+- Actual final original browser smoke check: seven home/Guest/filter/Trial/history/
+  Admin/mobile/login-quota workflows pass, no grades or mobile overflow; external
+  requests zero. Catalog/all14 dashboard checks62 and six-form checks61 retained.
+  Current84-file frontend/source and compiled asset preservation evidence62 used.
+- Coverage/evidence verifier checks70 relative source/report/doc links, full230
+  backend and earlier40-case native successful reports, clean isolated/browser
+  results and explicit retry/non-production limits. No test totals fabricated by
+  combining retries or describing focused cases as a full current native run.
+- Evidence batch-63-*.json. Exactly27 complete /9 partial or pending:
+  02,05,07,08,13,14,20,29,35. Next finite technical work: full JSON history/list
+  query bounds and remaining stable-filter/cross-record scope issues. Current
+  source/referral/session/input/day-filter/movement policy gates stay unchanged.
+- Existing design,14 cards, fields, names, measurements, pricing/trial/referral
+  rules and all business records preserved. Local commits only; no production
+  access/data/migrations/credentials, push, merge or deploy. Guarded preview at
+  http://127.0.0.1:55446; PostgreSQL stopped.

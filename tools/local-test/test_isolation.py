@@ -21,8 +21,11 @@ class IsolationTests(unittest.TestCase):
             socket.getaddrinfo("service.example.invalid", 443)
 
     def test_secret_file_denied_before_open(self):
+        # Never target an application dotenv, even if the guard regresses.
+        probe = guard.ROOT / "tools/local-test/runtime/never-created-isolation-sentinel/.env.synthetic-probe"
+        self.assertFalse(probe.exists())
         with self.assertRaises(RuntimeError):
-            (guard.ROOT / "backend/.env").read_text()
+            probe.read_text()
 
     def test_postgresql_native_connections_denied(self):
         import psycopg
