@@ -74,6 +74,9 @@ def list_quality_signals(db: Session, *, commodity_id: int | None = None) -> lis
 
 def update_quality_signal(db: Session, signal: QualitySignal, payload: QualitySignalUpdate, *, commit: bool = True) -> QualitySignal:
     changes = payload.model_dump(exclude_unset=True)
+    required = ("commodity_id", "market_id")
+    if any(field in changes and changes[field] is None for field in required):
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Required quality-signal values cannot be null")
     commodity_id = int(changes.get("commodity_id", signal.commodity_id))
     market_id = int(changes.get("market_id", signal.market_id))
     price_update_id = changes.get("price_update_id", signal.price_update_id)

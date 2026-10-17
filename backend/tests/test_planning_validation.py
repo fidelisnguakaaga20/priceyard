@@ -1,4 +1,4 @@
-"""Reject clearing required planning fields, retaining optional clearing/history."""
+"""Reject clearing required intelligence fields; preserve optional values/history."""
 from datetime import datetime, timezone
 from decimal import Decimal
 import unittest
@@ -15,7 +15,9 @@ from app.models.audit_log import AuditLog
 from app.models.buying_zone import BuyingZone
 from app.models.commodity import Commodity
 from app.models.market import Market
+from app.models.market_signal import MarketSignal
 from app.models.price_update import PriceUpdate
+from app.models.quality_signal import QualitySignal
 from app.models.sell_watch_window import SellWatchWindow
 from app.models.user import User
 from app.security import create_access_token
@@ -23,6 +25,8 @@ from app.security import create_access_token
 RESOURCES = {
     "buying": ("buying-zones", {"price_low": "210000", "price_high": "220000", "reason": "Synthetic saved reason", "confidence": "Low confidence", "valid_from": "2026-10-01", "valid_to": "2026-10-31"}, ("commodity_id", "market_id", "price_low", "price_high", "reason", "confidence"), "valid_to", "reason"),
     "sell": ("sell-watch-windows", {"start_period": "Synthetic recorded start", "end_period": "Synthetic recorded end", "observation": "Synthetic saved observation", "confidence": "Low confidence"}, ("commodity_id", "market_id", "start_period", "observation", "confidence"), "end_period", "observation"),
+    "market": ("market-signals", {"signal_type": "Synthetic observation", "signal_description": "Synthetic description", "possible_meaning": "Synthetic optional note"}, ("commodity_id", "market_id", "signal_type", "signal_description"), "possible_meaning", "signal_description"),
+    "quality": ("quality-signals", {"quality_status": "Synthetic observation", "moisture_status": "Synthetic moisture note", "storage_readiness": "Synthetic readiness note", "risk_note": "Synthetic optional risk"}, ("commodity_id", "market_id"), "risk_note", "quality_status"),
 }
 
 
@@ -46,7 +50,7 @@ def exercise_planning_validation(check, engine, kind):
 
     def state():
         with Session(engine) as db:
-            return {model.__tablename__: db.execute(select(model.__table__).order_by(model.id)).all() for model in (BuyingZone, SellWatchWindow, AuditLog, PriceUpdate)}
+            return {model.__tablename__: db.execute(select(model.__table__).order_by(model.id)).all() for model in (BuyingZone, SellWatchWindow, MarketSignal, QualitySignal, AuditLog, PriceUpdate)}
 
     app.dependency_overrides[get_db] = sessions
     try:
@@ -99,3 +103,9 @@ class PlanningValidationTests(unittest.TestCase):
 
     def test_sell_watch_required_values_reject_null_without_mutation(self):
         exercise_planning_validation(self, self.engine, "sell")
+
+    def test_market_signal_required_values_reject_null_without_mutation(self):
+        exercise_planning_validation(self, self.engine, "market")
+
+    def test_quality_signal_required_values_reject_null_without_mutation(self):
+        exercise_planning_validation(self, self.engine, "quality")

@@ -317,6 +317,12 @@ and14-card dashboard pass. Native schemas59/80, stopped; no frontend changes.
 Exactly23 complete /13 partial or pending. Next PY-08 remaining signal required
 values; do not invent text/body/session/source policies to close tracker items.
 
+Batch56 Market/Quality required-value safeguards verified: four focused backend
+validation cases, nine audit regressions, three native cases and69 browser checks
+pass. Native schemas62/80, stopped. Full202 backend baseline remains batch55;
+no new full204-suite claim. Exactly23 complete /13 partial or pending. Next Storage
+required IDs/status, preserving nullable notes and linked-price clearing.
+
 | ID | Improvement | Current status |
 |---|---|---|
 | PY-01 | Consistent historical access checks | Complete in batch 7; date/comparison/ID routes enforce existing history entitlement; current summaries preserved |
@@ -326,7 +332,7 @@ values; do not invent text/body/session/source policies to close tracker items.
 | PY-05 | Referral abuse protection | Partial: atomic registration/reward/audit, duplicate-registration safety and concurrent seven-day reward preservation verified in batch 20; qualification/abuse-cap changes require approval and remain unchanged |
 | PY-06 | Safe push notification destinations | Application-side complete in batch 13; known-provider/key validation, bounded TLS transport, no redirects; live provider compatibility remains operational verification |
 | PY-07 | Shared-device/session safety | Partial: server revocation, stale UI protection, possession-based push ownership/concurrent registration and bounded current-device logout cleanup verified; JS token storage/offline cleanup limits remain |
-| PY-08 | Input/upload/request abuse bounds | Partial: push endpoint/key/query bounds, feedback pre-decode 2MB screenshot bound, existing watchlist numeric limits (batch53), Cost required values/totals (batch54), Buying/Sell-watch required-value protection (batch55) verified; broader request/text/body limits remain pending |
+| PY-08 | Input/upload/request abuse bounds | Partial: push endpoint/key/query bounds, feedback pre-decode 2MB screenshot bound, watchlist numeric limits (batch53), Cost required values/totals (batch54), Buying/Sell-watch (batch55) and Market/Quality required values (batch56) verified; broader request/text/body limits remain pending |
 | PY-09 | Concurrent security-action safety | Complete for identified reset/logout/last-Admin cases in batches 5/6; six PostgreSQL cases passed |
 | PY-10 | Spreadsheet export safety | Complete in batch 3; text/numeric regressions and original browser download/access checks passed |
 | PY-11 | Correct saved administrator price state | Complete in batch 10; actual create/approve/correct/outdated/reject/reload browser regression passed |
@@ -1968,3 +1974,28 @@ values; do not invent text/body/session/source policies to close tracker items.
   records; no unsupported delete endpoints added. Next remaining PY-08 signal
   required values; business/visible/production approval boundaries still apply.
   No production, push, merge or deployment.
+
+### Batch 56 — Required Market/Quality signal values (2026-10-17)
+
+- Further PY-08: required Market commodity/market/type/description and Quality
+  commodity/market IDs reject explicit null before coercion/flush. Optional
+  meanings, actions, quality/risk notes and linked price remain clearable under
+  existing schemas; no new fields, confidence policy, source access or appearance.
+- Before: two new HTTP workflows reproduce500; earlier two planning cases pass.
+  After all four validation workflows pass0.495s and nine intelligence audit
+  regressions pass1.133s. Shared fixture checks omitted fields, optional clearing,
+  valid correction/reload, non-Admin denial and unchanged raw history/audits on
+  invalid requests. Three focused native cases pass2.839s: same required-value
+  workflow plus existing Market and Quality audit rollback/concurrency checks.
+-69 actual six-form browser/API checks pass. Required nulls are422 with no record
+  or audit mutation; all original creation/editing/optional clearing/reload checks
+  still pass. Price history unchanged and zero external requests. Disposable
+  planning records are cleared only by the next memory-preview restart.
+- Native schemas59 to62 of80, cluster stopped before browser. Terminal polling
+  lost its finished start-helper session; verified fresh process marker plus the
+  literal loopback synthetic-only status rather than starting a duplicate process.
+  Original84-file hash-matched frontend build/CSS reused, no frontend changes,
+  copied dependencies or installations. Full202 backend baseline remains55; the
+  focused runs do not claim a full204 run. Evidence batch-56-*.json.
+- Exactly23 complete /13 partial or pending. Next Storage required IDs/status;
+  preserve nullable notes/linked-price clearing. No production, push, merge/deploy.

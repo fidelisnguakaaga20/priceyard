@@ -1,0 +1,9 @@
+{
+  "tests_run": 9,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "duration_seconds": 1.133,
+  "pattern": "test_intelligence_audit.py",
+  "runtime": "in-process synthetic SQLite; TCP and DNS denied"
+}

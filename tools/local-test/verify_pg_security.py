@@ -148,6 +148,13 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_signal_required_values_preserve_history(self):
+        spec = importlib.util.spec_from_file_location("local_signal_validation", ROOT / "backend/tests/test_planning_validation.py")
+        cases = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cases)
+        for kind in ("market", "quality"):
+            cases.exercise_planning_validation(self, self.engine, kind)
+
     def test_planning_required_values_preserve_history(self):
         spec = importlib.util.spec_from_file_location("local_planning_validation", ROOT / "backend/tests/test_planning_validation.py")
         cases = importlib.util.module_from_spec(spec)
