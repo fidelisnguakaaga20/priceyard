@@ -1,5 +1,6 @@
 import type { PriceUpdate } from "../types/api";
 import { shortDate } from "../utils";
+import { comparablePriceGroups } from "../utils/priceComparability";
 
 const WIDTH = 640;
 const HEIGHT = 180;
@@ -7,7 +8,18 @@ const PADDING = 28;
 
 export function PriceTrendChart({ items }: { items: PriceUpdate[] }) {
   if (items.length < 2) return null;
+  const groups = comparablePriceGroups(items).filter((group) => group.length >= 2);
+  const plotted = groups.reduce((count, group) => count + group.length, 0);
+  return <>
+    {groups.map((group) => <div key={group[0].id}>
+      <p className="muted">{group[0].commodity.name} · {group[0].market.name} · {group[0].unit} · {group[0].bag_size} · {group[0].commodity_type}</p>
+      <ComparableTrendChart items={group} />
+    </div>)}
+    {plotted < items.length && <p className="muted">Not enough comparable records.</p>}
+  </>;
+}
 
+function ComparableTrendChart({ items }: { items: PriceUpdate[] }) {
   const points = items.map((item) => {
     const low = Number(item.price_low);
     const high = Number(item.price_high);
@@ -15,11 +27,11 @@ export function PriceTrendChart({ items }: { items: PriceUpdate[] }) {
     return { x: new Date(item.update_date_time).getTime(), y: average, low, high, date: item.update_date_time };
   });
 
-  const xs = points.map((p) => p.x);
-  const minX = Math.min(...xs);
-  const maxX = Math.max(...xs);
-  const minY = Math.min(...points.map((p) => p.low));
-  const maxY = Math.max(...points.map((p) => p.high));
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  for (const point of points) {
+    minX = Math.min(minX, point.x); maxX = Math.max(maxX, point.x);
+    minY = Math.min(minY, point.low); maxY = Math.max(maxY, point.high);
+  }
 
   const scaleX = (x: number) => PADDING + (maxX === minX ? 0 : ((x - minX) / (maxX - minX)) * (WIDTH - PADDING * 2));
   const scaleY = (y: number) => HEIGHT - PADDING - (maxY === minY ? 0 : ((y - minY) / (maxY - minY)) * (HEIGHT - PADDING * 2));

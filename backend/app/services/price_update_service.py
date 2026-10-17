@@ -179,8 +179,9 @@ def _latest_approved_price_statement(
     selected_date: date | None = None,
     movement: Movement | None = None,
 ):
-    # Preserve the Stage 7 current-price rule: first identify the latest approved
-    # record for each commodity/market pair, then exclude it if it is outdated.
+    # Owner-approved specification groups: unlike recorded quantities/types must
+    # not replace one another. Keep the latest record per group, then exclude
+    # outdated records without resurfacing an older same-specification price.
     # This prevents an older non-outdated record from resurfacing as "current".
     # Movement is also applied after selecting the latest record so a movement
     # filter cannot accidentally surface an older historical match.
@@ -193,7 +194,12 @@ def _latest_approved_price_statement(
     ).with_only_columns(
         PriceUpdate.id.label("price_update_id"),
         func.row_number().over(
-            partition_by=(PriceUpdate.commodity_id, PriceUpdate.market_id),
+            partition_by=(
+                PriceUpdate.commodity_id, PriceUpdate.market_id,
+                func.lower(func.trim(func.coalesce(PriceUpdate.unit, ""))),
+                func.lower(func.trim(func.coalesce(PriceUpdate.bag_size, ""))),
+                func.lower(func.trim(func.coalesce(PriceUpdate.commodity_type, ""))),
+            ),
             order_by=(PriceUpdate.update_date_time.desc(), PriceUpdate.id.desc()),
         ).label("position"),
     ).subquery()

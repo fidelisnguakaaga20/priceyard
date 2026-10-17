@@ -17,7 +17,7 @@ export function PriceTicker({ items }: { items: PriceUpdate[] }) {
             {item.commodity.name}{" "}
             <strong>{money(item.price_low)}–{money(item.price_high)}</strong>{" "}
             <span className={`movement movement-${item.movement}`}>{movementIcon(item.movement)}</span>
-            <span className="price-ticker-market">@ {item.market.name}</span>
+            <span className="price-ticker-market">{[item.unit, item.bag_size, item.commodity_type].filter(Boolean).join(" · ")} @ {item.market.name}</span>
           </span>
         ))}
       </div>

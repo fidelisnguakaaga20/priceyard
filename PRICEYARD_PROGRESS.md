@@ -175,6 +175,15 @@ All 156 backend tests, 30 pinned PG cases and unchanged moderation/browser contr
 pass. Seventeen complete, nineteen partial/pending. Owner explicitly approved the
 comparison safeguard on 2026-10-17; implement that next from the approved doc.
 
+Batch 37 verified: owner-approved current specification groups and separate
+matching history charts implemented using existing fields only. Unknown/incomplete
+measurements are not joined; no stored weights, types or history rewritten.
+All 159 backend tests, 31 pinned PG cases, 31 comparison-unit cases and original
+browser comparison/access/fourteen-card checks pass; TypeScript/build passes.
+PY-12 approved comparison scope complete: eighteen complete, eighteen partial/
+pending. Cost-reference unit inference is a separate PY-29 decision pending in
+docs/COST_REFERENCE_UNIT_APPROVAL.md. Next: missing editorial audits and usability.
+
 ## Checklist — do not repeat the audit
 
 | ID | Improvement | Current status |
@@ -190,7 +199,7 @@ comparison safeguard on 2026-10-17; implement that next from the approved doc.
 | PY-09 | Concurrent security-action safety | Complete for identified reset/logout/last-Admin cases in batches 5/6; six PostgreSQL cases passed |
 | PY-10 | Spreadsheet export safety | Complete in batch 3; text/numeric regressions and original browser download/access checks passed |
 | PY-11 | Correct saved administrator price state | Complete in batch 10; actual create/approve/correct/outdated/reject/reload browser regression passed |
-| PY-12 | Accurate existing quantity/type/market comparisons | Pending; no grades/new measurement fields |
+| PY-12 | Accurate existing quantity/type/market comparisons | Complete for owner-approved current-record/history-chart safeguards in batch 37: separate recorded specifications, matching commodity/market/unit/size/type only, no inferred missing measurements; all historical rows preserved. Cost-reference quantity linkage remains separate PY-29 work |
 | PY-13 | Consistent Nigerian dates/times | Partial: legacy naive trial timestamps treated as UTC; original Admin create/correction inputs now convert local time to UTC like Reporter, with Lagos/UTC browser and PG persistence verified; remaining display/day-filter semantics pending, original paid UTC policy unchanged |
 | PY-14 | Evidence-based movement/confidence | Pending; wording/policy changes require approval |
 | PY-15 | Prices recover after failed loading | Complete in batch 1; before/after browser regression passed |
@@ -1262,3 +1271,37 @@ comparison safeguard on 2026-10-17; implement that next from the approved doc.
   docs/PRICE_COMPARISON_APPROVAL.md now records that approval. Three next-batch
   specification tests reproduce current-selection failures and remain uncommitted
   outside this verified batch until the approved safeguard is implemented.
+
+### Batch 37 — approved PY-12 comparison scope (2026-10-17)
+
+- Owner explicitly approved docs/PRICE_COMPARISON_APPROVAL.md before implementation.
+  Latest current records now rank within commodity/market/trimmed lowercase existing
+  unit/bag-size/type groups; unlike recorded specifications no longer hide one
+  another. Outdated/movement filters still cannot resurface older same-spec records.
+  Shared query keeps fourteen dashboard card definitions and correct latest totals.
+- Original history chart styling reused for separate matching complete groups;
+  unlike markets/commodities/units/sizes/types are never joined. Missing/placeholder
+  specifications or invalid numbers/dates are not plotted as comparable. The
+  approved "Not enough comparable records." message replaces unsupported lines.
+  All rows remain in the original history table/cards. No quantity conversion,
+  grades, new fields, historical backfill, recorded movement/confidence/previous
+  price edits or new calendar-day policy. Price cards/detail/ticker show existing
+  type/quantity text to distinguish records; original CSS remains unchanged.
+- Three before specification tests fail (0.140s); all pass after (0.124s). Actual
+  before browser reproduces a single mixed-measurement line and hidden variants.
+  After: two matching two-point charts, distinct current cards, original history
+  retained; temporary synthetic labels/rows removed and starting history restored.
+- All 159 backend tests pass, 32.845s. Thirty-one pinned PG cases pass, 31.534s,
+  including case/space matching, bounded winning-row hydration, four correct
+  current specifications/dashboard count and every retained historical row.
+  Thirty-one real TypeScript comparison cases pass; inputs remain unmodified.
+- TypeScript/Vite passes, 2.63s, 101 modules, JS320.26kB/90.74kB gzip; original
+  index-19youOJ7.css unchanged. Original browser eight-role access and fourteen
+  dashboard totals/request/recovery regressions pass. Evidence: batch-37-*.json.
+- Manual: http://127.0.0.1:55446/history as trial@example.com / PriceYardDemo8!.
+  Existing synthetic unknown measurements correctly show the approved insufficient
+  comparison message; full history rows remain. No invented sizes are left there.
+- Eighteen IDs complete, eighteen partial/pending. Cost references contain no
+  saved unit; existing inference from the first market price remains unmodified
+  pending separate visible-label approval in docs/COST_REFERENCE_UNIT_APPROVAL.md.
+  Remaining audits for six editorial/intelligence resource writers still open.

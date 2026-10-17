@@ -123,6 +123,32 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_current_price_specifications_preserve_variants_and_dashboard_history(self):
+        from sqlalchemy import event
+        from app.models.commodity import Commodity
+        from app.models.market import Market
+        from app.models.price_update import PriceUpdate
+        from app.services.price_update_service import list_latest_approved_price_updates,list_price_history
+        from app.services.admin_summary_service import get_admin_summary
+        Base.metadata.create_all(self.engine)
+        with Session(self.engine) as db:
+            admin=User(full_name="Synthetic specification admin",email="pg-spec@example.com",password_hash="unused",role="admin",referral_code="PGSPECS")
+            commodity,market=Commodity(name="Egusi"),Market(name="Kwali Market");db.add_all([admin,commodity,market]);db.flush();ids=[]
+            specs=[("recorded quantity one","recorded size one","recorded type one"),("recorded quantity two","recorded size one","recorded type one"),
+                   ("recorded quantity one","recorded size two","recorded type one"),("recorded quantity one","recorded size one","recorded type two"),
+                   (" RECORDED QUANTITY ONE "," RECORDED SIZE ONE "," RECORDED TYPE ONE ")]
+            for index,(unit,size,kind) in enumerate(specs):
+                item=PriceUpdate(commodity_id=commodity.id,market_id=market.id,unit=unit,bag_size=size,commodity_type=kind,price_low=210000,price_high=220000,
+                    movement="unknown",confidence_level="Low confidence",status="approved",update_date_time=datetime.now(timezone.utc)+timedelta(minutes=index),created_by=admin.id)
+                db.add(item);db.flush();ids.append(item.id)
+            db.commit()
+        with Session(self.engine) as db:
+            before=db.execute(select(PriceUpdate.__table__)).all();loaded=[]
+            event.listen(db,"loaded_as_persistent",lambda session,instance:loaded.append(instance.id) if isinstance(instance,PriceUpdate) else None)
+            self.assertEqual([row.id for row in list_latest_approved_price_updates(db)],list(reversed(ids[1:])))
+            self.assertEqual(set(loaded),set(ids[1:]));self.assertEqual(get_admin_summary(db).latest,4)
+            self.assertEqual(len(list_price_history(db)),5);self.assertEqual(db.execute(select(PriceUpdate.__table__)).all(),before)
+
     def test_flag_review_is_one_query_and_reason_matches_existing_storage_limit(self):
         from pydantic import ValidationError
         from sqlalchemy import event

@@ -49,7 +49,7 @@ export function PriceCard({ item }: { item: PriceUpdate }) {
         <span className={`movement movement-${item.movement}`}>{movementIcon(item.movement)} {item.movement}</span>
       </div>
       <p className="price-range">{money(item.price_low)} – {money(item.price_high)}</p>
-      <p className="muted">{item.unit}{item.bag_size ? ` · ${item.bag_size}` : ""}</p>
+      <p className="muted">{item.unit}{item.bag_size ? ` · ${item.bag_size}` : ""}{item.commodity_type ? ` · ${item.commodity_type}` : ""}</p>
       <div className="mini-grid">
         <span><strong>Status</strong><span className={`confidence-badge ${confidenceClass(item.confidence_level)}`}>{item.confidence_level}</span><ConfidenceInfo /></span>
         <span><strong>Updated</strong><span className={agingClass(item.update_date_time)}>{relativeTime(item.update_date_time)}</span></span>
