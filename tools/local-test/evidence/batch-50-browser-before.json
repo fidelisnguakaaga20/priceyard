@@ -1,0 +1,18 @@
+{
+  "checks": {
+    "market-signals_blocks_until_list_loaded": false,
+    "market-signals_loads_saved_values": false,
+    "quality-signals_blocks_until_list_loaded": false,
+    "quality-signals_loads_saved_values": false
+  },
+  "failures": [
+    "market-signals_blocks_until_list_loaded",
+    "market-signals_loads_saved_values",
+    "quality-signals_blocks_until_list_loaded",
+    "quality-signals_loads_saved_values"
+  ],
+  "expected_original_bug": true,
+  "original_price_history_unchanged": true,
+  "external_page_requests": 0,
+  "production_connections": 0
+}

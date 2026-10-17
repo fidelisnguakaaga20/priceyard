@@ -272,8 +272,11 @@ Twelve relevant backend tests, two native cases and actual planning/detail/14-ca
 dashboard browser regressions pass; retained PG schemas43 to45. No new full suite
 claim (latest full backend194 in batch48, full native40 in batch47). Existing build
 dependencies reused; CSS unchanged. Exactly22 complete /14 partial or pending.
-PY-27 Admin ID-to-edit forms still do not load saved optional values; owner approval
-requested for docs/ADMIN_EDIT_PREFILL_APPROVAL.md before changing visible editing.
+Owner approved docs/ADMIN_EDIT_PREFILL_APPROVAL.md on2026-10-17. Batch50 now loads
+saved values in the original Market/Quality edit forms; 18 actual browser checks,
+nine backend tests, two focused native cases and all14 dashboard cards pass. Four
+approved forms remain for sequential batches. Exactly22 complete /14 partial or
+pending; original design, fields and policies retained, native fixture stopped.
 
 | ID | Improvement | Current status |
 |---|---|---|
@@ -303,7 +306,7 @@ requested for docs/ADMIN_EDIT_PREFILL_APPROVAL.md before changing visible editin
 | PY-24 | Keyboard/focus accessibility | Complete for identified original keyboard/focus scope in batches 42/45: selectable records and named role/status controls, menu/help Escape with trigger focus restoration, welcome-dialog initial/wrapped focus and original Skip/Next/Back behavior; 36 browser keyboard cases and all fourteen dashboard cards verified |
 | PY-25 | Safe and clearly aged offline prices | Complete for owner-approved application scope in batch 44: public-only explicit configured-API caching, timestamped saved copies, truthful original-view warnings, legacy/private/history exclusion and fresh-response recovery verified using actual worker source with fake network and actual browser UI with synthetic metadata. Native deployed PWA compatibility remains PY-35; no new age cutoff |
 | PY-26 | Complete atomic administrative audit | Complete for identified business-record writers through batch 40: payment/referral, price/moderation/flags, account/subscription, FAQ/catalog and all six intelligence resources save sanitized audits atomically; native concurrent edits and failed-audit rollback verified. External delivery operations remain PY-35 |
-| PY-27 | Consistent existing editing/password inputs | Partial: feedback async file selection fixed in batch26; original password forms now enforce the existing Unicode-character/72-byte rules without truncating input, reset byte rejection is422 and preserves the link/access (batch46). Remaining edit consistency pending |
+| PY-27 | Consistent existing editing/password inputs | Partial: feedback async file selection fixed in batch26; existing password rules preserved in batch46. Owner-approved saved-value loading verified for Market/Quality forms in batch50; Buying/Sell-watch/Storage/Cost forms remain |
 | PY-28 | Historical record preservation | Partial: approved 0022 tested on fresh/populated synthetic PostgreSQL; future migration/history work pending |
 | PY-29 | Stable identities and dependent records | Partial: catalog IDs/fields and referenced-price deletion rejection verified with atomic audit writes in batch 34; broader identity/duplicate/rename issues pending, no automatic merge |
 | PY-30 | Isolated automated/browser verification | Partial/ongoing: guarded194 backend tests and three focused native cases pass in batch48; full40-case PG baseline passed batch47. Original-browser regressions pass; native suites serialized, schema budget80, smaller fixture and sequential heavy checks; reuse isolated dependency snapshot rather than duplicating it. Actual worker source fake transport only, native browser workers/providers disabled; expand with remaining work, live services forbidden |
@@ -1759,3 +1762,27 @@ requested for docs/ADMIN_EDIT_PREFILL_APPROVAL.md before changing visible editin
   native cluster stopped. Manual local commodity detail keeps the same six section
   headings/design. Exactly22 complete /14 partial or pending; PY-20 broader lists/
   history and remaining policies/operations still open. Local commits only.
+
+### Batch 50 — Approved Market/Quality editing safeguard (2026-10-17)
+
+- Owner explicitly approved the six-form scope in docs/ADMIN_EDIT_PREFILL_APPROVAL.md.
+  First two forms only: entering an ID loads saved values from the existing Admin
+  list into existing controls; switching/clearing IDs restores approved behavior.
+  Pending/unknown IDs cannot save a mismatched record. No new fields, layout,
+  database changes, automatic writes or business policies.
+- Before build, actual old-browser behavior reproduces four loading/prefill failures.
+  After:18 browser checks pass, including changing one field without losing saved
+  optional values, reload, explicit clearing, other/unknown/blank IDs and creation.
+  Initial check hit ambiguous existing error/toast text; narrowed only the test
+  locator and reran successfully. Price history unchanged; zero external requests.
+- Nine intelligence audit backend cases pass,0.681s; two existing native Market/
+  Quality atomic audit, rollback and concurrency cases pass,1.562s. Small pinned
+  fixture schemas45 to47 of80, stopped gracefully before build/browser. Latest
+  full backend194 remains batch48; focused runs do not imply a new full-suite run.
+- Reused isolated build passes TypeScript/Vite,1.27s/103modules; JS325.17kB,
+  92.47kB gzip; original CSS index-BEBH-Ai6.css unchanged. All14 original dashboard
+  cards/totals, one summary request and outage recovery pass. Evidence batch-50-*.
+- Exactly22 complete /14 partial or pending; PY-27 four approved forms still open.
+  Next Buying/Sell-watch, then Storage/Cost in batches of two. Synthetic-only
+  preview http://127.0.0.1:55446; existing admin@example.com / PriceYardDemo8!.
+  No production access, dependencies installed, push, merge or deployment.

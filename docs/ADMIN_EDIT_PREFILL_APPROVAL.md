@@ -1,4 +1,7 @@
-# Existing Admin editing safeguard — approval requested, not implemented
+# Existing Admin editing safeguard — approved for local implementation
+
+Owner approved on2026-10-17: "Approve the editing safeguard". Implement and verify
+in batches of one or two original forms; no production authorization is implied.
 
 Scope: PY-27, local development and synthetic testing only. Existing forms for
 Market signals, Quality signals, Buying zones, Sell-watch windows, Storage
@@ -20,5 +23,5 @@ validation, access and atomic audit requirements remain. Browser tests must prov
 saved optional details/costs survive changing one field and reloading, and confirm
 explicit clearing, ID switching, unknown IDs and original creation still work.
 
-Owner approval is required because loading/replacing values changes visible
-editing behavior. This file authorizes no implementation by itself.
+This specific approval covers loading/replacing values in existing editing forms.
+It does not approve new fields, screens, business rules or production changes.
