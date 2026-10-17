@@ -1,0 +1,21 @@
+{
+  "files": [
+    {
+      "file": "AdminIntelligencePages.tsx",
+      "emitted_syntax_identical": true,
+      "verified_build_syntax_identical": true,
+      "emitted_syntax_sha256": "55d62f39b625781e26a55c6cd95e767afcb31264cb526f3449eb14a231581581",
+      "original_lines": 376,
+      "formatted_lines": 376
+    },
+    {
+      "file": "AdminSignalsPage.tsx",
+      "emitted_syntax_identical": true,
+      "verified_build_syntax_identical": true,
+      "emitted_syntax_sha256": "05ec3829c172feb483561b1503bc2ee5f6b082db94214e7489faa46949135627",
+      "original_lines": 230,
+      "formatted_lines": 230
+    }
+  ],
+  "dependencies_installed": 0
+}

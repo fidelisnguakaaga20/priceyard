@@ -24,7 +24,11 @@ def main():
                 probe.settimeout(1)
                 if probe.connect_ex(("127.0.0.1", port)) == 0:
                     raise RuntimeError("Stop local preview/PostgreSQL before reusing the test build")
-        manifest = json.loads((RUNTIME / "frontend.json").read_text())
+        ready_marker = RUNTIME / "frontend.json"
+        progress_marker = RUNTIME / "frontend.reuse-in-progress.json"
+        # A failed build deliberately leaves no ready marker. Resume only its
+        # preserved identity, with the same port/path/purpose checks below.
+        manifest = json.loads((ready_marker if ready_marker.exists() else progress_marker).read_text())
         target = Path(manifest["path"]).resolve()
         if (manifest.get("purpose") != "synthetic-only-no-application-credentials"
                 or target.parent != RUNTIME.resolve() or not target.name.startswith("frontend-")
@@ -32,7 +36,8 @@ def main():
             raise RuntimeError("Only the existing marked workspace test snapshot may be reused")
         # Fail closed while updating: a failed build cannot serve the old output
         # as though it had verified the new source. Preserve the previous marker.
-        (RUNTIME / "frontend.json").replace(RUNTIME / "frontend.reuse-in-progress.json")
+        if ready_marker.exists():
+            ready_marker.replace(progress_marker)
     else:
         target = RUNTIME / ("frontend-" + uuid.uuid4().hex)
         target.mkdir(parents=True)

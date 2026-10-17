@@ -1,584 +1,160 @@
-# API Endpoints
-
-## Stage 2 — Backend Foundation
-
-### GET /health
-
-Purpose: verify that the PriceYard FastAPI backend is running.
-
-Authentication: none.
-
-Expected successful response:
-
-```json
-{"status":"healthy"}
-```
-
-Owner-verified in Stage 2 with HTTP 200.
-
-## Stage 3 — Database Foundation
-
-No new public/business API endpoint is introduced in Stage 3.
-
-Stage 3 adds only the approved PostgreSQL/SQLAlchemy/Alembic database foundation and model schema.
-
-## Stage 4 — Authentication
-
-### POST /auth/register
-
-Purpose: create a normal PriceYard user account.
-
-Authentication: none.
-
-Input:
-- `full_name`
-- `email`
-- optional `phone`
-- `password`
-
-Rules:
-- email must be unique;
-- phone must be unique when supplied;
-- password is stored only as a bcrypt hash;
-- public registration always assigns `free_user`;
-- password/hash is never returned.
-
-### POST /auth/login
-
-Purpose: authenticate an active user and issue a JWT access token.
-
-Authentication: none.
-
-Input:
-- `email`
-- `password`
-
-Rules:
-- invalid credentials return 401;
-- inactive users are blocked;
-- successful login returns a bearer JWT.
-
-### GET /auth/me
-
-Purpose: return the authenticated user's safe account profile.
-
-Authentication: bearer JWT required.
-
-Rules:
-- missing/invalid/expired JWT is rejected;
-- inactive users are blocked;
-- password/hash is never returned.
-
-## Later approved stages
-
-Commodity, market, price, signal, quality, FAQ, feedback and broader admin APIs remain unimplemented until their approved stages.
-
-## Stage 5 — Subscription and 14-Day Trial
-
-### GET /subscriptions
-Purpose: list subscription records for manual administration.
-Authentication: admin bearer JWT required.
-
-### GET /subscriptions/{user_id}
-Purpose: return one user's subscription/trial record.
-Authentication: bearer JWT required. A normal user may view only their own record; admin may view any user's record.
-
-### PATCH /subscriptions/{user_id}/status
-Purpose: manually set an approved subscription status.
-Authentication: admin bearer JWT required.
-
-Allowed statuses:
-- `free`
-- `trial`
-- `active`
-- `expired`
-- `cancelled`
-
-Stage 5 rules:
-- normal public registration creates a 14-day trial subscription;
-- trial status gives full-access classification only until `trial_ends_at`;
-- an expired trial transitions to `expired` and the user remains/returns `free_user`;
-- `active` is the paid/full-access status and assigns `paid_user` for a normal user;
-- `free`, `expired`, and `cancelled` are limited-access statuses;
-- payment gateway integration remains deferred.
-
-## Stage 6 — Admin Core Management
-
-### GET /users
-Purpose: list PriceYard users for administration.
-Authentication: admin bearer JWT required.
-
-### GET /users/{user_id}
-Purpose: view one user's safe account details.
-Authentication: admin bearer JWT required.
-Rule: password hashes are never returned.
-
-### PATCH /users/{user_id}
-Purpose: change an approved MVP role and/or activate/deactivate a user.
-Authentication: admin bearer JWT required.
-Allowed roles: `admin`, `free_user`, `paid_user`.
-Reporter remains deferred.
-Role/subscription consistency:
-- `paid_user` synchronizes to active paid subscription status;
-- `free_user` synchronizes to free subscription status;
-- `admin` grants administration role directly.
-
-### GET /commodities
-Purpose: view commodities.
-Authentication: none.
-CR-03 rule: returns active commodities only.
-
-### GET /commodities/admin/all
-Purpose: allow administration to view active and inactive commodities for CRUD/reactivation.
-Authentication: admin bearer JWT required.
-
-### GET /commodities/{commodity_id}
-Purpose: view one commodity.
-Authentication: none.
-CR-03 rule: inactive commodities return 404 publicly.
-
-### POST /commodities
-Purpose: add a commodity.
-Authentication: admin bearer JWT required.
-
-### PATCH /commodities/{commodity_id}
-Purpose: edit a commodity.
-Authentication: admin bearer JWT required.
-
-### DELETE /commodities/{commodity_id}
-Purpose: delete a commodity when it is not referenced by dependent records.
-Authentication: admin bearer JWT required.
-
-Initial approved commodities:
-- Egusi
-- Beans
-- Palm oil
-
-### GET /markets
-Purpose: view markets.
-Authentication: none.
-CR-03 rule: returns active markets only.
-
-### GET /markets/admin/all
-Purpose: allow administration to view active and inactive markets for CRUD/reactivation.
-Authentication: admin bearer JWT required.
-
-### GET /markets/{market_id}
-Purpose: view one market.
-Authentication: none.
-CR-03 rule: inactive markets return 404 publicly.
-
-### POST /markets
-Purpose: add a market.
-Authentication: admin bearer JWT required.
-
-### PATCH /markets/{market_id}
-Purpose: edit a market.
-Authentication: admin bearer JWT required.
-
-### DELETE /markets/{market_id}
-Purpose: delete a market when it is not referenced by dependent records.
-Authentication: admin bearer JWT required.
-
-Initial approved markets:
-- Abuja/FCT — market day not set unless independently verified
-- Kwali Market — Tuesday
-- Nasarawa — Monday
-- Benue — market day not set unless independently verified
-
-Stage 6 reuses the Stage 5 subscription management APIs. No new payment behavior is introduced.
-
-## Stage 7 — Price Updates
-
-### GET /price-updates
-Purpose: return the latest approved, current price record for each commodity/market pair.
-Authentication: none at Stage 7; full access-tier enforcement is tested in the approved later access-control stage.
-Public privacy rule: `source_1` and `source_2` are never returned.
-Stage boundary: this is a current/latest view, not the Stage 8 chronological history/filter system.
-
-### GET /price-updates/{price_update_id}
-Purpose: return one approved price update.
-Authentication: none at Stage 7.
-Rule: pending/rejected records are not publicly returned; private source identities are excluded.
-
-### POST /price-updates
-Purpose: create a price update.
-Authentication: admin bearer JWT required.
-Rule: created records begin with `pending` status; `created_by` is server-controlled.
-
-### PATCH /price-updates/{price_update_id}
-Purpose: edit a price update.
-Authentication: admin bearer JWT required.
-
-### PATCH /price-updates/{price_update_id}/approve
-Purpose: approve a price update for public retrieval.
-Authentication: admin bearer JWT required.
-Rule: records the approving admin in `approved_by`.
-
-### PATCH /price-updates/{price_update_id}/reject
-Purpose: reject a price update.
-Authentication: admin bearer JWT required.
-
-### PATCH /price-updates/{price_update_id}/mark-outdated
-Purpose: mark a price update as outdated so it is not presented as current data.
-Authentication: admin bearer JWT required.
-
-### DELETE /price-updates/{price_update_id}
-Purpose: delete an incorrect price update when no dependent record prevents deletion.
-Authentication: admin bearer JWT required.
-
-Stage 7 validation rules:
-- current price uses `price_low` and `price_high` and permits equal values only when an exact confirmed value is intentionally supplied;
-- `price_high` cannot be below `price_low`;
-- `average_price` must be within the current range;
-- previous range values are optional when not confirmed, but when supplied they must be supplied as a pair and form a valid range;
-- movement is `up`, `down`, `stable`, or `unknown`;
-- suggested action is `Watch`, `Investigate`, `Buy Carefully`, `Hold`, or `Sell Carefully`;
-- explicit guarantee/financial-advice wording is rejected from `possible_meaning`;
-- public responses exclude private `source_1` and `source_2` values.
-
-## Stage 8 — Search, Filters, History, Comparison
-
-### GET /price-updates
-Returns latest approved, non-outdated price records (latest per commodity + market). Existing no-query behavior is preserved.
-CR-03 rule: public results require both an active commodity and an active market.
-
-Optional query parameters:
-- `commodity` — case-insensitive commodity-name search.
-- `market` — case-insensitive market-name filter.
-- `date` — exact UTC calendar date (`YYYY-MM-DD`) for the stored update timestamp.
-- `movement` — `up`, `down`, `stable`, or `unknown`.
-
-### GET /price-updates/history
-Returns approved price records in chronological order. Historical approved records remain available even when marked outdated, because outdated status means the record is no longer current, not that it should disappear from history.
-CR-03 rule: public history requires both an active commodity and an active market; protected admin history preserves management visibility for inactive references.
-
-### GET /price-updates/admin/history
-Purpose: preserve administration visibility of approved history linked to active or inactive commodity/market records.
-Authentication: admin bearer JWT required.
-
-Optional query parameters:
-- `commodity`
-- `market`
-- `date`
-- `movement`
-- `time_of_day` — `morning`, `afternoon`, `evening`, or `closing`.
-
-### GET /price-updates/comparison
-Returns the latest approved, non-outdated record per market for a commodity. Each record contains both current and previous price ranges, movement, confidence, Possible Meaning, and Suggested Action, allowing previous/current and cross-market comparison without duplicating price data.
-
-Required query parameter:
-- `commodity`
-
-Optional query parameter:
-- `date`
-
-Public source privacy remains unchanged: `source_1` and `source_2` are not returned.
-
-## Stage 9 — Market Signals and Quality Signals
-
-### GET /market-signals
-Purpose: list market signals created by PriceYard administration.
-Authentication: active bearer JWT required at Stage 9. Full tier-by-tier premium access enforcement remains scheduled for Stage 20.
-Response includes the approved market-signal disclaimer.
-
-### GET /market-signals/{signal_id}
-Purpose: view one market signal.
-Authentication: active bearer JWT required.
-Response includes the approved market-signal disclaimer.
-
-### POST /market-signals
-Purpose: create a market signal.
-Authentication: admin bearer JWT required.
-Fields: `commodity_id`, `market_id`, optional `price_update_id`, `signal_type`, `signal_description`, optional `possible_meaning`, optional approved `suggested_action`.
-Rules: explicit guarantee/financial-advice wording is rejected; `created_by` is server-controlled.
-
-### PATCH /market-signals/{signal_id}
-Purpose: edit a market signal.
-Authentication: admin bearer JWT required.
-
-### DELETE /market-signals/{signal_id}
-Purpose: delete a market signal.
-Authentication: admin bearer JWT required.
-
-Market-signal disclaimer returned by the API:
-
-> Market signals are observations based on available market information. They are not guaranteed predictions or financial advice. Users should verify before making major buying, selling, or storage decisions.
-
-### GET /quality-signals
-Purpose: list quality/readiness observations.
-Authentication: active bearer JWT required at Stage 9. Full tier-by-tier premium access enforcement remains scheduled for Stage 20.
-
-### GET /quality-signals/{signal_id}
-Purpose: view one quality/readiness observation.
-Authentication: active bearer JWT required.
-
-### POST /quality-signals
-Purpose: create quality/readiness information.
-Authentication: admin bearer JWT required.
-Fields: `commodity_id`, `market_id`, optional `price_update_id`, optional `quality_status`, `moisture_status`, `storage_readiness`, `risk_note`.
-Rule: explicit unsupported laboratory-confirmation wording is rejected; `created_by` is server-controlled.
-
-### PATCH /quality-signals/{signal_id}
-Purpose: edit quality/readiness information.
-Authentication: admin bearer JWT required.
-
-### DELETE /quality-signals/{signal_id}
-Purpose: delete quality/readiness information.
-Authentication: admin bearer JWT required.
-
-For both signal types, an optional linked price update must use the same commodity and market. Market-signal meaning/action remains separate from price-update meaning/action.
-
-
-## Stage 10 — Buying Zones and Sell-Watch Windows
-
-### GET /buying-zones
-Purpose: list buying-zone market observations.
-Authentication/access: admin, active trial, or active paid access required. Free/expired/cancelled users do not receive this full-intelligence view.
-Response includes the buying-zone safety disclaimer.
-
-### GET /buying-zones/{zone_id}
-Purpose: view one buying-zone observation.
-Authentication/access: admin, active trial, or active paid access required.
-
-### POST /buying-zones
-Purpose: create a buying-zone observation.
-Authentication: admin bearer JWT required.
-Fields: `commodity_id`, `market_id`, `price_low`, `price_high`, `reason`, optional `valid_from`, optional `valid_to`, `confidence`.
-Rules: invalid ranges and reversed validity periods are rejected; `created_by` is server-controlled; guarantee/financial-advice wording is rejected.
-
-### PATCH /buying-zones/{zone_id}
-Purpose: edit a buying-zone observation.
-Authentication: admin bearer JWT required.
-
-Buying-zone API disclaimer:
-
-> Buying zones are market observations and are not guaranteed lowest prices, guaranteed buying opportunities, predictions, or financial advice.
-
-### GET /sell-watch-windows
-Purpose: list sell-watch market observations.
-Authentication/access: admin, active trial, or active paid access required. Free/expired/cancelled users do not receive this full-intelligence view.
-Response includes the sell-watch safety disclaimer.
-
-### GET /sell-watch-windows/{window_id}
-Purpose: view one sell-watch observation.
-Authentication/access: admin, active trial, or active paid access required.
-
-### POST /sell-watch-windows
-Purpose: create a sell-watch observation.
-Authentication: admin bearer JWT required.
-Fields: `commodity_id`, `market_id`, `start_period`, optional `end_period`, `observation`, `confidence`.
-Rules: `created_by` is server-controlled; guaranteed-profit/prediction/financial-advice wording is rejected.
-
-### PATCH /sell-watch-windows/{window_id}
-Purpose: edit a sell-watch observation.
-Authentication: admin bearer JWT required.
-
-Sell-watch API disclaimer:
-
-> Sell-watch windows are market observations and are not guaranteed profit periods, guaranteed selling opportunities, predictions, or financial advice.
-
-Stage 10 did not include the Stage 11 storage-suitability API.
-
-
-## Stage 11 — Storage Suitability
-
-### GET /storage-suitability
-Purpose: list storage-suitability observations.
-Authentication/access: admin, active trial, or active paid access required. Free/expired/cancelled users do not receive this full-intelligence view.
-Response includes the approved storage-suitability disclaimer.
-
-### GET /storage-suitability/{item_id}
-Purpose: view one storage-suitability observation.
-Authentication/access: admin, active trial, or active paid access required.
-
-### POST /storage-suitability
-Purpose: create a storage-suitability observation.
-Authentication: admin bearer JWT required.
-Fields: `commodity_id`, `market_id`, optional `price_update_id`, `suitability_status`, optional `import_risk`, `oversupply_risk`, `spoilage_risk`, `buyer_availability`, `quality_storage_notes`, `summary`.
-Rules: status must be `good`, `watch`, `risky`, or `not_recommended`; optional price-update link must match the same commodity and market; explicit guaranteed profit/preservation/scarcity/future-price wording is rejected.
-
-### PATCH /storage-suitability/{item_id}
-Purpose: edit a storage-suitability observation.
-Authentication: admin bearer JWT required.
-
-Storage-suitability API disclaimer:
-
-> Storage suitability is based on available market and quality information. It does not guarantee profit, preservation, or future price increase.
-
-No Stage 12 cost-breakdown API is included in Stage 11.
-
-## Stage 12 — Cost Breakdown
-
-### GET /cost-breakdowns
-Purpose: list cost breakdowns linked to price updates.
-Authentication/access: admin, active trial, or active paid access required. Free/expired/cancelled users do not receive this full-intelligence view.
-
-### GET /cost-breakdowns/{item_id}
-Purpose: view one cost breakdown.
-Authentication/access: admin, active trial, or active paid access required.
-
-### POST /cost-breakdowns
-Purpose: create a cost breakdown for a price update.
-Authentication: admin bearer JWT required.
-Input fields: `price_update_id`, `transport`, `warehouse`, `security`, `market_charges`, `loading_offloading`, `other_costs`, `purchase_price_reference`.
-Server-calculated response fields: `total_additional_cost`, `total_estimated_landing_storage_cost`.
-Rules: linked price update must exist; negative amounts are rejected; client input does not control calculated totals.
-
-### PATCH /cost-breakdowns/{item_id}
-Purpose: edit cost components or purchase-price reference.
-Authentication: admin bearer JWT required.
-Rules: every edit recalculates both totals; negative amounts are rejected.
-
-No full accounting, average-cost calculator, Stage 13 watchlist API, or other future feature is included in Stage 12.
-
-## Stage 13 — Watchlist
-
-### POST /watchlist
-Purpose: save a commodity, market, or commodity+market combination to the authenticated user's own watchlist.
-Authentication: active bearer JWT required.
-Input fields: optional `commodity_id`, optional `market_id`; at least one is required.
-Rules: referenced commodity/market must exist and be active; `user_id` is server-controlled; an exact duplicate for the same user returns HTTP 409; target-price input/alert behavior is not part of Stage 13.
-
-### GET /watchlist
-Purpose: list only the authenticated user's own watchlist items.
-Authentication: active bearer JWT required.
-Rule: no user-id query parameter is accepted; the JWT identity is the authority.
-
-### DELETE /watchlist/{item_id}
-Purpose: remove one item from the authenticated user's own watchlist.
-Authentication: active bearer JWT required.
-Rule: an item owned by another user is not exposed or removed.
-
-Stage 13 does not add target-price alerts, Stage 14 FAQ management, or any later-stage feature.
-
-## Stage 14 — FAQ
-
-### GET /faq
-Purpose: publicly list published FAQ items only.
-Authentication: none required.
-Rule: hidden/unpublished FAQ items are excluded. Public responses do not expose admin creator identity or publication-control fields.
-
-### GET /faq/{faq_id}
-Purpose: publicly view one published FAQ item.
-Authentication: none required.
-Rule: hidden/unpublished FAQ items return HTTP 404.
-
-### POST /faq
-Purpose: create a new FAQ draft.
-Authentication: admin bearer JWT required.
-Input fields: `question`, `answer`, `category`.
-Rule: new FAQ items start hidden; clients cannot publish through the create payload.
-
-### PATCH /faq/{faq_id}
-Purpose: edit FAQ question, answer, or category.
-Authentication: admin bearer JWT required.
-
-### PATCH /faq/{faq_id}/publish
-Purpose: publish an FAQ item for public viewing.
-Authentication: admin bearer JWT required.
-
-### PATCH /faq/{faq_id}/hide
-Purpose: hide an FAQ item from public viewing.
-Authentication: admin bearer JWT required.
-
-### DELETE /faq/{faq_id}
-Purpose: delete an incorrect FAQ item.
-Authentication: admin bearer JWT required.
-This endpoint is included because the approved Architecture Design defines FAQ deletion as part of the FAQ management API.
-
-Stage 14 content rules:
-- write FAQ content in PriceYard's own words;
-- do not copy paid-group content word-for-word;
-- do not include private phone/account numbers or vendor contact/payment instructions;
-- avoid guaranteed-profit, guaranteed-prediction, forced buy/sell, or financial-advice claims;
-- preserve approved PriceYard disclaimers where relevant.
-
-The paid-source word-for-word rule requires human/editorial source comparison; it is not represented as an automated plagiarism detector.
-
-No Stage 15 feedback-management API or later-stage feature is added in Stage 14.
-
-
-## Stage 15 — User Feedback and 1–5 Star Rating
-
-### POST /feedback
-Purpose: allow an authenticated user to submit PriceYard experience feedback.
-Authentication: active bearer JWT required.
-Input fields: `rating`, `comment`, `price_usefulness`, `price_accuracy`, `missing_market_request`, `missing_commodity_request`, `complaint_or_suggestion`, `continue_using_feedback`, `willingness_to_pay_feedback`.
-Rules: rating must be 1 through 5; `user_id` is server-controlled from the authenticated user and cannot be supplied by the client.
-
-### GET /feedback
-Purpose: admin-only feedback list with optional rating filter.
-Authentication: admin bearer JWT required.
-Query: optional `rating=1..5`.
-Rule: ordinary users cannot browse private feedback from other users.
-
-### GET /feedback/summary
-Purpose: admin-only basic feedback summary.
-Authentication: admin bearer JWT required.
-Response: total feedback count and average rating only. No advanced analytics are included.
-
-### GET /feedback/{feedback_id}
-Purpose: admin-only view of one feedback record, including complaints/suggestions.
-Authentication: admin bearer JWT required.
-
-### DELETE /feedback/{feedback_id}
-Purpose: admin-only removal of a feedback record under the Architecture-approved Feedback API.
-Authentication: admin bearer JWT required.
-
-Stage 15 reuses the existing Stage 3 `feedback` table and adds no migration, Stage 16 audit-log behavior, advanced analytics, or other later-stage feature.
-
-## Stage 16 — Audit Logs
-
-### GET /audit-logs
-Purpose: allow an admin to view audit history for important administrative changes.
-Authentication: admin bearer JWT required.
-Response fields: `id`, `user_id`, `action`, `table_name`, `record_id`, `old_value`, `new_value`, `created_at`.
-Rule: ordinary users cannot browse audit history.
-
-### GET /audit-logs/{audit_log_id}
-Purpose: allow an admin to view one audit record.
-Authentication: admin bearer JWT required.
-
-Stage 16 records important admin changes for price updates, commodities, markets, FAQ, subscriptions, users, and feedback administration. Price-update edit snapshots preserve changes to `possible_meaning` and `suggested_action`.
-
-Audit snapshots intentionally exclude password/password-hash fields, secrets/tokens, database credentials/URLs, `.env` values, and private price-source identities (`source_1`, `source_2`). Stage 16 adds no CSV export or Stage 17 feature.
-
-## Stage 17 — Simple CSV Report Export
-
-### GET /reports/prices.csv
-Purpose: download a simple CSV report of approved PriceYard price intelligence.
-Authentication: admin bearer JWT required.
-Query filters:
-- optional `commodity`
-- optional `market`
-- optional `date_from` (YYYY-MM-DD)
-- optional `date_to` (YYYY-MM-DD)
-
-Rules:
-- only approved `price_updates` are exported;
-- date range is inclusive; `date_from` later than `date_to` is rejected;
-- export includes commodity, market, current price range, previous price range, movement, update date/time, confidence, Possible Meaning, Suggested Action, linked market signals, and linked quality signals;
-- the Stage 9 signal schema has no separate approval-status field, so linked admin-managed signals are exported only when attached to an approved price update;
-- private source identities (`source_1`, `source_2`), password data, JWT/secrets, and unnecessary personal data are not exported;
-- no PDF generation, report-storage table, advanced analytics, or Stage 18 frontend is included.
-
-Response: `text/csv` attachment named `priceyard-price-report.csv`.
-
-## Stage 18 — Frontend API Integration
-
-Stage 18 adds no new backend API contract. The React + TypeScript public/user frontend consumes the approved APIs from Stages 4–15, including authentication, subscription self-view, commodities, markets, price updates/history/comparison, signals, quality, buying zones, sell-watch windows, storage suitability, cost breakdowns, FAQ, feedback, and watchlist.
-
-Local Vite development uses `/api/*` as a proxy to `http://127.0.0.1:8000`. Deployment will use `VITE_API_URL` and the approved production CORS/origin configuration in Stages 21–22.
-
-Private `source_1` / `source_2` values are not consumed by the Stage 18 frontend. Admin-management API consumption is deferred to Stage 19.
-
-## Stage 19 — Admin Frontend Integration
-
-Stage 19 adds no backend API endpoint and does not change any approved API contract. The React admin frontend reuses the existing authenticated/admin endpoints from Stages 6–17 for users, commodities, markets, price updates, signals, buying zones, sell-watch windows, storage suitability, costs, FAQ, subscriptions, feedback, audit logs and CSV export.
-
-Backend role/subscription authorization remains authoritative; frontend route hiding is presentation only.
-# AUTH-01 password recovery
-
-- `POST /auth/forgot-password` — accepts an email and always returns the same generic response. For an active matching account, a single-use 15-minute reset link is sent.
-- `POST /auth/reset-password` — accepts a reset token and an 8–72 character new password. Expired, invalid, or used tokens are rejected.
+# Current application API reference
+
+This replaces the old staged-development notes. The local application already
+implements authentication, subscriptions, prices, intelligence, moderation,
+payments, exports and Admin operations. This document describes existing code;
+it does not approve a new access policy or a production rollout.
+
+For request/response fields and validation, use `/docs` or `/openapi.json` on the
+isolated local backend. The browser preview proxies API calls through `/api`;
+the paths below are backend paths without that proxy prefix. The synthetic
+preview's `/__test__/...` controls are not application endpoints.
+
+## Access and security contracts
+
+- Guest has no account role. Trial and paid access are subscription states,
+  separate from stored roles `free_user`, `paid_user`, `reporter`, `admin`.
+- `get_current_user` checks the bearer JWT, account activation, current account
+  security version and revoked token hashes on the server.
+- `require_roles(...)` additionally restricts staff operations to the named roles.
+  `require_full_access` checks current trial/paid entitlement; Admin bypasses that
+  entitlement check. Reporter authority does not itself grant paid entitlement.
+- Public price schemas omit private source identities. Existing approved current
+  prices remain public. History, history options, historical comparisons and
+  historical detail apply entitlement checks, including conditional handler checks.
+  Admin history/source access remains separate from public responses.
+- Quality list/detail require full access. Other existing basic intelligence
+  visibility is unchanged pending the owner's source/access-policy decisions.
+- Subscription reads and watchlists enforce account ownership; Admin powers are
+  checked separately. The dependency column alone is not an ownership policy.
+- Checkout accepts only existing plans: NGN2,500/30 days and NGN6,000/90 days.
+  Activation requires strict signed/provider evidence and an atomic save.
+  A webhook uses signature verification rather than a user JWT; it is not an
+  unprotected payment activation endpoint. Provider success alone is insufficient.
+- CSV download is Admin only, includes every matching approved row, excludes
+  private sources and neutralizes spreadsheet formulas. It streams100-record
+  fetch batches; there is no arbitrary export count cap.
+- Cron/webhook/header checks, rate limits and conditional/ownership checks can
+  live inside handlers/services. A dash below means no declared non-DB Depends
+  argument, **not** that an operation is public or safe to call without review.
+
+The approved business rules and operational limits are recorded in
+[application contracts](APPLICATION_CONTRACTS.md),
+[local development](LOCAL_DEVELOPMENT.md) and
+[the live progress tracker](../PRICEYARD_PROGRESS.md).
+
+## Route index
+
+Generated from router declarations with `tools/local-test/update_api_reference.py`.
+Only source AST is read; no settings, credentials, application imports, database
+connection or provider request is involved. Dependency expressions are copied
+from declarations for traceability; follow the linked handler for all checks.
+
+| Method | Backend path | Declared access dependencies (excluding get_db) | Handler |
+| --- | --- | --- | --- |
+| POST | `/activity/ping` | `—` | [ping](../backend/app/routes/activity_routes.py#L16) |
+| POST | `/activity/seen` | `require_roles('admin')` | [seen](../backend/app/routes/activity_routes.py#L31) |
+| GET | `/activity/summary` | `require_roles('admin')` | [summary](../backend/app/routes/activity_routes.py#L23) |
+| GET | `/admin/summary` | `require_roles('admin')` | [dashboard_summary](../backend/app/routes/admin_summary_routes.py#L14) |
+| GET | `/audit-logs` | `require_roles('admin')` | [get_logs](../backend/app/routes/audit_log_routes.py#L15) |
+| GET | `/audit-logs/{audit_log_id}` | `require_roles('admin')` | [get_log](../backend/app/routes/audit_log_routes.py#L23) |
+| POST | `/auth/forgot-password` | `—` | [forgot_password](../backend/app/routes/auth_routes.py#L87) |
+| POST | `/auth/google` | `—` | [login_with_google](../backend/app/routes/auth_routes.py#L46) |
+| POST | `/auth/login` | `—` | [login](../backend/app/routes/auth_routes.py#L39) |
+| POST | `/auth/logout` | `bearer_scheme` | [logout](../backend/app/routes/auth_routes.py#L52) |
+| GET | `/auth/me` | `get_current_user` | [me](../backend/app/routes/auth_routes.py#L66) |
+| GET | `/auth/referral-summary` | `get_current_user` | [referral_summary](../backend/app/routes/auth_routes.py#L71) |
+| POST | `/auth/register` | `—` | [register](../backend/app/routes/auth_routes.py#L27) |
+| POST | `/auth/reset-password` | `—` | [change_forgotten_password](../backend/app/routes/auth_routes.py#L92) |
+| GET | `/buying-zones` | `require_full_access` | [get_zones](../backend/app/routes/buying_zone_routes.py#L23) |
+| POST | `/buying-zones` | `require_roles('admin')` | [add_zone](../backend/app/routes/buying_zone_routes.py#L41) |
+| GET | `/buying-zones/{zone_id}` | `require_full_access` | [get_zone](../backend/app/routes/buying_zone_routes.py#L32) |
+| PATCH | `/buying-zones/{zone_id}` | `require_roles('admin')` | [edit_zone](../backend/app/routes/buying_zone_routes.py#L52) |
+| GET | `/commodities` | `—` | [get_commodities](../backend/app/routes/commodity_routes.py#L32) |
+| POST | `/commodities` | `require_roles('admin')` | [add_commodity](../backend/app/routes/commodity_routes.py#L53) |
+| GET | `/commodities/admin/all` | `require_roles('admin')` | [get_all_commodities_for_admin](../backend/app/routes/commodity_routes.py#L37) |
+| DELETE | `/commodities/{commodity_id}` | `require_roles('admin')` | [remove_commodity](../backend/app/routes/commodity_routes.py#L78) |
+| GET | `/commodities/{commodity_id}` | `—` | [get_commodity_by_id](../backend/app/routes/commodity_routes.py#L45) |
+| PATCH | `/commodities/{commodity_id}` | `require_roles('admin')` | [edit_commodity](../backend/app/routes/commodity_routes.py#L64) |
+| GET | `/cost-breakdowns` | `require_full_access` | [get_items](../backend/app/routes/cost_breakdown_routes.py#L28) |
+| POST | `/cost-breakdowns` | `require_roles('admin')` | [add_item](../backend/app/routes/cost_breakdown_routes.py#L46) |
+| DELETE | `/cost-breakdowns/{item_id}` | `require_roles('admin')` | [remove_item](../backend/app/routes/cost_breakdown_routes.py#L71) |
+| GET | `/cost-breakdowns/{item_id}` | `require_full_access` | [get_item](../backend/app/routes/cost_breakdown_routes.py#L37) |
+| PATCH | `/cost-breakdowns/{item_id}` | `require_roles('admin')` | [edit_item](../backend/app/routes/cost_breakdown_routes.py#L57) |
+| GET | `/faq` | `—` | [get_published_items](../backend/app/routes/faq_routes.py#L37) |
+| POST | `/faq` | `require_roles('admin')` | [add_item](../backend/app/routes/faq_routes.py#L55) |
+| GET | `/faq/admin` | `require_roles('admin')` | [get_admin_items](../backend/app/routes/faq_routes.py#L42) |
+| DELETE | `/faq/{faq_id}` | `require_roles('admin')` | [remove_item](../backend/app/routes/faq_routes.py#L106) |
+| GET | `/faq/{faq_id}` | `—` | [get_published_item](../backend/app/routes/faq_routes.py#L50) |
+| PATCH | `/faq/{faq_id}` | `require_roles('admin')` | [edit_item](../backend/app/routes/faq_routes.py#L66) |
+| PATCH | `/faq/{faq_id}/hide` | `require_roles('admin')` | [hide_item](../backend/app/routes/faq_routes.py#L93) |
+| PATCH | `/faq/{faq_id}/publish` | `require_roles('admin')` | [publish_item](../backend/app/routes/faq_routes.py#L80) |
+| GET | `/feedback` | `require_roles('admin')` | [get_feedback_list](../backend/app/routes/feedback_routes.py#L70) |
+| POST | `/feedback` | `get_current_user` | [submit_feedback](../backend/app/routes/feedback_routes.py#L53) |
+| GET | `/feedback/summary` | `require_roles('admin')` | [get_feedback_summary](../backend/app/routes/feedback_routes.py#L62) |
+| DELETE | `/feedback/{feedback_id}` | `require_roles('admin')` | [remove_feedback](../backend/app/routes/feedback_routes.py#L115) |
+| GET | `/feedback/{feedback_id}` | `require_roles('admin')` | [get_feedback_item](../backend/app/routes/feedback_routes.py#L79) |
+| PATCH | `/feedback/{feedback_id}/testimonial/hide` | `require_roles('admin')` | [hide_testimonial](../backend/app/routes/feedback_routes.py#L102) |
+| PATCH | `/feedback/{feedback_id}/testimonial/publish` | `require_roles('admin')` | [publish_testimonial](../backend/app/routes/feedback_routes.py#L88) |
+| GET | `/health` | `—` | [health_check](../backend/app/main.py#L82) |
+| GET | `/market-signals` | `get_current_user` | [get_signals](../backend/app/routes/market_signal_routes.py#L24) |
+| POST | `/market-signals` | `require_roles('admin')` | [add_signal](../backend/app/routes/market_signal_routes.py#L42) |
+| DELETE | `/market-signals/{signal_id}` | `require_roles('admin')` | [remove_signal](../backend/app/routes/market_signal_routes.py#L67) |
+| GET | `/market-signals/{signal_id}` | `get_current_user` | [get_signal](../backend/app/routes/market_signal_routes.py#L33) |
+| PATCH | `/market-signals/{signal_id}` | `require_roles('admin')` | [edit_signal](../backend/app/routes/market_signal_routes.py#L53) |
+| GET | `/markets` | `—` | [get_markets](../backend/app/routes/market_routes.py#L26) |
+| POST | `/markets` | `require_roles('admin')` | [add_market](../backend/app/routes/market_routes.py#L47) |
+| GET | `/markets/admin/all` | `require_roles('admin')` | [get_all_markets_for_admin](../backend/app/routes/market_routes.py#L31) |
+| DELETE | `/markets/{market_id}` | `require_roles('admin')` | [remove_market](../backend/app/routes/market_routes.py#L72) |
+| GET | `/markets/{market_id}` | `—` | [get_market_by_id](../backend/app/routes/market_routes.py#L39) |
+| PATCH | `/markets/{market_id}` | `require_roles('admin')` | [edit_market](../backend/app/routes/market_routes.py#L58) |
+| GET | `/payments` | `require_roles('admin')` | [get_payments](../backend/app/routes/payment_routes.py#L64) |
+| POST | `/payments/initiate` | `get_current_user` | [start_payment](../backend/app/routes/payment_routes.py#L39) |
+| POST | `/payments/webhook` | `—` | [paystack_webhook](../backend/app/routes/payment_routes.py#L48) |
+| POST | `/payments/{reference}/verify` | `_verification_user` | [verify_payment](../backend/app/routes/payment_routes.py#L29) |
+| GET | `/price-updates` | `bearer_scheme` | [get_latest_price_updates](../backend/app/routes/price_update_routes.py#L83) |
+| POST | `/price-updates` | `require_roles('admin', 'reporter')` | [add_price_update](../backend/app/routes/price_update_routes.py#L184) |
+| GET | `/price-updates/admin/flagged` | `require_roles('admin')` | [get_flagged_price_updates](../backend/app/routes/price_update_routes.py#L157) |
+| GET | `/price-updates/admin/history` | `require_roles('admin')` | [get_admin_price_history](../backend/app/routes/price_update_routes.py#L149) |
+| GET | `/price-updates/comparison` | `bearer_scheme` | [get_market_comparison](../backend/app/routes/price_update_routes.py#L132) |
+| GET | `/price-updates/history` | `require_full_access` | [get_price_history](../backend/app/routes/price_update_routes.py#L104) |
+| GET | `/price-updates/history/pairs` | `require_full_access` | [get_price_history_pairs](../backend/app/routes/price_update_routes.py#L124) |
+| GET | `/price-updates/my-stats` | `get_current_user` | [get_my_submission_stats](../backend/app/routes/price_update_routes.py#L165) |
+| DELETE | `/price-updates/{price_update_id}` | `require_roles('admin')` | [remove_price_update](../backend/app/routes/price_update_routes.py#L282) |
+| GET | `/price-updates/{price_update_id}` | `bearer_scheme` | [get_price_update](../backend/app/routes/price_update_routes.py#L173) |
+| PATCH | `/price-updates/{price_update_id}` | `require_roles('admin')` | [edit_price_update](../backend/app/routes/price_update_routes.py#L195) |
+| PATCH | `/price-updates/{price_update_id}/approve` | `require_roles('admin')` | [approve_update](../backend/app/routes/price_update_routes.py#L212) |
+| POST | `/price-updates/{price_update_id}/flag` | `get_current_user` | [flag_price](../backend/app/routes/price_update_routes.py#L239) |
+| POST | `/price-updates/{price_update_id}/flags/resolve` | `require_roles('admin')` | [resolve_price_flags](../backend/app/routes/price_update_routes.py#L250) |
+| PATCH | `/price-updates/{price_update_id}/mark-outdated` | `require_roles('admin')` | [mark_outdated](../backend/app/routes/price_update_routes.py#L269) |
+| PATCH | `/price-updates/{price_update_id}/reject` | `require_roles('admin')` | [reject_update](../backend/app/routes/price_update_routes.py#L226) |
+| POST | `/push/subscribe` | `get_current_user` | [subscribe](../backend/app/routes/push_routes.py#L35) |
+| GET | `/push/subscribed` | `get_current_user` | [check_subscribed](../backend/app/routes/push_routes.py#L16) |
+| POST | `/push/unsubscribe` | `get_current_user` | [unsubscribe](../backend/app/routes/push_routes.py#L44) |
+| GET | `/quality-signals` | `require_full_access` | [get_signals](../backend/app/routes/quality_signal_routes.py#L24) |
+| POST | `/quality-signals` | `require_roles('admin')` | [add_signal](../backend/app/routes/quality_signal_routes.py#L42) |
+| DELETE | `/quality-signals/{signal_id}` | `require_roles('admin')` | [remove_signal](../backend/app/routes/quality_signal_routes.py#L67) |
+| GET | `/quality-signals/{signal_id}` | `require_full_access` | [get_signal](../backend/app/routes/quality_signal_routes.py#L33) |
+| PATCH | `/quality-signals/{signal_id}` | `require_roles('admin')` | [edit_signal](../backend/app/routes/quality_signal_routes.py#L53) |
+| GET | `/reports/prices.csv` | `require_roles('admin')` | [export_price_report_csv](../backend/app/routes/report_export_routes.py#L33) |
+| GET | `/sell-watch-windows` | `require_full_access` | [get_windows](../backend/app/routes/sell_watch_window_routes.py#L27) |
+| POST | `/sell-watch-windows` | `require_roles('admin')` | [add_window](../backend/app/routes/sell_watch_window_routes.py#L45) |
+| GET | `/sell-watch-windows/{window_id}` | `require_full_access` | [get_window](../backend/app/routes/sell_watch_window_routes.py#L36) |
+| PATCH | `/sell-watch-windows/{window_id}` | `require_roles('admin')` | [edit_window](../backend/app/routes/sell_watch_window_routes.py#L56) |
+| GET | `/share/commodities/{commodity_name}` | `—` | [share_commodity_card](../backend/app/routes/share_routes.py#L48) |
+| GET | `/storage-suitability` | `require_full_access` | [get_items](../backend/app/routes/storage_suitability_routes.py#L27) |
+| POST | `/storage-suitability` | `require_roles('admin')` | [add_item](../backend/app/routes/storage_suitability_routes.py#L45) |
+| GET | `/storage-suitability/{item_id}` | `require_full_access` | [get_item](../backend/app/routes/storage_suitability_routes.py#L36) |
+| PATCH | `/storage-suitability/{item_id}` | `require_roles('admin')` | [edit_item](../backend/app/routes/storage_suitability_routes.py#L56) |
+| GET | `/subscriptions` | `require_roles('admin')` | [get_subscriptions](../backend/app/routes/subscription_routes.py#L31) |
+| POST | `/subscriptions/cron/send-trial-reminders` | `verify_cron_secret` | [cron_trigger_trial_reminders](../backend/app/routes/subscription_routes.py#L62) |
+| POST | `/subscriptions/send-trial-reminders` | `require_roles('admin')` | [trigger_trial_reminders](../backend/app/routes/subscription_routes.py#L53) |
+| GET | `/subscriptions/{user_id}` | `get_current_user` | [get_user_subscription](../backend/app/routes/subscription_routes.py#L39) |
+| PATCH | `/subscriptions/{user_id}/status` | `require_roles('admin')` | [set_subscription_status](../backend/app/routes/subscription_routes.py#L74) |
+| GET | `/testimonials` | `—` | [get_public_testimonials](../backend/app/routes/feedback_routes.py#L48) |
+| GET | `/users` | `require_roles('admin')` | [get_users](../backend/app/routes/user_routes.py#L16) |
+| GET | `/users/{user_id}` | `require_roles('admin')` | [get_user_by_id](../backend/app/routes/user_routes.py#L24) |
+| PATCH | `/users/{user_id}` | `require_roles('admin')` | [edit_user](../backend/app/routes/user_routes.py#L33) |
+| GET | `/watchlist` | `get_current_user` | [get_own_watchlist](../backend/app/routes/watchlist_routes.py#L28) |
+| POST | `/watchlist` | `get_current_user` | [save_item](../backend/app/routes/watchlist_routes.py#L19) |
+| DELETE | `/watchlist/{item_id}` | `get_current_user` | [remove_item](../backend/app/routes/watchlist_routes.py#L36) |

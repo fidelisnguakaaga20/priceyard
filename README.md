@@ -21,6 +21,22 @@ Built and shipped solo, end to end: product design, database schema, backend API
 - **Frontend:** React, TypeScript, Vite
 - **Infra:** Render (frontend + backend as separate services), Paystack, Brevo (transactional email)
 
-## Notes
+## Local development and verified changes
+
+The local development branch preserves the original application design and
+approved business rules. Start with [PRICEYARD_PROGRESS.md](PRICEYARD_PROGRESS.md)
+for current36-item counts, approvals, exact test results and interrupted work.
+Do not treat the live-app link above as a testing target.
+
+- [Safe isolated browser/backend/PostgreSQL workflow](docs/LOCAL_DEVELOPMENT.md)
+- [Existing product, security and data-preservation contracts](docs/APPLICATION_CONTRACTS.md)
+- [Current API route reference](docs/api-endpoints.md)
+- [Migration preservation](docs/MIGRATION_PRESERVATION.md)
+- [Read-only-by-default payment recovery](docs/PAYMENT_RECONCILIATION.md)
+
+Local verification is not production rollout approval. No production connection,
+push, merge, deployment or legacy-data repair is part of the local workflow.
+
+## Product notes
 
 This is a live, evolving product — the codebase reflects an iterative build process: real user feedback, data-integrity fixes caught by actual usage, and features added based on what traders in the target market said they needed (not a spec written in isolation).

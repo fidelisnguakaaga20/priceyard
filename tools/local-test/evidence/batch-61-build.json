@@ -1,0 +1,13 @@
+{
+  "typescript_and_vite_passed": true,
+  "reused_snapshot": true,
+  "js_css_byte_identical_to_previous_verified_build": true,
+  "assets_sha256": {
+    "index-BEBH-Ai6.css": "1cb3438f14a262d4ad7efa4ad11153cf61867917aabf51e88a04c6655cffdb28",
+    "index-BgXjH4fu.js": "ce9b95ae5446899da9dd1536d912caa8a9e8b46520d9713209d47adfb09534bc"
+  },
+  "dependencies_installed": 0,
+  "dependencies_copied": 0,
+  "build_retry_after_windows_sandbox_denial": true,
+  "ready_marker_restored_only_after_success": true
+}

@@ -25,6 +25,16 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest verified: batch61,26 complete /10 partial or pending:
+02,05,07,08,13,14,20,29,30,35. Batch60 bounds complete CSV exports without
+discarding history; batch61 completes current documentation/six-form readability
+and fixes safe resumption of failed isolated builds. Full225 backend tests,
+focused native export, TypeScript/Vite, six-form/14-card/original browser checks
+pass. Compiled JS/CSS are byte-identical to the previous verified build. Smaller
+native fixture71/80 schemas, stopped. Next: remaining PY-20 full JSON history/
+list bounds and PY-29 identity work; keep owner-policy/production gates explicit.
+Do not reopen completed scope or mistake earlier historical counts for current.
+
 Baseline browser/isolation verification passed. Batch 1 (PY-15) verified:
 homepage/current prices clear stale errors after normal successful refresh.
 Batch 2 (PY-34) verified: subscription transitions preserve staff authority and
@@ -385,13 +395,13 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-27 | Consistent existing editing/password inputs | Complete for identified scope: feedback selection in batch26, existing Unicode/72-byte password rules and reset validation in batch46, owner-approved six Admin edit forms in batches50–52. Saved values/costs, one-field edits, reload, explicit clearing, switching/unknown/blank IDs and creation verified in61 actual browser checks |
 | PY-28 | Historical record preservation | Current application-side scope complete in batch59: read-only legacy/unversioned preflight before migration steps, empty/reviewed0021-to0022 paths, unchanged raw history/catalog IDs/active flags/cost links/sources/audits, preserved paid/payment records and0022 downgrade refusal verified. No guesses to repair already-changed historical data; production backup/restore/rollout and any repairs require owner approval under PY-35 |
 | PY-29 | Stable identities and dependent records | Partial: catalog IDs/fields and referenced-price deletion rejection verified with atomic audit writes in batch 34; broader identity/duplicate/rename issues pending, no automatic merge |
-| PY-30 | Isolated automated/browser verification | Partial/ongoing: full216 backend tests pass in59; four focused native recovery/migration cases pass across58–59. Full40 native baseline remains47; no new full-native-suite claim. Actual recovery/payment browser checks pass58; seven original workflows and14-card dashboard pass59. Fixture69/80 schemas, stopped; serialized phases and existing frontend reused; no copied dependencies, native browser workers/providers disabled, live services forbidden |
+| PY-30 | Isolated automated/browser verification | Partial/ongoing: full225 backend tests pass in61; focused native CSV export passes60, prior recovery/migration cases58–59 retained. Full40 native baseline remains47, no new full-native-suite claim. Build safely resumes failed marked snapshots, four mock-only guard tests pass61; TypeScript/Vite, six original forms,14-card dashboard and seven original browser workflows pass61. Fixture71/80 schemas, stopped; serialized phases, one snapshot reused, byte-identical compiled JS/CSS; no copied dependencies, native browser workers/providers disabled, live services forbidden |
 | PY-31 | Confirmed payment activation and recovery | Application-side approved scope complete in batch58: atomic confirmation, owner callback and explicit bounded/resumable reconciliation for missed webhook/return; dry-run default, strict existing evidence/activation, single PG worker, error isolation, replay safety and purchased-time/manual-grant preservation verified. Live scheduling/checkpoints/monitoring and ambiguous legacy repairs require owner approval under PY-35 |
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches 14/21: carry forward dated paid/trial time; preserve indefinite grants, block new checkout and hold/recover old purchases without consuming days |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
 | PY-34 | Expiry without unintended staff-role loss | Complete in batch 2; 18 backend tests and two expired-Reporter browser cases passed |
 | PY-35 | Operational readiness and dependency evidence | Pending; production/provider/backup-restore/rollout checks outside current scope. Reconciliation scheduling/checkpoint storage/monitoring and any ambiguous historical payment or migration-data repair require owner approval; no live job or scheduler enabled |
-| PY-36 | Accurate progress/documentation/maintainability | Progress record established; ongoing |
+| PY-36 | Accurate progress/documentation/maintainability | Current application documentation/identified six-form readability scope complete in61: exact106-operation API index, approved contracts, safe local recovery/resumption guide and README links; six original intelligence forms expanded for maintenance with identical emitted syntax and byte-identical compiled JS/CSS. Progress/approvals/evidence current; future maintenance does not reopen this scope. Production rollout/provider documentation verification remains PY-35 |
 
 ## Verified results and batch history
 
@@ -2178,3 +2188,58 @@ No expansion of completed null-guard/account/UI scopes is needed.
   other lists; do not claim all query work complete. Next finite task: PY-36
   current documentation and behavior-preserving readability of existing forms.
 - No production contact/data/migration, credential reads, push, merge or deploy.
+
+### Batch 61 — current documentation, readable original forms and build recovery (2026-10-17)
+
+- PY-36 finite current application scope complete. Replaced obsolete staged API
+  notes (including claims that implemented resources were unimplemented) with a
+  source-derived106-operation reference. Compared exact method/path inventory to
+  guarded local OpenAPI:106/106 match;123 relative file links resolve. No database
+  connection, credentials or provider access for documentation verification.
+- README now links the live tracker, approved behavior contracts, local workflow,
+  migration-preservation and payment-recovery guides. APPLICATION_CONTRACTS.md
+  distinguishes implemented safeguards from pending owner policies and PY-35
+  operations. LOCAL_DEVELOPMENT.md explains safe demo/tests/build resumption,
+  evidence retention, pinned small native fixture and resource limits. No new
+  audit, application feature, policy or commercial-readiness claim.
+- Six original Admin intelligence forms in two legacy compressed source files
+  expanded into readable statements/JSX. Allowlisted formatter verifies emitted
+  syntax/literal equality against both input and previous verified snapshot;
+  no changes to names/fields/defaults/actions/measurements/markup behavior. Initial
+  formatter comparison was too sensitive to layout (including SourceFile text);
+  corrected structural comparison excludes positions/source layout but retains
+  node kinds, operators, declaration scope and all literal/identifier text.
+- TypeScript/Vite pass,103 modules,1.43s Vite. Stronger independent proof: built
+  JS index-BgXjH4fu.js and CSS index-BEBH-Ai6.css hashes are byte-for-byte identical
+  to the previous verified build. Exactly the same compiled original UI.
+- Actual Windows restricted-token build failed esbuild directory access, and its
+  ready marker correctly stayed absent. Normal approved escalation then exposed
+  a real interrupted-build resumption gap: --reuse required that missing marker.
+  Fixed only local harness PY-30: resume the preserved in-progress identity,
+  revalidate the same port/path/purpose checks, and publish ready marker only
+  after both TypeScript/Vite succeed. No manually restored ready marker, weakened
+  network/secret guard, new dependency tree or security restriction bypass.
+- Four file/process-free mock tests verify failed resume never publishes ready,
+  both steps must pass, unapproved purpose stops before copying/building, and an
+  active test port stops before marker reads. Targeted4 pass0.019s. Final full225
+  backend tests pass32.509s, zero failures/errors/skips. Repeated broader run was
+  after new harness/global-mock tests, not repeated native/schema-heavy testing.
+- Actual browser: all six existing forms retain saved-value loading, field edits,
+  required-null rejection, reload/clearing/ID-switch/creation behavior and unchanged
+  original price history. All14 dashboard labels/totals preserved, one summary
+  request, outage recovery; seven original home/Guest/filter/Trial/history/Admin/
+  mobile/login-quota workflows pass, no grades or mobile overflow. Browser workers
+  and external requests disabled; synthetic fixture only. Planning-form test
+  entries without original DELETE APIs remain synthetic until preview reseeding.
+- No native rerun for pure docs/formatting/harness change. Focused native export
+  proof from60 retained, full40 baseline remains47;71/80 schemas retained and
+  stopped. Build/browser/backend phases serialized; no dependency installations,
+  copied dependency trees or unbounded new fixture/file creation.
+- Evidence batch-61-*.json.26 complete /10 partial or pending:
+  02,05,07,08,13,14,20,29,30,35. Next finite PY-20 full JSON history/list bounds
+  and PY-29 stable identity/concurrent duplicate protection; no automatic catalog
+  merges or changes to original filter semantics. Source/referral/session/input/
+  calendar/movement policy and production gates remain explicit in their rows.
+- Master/backup preserved, verified changes saved only on the existing local
+  development branch. No production data/services/migrations, credential reads,
+  push, merge or deployment. Preview remains guarded at127.0.0.1:55446.

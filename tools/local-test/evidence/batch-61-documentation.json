@@ -1,0 +1,9 @@
+{
+  "documented_operations": 106,
+  "openapi_operations": 106,
+  "exact_route_inventory_match": true,
+  "relative_file_links_checked": 123,
+  "database_connections": 0,
+  "production_contacts": 0,
+  "dotenv_reads": 0
+}

@@ -1,0 +1,9 @@
+{
+  "tests_run": 4,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "duration_seconds": 0.019,
+  "pattern": "test_local_build_recovery.py",
+  "runtime": "in-process synthetic SQLite; TCP and DNS denied"
+}
