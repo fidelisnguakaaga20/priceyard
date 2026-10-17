@@ -1,0 +1,24 @@
+{
+  "before": false,
+  "checks": {
+    "confidence_help_relationship": true,
+    "help_close_reachable_by_tab": true,
+    "help_escape_closes": true,
+    "help_escape_restores_trigger": true,
+    "original_help_close_restores_trigger": true,
+    "menu_controls_existing_navigation": true,
+    "menu_links_reachable": true,
+    "menu_escape_closes": true,
+    "menu_escape_restores_toggle": true,
+    "tour_initial_focus_inside": true,
+    "tour_reverse_tab_contained": true,
+    "tour_forward_tab_contained": true,
+    "original_tour_next_and_back_preserved": true,
+    "tour_escape_uses_existing_skip": true,
+    "tour_original_seen_policy_preserved": true,
+    "tour_restores_focus_after_dismissal": true
+  },
+  "failures": [],
+  "external_page_requests": 0,
+  "production_connections": 0
+}

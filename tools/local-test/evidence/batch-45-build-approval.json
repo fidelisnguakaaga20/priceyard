@@ -1,0 +1,12 @@
+{
+  "prior_review_failure": "Usage limit prevented automatic approval review; command was not executed and was not determined unsafe",
+  "normal_sandbox_attempt": "TypeScript passed; Vite/esbuild ancestor-directory metadata read denied",
+  "approved_alternative": "Same isolated build submitted to explicit automatic approval review and allowed",
+  "credential_free_snapshot": true,
+  "node_network_dns_and_secret_file_guards_retained": true,
+  "dependencies_installed": false,
+  "production_contacts": 0,
+  "typescript_and_vite_passed": true,
+  "vite_seconds": 2.37,
+  "css_unchanged": "index-BEBH-Ai6.css"
+}

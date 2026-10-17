@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export const ONBOARDING_TOUR_SEEN_KEY = "priceyard_onboarding_seen";
 export const ONBOARDING_TOUR_SEEN_EVENT = "priceyard-onboarding-seen";
@@ -16,6 +16,17 @@ export function OnboardingTour() {
     try { return localStorage.getItem(SEEN_KEY) === "1"; } catch { return true; }
   });
   const [step, setStep] = useState(0);
+  const dialog = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (dismissed) return;
+    const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    dialog.current?.querySelector<HTMLButtonElement>("button")?.focus();
+    return () => {
+      const target = previous?.isConnected && previous !== document.body ? previous : document.querySelector<HTMLElement>(".brand");
+      target?.focus();
+    };
+  }, [dismissed]);
 
   const finish = () => {
     setDismissed(true);
@@ -29,10 +40,17 @@ export function OnboardingTour() {
   const isFirst = step === 0;
 
   return (
-    <div className="onboarding-overlay" role="dialog" aria-modal="true" aria-label="Welcome to PriceYard">
+    <div ref={dialog} className="onboarding-overlay" role="dialog" aria-modal="true" aria-label="Welcome to PriceYard" aria-describedby="priceyard-onboarding-step" onKeyDown={event => {
+      if (event.key === "Escape") { event.preventDefault(); finish(); return; }
+      if (event.key !== "Tab") return;
+      const controls = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>("button:not(:disabled)"));
+      const first = controls[0], last = controls[controls.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    }}>
       <div className="onboarding-card">
         <span className="eyebrow">Welcome to PriceYard ({step + 1}/{STEPS.length})</span>
-        <p>{STEPS[step]}</p>
+        <p id="priceyard-onboarding-step" aria-live="polite">{STEPS[step]}</p>
         <div className="onboarding-actions">
           <button type="button" className="text-link text-link-button" onClick={finish}>Skip</button>
           <div className="onboarding-nav-buttons">

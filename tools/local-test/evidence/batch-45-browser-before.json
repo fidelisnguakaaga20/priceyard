@@ -1,0 +1,37 @@
+{
+  "before": true,
+  "checks": {
+    "confidence_help_relationship": false,
+    "help_close_reachable_by_tab": true,
+    "help_escape_closes": false,
+    "help_escape_restores_trigger": false,
+    "original_help_close_restores_trigger": false,
+    "menu_controls_existing_navigation": false,
+    "menu_links_reachable": true,
+    "menu_escape_closes": false,
+    "menu_escape_restores_toggle": false,
+    "tour_initial_focus_inside": false,
+    "tour_reverse_tab_contained": false,
+    "tour_forward_tab_contained": false,
+    "original_tour_next_and_back_preserved": true,
+    "tour_escape_uses_existing_skip": false,
+    "tour_original_seen_policy_preserved": true,
+    "tour_restores_focus_after_dismissal": false
+  },
+  "failures": [
+    "confidence_help_relationship",
+    "help_escape_closes",
+    "help_escape_restores_trigger",
+    "original_help_close_restores_trigger",
+    "menu_controls_existing_navigation",
+    "menu_escape_closes",
+    "menu_escape_restores_toggle",
+    "tour_initial_focus_inside",
+    "tour_reverse_tab_contained",
+    "tour_forward_tab_contained",
+    "tour_escape_uses_existing_skip",
+    "tour_restores_focus_after_dismissal"
+  ],
+  "external_page_requests": 0,
+  "production_connections": 0
+}

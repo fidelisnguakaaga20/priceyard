@@ -226,6 +226,16 @@ PY-25 approved application scope complete: twenty-one complete, fifteen partial/
 pending. Native browser service workers remain deliberately disabled in this lab;
 real deployment/PWA/provider compatibility remains operational PY-35 work.
 
+Batch 45 resumes the uncommitted keyboard work at df74e55. Sixteen original menu/
+help/welcome-tour cases, twenty earlier keyboard regressions, fourteen-card
+dashboard regression, six backend boundary tests and 38 pinned PG cases pass.
+PY-24 identified keyboard/focus scope complete: twenty-two complete, fourteen
+partial/pending. The previous build was not executed because approval review hit
+a usage limit. Normal sandbox TypeScript passed but Vite ancestor metadata access
+failed; a subsequent explicitly reviewed guarded build succeeded. No bypass.
+Next: existing password/input consistency, bounded detail queries and remaining
+approved technical safeguards; business-rule and live-operation decisions remain.
+
 ## Checklist — do not repeat the audit
 
 | ID | Improvement | Current status |
@@ -253,13 +263,13 @@ real deployment/PWA/provider compatibility remains operational PY-35 work.
 | PY-21 | Reliable independent alerts | Application-side identified channel dependency complete in batch 24: failed email no longer skips push/WhatsApp; per-user/channel failures isolated; existing deduplication/count semantics retained. Delivery/retry operations remain PY-35 |
 | PY-22 | Efficient loading and accurate dashboard totals | Complete for identified dashboard scope in batch 29: all 14 original metrics preserved; one Admin-only aggregate API/DB snapshot, zero entity hydration; backend/PG/browser totals and outage recovery verified |
 | PY-23 | Preserve layout while fixing mobile overflow | Complete for identified original critical-layout/price-card overflow scope in batches 42/43: 78 normal and twelve long-name viewport checks, 320–1366px, Easy reading both modes; ordinary card/badge geometry and all fourteen Admin cards preserved |
-| PY-24 | Keyboard/focus accessibility | Partial: price-row and published/hidden FAQ selection now supports Tab/Enter/Space with visible keyboard focus; original mouse actions retained and user-role/subscription selects named. Remaining navigation/popover checks pending |
+| PY-24 | Keyboard/focus accessibility | Complete for identified original keyboard/focus scope in batches 42/45: selectable records and named role/status controls, menu/help Escape with trigger focus restoration, welcome-dialog initial/wrapped focus and original Skip/Next/Back behavior; 36 browser keyboard cases and all fourteen dashboard cards verified |
 | PY-25 | Safe and clearly aged offline prices | Complete for owner-approved application scope in batch 44: public-only explicit configured-API caching, timestamped saved copies, truthful original-view warnings, legacy/private/history exclusion and fresh-response recovery verified using actual worker source with fake network and actual browser UI with synthetic metadata. Native deployed PWA compatibility remains PY-35; no new age cutoff |
 | PY-26 | Complete atomic administrative audit | Complete for identified business-record writers through batch 40: payment/referral, price/moderation/flags, account/subscription, FAQ/catalog and all six intelligence resources save sanitized audits atomically; native concurrent edits and failed-audit rollback verified. External delivery operations remain PY-35 |
 | PY-27 | Consistent existing editing/password inputs | Partial: feedback file replacement/removal/async ordering fixed without form changes in batch 26; remaining editing/password cases pending |
 | PY-28 | Historical record preservation | Partial: approved 0022 tested on fresh/populated synthetic PostgreSQL; future migration/history work pending |
 | PY-29 | Stable identities and dependent records | Partial: catalog IDs/fields and referenced-price deletion rejection verified with atomic audit writes in batch 34; broader identity/duplicate/rename issues pending, no automatic merge |
-| PY-30 | Isolated automated/browser verification | Partial/ongoing: guarded 180 backend tests, 38 identity-pinned synthetic PostgreSQL cases, real original-browser workflows and before/after evidence verified through batch 44; offline worker tested with fake transport only, native browser workers/providers disabled; expand with remaining work, live services forbidden |
+| PY-30 | Isolated automated/browser verification | Partial/ongoing: guarded 180 backend tests, 38 identity-pinned synthetic PostgreSQL cases, real original-browser workflows and before/after evidence verified through batch 45; offline worker tested with fake transport only, native browser workers/providers disabled; expand with remaining work, live services forbidden |
 | PY-31 | Confirmed payment activation and recovery | Partial: atomic confirmation, retry/replay, owner-only callback recovery and approved indefinite-grant holds verified; unattended recovery and operational delivery/reconciliation decisions remain |
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches 14/21: carry forward dated paid/trial time; preserve indefinite grants, block new checkout and hold/recover old purchases without consuming days |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
@@ -1519,3 +1529,35 @@ real deployment/PWA/provider compatibility remains operational PY-35 work.
 - Twenty-one IDs complete; fifteen partial/pending. Next: remaining keyboard/focus,
   editing/query/security work and separately approved business/operational decisions.
   No production access, dependency installation, push, merge or deployment.
+
+### Batch 45 — finish identified PY-24 keyboard/focus scope (2026-10-17)
+
+- Resume preserved uncommitted component changes and before evidence at df74e55;
+  no audit restart. Before browser reproduces twelve failures in sixteen cases.
+  Existing help popup now identifies its controlled note, handles Escape and
+  returns focus on Close/Escape. Existing mobile menu identifies its navigation
+  and Escape closes it while restoring the original toggle's focus.
+- Existing welcome dialog takes initial focus, wraps Tab/Shift+Tab within its
+  buttons, announces its existing step text, and restores focus on dismissal.
+  Escape invokes the original Skip action/seen preference; original Next/Back,
+  words, step count, buttons, prices/trial/access policies and appearance retained.
+- Previous auto-review attempt never executed the build: usage-limit review failure,
+  not an unsafe-action determination. Resumed normal sandbox attempt passed
+  TypeScript but esbuild could not read ancestor-directory metadata. Same guarded
+  credential-free build then received explicit automatic approval and passed.
+  No restriction bypass or dependency installation. Build2.37s/102modules,
+  JS323.59kB/91.84kB gzip; original CSS index-BEBH-Ai6.css unchanged.
+- All sixteen after cases and twenty prior selection/name/mouse regressions pass.
+  Original dashboard all fourteen labels/values, one summary request and recovery
+  pass. Six relevant backend boundary tests pass,2.255s (backend unchanged; latest
+  full suite180 in batch44). All38 native pinned PG cases pass,30.120s.
+- The isolated cluster had been interrupted; ordinary automatic recovery completed
+  without reset/WAL/PID deletion or edits. Live directory/system identity is checked
+  by the pinned runner before every connection/mutation; no production contacts.
+- Evidence: tools/local-test/evidence/batch-45-*.json. Manual: /prices at
+  http://127.0.0.1:55446, open the confidence ? then press Escape; at mobile width,
+  open Menu, Tab to its first link and press Escape. A fresh private browser opens
+  the original tour; Tab remains inside it and Escape performs Skip.
+- Twenty-two IDs complete; fourteen partial/pending. Remaining editing/query,
+  security/business and operational work is not claimed complete. No production
+  data access, push, merge or deployment. Preview remains synthetic-only.

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { apiFetch, apiFetchWithProvenance } from "../services/api";
@@ -34,6 +34,7 @@ export function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = useState(false);
+  const menuButton = useRef<HTMLButtonElement>(null);
   const [loggingOut, setLoggingOut] = useState(false);
   const [tickerPrices, setTickerPrices] = useState<PriceUpdate[]>([]);
   const [tickerSavedAt, setTickerSavedAt] = useState<string | null>(null);
@@ -89,8 +90,8 @@ export function Layout() {
             <span className="brand-mark">PY</span>
             <span><strong>PriceYard</strong><small>Know the market before you buy or sell.</small></span>
           </Link>
-          <button className="menu-button" type="button" aria-label="Toggle navigation" aria-expanded={open} onClick={() => setOpen((value) => !value)}>☰ Menu</button>
-          <nav className={open ? "main-nav open" : "main-nav"} aria-label="Primary navigation">
+          <button ref={menuButton} className="menu-button" type="button" aria-label="Toggle navigation" aria-controls="priceyard-primary-navigation" aria-expanded={open} onClick={() => setOpen((value) => !value)} onKeyDown={event => { if (open && event.key === "Escape") { event.preventDefault(); setOpen(false); } }}>☰ Menu</button>
+          <nav id="priceyard-primary-navigation" className={open ? "main-nav open" : "main-nav"} aria-label="Primary navigation" onKeyDown={event => { if (open && event.key === "Escape") { event.preventDefault(); setOpen(false); menuButton.current?.focus(); } }}>
             <div className="nav-primary">
               {navItems.map(([to, label]) => <NavLink key={to} to={to} onClick={() => setOpen(false)}>{label}</NavLink>)}
             </div>
