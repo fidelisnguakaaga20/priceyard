@@ -2,10 +2,11 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ButtonSpinner, LoadingSpinner } from "../components/LoadingSpinner";
 import { PushAlertPrompt } from "../components/PushAlertPrompt";
+import { SavedPriceNotice } from "../components/SavedPriceNotice";
 import { useAuth } from "../context/AuthContext";
 import { useCommodityMarketPairs } from "../hooks/useCommodityMarketPairs";
 import { useToast } from "../context/ToastContext";
-import { apiFetch } from "../services/api";
+import { apiFetch, apiFetchWithProvenance } from "../services/api";
 import type { Commodity, Market, PriceUpdate, TargetDirection, WatchlistItem } from "../types/api";
 import { agingClass, money, movementIcon, relativeTime } from "../utils";
 
@@ -18,6 +19,7 @@ export function WatchlistPage() {
   const [commodities, setCommodities] = useState<Commodity[]>([]);
   const [markets, setMarkets] = useState<Market[]>([]);
   const [prices, setPrices] = useState<PriceUpdate[]>([]);
+  const [savedAt, setSavedAt] = useState<string | null>(null);
   const [commodityId, setCommodityId] = useState("");
   const [marketId, setMarketId] = useState("");
   const [targetPrice, setTargetPrice] = useState("");
@@ -37,12 +39,13 @@ export function WatchlistPage() {
         apiFetch<WatchlistItem[]>("/watchlist", {}, token),
         apiFetch<Commodity[]>("/commodities"),
         apiFetch<Market[]>("/markets"),
-        apiFetch<PriceUpdate[]>("/price-updates"),
+        apiFetchWithProvenance<PriceUpdate[]>("/price-updates"),
       ]);
       setItems(watchlistItems);
       setCommodities(commodityItems);
       setMarkets(marketItems);
-      setPrices(priceItems);
+      setPrices(priceItems.data);
+      setSavedAt(priceItems.savedAt);
       setError("");
     } catch (err) {
       setError((err as Error).message);
@@ -166,6 +169,7 @@ export function WatchlistPage() {
       <div className="filter-actions"><button className="button button-small" disabled={saving || loading}>{saving ? <ButtonSpinner label="Please wait…" /> : "Save item"}</button></div>
     </form>
     {error && <div className="status-box error">{error}</div>}
+    {!loading && items.some(item => findPriceFor(item)) && <SavedPriceNotice savedAt={savedAt} />}
     {loading ? <LoadingSpinner label="Loading your watchlist…" /> : <>
       <div className="watchlist-grid">{items.map((item) => {
         const match = findPriceFor(item);

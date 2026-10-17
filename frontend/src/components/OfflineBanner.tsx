@@ -17,7 +17,7 @@ export function OfflineBanner() {
   if (online) return null;
   return (
     <div className="offline-banner" role="status">
-      You&rsquo;re offline — showing the last prices saved on this device.
+      You&rsquo;re offline. Saved prices may be shown; they are not live.
     </div>
   );
 }

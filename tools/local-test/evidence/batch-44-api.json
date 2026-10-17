@@ -1,0 +1,9 @@
+{
+  "cases": 12,
+  "passed": 12,
+  "actual_api_typescript": true,
+  "invalid_cache_timestamps_fail_closed": true,
+  "original_401_handler_preserved": true,
+  "only_fake_fetch_used": true,
+  "production_connections": 0
+}

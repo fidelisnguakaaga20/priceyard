@@ -1,0 +1,106 @@
+{
+  "before": true,
+  "tests": 28,
+  "failures": [
+    {
+      "name": "public current fallback has truthful device time and unchanged record time",
+      "error": "Expected values to be strictly equal:\n\nnull !== 'saved'\n"
+    },
+    {
+      "name": "configured separate API origin retains public-only offline functionality",
+      "error": "Expected values to be strictly equal:\n\nnull !== 'saved'\n"
+    },
+    {
+      "name": "never intercept private or historical path /api/auth/me",
+      "error": "Expected values to be strictly equal:\n\ntrue !== false\n"
+    },
+    {
+      "name": "never intercept private or historical path /api/payments",
+      "error": "Expected values to be strictly equal:\n\ntrue !== false\n"
+    },
+    {
+      "name": "never intercept private or historical path /api/users",
+      "error": "Expected values to be strictly equal:\n\ntrue !== false\n"
+    },
+    {
+      "name": "never intercept private or historical path /api/audit-logs",
+      "error": "Expected values to be strictly equal:\n\ntrue !== false\n"
+    },
+    {
+      "name": "never intercept private or historical path /api/subscriptions",
+      "error": "Expected values to be strictly equal:\n\ntrue !== false\n"
+    },
+    {
+      "name": "never intercept private or historical path /api/price-updates/history",
+      "error": "Expected values to be strictly equal:\n\ntrue !== false\n"
+    },
+    {
+      "name": "never intercept private or historical path /api/price-updates?date=2026-10-16",
+      "error": "Expected values to be strictly equal:\n\ntrue !== false\n"
+    },
+    {
+      "name": "never intercept private or historical path /api/price-updates/admin/history",
+      "error": "Expected values to be strictly equal:\n\ntrue !== false\n"
+    },
+    {
+      "name": "never intercept private or historical path /api/quality-signals",
+      "error": "Expected values to be strictly equal:\n\ntrue !== false\n"
+    },
+    {
+      "name": "never intercept private or historical path /api/faq/admin",
+      "error": "Expected values to be strictly equal:\n\ntrue !== false\n"
+    },
+    {
+      "name": "never intercept private or historical path /api/market-signals",
+      "error": "Expected values to be strictly equal:\n\ntrue !== false\n"
+    },
+    {
+      "name": "authorization bypasses every cache branch /assets/synthetic.js",
+      "error": "Expected values to be strictly equal:\n\ntrue !== false\n"
+    },
+    {
+      "name": "authorization bypasses every cache branch /prices",
+      "error": "Expected values to be strictly equal:\n\ntrue !== false\n"
+    },
+    {
+      "name": "unconfigured origins never enter cache https://outside.invalid/assets/test.js",
+      "error": "Expected values to be strictly equal:\n\ntrue !== false\n"
+    },
+    {
+      "name": "unconfigured origins never enter cache https://outside.invalid/price-updates",
+      "error": "Expected values to be strictly equal:\n\ntrue !== false\n"
+    },
+    {
+      "name": "unconfigured origins never enter cache https://outside.invalid/prices",
+      "error": "Expected values to be strictly equal:\n\ntrue !== false\n"
+    },
+    {
+      "name": "public filtered list retains its own URL key",
+      "error": "Expected values to be strictly equal:\n\nnull !== 'saved'\n"
+    },
+    {
+      "name": "unmarked or invalid-time copies cannot be replayed",
+      "error": "Missing expected rejection."
+    },
+    {
+      "name": "unrelated old caches are never used for fallback",
+      "error": "Missing expected rejection."
+    },
+    {
+      "name": "activation removes only the two known legacy PriceYard caches",
+      "error": "The expression evaluated to a falsy value:\n\n  assert.ok(!lab.stores.has('priceyard-v1-shell'))\n"
+    },
+    {
+      "name": "private and no-store public responses cannot be cached",
+      "error": "Missing expected rejection."
+    },
+    {
+      "name": "navigation excludes reset account Admin payment and historical screens",
+      "error": "Expected values to be strictly equal:\n\ntrue !== false\n"
+    }
+  ],
+  "actual_service_worker_source": true,
+  "in_memory_cache_and_fake_fetch": true,
+  "native_network_available_to_worker": false,
+  "production_connections": 0
+}

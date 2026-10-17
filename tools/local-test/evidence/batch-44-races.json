@@ -1,0 +1,10 @@
+{
+  "checks": {
+    "home_old_cached_response_cannot_replace_new_fresh_state": true,
+    "prices_old_cached_response_cannot_replace_new_fresh_state": true
+  },
+  "passed": 2,
+  "ticker_and_page_both_exercised": true,
+  "production_connections": 0,
+  "external_page_requests": 0
+}

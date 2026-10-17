@@ -35,6 +35,7 @@ export async function apiFetch<T>(
   path: string,
   options: RequestInit = {},
   token?: string | null,
+  onProvenance?: (savedAt: string | null) => void,
 ): Promise<T> {
   const headers = new Headers(options.headers);
   if (options.body && !headers.has("Content-Type")) headers.set("Content-Type", "application/json");
@@ -53,8 +54,22 @@ export async function apiFetch<T>(
     }
     throw new ApiError(response.status, errorDetail(payload, `Request failed with status ${response.status}`));
   }
-  if (response.status === 204) return undefined as T;
-  return response.json() as Promise<T>;
+  const cached = response.headers.get("X-PriceYard-Cache") === "saved";
+  const stamp = response.headers.get("X-PriceYard-Saved-At");
+  const parsed = Date.parse(stamp || "");
+  if (cached && (!Number.isFinite(parsed) || new Date(parsed).toISOString() !== stamp)) {
+    // A legacy/invalid saved copy has no trustworthy device-save timestamp.
+    throw new ApiError(503, "Request failed with status 503");
+  }
+  const data = response.status === 204 ? undefined as T : await response.json() as T;
+  onProvenance?.(cached ? stamp : null);
+  return data;
+}
+
+export async function apiFetchWithProvenance<T>(path: string): Promise<{ data: T; savedAt: string | null }> {
+  let savedAt: string | null = null;
+  const data = await apiFetch<T>(path, {}, null, value => { savedAt = value; });
+  return { data, savedAt };
 }
 
 export function getApiBase(): string {

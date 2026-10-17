@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { apiFetch } from "../services/api";
+import { apiFetch, apiFetchWithProvenance } from "../services/api";
 import { InstallPrompt } from "./InstallPrompt";
 import { ButtonSpinner } from "./LoadingSpinner";
 import { OfflineBanner } from "./OfflineBanner";
@@ -36,15 +36,22 @@ export function Layout() {
   const [open, setOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [tickerPrices, setTickerPrices] = useState<PriceUpdate[]>([]);
+  const [tickerSavedAt, setTickerSavedAt] = useState<string | null>(null);
   const showTicker = !TICKER_HIDDEN_PREFIXES.some((prefix) => location.pathname.startsWith(prefix));
 
   useEffect(() => {
     if (!showTicker) return;
-    const loadTicker = () => { void apiFetch<PriceUpdate[]>("/price-updates").then(setTickerPrices).catch(() => {}); };
+    let current = true;
+    let sequence = 0;
+    const loadTicker = () => {
+      const request = ++sequence;
+      void apiFetchWithProvenance<PriceUpdate[]>("/price-updates").then(({ data, savedAt }) => {
+        if (current && request === sequence) { setTickerPrices(data); setTickerSavedAt(savedAt); }
+      }).catch(() => {});
+    };
     loadTicker();
-    if (dataSaver) return;
-    const interval = setInterval(loadTicker, TICKER_REFRESH_MS);
-    return () => clearInterval(interval);
+    const interval = dataSaver ? undefined : setInterval(loadTicker, TICKER_REFRESH_MS);
+    return () => { current = false; if (interval !== undefined) clearInterval(interval); };
   }, [dataSaver, showTicker]);
 
   useEffect(() => {
@@ -111,7 +118,7 @@ export function Layout() {
             <button type="button" className={darkMode ? "toggle-pill on" : "toggle-pill"} aria-pressed={darkMode} onClick={toggleDarkMode}>Dark mode: {darkMode ? "On" : "Off"}</button>
           </span>
         </div>
-        {showTicker && <PriceTicker items={tickerPrices} />}
+        {showTicker && <PriceTicker items={tickerPrices} savedAt={tickerSavedAt} />}
       </header>
       {trialDaysLeft !== null && trialDaysLeft >= 0 && (
         <div className="trial-banner">

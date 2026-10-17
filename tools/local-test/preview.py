@@ -10,6 +10,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import sys
 from unittest.mock import patch
+from urllib.parse import parse_qs
 
 LAB = Path(__file__).resolve().parent
 sys.path.insert(0, str(LAB))
@@ -303,6 +304,18 @@ async def control(request):
 async def controls(request):
     return HTMLResponse('''<!doctype html><html><head><title>PriceYard local testing controls</title></head><body style="font:18px system-ui;max-width:760px;margin:32px auto;padding:16px"><h1>Local testing controls</h1><p>These controls affect fabricated local test prices only. They are separate from the PriceYard application.</p><ol><li>Click <b>Simulate connection problem</b>.</li><li>Open <a href="/" target="_blank">the homepage</a> in another tab. Its existing error message should appear.</li><li>Return here and click <b>Restore connection</b>.</li><li>Return to the homepage. With Data saver Off, the normal refresh should show prices and remove the error within one minute.</li></ol><button onclick="setOutage(true)">Simulate connection problem</button> <button onclick="setOutage(false)">Restore connection</button><p id="status" role="status"></p><script>async function setOutage(enabled){const response=await fetch('/__test__/outage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({enabled})});if(!response.ok)throw Error('Control failed');document.querySelector('#status').textContent=enabled?'Simulated price outage enabled.':'Connection restored. Prices will refresh normally.'}</script></body></html>''')
 
+saved_copy_demo = {"enabled": False, "saved_at": None}
+
+async def offline_price_controls(request):
+    if request.method == "POST":
+        payload = await request.json()
+        if set(payload) != {"enabled"} or type(payload["enabled"]) is not bool:
+            return JSONResponse({"detail": "Expected one boolean enabled value"}, status_code=422)
+        saved_copy_demo["enabled"] = payload["enabled"]
+        saved_copy_demo["saved_at"] = datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z") if payload["enabled"] else None
+        return JSONResponse(saved_copy_demo)
+    return HTMLResponse('''<!doctype html><html><head><title>Local saved-price simulation</title></head><body style="font:18px system-ui;max-width:760px;margin:32px auto;padding:16px"><h1>Local saved-price simulation</h1><p>Fabricated local prices only. This control simulates saved-copy response metadata so you can review the approved warning in the original interface. Actual worker caching is tested separately with an isolated fake network; native service workers stay disabled here.</p><button onclick="mode(true)">Show simulated saved copy</button> <button onclick="mode(false)">Restore normal responses</button><p><a href="/prices" target="_blank">Open Current Prices</a> and reload after choosing a mode.</p><p id="result" role="status"></p><script>async function mode(enabled){const r=await fetch('/__test__/offline-prices',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({enabled})});if(!r.ok)throw Error('Control failed');document.querySelector('#result').textContent=enabled?'Saved-copy simulation enabled. Reload Current Prices.':'Normal responses restored. Reload Current Prices.'}</script></body></html>''')
+
 class LocalOnly:
     def __init__(self, app):
         self.app = app
@@ -324,6 +337,11 @@ class LocalOnly:
                 scope = dict(scope, client=("local-test-"+test_client, 0))
         async def secured(message):
             if message["type"] == "http.response.start":
+                if (scope.get("path") == "/api/price-updates" and scope.get("method") == "GET"
+                        and message.get("status") == 200 and saved_copy_demo["enabled"]
+                        and b"authorization" not in dict(scope.get("headers", []))
+                        and "date" not in parse_qs(scope.get("query_string", b"").decode("ascii", errors="ignore"))):
+                    message.setdefault("headers", []).extend([(b"x-priceyard-cache", b"saved"), (b"x-priceyard-saved-at", saved_copy_demo["saved_at"].encode("ascii"))])
                 message.setdefault("headers", []).extend([(b"cache-control", b"no-store"), (b"content-security-policy", b"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'")])
             await send(message)
         if scope["type"] == "http" and scope.get("path") == "/api/price-updates" and outage["enabled"]:
@@ -343,7 +361,7 @@ class LocalOnly:
         else:
             await self.app(scope, receive, secured)
 
-preview = LocalOnly(Starlette(routes=[Route("/__test__/status", status), Route("/__test__/google-mode", set_google_mode, methods=["POST"]), Route("/__test__/alerts", notification_controls, methods=["GET", "POST"]), Route("/__test__/inbox", inbox), Route("/__test__/controls", controls), Route("/__test__/push", push_controls), Route("/__test__/payments", payment_controls), Route("/__test__/manual-review", manual_review_controls), Route("/__test__/purchase-value", purchase_value_controls), Route("/__test__/verification", verification_controls), Route("/__test__/verification-mode", set_verification_mode, methods=["POST"]), Route("/__test__/checkout", checkout_controls), Route("/__test__/checkout-mode", set_checkout_mode, methods=["POST"]), Route("/__test__/payment-event", payment_event, methods=["POST"]), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
+preview = LocalOnly(Starlette(routes=[Route("/__test__/status", status), Route("/__test__/offline-prices", offline_price_controls, methods=["GET", "POST"]), Route("/__test__/google-mode", set_google_mode, methods=["POST"]), Route("/__test__/alerts", notification_controls, methods=["GET", "POST"]), Route("/__test__/inbox", inbox), Route("/__test__/controls", controls), Route("/__test__/push", push_controls), Route("/__test__/payments", payment_controls), Route("/__test__/manual-review", manual_review_controls), Route("/__test__/purchase-value", purchase_value_controls), Route("/__test__/verification", verification_controls), Route("/__test__/verification-mode", set_verification_mode, methods=["POST"]), Route("/__test__/checkout", checkout_controls), Route("/__test__/checkout-mode", set_checkout_mode, methods=["POST"]), Route("/__test__/payment-event", payment_event, methods=["POST"]), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
 
 if __name__ == "__main__":
     import uvicorn

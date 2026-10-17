@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { CommodityImage } from "../components/CommodityImage";
 import { Disclaimer, PRICE_DISCLAIMER } from "../components/Disclaimer";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { PriceCard } from "../components/PriceCard";
+import { SavedPriceNotice } from "../components/SavedPriceNotice";
 import { NativeShareButton } from "../components/ShareButtons";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { usePreferences } from "../context/PreferencesContext";
-import { apiFetch } from "../services/api";
+import { apiFetch, apiFetchWithProvenance } from "../services/api";
 import type { Commodity, Market, PriceUpdate, Testimonial } from "../types/api";
 import { comingSoonShareContent, comingSoonShareUrl, dateOnly, money, priceShareContent, relativeTime, whatsAppShareUrl, WHATSAPP_COMMUNITY_URL } from "../utils";
 
@@ -17,6 +18,8 @@ export function HomePage() {
   useDocumentTitle("Know the market before you buy or sell");
   const { dataSaver } = usePreferences();
   const [prices, setPrices] = useState<PriceUpdate[]>([]);
+  const [savedAt, setSavedAt] = useState<string | null>(null);
+  const priceRequest = useRef(0);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [upcoming, setUpcoming] = useState<Commodity[]>([]);
@@ -26,10 +29,11 @@ export function HomePage() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
 
   const loadPrices = (silent = false) => {
-    apiFetch<PriceUpdate[]>("/price-updates")
-      .then((items) => { setPrices(items.slice(0, 3)); setRecordCount(items.length); setError(""); })
-      .catch((err: Error) => { if (!silent) setError(err.message); })
-      .finally(() => { if (!silent) setLoading(false); });
+    const sequence = ++priceRequest.current;
+    apiFetchWithProvenance<PriceUpdate[]>("/price-updates")
+      .then(({ data: items, savedAt }) => { if (sequence !== priceRequest.current) return; setPrices(items.slice(0, 3)); setSavedAt(savedAt); setRecordCount(items.length); setError(""); })
+      .catch((err: Error) => { if (sequence === priceRequest.current && !silent) setError(err.message); })
+      .finally(() => { if (sequence === priceRequest.current && !silent) setLoading(false); });
   };
 
   useEffect(() => {
@@ -46,6 +50,7 @@ export function HomePage() {
     apiFetch<Testimonial[]>("/testimonials")
       .then(setTestimonials)
       .catch(() => undefined);
+    return () => { priceRequest.current++; };
   }, []);
 
   // Silently keep the homepage's prices current while it's open (ticker + "Today's
@@ -66,7 +71,8 @@ export function HomePage() {
           <p>See today's and past prices, price changes, and real market updates for Egusi, Honey Beans and Palm oil.</p>
           {!loading && prices[0] && (
             <div className="hero-price-preview">
-              <span className="eyebrow">Live now</span>
+              {!savedAt && <span className="eyebrow">Live now</span>}
+              <SavedPriceNotice savedAt={savedAt} />
               <p className="price-range">{prices[0].commodity.name}: {money(prices[0].price_low)} – {money(prices[0].price_high)}</p>
               <span className="muted">{prices[0].market.name} · updated {relativeTime(prices[0].update_date_time)}</span>
               <a className="text-link" href={whatsAppShareUrl(prices[0])} target="_blank" rel="noopener noreferrer">Share on WhatsApp →</a>
@@ -119,6 +125,7 @@ export function HomePage() {
 
       <section className="page section-block">
         <div className="section-heading"><div><span className="eyebrow">Latest market information</span><h2>Today's prices</h2></div><Link className="text-link" to="/prices">See all prices →</Link></div>
+        {!loading && prices.length > 0 && <SavedPriceNotice savedAt={savedAt} />}
         {loading ? <LoadingSpinner label="Loading approved prices…" /> : error ? <div className="status-box error">Could not load prices: {error}</div> : prices.length ? <div className="card-grid">{prices.map((item) => <PriceCard key={item.id} item={item} />)}</div> : <div className="status-box">No approved current price updates are available yet. Check back soon.</div>}
       </section>
 

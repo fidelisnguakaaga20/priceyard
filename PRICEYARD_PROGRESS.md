@@ -218,6 +218,14 @@ identified overflow scope complete: twenty complete, sixteen partial/pending.
 Owner approved docs/OFFLINE_PRICE_SAFETY_APPROVAL.md on 2026-10-17; implement that
 exact local-only safeguard next, with service workers/providers still isolated.
 
+Batch 44 implements the owner-approved offline safeguard: actual worker source
+passes 32 fake-network/cache checks, real API TypeScript passes twelve checks,
+and original browser views pass thirteen provenance plus two refresh-race checks.
+All 180 backend/38 pinned PG tests pass; original browser/access regressions pass.
+PY-25 approved application scope complete: twenty-one complete, fifteen partial/
+pending. Native browser service workers remain deliberately disabled in this lab;
+real deployment/PWA/provider compatibility remains operational PY-35 work.
+
 ## Checklist — do not repeat the audit
 
 | ID | Improvement | Current status |
@@ -246,12 +254,12 @@ exact local-only safeguard next, with service workers/providers still isolated.
 | PY-22 | Efficient loading and accurate dashboard totals | Complete for identified dashboard scope in batch 29: all 14 original metrics preserved; one Admin-only aggregate API/DB snapshot, zero entity hydration; backend/PG/browser totals and outage recovery verified |
 | PY-23 | Preserve layout while fixing mobile overflow | Complete for identified original critical-layout/price-card overflow scope in batches 42/43: 78 normal and twelve long-name viewport checks, 320–1366px, Easy reading both modes; ordinary card/badge geometry and all fourteen Admin cards preserved |
 | PY-24 | Keyboard/focus accessibility | Partial: price-row and published/hidden FAQ selection now supports Tab/Enter/Space with visible keyboard focus; original mouse actions retained and user-role/subscription selects named. Remaining navigation/popover checks pending |
-| PY-25 | Safe and clearly aged offline prices | Pending implementation: owner approved exact local-only cache/provenance wording and public-only safeguards in docs/OFFLINE_PRICE_SAFETY_APPROVAL.md on 2026-10-17; no invented age cutoff or business rule |
+| PY-25 | Safe and clearly aged offline prices | Complete for owner-approved application scope in batch 44: public-only explicit configured-API caching, timestamped saved copies, truthful original-view warnings, legacy/private/history exclusion and fresh-response recovery verified using actual worker source with fake network and actual browser UI with synthetic metadata. Native deployed PWA compatibility remains PY-35; no new age cutoff |
 | PY-26 | Complete atomic administrative audit | Complete for identified business-record writers through batch 40: payment/referral, price/moderation/flags, account/subscription, FAQ/catalog and all six intelligence resources save sanitized audits atomically; native concurrent edits and failed-audit rollback verified. External delivery operations remain PY-35 |
 | PY-27 | Consistent existing editing/password inputs | Partial: feedback file replacement/removal/async ordering fixed without form changes in batch 26; remaining editing/password cases pending |
 | PY-28 | Historical record preservation | Partial: approved 0022 tested on fresh/populated synthetic PostgreSQL; future migration/history work pending |
 | PY-29 | Stable identities and dependent records | Partial: catalog IDs/fields and referenced-price deletion rejection verified with atomic audit writes in batch 34; broader identity/duplicate/rename issues pending, no automatic merge |
-| PY-30 | Isolated automated/browser verification | Partial/ongoing: guarded 180 backend tests, 38 identity-pinned synthetic PostgreSQL cases, real original-browser workflows and before/after evidence verified through batch 41; expand with remaining work, live services forbidden |
+| PY-30 | Isolated automated/browser verification | Partial/ongoing: guarded 180 backend tests, 38 identity-pinned synthetic PostgreSQL cases, real original-browser workflows and before/after evidence verified through batch 44; offline worker tested with fake transport only, native browser workers/providers disabled; expand with remaining work, live services forbidden |
 | PY-31 | Confirmed payment activation and recovery | Partial: atomic confirmation, retry/replay, owner-only callback recovery and approved indefinite-grant holds verified; unattended recovery and operational delivery/reconciliation decisions remain |
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches 14/21: carry forward dated paid/trial time; preserve indefinite grants, block new checkout and hold/recover old purchases without consuming days |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
@@ -1467,3 +1475,47 @@ exact local-only safeguard next, with service workers/providers still isolated.
   http://127.0.0.1:55446; original ordinary records still look the same. Browser
   stress text never persists in the preview. Twenty IDs complete, sixteen partial/
   pending. Next approved offline-price safeguard; no production/push/merge/deploy.
+
+### Batch 44 — owner-approved PY-25 offline-price safeguard (2026-10-17)
+
+- Owner explicitly approved docs/OFFLINE_PRICE_SAFETY_APPROVAL.md before this batch.
+  Actual service worker now caches only recognized public resources from the
+  configured API location (including separate API origins) and same-origin public
+  shell/assets. Authenticated, private, Admin, reset/account/payment, historical and
+  date-selected requests bypass all cache branches. Non-success/private/no-store
+  responses are never used as new public copies; 401/403/private responses remove
+  a previous same-key copy. Cache failures cannot break successful live responses.
+- Successful public copies store device-save time separately from record timestamps.
+  Fallbacks require valid metadata and use only the current named data cache; old
+  unmarked copies are not replayed. Activation removes only the two known legacy
+  PriceYard stores, retaining unrelated/future caches. No age cutoff or new paid rule.
+- Reuse the existing banner styling for approved saved-copy wording/time beside
+  Home/current/detail/Watchlist prices and the ticker. Cached Home hero no longer
+  says Live now. Fresh responses clear their warning; browser offline wording no
+  longer promises a cache exists. Per-request metadata and request sequencing prevent
+  late cached results replacing newer fresh Home/current/ticker state. No schema,
+  price/measurement/confidence edits, changed money/formulas or new database fields.
+- Before actual-source tests reproduce 24 failures in 28 cases. All 32 final worker
+  cases pass with an in-memory cache and fake fetch; no native transport is supplied
+  to the VM. Twelve tests execute actual API TypeScript, including unchanged 401
+  handling and fail-closed invalid cache timestamps. Actual original browser with
+  synthetic response metadata passes thirteen cases and two refresh-race cases;
+  four existing filter regressions and seven original-browser checks pass.
+- All 180 backend tests pass, 32.751s; all 38 pinned PG cases pass, 39.816s. Backend
+  source unchanged in this batch. Final registration guard excludes userinfo/query/
+  fragment API configuration before constructing a worker URL. TypeScript/Vite
+  passes, 2.04s/102 modules; JS322.34kB/91.45kB gzip. CSS remains
+  index-BEBH-Ai6.css, unchanged from batch43.
+  Built worker/source hashes verified equal. Evidence: batch-44-*.json.
+- Isolation remains strict: native service workers deliberately disabled in the
+  review browser, all requests restricted to literal loopback, real providers off.
+  Worker-source fake-network checks and browser UI checks are separate evidence,
+  not a claim that deployed browser/PWA/provider compatibility was tested.
+- Manual: open http://127.0.0.1:55446/__test__/offline-prices, click Show simulated
+  saved copy, then open/reload Current Prices. Use Restore normal responses and
+  reload to clear the notice. This control is outside the app and stamps only
+  fabricated unauthenticated current-list responses; it does not enable real cache,
+  change stored prices, or remove the testing wrapper's no-store/network guards.
+- Twenty-one IDs complete; fifteen partial/pending. Next: remaining keyboard/focus,
+  editing/query/security work and separately approved business/operational decisions.
+  No production access, dependency installation, push, merge or deployment.

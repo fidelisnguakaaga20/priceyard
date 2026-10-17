@@ -3,10 +3,11 @@ import { useSearchParams } from "react-router-dom";
 import { Disclaimer, PRICE_DISCLAIMER } from "../components/Disclaimer";
 import { ButtonSpinner, LoadingSpinner } from "../components/LoadingSpinner";
 import { PriceCard } from "../components/PriceCard";
+import { SavedPriceNotice } from "../components/SavedPriceNotice";
 import { useCommodityMarketPairs } from "../hooks/useCommodityMarketPairs";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { usePreferences } from "../context/PreferencesContext";
-import { apiFetch } from "../services/api";
+import { apiFetch, apiFetchWithProvenance } from "../services/api";
 import type { Commodity, Market, PriceUpdate } from "../types/api";
 
 const AUTO_REFRESH_MS = 60_000;
@@ -17,6 +18,7 @@ export function PricesPage() {
   useDocumentTitle("Current Prices");
   const [searchParams] = useSearchParams();
   const [items, setItems] = useState<PriceUpdate[]>([]);
+  const [savedAt, setSavedAt] = useState<string | null>(null);
   const [commodities, setCommodities] = useState<Commodity[]>([]);
   const [markets, setMarkets] = useState<Market[]>([]);
   const [commodity, setCommodity] = useState(() => searchParams.get("commodity") || "");
@@ -46,9 +48,10 @@ export function PricesPage() {
     if (params?.market) query.set("market", params.market);
     if (params?.movement) query.set("movement", params.movement);
     try {
-      const data = await apiFetch<PriceUpdate[]>(`/price-updates${query.size ? `?${query}` : ""}`);
+      const { data, savedAt } = await apiFetchWithProvenance<PriceUpdate[]>(`/price-updates${query.size ? `?${query}` : ""}`);
       if (sequence !== requestSequence.current) return;
       setItems(data);
+      setSavedAt(savedAt);
       setError("");
     } catch (err) {
       if (sequence === requestSequence.current && !silent) setError((err as Error).message);
@@ -106,6 +109,7 @@ export function PricesPage() {
       <div className="filter-actions"><button className="button button-small" type="submit" disabled={loading}>{loading ? <ButtonSpinner label="Please wait…" /> : "Apply"}</button><button className="button button-ghost button-small" type="button" onClick={clear} disabled={loading}>Clear</button></div>
     </form>
     {error && <div className="status-box error">{error}</div>}
+    {!loading && items.length > 0 && <SavedPriceNotice savedAt={savedAt} />}
     {loading || filtersLoading ? <LoadingSpinner label="Loading approved prices…" /> : items.length ? <div className="card-grid">{items.map((item) => <PriceCard key={item.id} item={item} />)}</div> : <div className="status-box">No current prices found{commodity ? ` for ${commodity}` : ""}{market ? ` at ${market}` : ""}. Try clearing the filters or check back soon for new records.</div>}
     <Disclaimer>{PRICE_DISCLAIMER}</Disclaimer>
   </section>;

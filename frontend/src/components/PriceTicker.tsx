@@ -1,16 +1,17 @@
 import type { PriceUpdate } from "../types/api";
 import { money, movementIcon } from "../utils";
+import { SavedPriceNotice } from "./SavedPriceNotice";
 
 /** A continuously-scrolling strip of live current prices, shown at the top of the
  * homepage. Purely decorative/redundant with the real price cards further down the
  * page, so it's hidden from screen readers and pauses on hover/focus for anyone who
  * wants to actually read it. */
-export function PriceTicker({ items }: { items: PriceUpdate[] }) {
+export function PriceTicker({ items, savedAt = null }: { items: PriceUpdate[]; savedAt?: string | null }) {
   if (!items.length) return null;
   const track = [...items, ...items];
 
   return (
-    <div className="price-ticker" aria-hidden="true">
+    <><SavedPriceNotice savedAt={savedAt} /><div className="price-ticker" aria-hidden="true">
       <div className="price-ticker-track">
         {track.map((item, index) => (
           <span className="price-ticker-item" key={`${item.id}-${index}`}>
@@ -21,6 +22,6 @@ export function PriceTicker({ items }: { items: PriceUpdate[] }) {
           </span>
         ))}
       </div>
-    </div>
+    </div></>
   );
 }
