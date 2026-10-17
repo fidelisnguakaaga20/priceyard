@@ -241,6 +241,39 @@ async def verification_controls(request):
     return HTMLResponse((LAB / "verification_controls.html").read_text(encoding="utf-8"))
 
 
+async def reconciliation_control(request):
+    # Test harness only: one existing fabricated purchase, no live transport.
+    payload = await request.json()
+    if payload not in ({"mode": "preview"}, {"mode": "wrong_amount"}, {"mode": "valid"}):
+        return JSONResponse({"detail": "Choose a synthetic reconciliation mode"}, status_code=400)
+    import requests
+    from app.config import get_settings
+    from app.services.payment_reconciliation_service import reconcile_payments
+    from sqlalchemy import select
+    with Session(engine) as db:
+        purchase = db.scalar(select(Payment).join(User).where(Payment.reference == "py_local_verify_only", User.email == "verify@example.com"))
+        if purchase is None:
+            raise RuntimeError("Fabricated reconciliation purchase is missing")
+        payment_id, user_id = purchase.id, purchase.user_id
+    calls = []
+    def provider(session, method, url, **kwargs):
+        if method.upper() != "GET" or url != "https://api.paystack.co/transaction/verify/py_local_verify_only":
+            raise RuntimeError("Only fabricated reconciliation verification is allowed")
+        calls.append("synthetic-verification")
+        response = requests.Response(); response.status_code = 200
+        response._content = json.dumps({"status": True, "data": {"reference": "py_local_verify_only", "id": 909090,
+            "amount": 249999 if payload["mode"] == "wrong_amount" else 250000, "currency": "NGN", "status": "success"}}).encode()
+        return response
+    settings = get_settings().model_copy(update={"paystack_secret_key": "sk_test_synthetic_reconciliation_only"})
+    with patch("app.services.payment_service.get_settings", return_value=settings), patch("app.services.payment_service.notify_admins"), patch("requests.Session.request", autospec=True, side_effect=provider):
+        report = reconcile_payments(engine, apply=payload["mode"] != "preview", after_id=payment_id-1, ceiling_id=payment_id, limit=1)
+    with Session(engine) as db:
+        subscription = db.get(User, user_id).subscription
+        state = {"payment_status": db.get(Payment, payment_id).status, "subscription_status": subscription.status,
+                 "end_date": str(subscription.end_date) if subscription.end_date else None}
+    return JSONResponse({"synthetic_only": True, "provider_calls": len(calls), "report": report, **state})
+
+
 async def set_verification_mode(request):
     payload = await request.json()
     if payload not in ({"mode": "disabled"}, {"mode": "pending"}, {"mode": "wrong_amount"}, {"mode": "valid"}):
@@ -361,7 +394,7 @@ class LocalOnly:
         else:
             await self.app(scope, receive, secured)
 
-preview = LocalOnly(Starlette(routes=[Route("/__test__/status", status), Route("/__test__/offline-prices", offline_price_controls, methods=["GET", "POST"]), Route("/__test__/google-mode", set_google_mode, methods=["POST"]), Route("/__test__/alerts", notification_controls, methods=["GET", "POST"]), Route("/__test__/inbox", inbox), Route("/__test__/controls", controls), Route("/__test__/push", push_controls), Route("/__test__/payments", payment_controls), Route("/__test__/manual-review", manual_review_controls), Route("/__test__/purchase-value", purchase_value_controls), Route("/__test__/verification", verification_controls), Route("/__test__/verification-mode", set_verification_mode, methods=["POST"]), Route("/__test__/checkout", checkout_controls), Route("/__test__/checkout-mode", set_checkout_mode, methods=["POST"]), Route("/__test__/payment-event", payment_event, methods=["POST"]), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
+preview = LocalOnly(Starlette(routes=[Route("/__test__/status", status), Route("/__test__/reconciliation", reconciliation_control, methods=["POST"]), Route("/__test__/offline-prices", offline_price_controls, methods=["GET", "POST"]), Route("/__test__/google-mode", set_google_mode, methods=["POST"]), Route("/__test__/alerts", notification_controls, methods=["GET", "POST"]), Route("/__test__/inbox", inbox), Route("/__test__/controls", controls), Route("/__test__/push", push_controls), Route("/__test__/payments", payment_controls), Route("/__test__/manual-review", manual_review_controls), Route("/__test__/purchase-value", purchase_value_controls), Route("/__test__/verification", verification_controls), Route("/__test__/verification-mode", set_verification_mode, methods=["POST"]), Route("/__test__/checkout", checkout_controls), Route("/__test__/checkout-mode", set_checkout_mode, methods=["POST"]), Route("/__test__/payment-event", payment_event, methods=["POST"]), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
 
 if __name__ == "__main__":
     import uvicorn

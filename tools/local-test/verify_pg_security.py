@@ -148,6 +148,48 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_bounded_payment_reconciliation_preserves_existing_rules(self):
+        spec = importlib.util.spec_from_file_location("local_payment_recovery", ROOT / "backend/tests/test_payment_reconciliation.py")
+        cases = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cases)
+        cases.verify_reconciliation_workflow(self, self.engine)
+
+    def test_reconciliation_single_worker_and_webhook_apply_once(self):
+        spec = importlib.util.spec_from_file_location("local_payment_recovery_race", ROOT / "backend/tests/test_payment_reconciliation.py")
+        cases = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cases)
+        fixture = cases.seed_reconciliation(self.engine, ("paid",))
+        entered, release = threading.Event(), threading.Event()
+        observed, outcomes = [], []
+        send = cases.fake_provider(fixture, observed)
+        def provider(session, method, url, **kwargs):
+            entered.set()
+            if not release.wait(10):
+                raise RuntimeError("Synthetic provider coordination timed out")
+            return send(session, method, url, **kwargs)
+        def worker():
+            try:
+                outcomes.append(cases.recovery.reconcile_payments(self.engine, apply=True))
+            except Exception as error:
+                outcomes.append(type(error).__name__)
+        with cases.provider_patches(fixture, observed, provider):
+            thread = threading.Thread(target=worker); thread.start()
+            try:
+                self.assertTrue(entered.wait(10))
+                busy = cases.recovery.reconcile_payments(self.engine, apply=True)
+                self.assertTrue(busy["busy"]); self.assertEqual(busy["outcomes"], [])
+                with Session(self.engine) as db:
+                    payment_service.handle_webhook_event(db, {"event": "charge.success", "data": fixture["paid"]["evidence"]})
+            finally:
+                release.set(); thread.join(15)
+        self.assertFalse(thread.is_alive()); self.assertEqual(len(observed), 1)
+        self.assertEqual(outcomes[0]["outcomes"][0]["outcome"], "confirmed")
+        with Session(self.engine) as db:
+            self.assertEqual(db.get(User, fixture["paid"]["user_id"]).subscription.end_date, fixture["paid"]["paid_end"]+timedelta(days=30))
+            self.assertEqual(len(db.scalars(select(AuditLog).where(AuditLog.action == "payment.success")).all()), 1)
+        # The session lock must be released after the worker exits.
+        self.assertFalse(cases.recovery.reconcile_payments(self.engine, apply=True)["busy"])
+
     def test_storage_required_values_preserve_history(self):
         spec = importlib.util.spec_from_file_location("local_storage_validation", ROOT / "backend/tests/test_planning_validation.py")
         cases = importlib.util.module_from_spec(spec)

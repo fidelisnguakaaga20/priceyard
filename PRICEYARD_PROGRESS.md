@@ -334,6 +334,15 @@ Resume compatible remaining input/query/history work; do not repeat completed nu
 guards, cost limits or prior batches. Legacy unbounded text must not be arbitrarily
 capped, and source/referral/session/date/movement/business changes need approval.
 
+Batch58 completes PY-31 application recovery: explicit dry-run-by-default, bounded
+pending/failed reconciliation command using existing strict verification/activation.
+No charging, scheduler or live execution enabled. Seven new backend tests, eight
+existing verification tests, two focused native cases and actual recovery/payment/
+14-card dashboard browser checks pass. Full211 backend baseline passed before the
+final CLI error-redaction case; targeted seven pass afterward. Exactly24 complete /
+12 partial or pending. Native66/80 schemas, stopped. Next PY-28 legacy migration
+preflight, not more expansion of already completed account/input/UI improvements.
+
 | ID | Improvement | Current status |
 |---|---|---|
 | PY-01 | Consistent historical access checks | Complete in batch 7; date/comparison/ID routes enforce existing history entitlement; current summaries preserved |
@@ -366,11 +375,11 @@ capped, and source/referral/session/date/movement/business changes need approval
 | PY-28 | Historical record preservation | Partial: approved 0022 tested on fresh/populated synthetic PostgreSQL; future migration/history work pending |
 | PY-29 | Stable identities and dependent records | Partial: catalog IDs/fields and referenced-price deletion rejection verified with atomic audit writes in batch 34; broader identity/duplicate/rename issues pending, no automatic merge |
 | PY-30 | Isolated automated/browser verification | Partial/ongoing: full205 backend tests pass in batch57; ten focused native cases pass across54–57. Full40 native baseline remains batch47; no new full-native-suite claim.73 editing/API, five detail and14-card dashboard checks pass in57; seven cost-browser checks in54. Fixture64/80 schemas, stopped; serialized heavy phases,84 frontend hashes matched/reused, no copied dependencies; native browser workers/providers disabled, live services forbidden |
-| PY-31 | Confirmed payment activation and recovery | Partial: atomic confirmation, retry/replay, owner-only callback recovery and approved indefinite-grant holds verified; unattended recovery and operational delivery/reconciliation decisions remain |
+| PY-31 | Confirmed payment activation and recovery | Application-side approved scope complete in batch58: atomic confirmation, owner callback and explicit bounded/resumable reconciliation for missed webhook/return; dry-run default, strict existing evidence/activation, single PG worker, error isolation, replay safety and purchased-time/manual-grant preservation verified. Live scheduling/checkpoints/monitoring and ambiguous legacy repairs require owner approval under PY-35 |
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches 14/21: carry forward dated paid/trial time; preserve indefinite grants, block new checkout and hold/recover old purchases without consuming days |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
 | PY-34 | Expiry without unintended staff-role loss | Complete in batch 2; 18 backend tests and two expired-Reporter browser cases passed |
-| PY-35 | Operational readiness and dependency evidence | Pending; production checks outside current scope |
+| PY-35 | Operational readiness and dependency evidence | Pending; production/provider checks outside current scope. Reconciliation scheduling/checkpoint storage/monitoring and any ambiguous historical payment repairs require owner approval; no live job or scheduler enabled |
 | PY-36 | Accurate progress/documentation/maintainability | Progress record established; ongoing |
 
 ## Verified results and batch history
