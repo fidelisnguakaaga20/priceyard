@@ -323,6 +323,17 @@ pass. Native schemas62/80, stopped. Full202 backend baseline remains batch55;
 no new full204-suite claim. Exactly23 complete /13 partial or pending. Next Storage
 required IDs/status, preserving nullable notes and linked-price clearing.
 
+Batch57 completes required-value protection across the six existing intelligence
+resources. Full205 backend tests pass35.526s; two Storage native cases pass1.677s;
+73 browser/API checks, all14 dashboard cards and five detail regressions pass.
+84 frontend hashes match the original verified build; no frontend/policy/schema
+changes. Native fixture64/80 schemas, stopped; heavy checks sequential. Exactly23
+complete /13 partial or pending. These were further PY-08 protections, not a claim
+that broader request/text limits, owner policies or production operations are done.
+Resume compatible remaining input/query/history work; do not repeat completed null
+guards, cost limits or prior batches. Legacy unbounded text must not be arbitrarily
+capped, and source/referral/session/date/movement/business changes need approval.
+
 | ID | Improvement | Current status |
 |---|---|---|
 | PY-01 | Consistent historical access checks | Complete in batch 7; date/comparison/ID routes enforce existing history entitlement; current summaries preserved |
@@ -332,7 +343,7 @@ required IDs/status, preserving nullable notes and linked-price clearing.
 | PY-05 | Referral abuse protection | Partial: atomic registration/reward/audit, duplicate-registration safety and concurrent seven-day reward preservation verified in batch 20; qualification/abuse-cap changes require approval and remain unchanged |
 | PY-06 | Safe push notification destinations | Application-side complete in batch 13; known-provider/key validation, bounded TLS transport, no redirects; live provider compatibility remains operational verification |
 | PY-07 | Shared-device/session safety | Partial: server revocation, stale UI protection, possession-based push ownership/concurrent registration and bounded current-device logout cleanup verified; JS token storage/offline cleanup limits remain |
-| PY-08 | Input/upload/request abuse bounds | Partial: push endpoint/key/query bounds, feedback pre-decode 2MB screenshot bound, watchlist numeric limits (batch53), Cost required values/totals (batch54), Buying/Sell-watch (batch55) and Market/Quality required values (batch56) verified; broader request/text/body limits remain pending |
+| PY-08 | Input/upload/request abuse bounds | Partial: push endpoint/key/query bounds, feedback pre-decode 2MB screenshot bound, watchlist numeric limits (batch53), Cost calculated totals and required values across all six intelligence resources (batches54–57) verified; broader request/text/body limits remain pending |
 | PY-09 | Concurrent security-action safety | Complete for identified reset/logout/last-Admin cases in batches 5/6; six PostgreSQL cases passed |
 | PY-10 | Spreadsheet export safety | Complete in batch 3; text/numeric regressions and original browser download/access checks passed |
 | PY-11 | Correct saved administrator price state | Complete in batch 10; actual create/approve/correct/outdated/reject/reload browser regression passed |
@@ -354,7 +365,7 @@ required IDs/status, preserving nullable notes and linked-price clearing.
 | PY-27 | Consistent existing editing/password inputs | Complete for identified scope: feedback selection in batch26, existing Unicode/72-byte password rules and reset validation in batch46, owner-approved six Admin edit forms in batches50–52. Saved values/costs, one-field edits, reload, explicit clearing, switching/unknown/blank IDs and creation verified in61 actual browser checks |
 | PY-28 | Historical record preservation | Partial: approved 0022 tested on fresh/populated synthetic PostgreSQL; future migration/history work pending |
 | PY-29 | Stable identities and dependent records | Partial: catalog IDs/fields and referenced-price deletion rejection verified with atomic audit writes in batch 34; broader identity/duplicate/rename issues pending, no automatic merge |
-| PY-30 | Isolated automated/browser verification | Partial/ongoing: full202 backend tests pass in batch55; two focused cost native cases in54 and three planning native cases in55. Full40 native baseline remains batch47.65 editing/API, five detail and14-card dashboard checks pass; seven cost-browser checks in54. Fixture59/80 schemas, stopped; serialized heavy phases, verified/reused frontend hashes/dependencies; native browser workers/providers disabled, live services forbidden |
+| PY-30 | Isolated automated/browser verification | Partial/ongoing: full205 backend tests pass in batch57; ten focused native cases pass across54–57. Full40 native baseline remains batch47; no new full-native-suite claim.73 editing/API, five detail and14-card dashboard checks pass in57; seven cost-browser checks in54. Fixture64/80 schemas, stopped; serialized heavy phases,84 frontend hashes matched/reused, no copied dependencies; native browser workers/providers disabled, live services forbidden |
 | PY-31 | Confirmed payment activation and recovery | Partial: atomic confirmation, retry/replay, owner-only callback recovery and approved indefinite-grant holds verified; unattended recovery and operational delivery/reconciliation decisions remain |
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches 14/21: carry forward dated paid/trial time; preserve indefinite grants, block new checkout and hold/recover old purchases without consuming days |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
@@ -1999,3 +2010,38 @@ required IDs/status, preserving nullable notes and linked-price clearing.
   focused runs do not claim a full204 run. Evidence batch-56-*.json.
 - Exactly23 complete /13 partial or pending. Next Storage required IDs/status;
   preserve nullable notes/linked-price clearing. No production, push, merge/deploy.
+
+### Batch 57 — Required Storage values; complete intelligence null guards (2026-10-17)
+
+- Last resource in this PY-08 scope: commodity/market IDs and suitability status
+  reject null before coercion/flush, matching their original non-nullable columns.
+  Existing linked-price and optional storage/risk/quality notes remain clearable.
+  No fields, measurement, grade, status terminology, appearance or policy added.
+- Before: Storage HTTP workflow reproduces500, earlier four cases pass. After:
+  full205 backend tests pass35.526s, no skips/failures/errors. Raw business history
+  and audits remain unchanged on rejection; optional clearing, omitted-value
+  preservation, correction/reload and non-Admin write denial are verified.
+- Two focused native Storage cases pass1.677s: required-value/history preservation
+  and existing audit rollback/concurrent-edit test. Fixture schemas62 to64 of80,
+  stopped before browser. Full40 native baseline remains batch47; do not run a full
+  current suite against this budget or claim a new full-suite native result.
+-73 original-browser/API checks pass across all six forms, including every required
+  null field and unchanged records/audits on rejection. All14 original dashboard
+  labels/totals, one summary request/outage recovery and five detail failure/race
+  regressions pass. Zero external page requests. Existing seven cost overflow/
+  correction browser checks passed54 and full backend covers those paths here.
+-84 source/public/config hashes match the existing verified frontend snapshot;
+  original CSS index-BEBH-Ai6.css retained. No rebuild/copies/install needed for
+  these backend-only batches. Heavy checks serialized, one browser at a time,
+  retained synthetic schemas below80; old large cluster remains stopped/untouched.
+  Reseed only the disposable memory preview after testing to clear fabricated
+  planning records; no unsupported deletes or historical-record cleanup.
+- Evidence batch-57-*.json. Exactly23 complete /13 partial or pending:
+  02,05,07,08,13,14,20,28,29,30,31,35,36. Next compatible remaining request/input/
+  query/history work and separately approved business/operational decisions. Do
+  not repeat completed required-null guards or cost-total/target validation.
+  Unknown legacy text lengths are not permission to invent caps or discard data.
+- Master76dbd27588de4aa37f3163d8b263d4b72a2cff32 and backup258991019e5af8b36eff407a8efa2c9fd03dd644
+  remain unchanged. Local verified commits only; no credentials read, production
+  services/data, production migrations, push, merge or deployment. Routine local
+  work remains authorized; Windows/Git sandbox restrictions are still enforced.

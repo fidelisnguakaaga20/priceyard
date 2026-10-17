@@ -19,6 +19,7 @@ from app.models.market_signal import MarketSignal
 from app.models.price_update import PriceUpdate
 from app.models.quality_signal import QualitySignal
 from app.models.sell_watch_window import SellWatchWindow
+from app.models.storage_suitability import StorageSuitability
 from app.models.user import User
 from app.security import create_access_token
 
@@ -27,6 +28,7 @@ RESOURCES = {
     "sell": ("sell-watch-windows", {"start_period": "Synthetic recorded start", "end_period": "Synthetic recorded end", "observation": "Synthetic saved observation", "confidence": "Low confidence"}, ("commodity_id", "market_id", "start_period", "observation", "confidence"), "end_period", "observation"),
     "market": ("market-signals", {"signal_type": "Synthetic observation", "signal_description": "Synthetic description", "possible_meaning": "Synthetic optional note"}, ("commodity_id", "market_id", "signal_type", "signal_description"), "possible_meaning", "signal_description"),
     "quality": ("quality-signals", {"quality_status": "Synthetic observation", "moisture_status": "Synthetic moisture note", "storage_readiness": "Synthetic readiness note", "risk_note": "Synthetic optional risk"}, ("commodity_id", "market_id"), "risk_note", "quality_status"),
+    "storage": ("storage-suitability", {"suitability_status": "watch", "summary": "Synthetic saved summary", "quality_storage_notes": "Synthetic optional storage note"}, ("commodity_id", "market_id", "suitability_status"), "quality_storage_notes", "summary"),
 }
 
 
@@ -50,7 +52,7 @@ def exercise_planning_validation(check, engine, kind):
 
     def state():
         with Session(engine) as db:
-            return {model.__tablename__: db.execute(select(model.__table__).order_by(model.id)).all() for model in (BuyingZone, SellWatchWindow, MarketSignal, QualitySignal, AuditLog, PriceUpdate)}
+            return {model.__tablename__: db.execute(select(model.__table__).order_by(model.id)).all() for model in (BuyingZone, SellWatchWindow, MarketSignal, QualitySignal, StorageSuitability, AuditLog, PriceUpdate)}
 
     app.dependency_overrides[get_db] = sessions
     try:
@@ -109,3 +111,6 @@ class PlanningValidationTests(unittest.TestCase):
 
     def test_quality_signal_required_values_reject_null_without_mutation(self):
         exercise_planning_validation(self, self.engine, "quality")
+
+    def test_storage_required_values_reject_null_without_mutation(self):
+        exercise_planning_validation(self, self.engine, "storage")

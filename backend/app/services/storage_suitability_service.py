@@ -85,6 +85,9 @@ def update_storage_suitability(
     commit: bool = True,
 ) -> StorageSuitability:
     changes = payload.model_dump(exclude_unset=True)
+    required = ("commodity_id", "market_id", "suitability_status")
+    if any(field in changes and changes[field] is None for field in required):
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Required storage-suitability values cannot be null")
     commodity_id = int(changes.get("commodity_id", item.commodity_id))
     market_id = int(changes.get("market_id", item.market_id))
     price_update_id = changes.get("price_update_id", item.price_update_id)
