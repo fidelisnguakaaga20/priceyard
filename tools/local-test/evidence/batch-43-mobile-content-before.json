@@ -1,0 +1,367 @@
+{
+  "before": true,
+  "cases": 12,
+  "failures": [
+    {
+      "width": 320,
+      "easy": false,
+      "document_overflow": false,
+      "outliers": [
+        {
+          "tag": "DIV",
+          "field": "card-row",
+          "left": 35,
+          "right": 285,
+          "content": 1466,
+          "box": 250
+        },
+        {
+          "tag": "H3",
+          "field": "",
+          "left": 35,
+          "right": 1448,
+          "content": 1413,
+          "box": 1413
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "easy": true,
+      "document_overflow": false,
+      "outliers": [
+        {
+          "tag": "DIV",
+          "field": "card-row",
+          "left": 36,
+          "right": 284,
+          "content": 1723,
+          "box": 248
+        },
+        {
+          "tag": "H3",
+          "field": "",
+          "left": 36,
+          "right": 1703,
+          "content": 1667,
+          "box": 1667
+        }
+      ]
+    },
+    {
+      "width": 375,
+      "easy": false,
+      "document_overflow": false,
+      "outliers": [
+        {
+          "tag": "DIV",
+          "field": "card-row",
+          "left": 35,
+          "right": 340,
+          "content": 1466,
+          "box": 305
+        },
+        {
+          "tag": "H3",
+          "field": "",
+          "left": 35,
+          "right": 1448,
+          "content": 1413,
+          "box": 1413
+        }
+      ]
+    },
+    {
+      "width": 375,
+      "easy": true,
+      "document_overflow": false,
+      "outliers": [
+        {
+          "tag": "DIV",
+          "field": "card-row",
+          "left": 36,
+          "right": 339,
+          "content": 1723,
+          "box": 303
+        },
+        {
+          "tag": "H3",
+          "field": "",
+          "left": 36,
+          "right": 1703,
+          "content": 1667,
+          "box": 1667
+        }
+      ]
+    },
+    {
+      "width": 640,
+      "easy": false,
+      "document_overflow": false,
+      "outliers": [
+        {
+          "tag": "DIV",
+          "field": "card-row",
+          "left": 35,
+          "right": 605,
+          "content": 1466,
+          "box": 570
+        },
+        {
+          "tag": "H3",
+          "field": "",
+          "left": 35,
+          "right": 1448,
+          "content": 1413,
+          "box": 1413
+        }
+      ]
+    },
+    {
+      "width": 640,
+      "easy": true,
+      "document_overflow": false,
+      "outliers": [
+        {
+          "tag": "DIV",
+          "field": "card-row",
+          "left": 36,
+          "right": 604,
+          "content": 1723,
+          "box": 568
+        },
+        {
+          "tag": "H3",
+          "field": "",
+          "left": 36,
+          "right": 1703,
+          "content": 1667,
+          "box": 1667
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "easy": false,
+      "document_overflow": false,
+      "outliers": [
+        {
+          "tag": "DIV",
+          "field": "card-row",
+          "left": 43,
+          "right": 1509,
+          "content": 1466,
+          "box": 1466
+        },
+        {
+          "tag": "H3",
+          "field": "",
+          "left": 43,
+          "right": 1456,
+          "content": 1413,
+          "box": 1413
+        },
+        {
+          "tag": "P",
+          "field": "price-range",
+          "left": 43,
+          "right": 1509,
+          "content": 1466,
+          "box": 1466
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "easy": true,
+      "document_overflow": false,
+      "outliers": [
+        {
+          "tag": "DIV",
+          "field": "card-row",
+          "left": 44,
+          "right": 1767,
+          "content": 1723,
+          "box": 1723
+        },
+        {
+          "tag": "H3",
+          "field": "",
+          "left": 44,
+          "right": 1711,
+          "content": 1667,
+          "box": 1667
+        },
+        {
+          "tag": "P",
+          "field": "price-range",
+          "left": 44,
+          "right": 1767,
+          "content": 1723,
+          "box": 1723
+        }
+      ]
+    },
+    {
+      "width": 900,
+      "easy": false,
+      "document_overflow": false,
+      "outliers": [
+        {
+          "tag": "DIV",
+          "field": "card-row",
+          "left": 43,
+          "right": 1509,
+          "content": 1466,
+          "box": 1466
+        },
+        {
+          "tag": "H3",
+          "field": "",
+          "left": 43,
+          "right": 1456,
+          "content": 1413,
+          "box": 1413
+        },
+        {
+          "tag": "P",
+          "field": "price-range",
+          "left": 43,
+          "right": 1509,
+          "content": 1466,
+          "box": 1466
+        }
+      ]
+    },
+    {
+      "width": 900,
+      "easy": true,
+      "document_overflow": false,
+      "outliers": [
+        {
+          "tag": "DIV",
+          "field": "card-row",
+          "left": 44,
+          "right": 1767,
+          "content": 1723,
+          "box": 1723
+        },
+        {
+          "tag": "H3",
+          "field": "",
+          "left": 44,
+          "right": 1711,
+          "content": 1667,
+          "box": 1667
+        },
+        {
+          "tag": "P",
+          "field": "price-range",
+          "left": 44,
+          "right": 1767,
+          "content": 1723,
+          "box": 1723
+        }
+      ]
+    },
+    {
+      "width": 1366,
+      "easy": false,
+      "document_overflow": false,
+      "outliers": [
+        {
+          "tag": "DIV",
+          "field": "card-row",
+          "left": 116,
+          "right": 1582,
+          "content": 1466,
+          "box": 1466
+        },
+        {
+          "tag": "H3",
+          "field": "",
+          "left": 116,
+          "right": 1529,
+          "content": 1413,
+          "box": 1413
+        },
+        {
+          "tag": "P",
+          "field": "price-range",
+          "left": 116,
+          "right": 1582,
+          "content": 1466,
+          "box": 1466
+        }
+      ]
+    },
+    {
+      "width": 1366,
+      "easy": true,
+      "document_overflow": false,
+      "outliers": [
+        {
+          "tag": "DIV",
+          "field": "card-row",
+          "left": 117,
+          "right": 1840,
+          "content": 1723,
+          "box": 1723
+        },
+        {
+          "tag": "H3",
+          "field": "",
+          "left": 117,
+          "right": 1784,
+          "content": 1667,
+          "box": 1667
+        },
+        {
+          "tag": "P",
+          "field": "price-range",
+          "left": 117,
+          "right": 1840,
+          "content": 1723,
+          "box": 1723
+        }
+      ]
+    }
+  ],
+  "normal_geometry": [
+    {
+      "width": 375,
+      "card": {
+        "x": 12,
+        "y": 784.203125,
+        "width": 351,
+        "height": 720.75
+      },
+      "badge": {
+        "x": 290.90625,
+        "y": 1051.953125,
+        "width": 49.09375,
+        "height": 26
+      }
+    },
+    {
+      "width": 1366,
+      "card": {
+        "x": 93,
+        "y": 541.5,
+        "width": 381.328125,
+        "height": 698.484375
+      },
+      "badge": {
+        "x": 402.234375,
+        "y": 831.984375,
+        "width": 49.09375,
+        "height": 26
+      }
+    }
+  ],
+  "normal_card_geometry_preserved": false,
+  "server_records_unchanged": true,
+  "measurements_unchanged": true,
+  "external_page_requests": 0,
+  "production_connections": 0
+}

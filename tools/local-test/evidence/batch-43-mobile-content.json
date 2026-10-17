@@ -1,0 +1,42 @@
+{
+  "before": false,
+  "cases": 12,
+  "failures": [],
+  "normal_geometry": [
+    {
+      "width": 375,
+      "card": {
+        "x": 12,
+        "y": 784.203125,
+        "width": 351,
+        "height": 720.75
+      },
+      "badge": {
+        "x": 290.90625,
+        "y": 1051.953125,
+        "width": 49.09375,
+        "height": 26
+      }
+    },
+    {
+      "width": 1366,
+      "card": {
+        "x": 93,
+        "y": 541.5,
+        "width": 381.328125,
+        "height": 698.484375
+      },
+      "badge": {
+        "x": 402.234375,
+        "y": 831.984375,
+        "width": 49.09375,
+        "height": 26
+      }
+    }
+  ],
+  "normal_card_geometry_preserved": true,
+  "server_records_unchanged": true,
+  "measurements_unchanged": true,
+  "external_page_requests": 0,
+  "production_connections": 0
+}

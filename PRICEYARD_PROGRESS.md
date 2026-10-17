@@ -211,6 +211,13 @@ normal viewport/Easy-reading checks pass; five relevant backend/38 pinned PG
 compatibility cases pass. Nineteen complete; seventeen partial/pending. Next:
 long-content mobile stress checks and remaining keyboard/offline safeguards.
 
+Batch 43 verified: long price-card names no longer escape their cards; ordinary
+card/badge geometry is identical before/after. Twelve long-content and 78 normal
+viewport checks, six backend query/38 pinned PG compatibility cases pass. PY-23
+identified overflow scope complete: twenty complete, sixteen partial/pending.
+Owner approved docs/OFFLINE_PRICE_SAFETY_APPROVAL.md on 2026-10-17; implement that
+exact local-only safeguard next, with service workers/providers still isolated.
+
 ## Checklist — do not repeat the audit
 
 | ID | Improvement | Current status |
@@ -237,9 +244,9 @@ long-content mobile stress checks and remaining keyboard/offline safeguards.
 | PY-20 | Bounded queries with accessible historical records | Partial: current-price DB ranking (batch 23), single-query dashboard summary (batch 29), compact protected DISTINCT history filter metadata (batch 32); complete history and other unbounded lists remain unchanged/pending |
 | PY-21 | Reliable independent alerts | Application-side identified channel dependency complete in batch 24: failed email no longer skips push/WhatsApp; per-user/channel failures isolated; existing deduplication/count semantics retained. Delivery/retry operations remain PY-35 |
 | PY-22 | Efficient loading and accurate dashboard totals | Complete for identified dashboard scope in batch 29: all 14 original metrics preserved; one Admin-only aggregate API/DB snapshot, zero entity hydration; backend/PG/browser totals and outage recovery verified |
-| PY-23 | Preserve layout while fixing mobile overflow | Partial: original critical screens fit 320/375/768px in normal/Easy-reading modes (78 checks), all fourteen Admin cards retained; long-content stress cases pending |
+| PY-23 | Preserve layout while fixing mobile overflow | Complete for identified original critical-layout/price-card overflow scope in batches 42/43: 78 normal and twelve long-name viewport checks, 320–1366px, Easy reading both modes; ordinary card/badge geometry and all fourteen Admin cards preserved |
 | PY-24 | Keyboard/focus accessibility | Partial: price-row and published/hidden FAQ selection now supports Tab/Enter/Space with visible keyboard focus; original mouse actions retained and user-role/subscription selects named. Remaining navigation/popover checks pending |
-| PY-25 | Safe and clearly aged offline prices | Pending; visible additions require approval |
+| PY-25 | Safe and clearly aged offline prices | Pending implementation: owner approved exact local-only cache/provenance wording and public-only safeguards in docs/OFFLINE_PRICE_SAFETY_APPROVAL.md on 2026-10-17; no invented age cutoff or business rule |
 | PY-26 | Complete atomic administrative audit | Complete for identified business-record writers through batch 40: payment/referral, price/moderation/flags, account/subscription, FAQ/catalog and all six intelligence resources save sanitized audits atomically; native concurrent edits and failed-audit rollback verified. External delivery operations remain PY-35 |
 | PY-27 | Consistent existing editing/password inputs | Partial: feedback file replacement/removal/async ordering fixed without form changes in batch 26; remaining editing/password cases pending |
 | PY-28 | Historical record preservation | Partial: approved 0022 tested on fresh/populated synthetic PostgreSQL; future migration/history work pending |
@@ -1440,3 +1447,23 @@ long-content mobile stress checks and remaining keyboard/offline safeguards.
   /admin/faq at http://127.0.0.1:55446 as demo Admin; Tab to a record, press Enter
   or Space, and confirm its ID is selected without saving. Nineteen IDs complete,
   seventeen partial/pending. No production access, push, merge or deployment.
+
+### Batch 43 — identified PY-23 long-content containment (2026-10-17)
+
+- Browser reproduces clipped price names in all twelve stress cases even though
+  document overflow reports false. Existing commodity/market text at its existing
+  limits is stubbed only in that disposable browser; no API records/names/amounts
+  or measurements are saved or changed. Other original screens are retained.
+- Three narrowly scoped CSS rules let a price card and its flex text shrink/wrap
+  while keeping the movement badge readable. No truncation, new label, new field,
+  palette/typography/layout redesign, hidden content or historical change.
+- All twelve cases pass at 320/375/640/768/900/1366px with Easy reading off/on.
+  Ordinary mobile/desktop card and badge rectangles exactly match before/after.
+  All 78 original critical-screen layout cases pass; fourteen Admin cards retained.
+- TypeScript/Vite passes, 1.69s/101 modules; JS unchanged 320.89kB/90.90kB gzip;
+  CSS31.84kB/7.16kB gzip. Backend unchanged: six relevant current-query compatibility
+  tests pass, 0.509s; all 38 pinned PG cases pass, 33.429s. Latest full backend180.
+- Evidence: tools/local-test/evidence/batch-43-*.json. Manual: /prices at
+  http://127.0.0.1:55446; original ordinary records still look the same. Browser
+  stress text never persists in the preview. Twenty IDs complete, sixteen partial/
+  pending. Next approved offline-price safeguard; no production/push/merge/deploy.
