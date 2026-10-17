@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app.models.user import User
 from app.models.subscription import Subscription
 from app.schemas.user_schema import AdminUserUpdate
-from app.services.subscription_service import update_subscription_status
+from app.services.subscription_service import lock_subscription_state, update_subscription_status
 
 
 def list_users(db: Session) -> list[User]:
@@ -30,12 +30,17 @@ def _is_last_active_admin(db: Session, user: User) -> bool:
     return (other_active_admins or 0) == 0
 
 
-def update_user(db: Session, user: User, payload: AdminUserUpdate) -> User:
+def prepare_user_update(db: Session, user_id: int) -> tuple[User, Subscription | None]:
     if db.get_bind().dialect.name == "postgresql":
         # Serialize privileged role/activity edits across API workers. Keep this
         # transaction open through the final user/subscription change.
         db.execute(text("SELECT pg_advisory_xact_lock(741523, 1)"))
-        db.refresh(user)
+    return lock_subscription_state(db, user_id)
+
+
+def update_user(db: Session, user: User, payload: AdminUserUpdate, *, commit: bool = True, prepared: bool = False) -> User:
+    if not prepared:
+        user, _ = prepare_user_update(db, user.id)
     would_deactivate = payload.is_active is False
     would_demote = payload.role is not None and payload.role != "admin"
     if (would_deactivate or would_demote) and _is_last_active_admin(db, user):
@@ -59,7 +64,5 @@ def update_user(db: Session, user: User, payload: AdminUserUpdate) -> User:
     elif payload.role in {"admin", "reporter"}:
         user.role = payload.role
 
-    db.commit()
-
-    db.refresh(user)
+    db.commit() if commit else db.flush()
     return user

@@ -9,6 +9,9 @@ from app.schemas.subscription_schema import SubscriptionResponse, SubscriptionSt
 from app.services.audit_service import create_audit_log, snapshot_model
 from app.services.subscription_service import (
     get_subscription_for_user,
+    lock_subscription_state,
+    apply_paid_expiry,
+    apply_trial_expiry,
     list_subscriptions,
     send_trial_expiry_reminders,
     update_subscription_status,
@@ -74,18 +77,26 @@ def set_subscription_status(
     db: Session = Depends(get_db),
     admin: User = Depends(require_roles("admin")),
 ) -> Subscription:
-    subscription = get_subscription_for_user(db, user_id)
+    user, subscription = lock_subscription_state(db, user_id)
+    if subscription is None:
+        raise HTTPException(status_code=404, detail="Subscription not found")
     old_subscription = snapshot_model(subscription)
-    old_user = snapshot_model(subscription.user)
-    subscription = update_subscription_status(db, subscription, payload.status)
-    create_audit_log(
-        db, actor=admin, action="subscription.status_update", table_name="subscriptions",
-        record_id=subscription.id, old_value=old_subscription, new_value=snapshot_model(subscription),
-    )
-    new_user = snapshot_model(subscription.user)
-    if old_user != new_user:
+    old_user = snapshot_model(user)
+    try:
+        apply_trial_expiry(subscription); apply_paid_expiry(subscription)
+        subscription = update_subscription_status(db, subscription, payload.status, commit=False)
         create_audit_log(
-            db, actor=admin, action="user.subscription_role_sync", table_name="users",
-            record_id=subscription.user.id, old_value=old_user, new_value=new_user,
+            db, actor=admin, action="subscription.status_update", table_name="subscriptions",
+            record_id=subscription.id, old_value=old_subscription, new_value=snapshot_model(subscription), commit=False,
         )
+        new_user = snapshot_model(user)
+        if old_user != new_user:
+            create_audit_log(
+                db, actor=admin, action="user.subscription_role_sync", table_name="users",
+                record_id=user.id, old_value=old_user, new_value=new_user, commit=False,
+            )
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
     return subscription

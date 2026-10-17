@@ -14,6 +14,15 @@ def utc_now() -> datetime:
     return datetime.now(timezone.utc)
 
 
+def lock_subscription_state(db: Session, user_id: int) -> tuple[User, Subscription | None]:
+    """Match payment/security writers' User -> Subscription row-lock order."""
+    user = db.scalar(select(User).where(User.id == user_id).with_for_update().execution_options(populate_existing=True))
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    subscription = db.scalar(select(Subscription).where(Subscription.user_id == user_id).with_for_update().execution_options(populate_existing=True))
+    return user, subscription
+
+
 def build_trial_subscription(*, user: User, now: datetime | None = None) -> Subscription:
     started_at = now or utc_now()
     return Subscription(

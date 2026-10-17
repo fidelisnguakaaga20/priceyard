@@ -123,6 +123,62 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_admin_access_and_revocation_rollback_with_second_audit_failure(self):
+        from app.routes import user_routes, subscription_routes
+        from app.schemas.subscription_schema import SubscriptionStatusUpdate
+        from app.services.audit_service import create_audit_log
+        Base.metadata.create_all(self.engine)
+        with Session(self.engine) as db:
+            admin=User(full_name="Synthetic audit admin",email="pg-access-admin@example.com",password_hash="unused",role="admin",referral_code="PGACCADMIN")
+            user=User(full_name="Synthetic audit customer",email="pg-access@example.com",password_hash="preserved",role="free_user",referral_code="PGACCESS")
+            user.subscription=build_trial_subscription(user=user)
+            db.add_all([admin,user]);db.commit();admin_id,user_id=admin.id,user.id
+        def snapshot(db):
+            return {table:db.execute(select(table)).all() for table in (User.__table__,Subscription.__table__,AuditLog.__table__)}
+        for route in (user_routes,subscription_routes):
+            with Session(self.engine) as db:
+                before=snapshot(db);admin=db.get(User,admin_id);calls=0
+                def audit(*args,**kwargs):
+                    nonlocal calls
+                    calls+=1
+                    if calls==2:raise RuntimeError("Synthetic second audit failure")
+                    return create_audit_log(*args,**kwargs)
+                with patch.object(route,"create_audit_log",side_effect=audit),self.assertRaisesRegex(RuntimeError,"Synthetic second audit failure"):
+                    if route is user_routes:
+                        route.edit_user(user_id,AdminUserUpdate(role="paid_user",is_active=False),db,admin)
+                    else:
+                        route.set_subscription_status(user_id,SubscriptionStatusUpdate(status="active"),db,admin)
+                self.assertEqual(calls,2);self.assertEqual(snapshot(db),before)
+
+    def test_concurrent_admin_status_changes_preserve_continuous_audit_snapshots(self):
+        from app.routes.subscription_routes import set_subscription_status
+        from app.schemas.subscription_schema import SubscriptionStatusUpdate
+        from app.services.audit_service import snapshot_model
+        Base.metadata.create_all(self.engine)
+        with Session(self.engine) as db:
+            admin=User(full_name="Synthetic status admin",email="pg-status-admin@example.com",password_hash="unused",role="admin",referral_code="PGSTATADMIN")
+            user=User(full_name="Synthetic status customer",email="pg-status@example.com",password_hash="preserved",role="free_user",referral_code="PGSTATUS")
+            user.subscription=build_trial_subscription(user=user)
+            db.add_all([admin,user]);db.commit();admin_id,user_id=admin.id,user.id;before=snapshot_model(user.subscription)
+        barrier=threading.Barrier(2);outcomes=[]
+        def worker(status):
+            with Session(self.engine) as db:
+                admin=db.get(User,admin_id);barrier.wait(timeout=15)
+                try:set_subscription_status(user_id,SubscriptionStatusUpdate(status=status),db,admin);outcomes.append(200)
+                except BaseException as error:db.rollback();outcomes.append(type(error).__name__)
+        threads=[threading.Thread(target=worker,args=(status,)) for status in ("active","free")]
+        for thread in threads:thread.start()
+        for thread in threads:thread.join(25)
+        self.assertFalse(any(thread.is_alive() for thread in threads));self.assertEqual(outcomes,[200,200])
+        with Session(self.engine) as db:
+            logs=db.scalars(select(AuditLog).where(AuditLog.action=="subscription.status_update").order_by(AuditLog.id)).all()
+            self.assertEqual(len(logs),2);self.assertEqual(logs[0].old_value,before)
+            self.assertEqual(logs[1].old_value,logs[0].new_value)
+            user=db.get(User,user_id)
+            self.assertEqual(logs[1].new_value,snapshot_model(user.subscription))
+            self.assertEqual(user.role,"paid_user" if user.subscription.status=="active" else "free_user")
+            self.assertEqual(user.password_hash,"preserved");self.assertEqual(user.auth_version,0)
+
     def test_admin_summary_is_one_read_snapshot_without_loading_customer_rows(self):
         from sqlalchemy import event
         from app.models.commodity import Commodity

@@ -124,6 +124,13 @@ totals/loading/recovery passed. Original CSS unchanged. PY-22 identified dashboa
 scope complete: seventeen complete, nineteen partial/pending. Next: atomic Admin
 account/subscription/audit changes, date-entry consistency and remaining checklist.
 
+Batch 30 verified: Admin account/subscription/access/revocation/audit updates
+commit together using User -> Subscription locks and the existing last-Admin guard.
+All 136 backend tests, 23 pinned PostgreSQL cases and original Admin controls /
+six sanitized audit records / dashboard regression passed. Seventeen complete,
+nineteen partial/pending. Next: existing price date-entry consistency, remaining
+administrative audits and bounded history metadata. No policy, field or UI changes.
+
 ## Checklist — do not repeat the audit
 
 | ID | Improvement | Current status |
@@ -153,7 +160,7 @@ account/subscription/audit changes, date-entry consistency and remaining checkli
 | PY-23 | Preserve layout while fixing mobile overflow | Pending |
 | PY-24 | Keyboard/focus accessibility | Pending |
 | PY-25 | Safe and clearly aged offline prices | Pending; visible additions require approval |
-| PY-26 | Complete atomic administrative audit | Partial: payment, registration/referral and price create/edit/approve/reject/outdated share atomic sanitized audits; concurrent price edit trail verified in batch 25; remaining administrative writes pending |
+| PY-26 | Complete atomic administrative audit | Partial: payment, registration/referral, price create/edit/approve/reject/outdated and Admin user/subscription/access changes share atomic sanitized audits; concurrent price/status trails and rollback verified; other administrative writes pending |
 | PY-27 | Consistent existing editing/password inputs | Partial: feedback file replacement/removal/async ordering fixed without form changes in batch 26; remaining editing/password cases pending |
 | PY-28 | Historical record preservation | Partial: approved 0022 tested on fresh/populated synthetic PostgreSQL; future migration/history work pending |
 | PY-29 | Stable identities and dependent records | Pending; no automatic merge |
@@ -1031,3 +1038,28 @@ account/subscription/audit changes, date-entry consistency and remaining checkli
 - Manual: http://127.0.0.1:55446/admin, admin@example.com / PriceYardDemo8!.
   Evidence: tools/local-test/evidence/batch-29-*.json. Seventeen IDs complete,
   nineteen partial/pending. Native synthetic PG is running for the next batch.
+
+### Batch 30 — further PY-26/PY-28 (2026-10-17)
+
+- Admin user and subscription changes, linked role/access state, login security
+  counter and both sanitized audits now commit together or roll back together.
+  Trial/paid cleanup cannot commit ahead of a failed Admin change. Lock User then
+  Subscription, matching payment/security writers; preserve the existing global
+  last-active-Admin guard. No new schema, field, UI, grant or expiry policy.
+- Five focused tests reproduced five before failures (0.566s), then passed (0.426s).
+  All 136 backend tests passed, 26.595s. Preserve original inactive-account 403;
+  after reactivation an old token remains rejected with 401, while original
+  password works and staff authority/indefinite manual grants remain unchanged.
+- Twenty-three pinned native PG cases passed, 26.694s: a failed second audit
+  rolls back user, subscription, revocation and first audit; simultaneous status
+  edits retain continuous old/new snapshots. Prior last-Admin/payment races pass.
+  First PG checker run used two fabricated referral codes exceeding the existing
+  twelve-character column; fixed the synthetic codes, not the application schema.
+- Browser original Users role/deactivate/activate and Subscriptions status controls
+  pass, with six sanitized audits and fresh-password recovery. Checker initially
+  matched both existing toast and success box; scoped the selector and reseeded
+  only the synthetic memory database. Dashboard regression still preserves all
+  fourteen cards, one summary request, no list downloads and outage recovery.
+- Frontend unchanged; no rebuild needed. Manual: http://127.0.0.1:55446/admin/users,
+  admin@example.com / PriceYardDemo8!. Evidence: batch-30-*.json. Seventeen complete,
+  nineteen partial/pending; remaining Admin audit transactions are still partial.
