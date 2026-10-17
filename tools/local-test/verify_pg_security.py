@@ -123,6 +123,28 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_legacy_audit_response_privacy_preserves_original_json(self):
+        from app.schemas.audit_log_schema import AuditLogResponse
+        from app.routes.audit_log_routes import get_logs, get_log
+        from copy import deepcopy
+        cases_spec=importlib.util.spec_from_file_location("local_privacy_cases",ROOT/"backend/tests/test_audit_response_privacy.py")
+        cases=importlib.util.module_from_spec(cases_spec);cases_spec.loader.exec_module(cases)
+        Base.metadata.create_all(self.engine)
+        with Session(self.engine) as db:
+            admin=User(full_name="Synthetic privacy Admin",email="pg-audit-privacy@example.com",password_hash="unused",role="admin",referral_code="PGPRIVACY")
+            db.add(admin);db.flush()
+            item=AuditLog(user_id=admin.id,action="synthetic.legacy",table_name="price_updates",record_id=1,
+                          old_value=deepcopy(cases.LEGACY_VALUE),new_value=[deepcopy(cases.LEGACY_VALUE),None])
+            db.add(item);db.commit();item_id=item.id
+            before=db.execute(select(AuditLog.__table__)).all()
+            for record in [*get_logs(db,admin),get_log(item_id,db,admin)]:
+                response=AuditLogResponse.model_validate(record).model_dump(mode="json")
+                self.assertEqual(response["old_value"],cases.SAFE_VALUE)
+                self.assertEqual(response["new_value"],[cases.SAFE_VALUE,None])
+            db.commit()
+        with Session(self.engine) as db:
+            self.assertEqual(db.execute(select(AuditLog.__table__)).all(),before)
+
     def intelligence_resource_case(self,kind,*,planning=False):
         from app.models.commodity import Commodity
         from app.models.market import Market

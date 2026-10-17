@@ -21,14 +21,14 @@ SENSITIVE_KEY_FRAGMENTS = (
     "database_password",
     ".env",
 )
-# Price-source identities are intentionally excluded from audit snapshots.
-# They are operationally private and are not required by Stage 16 audit proof.
-PRIVATE_AUDIT_FIELDS = {"source_1", "source_2"}
+# Source identities and private feedback attachments are not audit proof.
+# Keep originals in their operational records, never in audit responses.
+PRIVATE_AUDIT_FIELDS = {"source_1", "source_2", "screenshot_data"}
 
 
 def _is_sensitive_key(key: str) -> bool:
-    lowered = key.lower()
-    return key in PRIVATE_AUDIT_FIELDS or any(fragment in lowered for fragment in SENSITIVE_KEY_FRAGMENTS)
+    lowered = key.strip().lower()
+    return lowered in PRIVATE_AUDIT_FIELDS or any(fragment in lowered for fragment in SENSITIVE_KEY_FRAGMENTS)
 
 
 def _json_safe(value: Any) -> Any:

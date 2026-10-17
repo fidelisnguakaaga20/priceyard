@@ -28,6 +28,7 @@ from sqlalchemy.orm import Session
 from app.database import Base, get_engine
 import app.models
 from app.models.commodity import Commodity
+from app.models.audit_log import AuditLog
 from app.models.faq_item import FAQItem
 from app.models.market import Market
 from app.models.payment import Payment
@@ -77,6 +78,11 @@ with Session(engine) as db:
         # bag_size stays NULL. No invented grades or quantity conversions.
         db.add(PriceUpdate(commodity_id=commodity.id, market_id=market.id, price_low=low, price_high=low+10000, average_price=low+5000, previous_price_low=210000 if day == 0 else None, previous_price_high=220000 if day == 0 else None, unit="1 bag", bag_size=None, movement="up" if day == 0 else "unknown", confidence_level="Low confidence", update_date_time=now-timedelta(days=day), status="approved", created_by=users["admin"].id, approved_by=users["admin"].id, notes="Fabricated local test price; bag size not supplied.", source_1="LOCAL-PRIVATE-SOURCE"))
     db.add(FAQItem(question="Local testing question", answer="Fabricated test entry only.", category="Local testing", is_published=True, created_by=users["admin"].id))
+    # Fabricated legacy evidence exercises response-time privacy without copying
+    # production records or exposing any real account/provider credential.
+    db.add(AuditLog(user_id=users["admin"].id, action="local.synthetic_legacy", table_name="price_updates", record_id=1,
+                    old_value={"notes":"Retained synthetic audit evidence", "source_1":"SYNTHETIC-LEGACY-PRIVATE", "password_hash":"SYNTHETIC-LEGACY-HASH"},
+                    new_value={"notes":"Retained synthetic audit evidence", "nested":[{"SOURCE_2":"SYNTHETIC-LEGACY-PRIVATE", "screenshot_data":"SYNTHETIC-LEGACY-ATTACHMENT", "access_token":"SYNTHETIC-LEGACY-TOKEN", "status":"approved"}]}))
     db.add(Payment(user_id=users["payment"].id, reference="py_local_browser_only", plan="monthly", amount=2500, currency="NGN", status="pending"))
     db.add(Payment(user_id=users["value-paid"].id, reference="py_local_renewal_only", plan="monthly", amount=2500, currency="NGN", status="pending"))
     db.add(Payment(user_id=users["value-trial"].id, reference="py_local_trial_purchase_only", plan="seasonal", amount=6000, currency="NGN", status="pending"))

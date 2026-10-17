@@ -199,12 +199,17 @@ and all six browser audits pass. PY-26 identified application scope complete.
 Nineteen IDs complete; seventeen partial/pending. Next: remaining source/privacy,
 mobile and keyboard safeguards, retaining original screens and policies.
 
+Batch 41 verified: legacy audit API responses recursively redact private source,
+credential and screenshot fields without rewriting original stored evidence.
+All 180 backend/38 pinned PG cases and original audit-screen privacy checks pass.
+Nineteen complete; seventeen partial/pending. Next: mobile/keyboard checks.
+
 ## Checklist — do not repeat the audit
 
 | ID | Improvement | Current status |
 |---|---|---|
 | PY-01 | Consistent historical access checks | Complete in batch 7; date/comparison/ID routes enforce existing history entitlement; current summaries preserved |
-| PY-02 | Confidential/restricted market information | Partial: quality list/detail match existing premium screen; broader source/audit response review pending; public basic guidance unchanged |
+| PY-02 | Confidential/restricted market information | Partial: quality list/detail match existing premium screen; new and legacy audit responses redact private fields without rewriting evidence, public price responses omit source identities and legitimate Admin source access stays; remaining source policy review pending, public basic guidance unchanged |
 | PY-03 | Google ownership and safe account linking | Application-side approved scope complete in batch 27: stable subject ownership, no email-only linking/overwrite, existing password/reset fallback and original trials; cryptographic/HTTP/PG/browser verified. Live Google popup/provider compatibility remains operational PY-35 |
 | PY-04 | Password reset and login revocation | Complete in batch 5; actual HTTP/browser and PostgreSQL reset/logout races passed |
 | PY-05 | Referral abuse protection | Partial: atomic registration/reward/audit, duplicate-registration safety and concurrent seven-day reward preservation verified in batch 20; qualification/abuse-cap changes require approval and remain unchanged |
@@ -232,7 +237,7 @@ mobile and keyboard safeguards, retaining original screens and policies.
 | PY-27 | Consistent existing editing/password inputs | Partial: feedback file replacement/removal/async ordering fixed without form changes in batch 26; remaining editing/password cases pending |
 | PY-28 | Historical record preservation | Partial: approved 0022 tested on fresh/populated synthetic PostgreSQL; future migration/history work pending |
 | PY-29 | Stable identities and dependent records | Partial: catalog IDs/fields and referenced-price deletion rejection verified with atomic audit writes in batch 34; broader identity/duplicate/rename issues pending, no automatic merge |
-| PY-30 | Isolated automated/browser verification | Partial/ongoing: guarded 177 backend tests, 37 identity-pinned synthetic PostgreSQL cases, real original-browser workflows and before/after evidence verified through batch 40; expand with remaining work, live services forbidden |
+| PY-30 | Isolated automated/browser verification | Partial/ongoing: guarded 180 backend tests, 38 identity-pinned synthetic PostgreSQL cases, real original-browser workflows and before/after evidence verified through batch 41; expand with remaining work, live services forbidden |
 | PY-31 | Confirmed payment activation and recovery | Partial: atomic confirmation, retry/replay, owner-only callback recovery and approved indefinite-grant holds verified; unattended recovery and operational delivery/reconciliation decisions remain |
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches 14/21: carry forward dated paid/trial time; preserve indefinite grants, block new checkout and hold/recover old purchases without consuming days |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
@@ -1383,3 +1388,25 @@ mobile and keyboard safeguards, retaining original screens and policies.
 - Nineteen IDs complete; seventeen partial/pending. PY-26 covers identified
   application business-record writers; live delivery/reconciliation operations
   remain separate. No production access, migrations, pushes, merges or deployment.
+
+### Batch 41 — further PY-02 historical audit privacy (2026-10-17)
+
+- Confirmed legacy audit list/detail returned unfiltered historical JSON despite
+  original Audit screen's explicit promise that secrets/private sources never appear.
+  Apply the existing recursive redaction when serializing both response fields;
+  normalize private-key case/space checks and exclude feedback attachment bytes.
+  Database evidence, nonprivate amounts/notes, actor/action/record IDs stay intact.
+- Three before tests reproduce three failures (0.177s); all pass after (0.262s).
+  All 180 backend tests pass, 33.051s; 38 pinned PostgreSQL cases pass, 42.185s.
+  Native fresh-session read verifies original nested historical JSON unchanged.
+  Guest/non-Admin denial, null/empty/list handling and input immutability pass.
+- Actual original browser Audit screen/list/detail omit fabricated legacy private
+  fields while retaining public evidence. Public current/history price responses
+  exclude sources, legitimate original Admin price response still contains them.
+  One initial browser check used the wrong test URL; corrected to existing /admin/audit,
+  with no application routing changes. No frontend rebuild or schema changes.
+- Evidence: tools/local-test/evidence/batch-41-*.json. The in-memory preview has one
+  clearly fabricated legacy audit fixture solely for regression/manual verification.
+  Manual: http://127.0.0.1:55446/admin/audit, admin@example.com / PriceYardDemo8!.
+- Nineteen IDs complete; seventeen partial/pending. Remaining source policy review,
+  mobile/keyboard issues and operational/business decisions are not claimed complete.
