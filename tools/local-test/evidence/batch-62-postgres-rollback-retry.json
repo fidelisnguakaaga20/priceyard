@@ -1,0 +1,15 @@
+{
+  "tests": 1,
+  "failures": 0,
+  "errors": 0,
+  "seconds": 1.484,
+  "cluster_identity_verified": true,
+  "production_contacts": 0,
+  "cluster_profile": "postgres-recovery-20261017",
+  "schemas_before": 72,
+  "schema_budget": 80,
+  "single_native_suite": true,
+  "selected_tests": [
+    "test_catalog_rollback_releases_identity_lock_without_losing_audits"
+  ]
+}

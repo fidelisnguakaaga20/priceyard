@@ -25,14 +25,15 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
-Latest verified: batch61,26 complete /10 partial or pending:
-02,05,07,08,13,14,20,29,30,35. Batch60 bounds complete CSV exports without
-discarding history; batch61 completes current documentation/six-form readability
-and fixes safe resumption of failed isolated builds. Full225 backend tests,
-focused native export, TypeScript/Vite, six-form/14-card/original browser checks
-pass. Compiled JS/CSS are byte-identical to the previous verified build. Smaller
-native fixture71/80 schemas, stopped. Next: remaining PY-20 full JSON history/
-list bounds and PY-29 identity work; keep owner-policy/production gates explicit.
+Latest verified: batch62,26 complete /10 partial or pending:
+02,05,07,08,13,14,20,29,30,35. Catalog duplicate/rename races now serialize
+existing checks until audited commit/rollback; no merges or naming changes.
+Full230 backend tests pass; both focused native catalog cases verified (one
+setup-timeout retry through approved runner), original catalog/browser controls
+and all14 dashboard cards pass.84 frontend source/config hashes and compiled
+JS/CSS unchanged. Smaller native fixture73/80 schemas, stopped. Next: finite
+PY-30 coverage/isolation acceptance, remaining PY-20 full JSON lists and PY-29
+filter/link-scope work; keep owner-policy/production gates explicit.
 Do not reopen completed scope or mistake earlier historical counts for current.
 
 Baseline browser/isolation verification passed. Batch 1 (PY-15) verified:
@@ -394,8 +395,8 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-26 | Complete atomic administrative audit | Complete for identified business-record writers through batch 40: payment/referral, price/moderation/flags, account/subscription, FAQ/catalog and all six intelligence resources save sanitized audits atomically; native concurrent edits and failed-audit rollback verified. External delivery operations remain PY-35 |
 | PY-27 | Consistent existing editing/password inputs | Complete for identified scope: feedback selection in batch26, existing Unicode/72-byte password rules and reset validation in batch46, owner-approved six Admin edit forms in batches50–52. Saved values/costs, one-field edits, reload, explicit clearing, switching/unknown/blank IDs and creation verified in61 actual browser checks |
 | PY-28 | Historical record preservation | Current application-side scope complete in batch59: read-only legacy/unversioned preflight before migration steps, empty/reviewed0021-to0022 paths, unchanged raw history/catalog IDs/active flags/cost links/sources/audits, preserved paid/payment records and0022 downgrade refusal verified. No guesses to repair already-changed historical data; production backup/restore/rollout and any repairs require owner approval under PY-35 |
-| PY-29 | Stable identities and dependent records | Partial: catalog IDs/fields and referenced-price deletion rejection verified with atomic audit writes in batch 34; broader identity/duplicate/rename issues pending, no automatic merge |
-| PY-30 | Isolated automated/browser verification | Partial/ongoing: full225 backend tests pass in61; focused native CSV export passes60, prior recovery/migration cases58–59 retained. Full40 native baseline remains47, no new full-native-suite claim. Build safely resumes failed marked snapshots, four mock-only guard tests pass61; TypeScript/Vite, six original forms,14-card dashboard and seven original browser workflows pass61. Fixture71/80 schemas, stopped; serialized phases, one snapshot reused, byte-identical compiled JS/CSS; no copied dependencies, native browser workers/providers disabled, live services forbidden |
+| PY-29 | Stable identities and dependent records | Partial: catalog IDs/fields and referenced deletion rejection with atomic audits verified34; normalized-name commodity/market create-versus-create/rename races and rollback lock release verified62 without changing market-state uniqueness or merging legacy duplicates. Remaining filter/link-scope issues pending; no automatic merge or invented cost units |
+| PY-30 | Isolated automated/browser verification | Partial: full230 backend tests pass62; two focused catalog concurrency/rollback cases verified62 with initial setup timeout retained and only failed case retried through approved runner. Full40 native baseline remains47; no new full-native-suite claim. Build recovery and original browser proof61 retained, catalog/14-card dashboard pass62. Fixture73/80 schemas, stopped;84 current frontend hashes match verified snapshot, no build/copies needed. Next finite current coverage/isolation acceptance; production/provider compatibility remains PY-35 |
 | PY-31 | Confirmed payment activation and recovery | Application-side approved scope complete in batch58: atomic confirmation, owner callback and explicit bounded/resumable reconciliation for missed webhook/return; dry-run default, strict existing evidence/activation, single PG worker, error isolation, replay safety and purchased-time/manual-grant preservation verified. Live scheduling/checkpoints/monitoring and ambiguous legacy repairs require owner approval under PY-35 |
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches 14/21: carry forward dated paid/trial time; preserve indefinite grants, block new checkout and hold/recover old purchases without consuming days |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
@@ -2243,3 +2244,43 @@ No expansion of completed null-guard/account/UI scopes is needed.
 - Master/backup preserved, verified changes saved only on the existing local
   development branch. No production data/services/migrations, credential reads,
   push, merge or deployment. Preview remains guarded at127.0.0.1:55446.
+
+### Batch 62 — concurrent catalog identity protection (2026-10-17)
+
+- Resumed clean fromaca2585. PY-29 existing case-insensitive commodity and
+  name/state market duplicate checks now use transaction-owned PostgreSQL
+  advisory locks (separate unused keys4/5 in existing namespace741523). Checks
+  serialize across application workers until the existing audited transaction
+  commits or rolls back. No schema/index additions, name/state/country policy
+  changes, automatic merge, legacy-data rewrite or new form fields.
+- Five new catalog tests cover case/whitespace collisions, rename/state conflicts,
+  preserved IDs/metadata, allowed distinct market states and untouched legacy
+  case-variant rows. Existing atomic catalog audit tests remain passing:
+  nine focused tests1.232s. Full230 backend tests pass131.731s, zero failures/
+  errors/skips. Run was slower than61; no repeated full-suite runs performed.
+- Native create-versus-create and create-versus-rename checks prove contender
+  waits through first writer's audited transaction. After commit it returns409;
+  after rollback it succeeds once. Four intended audited writes, saved metadata
+  and complete original price/source history remain correct. At most two owned
+  worker threads, joined before next case; no overlapping suites.
+- Initial focused native run: first case passed, second failed in connection
+  setup before its application checks. Restricted-runner pg_ctl also incorrectly
+  reported no server. Approved runner verified same healthy pinned PID35140 and
+  live identity; only failed rollback case retried and passed1.484s. Exact Windows
+  cause is unproven; log shows host-software client abort. No application change,
+  timeout increase, fixture restart, data deletion or weakened guard to pass.
+  Initial report retained. Schemas71->72 first case, no schema for failed setup,
+  then72->73 passing retry, of80. Fixture gracefully stopped before browser work.
+- Actual original catalog forms: edit/revert preserves IDs/names/fields; referenced
+  deletion remains rejected, duplicate case/whitespace creation shows existing409
+  message and adds no catalog/audit rows. Complete price history and four intended
+  continuous edit audits preserved. Initial browser harness used “Save” in new
+  creation mode; corrected to original “Create” control and handled response/click
+  promises together. No application screen/button change.
+- All14 original dashboard labels/totals, single summary query and outage recovery
+  pass.84 frontend source/public/config files and JS/CSS hashes match the existing
+  verified build; no rebuild, dependencies installed/copied or design changes.
+- Evidence batch-62-*.json.26 complete /10 partial or pending remain:
+  02,05,07,08,13,14,20,29,30,35. PY-29 stays partial for filter/link-scope work;
+  do not infer completion of all identity issues from duplicate race tests.
+- No production services/data/credentials/migrations, push, merge or deployment.

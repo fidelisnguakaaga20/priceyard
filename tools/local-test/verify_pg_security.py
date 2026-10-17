@@ -148,6 +148,18 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_catalog_duplicate_and_rename_races_preserve_history(self):
+        spec = importlib.util.spec_from_file_location("local_catalog_identity", ROOT / "backend/tests/test_catalog_identity.py")
+        cases = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cases)
+        cases.verify_catalog_races(self, self.engine, first_commits=True)
+
+    def test_catalog_rollback_releases_identity_lock_without_losing_audits(self):
+        spec = importlib.util.spec_from_file_location("local_catalog_rollback", ROOT / "backend/tests/test_catalog_identity.py")
+        cases = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cases)
+        cases.verify_catalog_races(self, self.engine, first_commits=False)
+
     def test_streamed_export_preserves_all_history_and_releases_connections(self):
         spec = importlib.util.spec_from_file_location("local_export_stream", ROOT / "backend/tests/test_report_export_streaming.py")
         cases = importlib.util.module_from_spec(spec)

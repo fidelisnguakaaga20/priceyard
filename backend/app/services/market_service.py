@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.models.market import Market
 from app.schemas.market_schema import MarketCreate, MarketUpdate
+from app.services.catalog_identity_service import lock_catalog_identity
 
 
 def list_markets(db: Session, *, active_only: bool = False) -> list[Market]:
@@ -40,6 +41,7 @@ def _ensure_unique_market(db: Session, name: str, state_value: str | None, *, ex
 
 
 def create_market(db: Session, payload: MarketCreate, *, commit: bool = True) -> Market:
+    lock_catalog_identity(db, "market")
     _ensure_unique_market(db, payload.name, payload.state)
     market = Market(**payload.model_dump())
     db.add(market)
@@ -59,6 +61,7 @@ def update_market(db: Session, market: Market, payload: MarketUpdate, *, commit:
     final_name = changes.get("name", market.name)
     final_state = changes.get("state", market.state)
     if "name" in changes or "state" in changes:
+        lock_catalog_identity(db, "market")
         _ensure_unique_market(db, final_name, final_state, exclude_id=market.id)
 
     for field, value in changes.items():

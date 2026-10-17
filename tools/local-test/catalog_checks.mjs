@@ -35,12 +35,21 @@ try{
   page.once('dialog',dialog=>dialog.accept());const denied=page.waitForResponse(r=>r.url()===origin+'/api/'+plural+'/'+original.id&&r.request().method()==='DELETE');
   await card.getByRole('button',{name:'Delete',exact:true}).click();assert.equal((await denied).status(),409);
   await page.locator('.status-box.error').getByText(/referenced by existing records/).waitFor();await page.reload();await card.waitFor();
+  const createForm=page.locator('form.admin-form');
+  await createForm.locator('input[name="name"]').fill('  '+name.toUpperCase()+'  ');
+  if(kind==='market')await createForm.locator('input[name="state"]').fill(original.state||'');
+  const [duplicate]=await Promise.all([
+   page.waitForResponse(r=>r.url()===origin+'/api/'+plural&&r.request().method()==='POST'),
+   createForm.getByRole('button',{name:'Create '+kind,exact:true}).click(),
+  ]);
+  assert.equal(duplicate.status(),409);
+  await page.locator('.status-box.error').getByText(/already exists/).waitFor();
  }
  assert.deepEqual(historyValues(await read('/price-updates/admin/history')),originalHistory);
  const audits=(await read('/audit-logs')).filter(row=>!auditIds.includes(row.id)).sort((a,b)=>a.id-b.id);
  for(const kind of ['commodity','market']){const logs=audits.filter(row=>row.action===kind+'.edit');assert.equal(logs.length,2);assert.deepEqual(logs[1].old_value,logs[0].new_value);}
  assert.equal(audits.length,4);assert.equal(outside,0);
- const report={original_commodity_and_market_edit_controls:true,original_names_ids_fields_and_descriptions_preserved:true,referenced_delete_still_denied:true,complete_price_history_preserved:true,four_continuous_audit_records:true,new_catalog_records:0,external_page_requests:outside,production_connections:0};
+ const report={original_commodity_and_market_edit_controls:true,original_names_ids_fields_and_descriptions_preserved:true,referenced_delete_still_denied:true,case_whitespace_duplicates_show_original_conflict_without_saving:true,complete_price_history_preserved:true,four_continuous_audit_records:true,new_catalog_records:0,external_page_requests:outside,production_connections:0};
  fs.writeFileSync(path.join(lab,'runtime/catalog-checks.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report));
 }catch(error){
  console.log(JSON.stringify({url:page.url(),headings:await page.locator('h1,h2,h3').allTextContents(),forms:await page.locator('form').count(),labels:await page.locator('form label').allTextContents(),errors:await page.locator('.status-box.error').allTextContents()}));

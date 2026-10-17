@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.models.commodity import Commodity
 from app.schemas.commodity_schema import CommodityCreate, CommodityUpdate
+from app.services.catalog_identity_service import lock_catalog_identity
 
 
 def list_commodities(db: Session, *, active_only: bool = False) -> list[Commodity]:
@@ -33,6 +34,7 @@ def _ensure_unique_name(db: Session, name: str, *, exclude_id: int | None = None
 
 
 def create_commodity(db: Session, payload: CommodityCreate, *, commit: bool = True) -> Commodity:
+    lock_catalog_identity(db, "commodity")
     _ensure_unique_name(db, payload.name)
     commodity = Commodity(**payload.model_dump())
     db.add(commodity)
@@ -51,6 +53,7 @@ def update_commodity(db: Session, commodity: Commodity, payload: CommodityUpdate
     if "is_active" in changes and changes["is_active"] is None:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Commodity active status cannot be null")
     if "name" in changes:
+        lock_catalog_identity(db, "commodity")
         _ensure_unique_name(db, changes["name"], exclude_id=commodity.id)
 
     for field, value in changes.items():
