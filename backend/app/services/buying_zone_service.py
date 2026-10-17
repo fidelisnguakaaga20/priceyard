@@ -77,6 +77,9 @@ def list_buying_zones(db: Session, *, commodity_id: int | None = None) -> list[B
 
 def update_buying_zone(db: Session, zone: BuyingZone, payload: BuyingZoneUpdate, *, commit: bool = True) -> BuyingZone:
     changes = payload.model_dump(exclude_unset=True)
+    required = ("commodity_id", "market_id", "price_low", "price_high", "reason", "confidence")
+    if any(field in changes and changes[field] is None for field in required):
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Required buying-zone values cannot be null")
     commodity_id = int(changes.get("commodity_id", zone.commodity_id))
     market_id = int(changes.get("market_id", zone.market_id))
     price_low = changes.get("price_low", zone.price_low)

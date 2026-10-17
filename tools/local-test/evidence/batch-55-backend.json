@@ -1,0 +1,9 @@
+{
+  "tests_run": 202,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "duration_seconds": 28.253,
+  "pattern": "test_*.py",
+  "runtime": "in-process synthetic SQLite; TCP and DNS denied"
+}

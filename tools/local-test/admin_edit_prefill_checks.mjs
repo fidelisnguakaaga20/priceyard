@@ -22,8 +22,8 @@ async function waitForField(name,value,numeric){
 const cases=[
   {endpoint:'market-signals',route:'market-signals',heading:'Market signals',button:'Save market signal',values:{signal_type:'Synthetic saved type',signal_description:'Synthetic saved description',possible_meaning:'Synthetic saved optional note',suggested_action:'Investigate'},edit:'signal_description',clear:'possible_meaning'},
   {endpoint:'quality-signals',route:'quality-signals',heading:'Quality signals',button:'Save quality signal',values:{quality_status:'Synthetic saved status',moisture_status:'Synthetic saved moisture',storage_readiness:'Synthetic saved readiness',risk_note:'Synthetic saved risk'},edit:'quality_status',clear:'risk_note'},
-  {endpoint:'buying-zones',route:'buying-zones',heading:'Buying zones',button:'Save buying zone',values:{price_low:100,price_high:200,reason:'Synthetic saved reason',valid_from:'2026-10-01',valid_to:'2026-10-31',confidence:'Synthetic confidence'},edit:'reason',clear:'valid_to',linkedPrice:false,canDelete:false},
-  {endpoint:'sell-watch-windows',route:'sell-watch',heading:'Sell-watch windows',button:'Save sell-watch window',values:{start_period:'Synthetic start',end_period:'Synthetic saved end',observation:'Synthetic saved observation',confidence:'Synthetic confidence'},edit:'observation',clear:'end_period',linkedPrice:false,canDelete:false},
+  {endpoint:'buying-zones',route:'buying-zones',heading:'Buying zones',button:'Save buying zone',values:{price_low:100,price_high:200,reason:'Synthetic saved reason',valid_from:'2026-10-01',valid_to:'2026-10-31',confidence:'Synthetic confidence'},edit:'reason',clear:'valid_to',linkedPrice:false,canDelete:false,requiredFields:['commodity_id','market_id','price_low','price_high','reason','confidence']},
+  {endpoint:'sell-watch-windows',route:'sell-watch',heading:'Sell-watch windows',button:'Save sell-watch window',values:{start_period:'Synthetic start',end_period:'Synthetic saved end',observation:'Synthetic saved observation',confidence:'Synthetic confidence'},edit:'observation',clear:'end_period',linkedPrice:false,canDelete:false,requiredFields:['commodity_id','market_id','start_period','observation','confidence']},
   {endpoint:'storage-suitability',route:'storage',heading:'Storage suitability',button:'Save storage suitability',values:{suitability_status:'watch',import_risk:'Synthetic import note',oversupply_risk:'Synthetic supply note',spoilage_risk:'Synthetic spoilage note',buyer_availability:'Synthetic buyer note',quality_storage_notes:'Synthetic saved storage note',summary:'Synthetic saved summary'},edit:'summary',clear:'quality_storage_notes',canDelete:false},
   {endpoint:'cost-breakdowns',route:'costs',heading:'Cost breakdown',button:'Save cost breakdown',values:{transport:120.50,warehouse:80.25,security:0,market_charges:20.75,loading_offloading:30,other_costs:10.10,purchase_price_reference:210000},edit:'transport',clear:'warehouse',linkedPrice:false,numeric:true},
 ];
@@ -34,6 +34,12 @@ try {
     const base={commodity_id:price.commodity_id,market_id:price.market_id,...(test.linkedPrice===false?{}:{price_update_id:price.id}),...test.values};
     const rows=[];for(const suffix of ['one','two']){const result=await api('/'+test.endpoint,'POST',{...base,[test.edit]:test.numeric?test.values[test.edit]+(suffix==='one'?1:2):test.values[test.edit]+' '+suffix});assert.equal(result.status,201);rows.push(result.body);created.push([test.endpoint,result.body.id,test.canDelete!==false]);}
     const known=(await api('/'+test.endpoint)).body;
+    if(test.requiredFields){
+      const audits=(await api('/audit-logs')).body;let rejected=true;
+      for(const field of test.requiredFields){const invalid=await api('/'+test.endpoint+'/'+rows[0].id,'PATCH',{[field]:null});rejected=invalid.status===422&&rejected;}
+      checks[test.endpoint+'_required_null_values_rejected']=rejected;
+      checks[test.endpoint+'_invalid_edits_preserve_records_and_audits']=JSON.stringify((await api('/'+test.endpoint)).body)===JSON.stringify(known)&&JSON.stringify((await api('/audit-logs')).body)===JSON.stringify(audits);
+    }
     let release;const held=new Promise(resolve=>{release=resolve;});
     await context.route('**/api/'+test.endpoint,async route=>{await held;await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(known)});},{times:1});
     await page.goto(origin+'/admin/'+test.route);await page.getByRole('heading',{name:test.heading,exact:true}).waitFor();

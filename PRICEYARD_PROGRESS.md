@@ -310,6 +310,13 @@ seven cost-browser checks and61 editing regressions pass.84 frontend source/conf
 hashes match the existing verified build; no frontend changes or dependency copies.
 Native fixture56/80 schemas, stopped. Exactly23 complete /13 partial or pending.
 
+Batch55 extends required-value validation to Buying zones/Sell-watch while keeping
+optional date/period clearing. Full202 backend tests pass28.253s; three focused
+native cases pass2.296s;65 original-form browser checks, five detail regressions
+and14-card dashboard pass. Native schemas59/80, stopped; no frontend changes.
+Exactly23 complete /13 partial or pending. Next PY-08 remaining signal required
+values; do not invent text/body/session/source policies to close tracker items.
+
 | ID | Improvement | Current status |
 |---|---|---|
 | PY-01 | Consistent historical access checks | Complete in batch 7; date/comparison/ID routes enforce existing history entitlement; current summaries preserved |
@@ -319,7 +326,7 @@ Native fixture56/80 schemas, stopped. Exactly23 complete /13 partial or pending.
 | PY-05 | Referral abuse protection | Partial: atomic registration/reward/audit, duplicate-registration safety and concurrent seven-day reward preservation verified in batch 20; qualification/abuse-cap changes require approval and remain unchanged |
 | PY-06 | Safe push notification destinations | Application-side complete in batch 13; known-provider/key validation, bounded TLS transport, no redirects; live provider compatibility remains operational verification |
 | PY-07 | Shared-device/session safety | Partial: server revocation, stale UI protection, possession-based push ownership/concurrent registration and bounded current-device logout cleanup verified; JS token storage/offline cleanup limits remain |
-| PY-08 | Input/upload/request abuse bounds | Partial: push endpoint/key/query bounds, feedback pre-decode 2MB screenshot bound, existing watchlist numeric limits (batch53), Cost breakdown required values/calculated storage limits (batch54) verified; broader request/text/body limits remain pending |
+| PY-08 | Input/upload/request abuse bounds | Partial: push endpoint/key/query bounds, feedback pre-decode 2MB screenshot bound, existing watchlist numeric limits (batch53), Cost required values/totals (batch54), Buying/Sell-watch required-value protection (batch55) verified; broader request/text/body limits remain pending |
 | PY-09 | Concurrent security-action safety | Complete for identified reset/logout/last-Admin cases in batches 5/6; six PostgreSQL cases passed |
 | PY-10 | Spreadsheet export safety | Complete in batch 3; text/numeric regressions and original browser download/access checks passed |
 | PY-11 | Correct saved administrator price state | Complete in batch 10; actual create/approve/correct/outdated/reject/reload browser regression passed |
@@ -341,7 +348,7 @@ Native fixture56/80 schemas, stopped. Exactly23 complete /13 partial or pending.
 | PY-27 | Consistent existing editing/password inputs | Complete for identified scope: feedback selection in batch26, existing Unicode/72-byte password rules and reset validation in batch46, owner-approved six Admin edit forms in batches50–52. Saved values/costs, one-field edits, reload, explicit clearing, switching/unknown/blank IDs and creation verified in61 actual browser checks |
 | PY-28 | Historical record preservation | Partial: approved 0022 tested on fresh/populated synthetic PostgreSQL; future migration/history work pending |
 | PY-29 | Stable identities and dependent records | Partial: catalog IDs/fields and referenced-price deletion rejection verified with atomic audit writes in batch 34; broader identity/duplicate/rename issues pending, no automatic merge |
-| PY-30 | Isolated automated/browser verification | Partial/ongoing: full196 backend tests pass in batch52; batch53 adds two passing target tests plus five existing alert regressions, one native workflow and six browser checks. Full40 native baseline remains batch47;61 editing, five detail and14-card dashboard regressions passed batch52. Fixture53/80 schemas, stopped; serialized heavy phases, reused dependencies; native browser workers/providers disabled, live services forbidden |
+| PY-30 | Isolated automated/browser verification | Partial/ongoing: full202 backend tests pass in batch55; two focused cost native cases in54 and three planning native cases in55. Full40 native baseline remains batch47.65 editing/API, five detail and14-card dashboard checks pass; seven cost-browser checks in54. Fixture59/80 schemas, stopped; serialized heavy phases, verified/reused frontend hashes/dependencies; native browser workers/providers disabled, live services forbidden |
 | PY-31 | Confirmed payment activation and recovery | Partial: atomic confirmation, retry/replay, owner-only callback recovery and approved indefinite-grant holds verified; unattended recovery and operational delivery/reconciliation decisions remain |
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches 14/21: carry forward dated paid/trial time; preserve indefinite grants, block new checkout and hold/recover old purchases without consuming days |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
@@ -1933,3 +1940,31 @@ Native fixture56/80 schemas, stopped. Exactly23 complete /13 partial or pending.
 - Evidence batch-54-*.json. Exactly23 complete /13 partial or pending. Next existing
   Buying/Sell-watch required-value validation; no new business/source/session policy.
   No production access, migrations, dependency installs, push, merge or deployment.
+
+### Batch 55 — Required Buying/Sell-watch values (2026-10-17)
+
+- Preserve existing non-nullable database rules for both resources: explicit null
+  for mandatory IDs, amounts or text returns422 before coercion/flush instead of500.
+  Omitted fields retain saved values. Nullable valid-from/to and end-period still
+  clear correctly; no new fields, layout, measurement or subscription/source rules.
+- Before: both backend workflows reproduce500. After: full202 backend tests pass,
+  28.253s, including new11-field null checks, omitted-value preservation, optional
+  clearing, corrections, forbidden non-Admin writes and unchanged raw price/audit
+  evidence on rejection. Three focused native tests pass2.296s: same preservation
+  workflow and both existing atomic-audit rollback/concurrent-edit cases. Fixture
+  schemas56 to59 of80, stopped before browser. Full40 native baseline remains47.
+-65 actual original-form browser checks pass, including all61 earlier editing
+  checks plus required-null rejection and record/audit preservation for these two
+  resources. Optional clearing, create/edit/reload still pass for all six forms.
+  Five detail regressions and all14 original dashboard labels/totals, one summary
+  request and outage recovery pass. Zero external page/provider requests.
+- Frontend source unchanged; reuse the84-file hash-matched build verified in54,
+  with original CSS index-BEBH-Ai6.css and no copied/installed dependencies. Heavy
+  phases run sequentially. Windows restricted-token startup failed inside sandbox;
+  required platform approval allowed only the pinned synthetic PostgreSQL fixture,
+  preserving all identity, network, exclusive-run and schema-budget guards.
+- Evidence batch-55-*.json. Exactly23 complete /13 partial or pending. Disposable
+  memory preview will be reseeded on next restart to clear temporary planning
+  records; no unsupported delete endpoints added. Next remaining PY-08 signal
+  required values; business/visible/production approval boundaries still apply.
+  No production, push, merge or deployment.
