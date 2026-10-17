@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, status
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -21,8 +23,9 @@ router = APIRouter(prefix="/buying-zones", tags=["buying-zones"])
 def get_zones(
     db: Session = Depends(get_db),
     _: User = Depends(require_full_access),
+    commodity_id: Annotated[int | None, Query(gt=0)] = None,
 ) -> list[BuyingZone]:
-    return list_buying_zones(db)
+    return list_buying_zones(db, commodity_id=commodity_id)
 
 
 @router.get("/{zone_id}", response_model=BuyingZoneResponse)

@@ -256,6 +256,16 @@ without a subsequent instruction. See batch47 history for resource safeguards.
 
 ## Checklist — do not repeat the audit
 
+Latest continuation: owner resumed development from c0bb6eb after recovery.
+Batch48 verifies two compatible PY-20 changes: commodity-scoped Buying zone and
+Sell-watch queries; original default Admin lists, UI and history remain complete.
+All194 backend tests, three focused native cases, actual scope browser, five
+detail regressions and all14 dashboard cards pass. Smaller PG stopped before
+browser/build; retained schemas40 to43, not another full suite. Existing dependency
+snapshot reused rather than copied. Exactly22 complete /14 partial or pending;
+next compatible remaining work includes Storage suitability query scope and
+remaining editing/input/security items. No production, push, merge or deployment.
+
 | ID | Improvement | Current status |
 |---|---|---|
 | PY-01 | Consistent historical access checks | Complete in batch 7; date/comparison/ID routes enforce existing history entitlement; current summaries preserved |
@@ -277,7 +287,7 @@ without a subsequent instruction. See batch47 history for resource safeguards.
 | PY-17 | Correct market-detail loading | Complete for identified loading races/combined-failure defect in batch 16; obsolete commodity/account responses ignored and independent successful sections retained |
 | PY-18 | Accurate account/payment/access messages | Complete for identified account/expiry/callback defects in batches 4/11/19; verified return refreshes access, unconfirmed return never claims payment received in title |
 | PY-19 | Existing FAQ draft/hide/publish management | Complete in batch 12; hidden drafts remain available to Admin across reload, public publication boundary verified |
-| PY-20 | Bounded queries with accessible historical records | Partial: current-price DB ranking (batch 23), single-query dashboard summary (batch 29), compact protected DISTINCT history filter metadata (batch 32), SQL commodity scoping for market/quality/cost detail requests with complete default Admin lists (batch47); complete history and other unbounded lists remain unchanged/pending |
+| PY-20 | Bounded queries with accessible historical records | Partial: current-price DB ranking (batch23), single-query dashboard summary (batch29), compact protected DISTINCT history filter metadata (batch32), SQL commodity scoping for market/quality/cost (batch47) and Buying zone/Sell-watch (batch48) detail requests with complete default Admin lists; full history, Storage suitability and other unbounded lists remain pending |
 | PY-21 | Reliable independent alerts | Application-side identified channel dependency complete in batch 24: failed email no longer skips push/WhatsApp; per-user/channel failures isolated; existing deduplication/count semantics retained. Delivery/retry operations remain PY-35 |
 | PY-22 | Efficient loading and accurate dashboard totals | Complete for identified dashboard scope in batch 29: all 14 original metrics preserved; one Admin-only aggregate API/DB snapshot, zero entity hydration; backend/PG/browser totals and outage recovery verified |
 | PY-23 | Preserve layout while fixing mobile overflow | Complete for identified original critical-layout/price-card overflow scope in batches 42/43: 78 normal and twelve long-name viewport checks, 320–1366px, Easy reading both modes; ordinary card/badge geometry and all fourteen Admin cards preserved |
@@ -287,7 +297,7 @@ without a subsequent instruction. See batch47 history for resource safeguards.
 | PY-27 | Consistent existing editing/password inputs | Partial: feedback async file selection fixed in batch26; original password forms now enforce the existing Unicode-character/72-byte rules without truncating input, reset byte rejection is422 and preserves the link/access (batch46). Remaining edit consistency pending |
 | PY-28 | Historical record preservation | Partial: approved 0022 tested on fresh/populated synthetic PostgreSQL; future migration/history work pending |
 | PY-29 | Stable identities and dependent records | Partial: catalog IDs/fields and referenced-price deletion rejection verified with atomic audit writes in batch 34; broader identity/duplicate/rename issues pending, no automatic merge |
-| PY-30 | Isolated automated/browser verification | Partial/ongoing: guarded190 backend tests,40 identity-pinned synthetic PostgreSQL cases and original-browser regressions verified through batch47; native suites serialized by exclusive file lock, retained-schema budget80, smaller recovery fixture and sequential heavy checks; actual worker source uses fake transport only, native browser workers/providers disabled; expand with remaining work, live services forbidden |
+| PY-30 | Isolated automated/browser verification | Partial/ongoing: guarded194 backend tests and three focused native cases pass in batch48; full40-case PG baseline passed batch47. Original-browser regressions pass; native suites serialized, schema budget80, smaller fixture and sequential heavy checks; reuse isolated dependency snapshot rather than duplicating it. Actual worker source fake transport only, native browser workers/providers disabled; expand with remaining work, live services forbidden |
 | PY-31 | Confirmed payment activation and recovery | Partial: atomic confirmation, retry/replay, owner-only callback recovery and approved indefinite-grant holds verified; unattended recovery and operational delivery/reconciliation decisions remain |
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches 14/21: carry forward dated paid/trial time; preserve indefinite grants, block new checkout and hold/recover old purchases without consuming days |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
@@ -1679,3 +1689,39 @@ without a subsequent instruction. See batch47 history for resource safeguards.
   it complete. Remaining IDs02,05,07,08,13,14,20,27,28,29,30,31,35,36. Preserve
   14-day trial, NGN2500/30days, NGN6000/90days and all approved rules. Stop after
   recovery report; no new batch, production access, push, merge or deployment.
+
+### Batch 48 — Buying zone/Sell-watch query scope and bounded verification (2026-10-17)
+
+- Owner resumed authorized development from c0bb6eb. Two existing sections now
+  pass the current commodity ID to their existing GET lists. Optional positive
+  commodity_id filters SQL before hydration; no filter still returns every record
+  in original order for Admin. No changes to forms, wording, calculations, access,
+  measurements, subscription/referral policies or stored business records.
+- Ten scope tests before reproduce two failures/two unexpected-keyword errors;
+  six earlier scope cases remain passing. All194 backend tests pass after,30.705s.
+  Existing native scope fixture now checks all five resources with two matching
+  rows hydrated from42 and preserves raw history. Scope plus both planning audit/
+  concurrency cases pass3/3,2.313s; retained schemas40 to43 of80. Native suite
+  explicitly selects existing cases with --test; report lists them, guards unchanged.
+  Do not confuse this focused run with the full40 baseline that passed in batch47.
+- PostgreSQL on pinned recovery55448 stopped gracefully before build/browser.
+  Build --reuse validates the existing synthetic snapshot, copies only approved
+  source/public/config files, reuses dependencies and invalidates its serving
+  marker until success. Refuses active preview/native test ports and stale removed
+  source. Actual refusal with running preview leaves the valid marker unchanged.
+  No dependency copies/installations; TypeScript/Vite passes1.47s/102modules,
+  JS323.88kB/91.95kB gzip; original CSS index-BEBH-Ai6.css unchanged.
+- Actual browser verifies both scoped responses/downloads, unchanged original
+  sections, complete default Admin lists and unchanged price history. These two
+  resources have no delete endpoint: no new feature added for cleanup. Restarted
+  only the disposable memory preview to remove fabricated planning fixtures.
+  Five detail failure/race regressions and all14 dashboard labels/totals, one
+  summary request and recovery pass. No external browser requests/providers.
+- Evidence: tools/local-test/evidence/batch-48-*.json. Manual: local /commodities/Egusi
+  while logged in as admin@example.com / PriceYardDemo8!; Buying zone/Sell-watch
+  headings/design stay the same. API requests include commodity_id; Admin lists
+  remain complete. Any preview fixtures are synthetic only.
+- Exactly22 complete /14 partial or pending. PY-20 remains partial for Storage
+  suitability, full history and other unbounded lists. Continue approved technical
+  work; do not invent new business/source/session policies to inflate completion.
+  No production access, push, merge or deployment.

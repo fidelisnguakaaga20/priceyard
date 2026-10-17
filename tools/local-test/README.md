@@ -40,6 +40,19 @@ that evidence and provision another explicitly pinned empty fixture instead of
 deleting schemas or weakening identity/budget guards. Existing tests use at most
 two concurrent application operations only where necessary to check races.
 
+For a small batch, select existing relevant cases with repeated `--test NAME`
+arguments to `verify_pg_security.py --recovery-cluster`. The report lists the
+exact cases; do not label a focused run as a full suite. Identity checks, the
+exclusive lock and the80-schema budget apply equally. Full40-case baseline last
+passed in batch47; batch48 adds only three schemas (40 to43).
+
+Use `build_frontend.py --reuse` to rebuild the marked workspace-only snapshot
+without another node_modules copy. It refuses while either test port is active,
+checks snapshot identity/location and refuses removed/stale source files. The
+valid build marker is moved aside before updating, restored only by a successful
+TypeScript/Vite build; preview must not run against an unfinished build. Application
+configuration/credentials are never copied. No additional dependency installation.
+
 After restart, stale PID metadata may refer to an unrelated Windows process. Keep
 the launcher's refusal intact. Verify that the record predates the reboot and
 the test port is free, then archive the stale metadata; never kill a reused PID.

@@ -12,6 +12,7 @@ ROOT = LAB.parents[1]
 sys.path.insert(0, str(LAB))
 parser = argparse.ArgumentParser()
 parser.add_argument("--recovery-cluster", action="store_true")
+parser.add_argument("--test", action="append", default=[], help="Existing case name; repeat to run only relevant native regressions")
 options = parser.parse_args()
 # Acquire before importing application/database code. Two native suites must never
 # run concurrently, even when different synthetic profiles were selected.
@@ -159,7 +160,7 @@ class PostgreSQLSecurityTests(unittest.TestCase):
         for kind,_,model,_,_ in cases.RESOURCES:
             with Session(self.engine) as db:
                 service=importlib.import_module("app.services."+kind+"_service")
-                method={"market_signal":"list_market_signals","quality_signal":"list_quality_signals","cost_breakdown":"list_cost_breakdowns"}[kind]
+                method={"market_signal":"list_market_signals","quality_signal":"list_quality_signals","cost_breakdown":"list_cost_breakdowns","buying_zone":"list_buying_zones","sell_watch_window":"list_sell_watch_windows"}[kind]
                 loaded=[]
                 event.listen(db,"loaded_as_persistent",lambda session,item:loaded.append(item.id) if isinstance(item,model) else None)
                 rows=getattr(service,method)(db,commodity_id=fixture["commodity"])
@@ -1139,7 +1140,11 @@ if __name__ == "__main__":
         try:pinned_connect(**arguments)
         except RuntimeError:pass
         else:raise RuntimeError("Connection isolation negative failed")
-    suite=unittest.defaultTestLoader.loadTestsFromTestCase(PostgreSQLSecurityTests)
+    available=unittest.defaultTestLoader.getTestCaseNames(PostgreSQLSecurityTests)
+    if set(options.test)-set(available):
+        parser.error("Unknown native test case; only existing case names are accepted")
+    selected=list(dict.fromkeys(options.test)) or available
+    suite=unittest.TestSuite(PostgreSQLSecurityTests(name) for name in selected)
     # Retain earlier synthetic evidence, but refuse unbounded schema/file growth.
     # A new marked fixture is required instead of dropping any preserved schema.
     with pinned_connect(host="127.0.0.1",port=expected_port,user=marker["user"],dbname=marker["database"]) as connection:
@@ -1148,7 +1153,7 @@ if __name__ == "__main__":
         raise RuntimeError("Synthetic schema budget exceeded; preserve this fixture and prepare a fresh pinned cluster")
     started=time.monotonic()
     result=unittest.TextTestRunner(verbosity=2).run(suite)
-    report={"tests":result.testsRun,"failures":len(result.failures),"errors":len(result.errors),"seconds":round(time.monotonic()-started,3),"cluster_identity_verified":True,"production_contacts":0,"cluster_profile":cluster_name,"schemas_before":schemas_before,"schema_budget":80,"single_native_suite":True}
+    report={"tests":result.testsRun,"failures":len(result.failures),"errors":len(result.errors),"seconds":round(time.monotonic()-started,3),"cluster_identity_verified":True,"production_contacts":0,"cluster_profile":cluster_name,"schemas_before":schemas_before,"schema_budget":80,"single_native_suite":True,"selected_tests":selected}
     (LAB / "runtime/postgres-security.json").write_text(json.dumps(report,indent=2))
     print(json.dumps(report))
     raise SystemExit(not result.wasSuccessful())

@@ -68,8 +68,11 @@ def get_buying_zone(db: Session, zone_id: int, *, lock: bool = False) -> BuyingZ
     return zone
 
 
-def list_buying_zones(db: Session) -> list[BuyingZone]:
-    return list(db.scalars(select(BuyingZone).order_by(BuyingZone.created_at.desc(), BuyingZone.id.desc())).all())
+def list_buying_zones(db: Session, *, commodity_id: int | None = None) -> list[BuyingZone]:
+    statement = select(BuyingZone)
+    if commodity_id is not None:
+        statement = statement.where(BuyingZone.commodity_id == commodity_id)
+    return list(db.scalars(statement.order_by(BuyingZone.created_at.desc(), BuyingZone.id.desc())).all())
 
 
 def update_buying_zone(db: Session, zone: BuyingZone, payload: BuyingZoneUpdate, *, commit: bool = True) -> BuyingZone:

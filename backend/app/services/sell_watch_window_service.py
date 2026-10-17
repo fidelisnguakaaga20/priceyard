@@ -43,10 +43,13 @@ def get_sell_watch_window(db: Session, window_id: int, *, lock: bool = False) ->
     return window
 
 
-def list_sell_watch_windows(db: Session) -> list[SellWatchWindow]:
+def list_sell_watch_windows(db: Session, *, commodity_id: int | None = None) -> list[SellWatchWindow]:
+    statement = select(SellWatchWindow)
+    if commodity_id is not None:
+        statement = statement.where(SellWatchWindow.commodity_id == commodity_id)
     return list(
         db.scalars(
-            select(SellWatchWindow).order_by(SellWatchWindow.created_at.desc(), SellWatchWindow.id.desc())
+            statement.order_by(SellWatchWindow.created_at.desc(), SellWatchWindow.id.desc())
         ).all()
     )
 

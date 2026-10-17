@@ -1,10 +1,12 @@
 """Build original/current source using existing tools in a credential-free copy."""
 import json
+import argparse
 import os
 from pathlib import Path
 import shutil
 import subprocess
 import uuid
+import socket
 
 ROOT = Path(__file__).resolve().parents[2]
 LAB = Path(__file__).resolve().parent
@@ -12,13 +14,38 @@ RUNTIME = LAB / "runtime"
 
 
 def main():
-    target = RUNTIME / ("frontend-" + uuid.uuid4().hex)
-    target.mkdir(parents=True)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--reuse", action="store_true", help="Rebuild the marked isolated snapshot without copying dependencies again")
+    options = parser.parse_args()
+    if options.reuse:
+        # Never update a snapshot being served, or build during native testing.
+        for port in (55446, 55448):
+            with socket.socket() as probe:
+                probe.settimeout(1)
+                if probe.connect_ex(("127.0.0.1", port)) == 0:
+                    raise RuntimeError("Stop local preview/PostgreSQL before reusing the test build")
+        manifest = json.loads((RUNTIME / "frontend.json").read_text())
+        target = Path(manifest["path"]).resolve()
+        if (manifest.get("purpose") != "synthetic-only-no-application-credentials"
+                or target.parent != RUNTIME.resolve() or not target.name.startswith("frontend-")
+                or not (target / "node_modules").is_dir() or (target / "node_modules").is_symlink()):
+            raise RuntimeError("Only the existing marked workspace test snapshot may be reused")
+        # Fail closed while updating: a failed build cannot serve the old output
+        # as though it had verified the new source. Preserve the previous marker.
+        (RUNTIME / "frontend.json").replace(RUNTIME / "frontend.reuse-in-progress.json")
+    else:
+        target = RUNTIME / ("frontend-" + uuid.uuid4().hex)
+        target.mkdir(parents=True)
     source = ROOT / "frontend"
     for name in ("package.json", "index.html", "tsconfig.json", "tsconfig.app.json", "tsconfig.node.json", "vite.config.ts"):
         shutil.copyfile(source / name, target / name)
-    for name in ("src", "public", "node_modules"):
-        shutil.copytree(source / name, target / name, ignore=lambda path, names: [item for item in names if item.startswith(".env") or item in {".cache", ".vite"} or Path(path, item).is_symlink()])
+    for name in (("src", "public") if options.reuse else ("src", "public", "node_modules")):
+        if options.reuse:
+            source_files = {item.relative_to(source / name) for item in (source / name).rglob("*") if item.is_file()}
+            snapshot_files = {item.relative_to(target / name) for item in (target / name).rglob("*") if item.is_file()}
+            if snapshot_files - source_files:
+                raise RuntimeError("Snapshot contains removed source files; prepare a reviewed clean snapshot instead")
+        shutil.copytree(source / name, target / name, dirs_exist_ok=options.reuse, ignore=lambda path, names: [item for item in names if item.startswith(".env") or item in {".cache", ".vite"} or Path(path, item).is_symlink()])
     env = {name: os.environ[name] for name in ("SYSTEMROOT", "WINDIR", "TEMP", "TMP", "PATH") if name in os.environ}
     env.update(VITE_API_URL="/api", VITE_GOOGLE_CLIENT_ID="", NODE_ENV="production")
     node = r"C:\Program Files\nodejs\node.exe"

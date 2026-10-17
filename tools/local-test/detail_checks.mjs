@@ -58,7 +58,7 @@ try {
   {
     const {context,page}=await fixture(true);
     await context.route('**/api/quality-signals*',route=>route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({detail:'Synthetic quality service unavailable'})}));
-    await context.route('**/api/buying-zones',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify([{id:9999,commodity_id:1,market_id:1,price_low:210000,price_high:220000,reason:'Synthetic independent buying-zone observation',confidence:'Low confidence',valid_from:null,valid_to:null}])}));
+    await context.route('**/api/buying-zones*',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify([{id:9999,commodity_id:1,market_id:1,price_low:210000,price_high:220000,reason:'Synthetic independent buying-zone observation',confidence:'Low confidence',valid_from:null,valid_to:null}])}));
     await page.goto(origin+'/commodities/Egusi');
     await page.getByRole('heading',{name:'Buying zone',exact:true}).waitFor();
     if(!expectBug) {

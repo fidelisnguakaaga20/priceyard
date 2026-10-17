@@ -68,8 +68,8 @@ export function CommodityDetailPage() {
     Promise.allSettled([
       apiFetch<MarketSignal[]>(`/market-signals?commodity_id=${commodityId}`, {}, token),
       apiFetch<QualitySignal[]>(`/quality-signals?commodity_id=${commodityId}`, {}, token),
-      apiFetch<BuyingZone[]>("/buying-zones", {}, token),
-      apiFetch<SellWatchWindow[]>("/sell-watch-windows", {}, token),
+      apiFetch<BuyingZone[]>(`/buying-zones?commodity_id=${commodityId}`, {}, token),
+      apiFetch<SellWatchWindow[]>(`/sell-watch-windows?commodity_id=${commodityId}`, {}, token),
       apiFetch<StorageSuitability[]>("/storage-suitability", {}, token),
       apiFetch<CostBreakdown[]>(`/cost-breakdowns?commodity_id=${commodityId}`, {}, token),
     ]).then((results) => {
