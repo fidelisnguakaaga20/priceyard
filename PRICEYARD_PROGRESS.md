@@ -146,6 +146,13 @@ market options and complete filtered history preserved. TypeScript/build passes,
 original CSS unchanged. Seventeen complete, nineteen partial/pending; other
 unbounded lists and remaining administrative audits are still open.
 
+Batch 33 verified: FAQ create/edit/publish/hide/delete and sanitized audit commit
+together, with row locks for existing records. All 143 backend tests, 26 pinned
+PG cases and original FAQ browser controls/publication/reload/audit checks pass.
+Frontend unchanged. Seventeen complete, nineteen partial/pending. Next unfinished:
+other Admin catalog/editorial/feedback/audit transactions, compatible list bounds,
+remaining mobile/accessibility and explicitly pending business/operational cases.
+
 ## Checklist — do not repeat the audit
 
 | ID | Improvement | Current status |
@@ -169,17 +176,17 @@ unbounded lists and remaining administrative audits are still open.
 | PY-17 | Correct market-detail loading | Complete for identified loading races/combined-failure defect in batch 16; obsolete commodity/account responses ignored and independent successful sections retained |
 | PY-18 | Accurate account/payment/access messages | Complete for identified account/expiry/callback defects in batches 4/11/19; verified return refreshes access, unconfirmed return never claims payment received in title |
 | PY-19 | Existing FAQ draft/hide/publish management | Complete in batch 12; hidden drafts remain available to Admin across reload, public publication boundary verified |
-| PY-20 | Database query/list performance | Partial: current-price DB ranking (batch 23), single-query dashboard summary (batch 29), compact protected DISTINCT history filter metadata (batch 32); complete history and other unbounded lists remain unchanged/pending |
+| PY-20 | Bounded queries with accessible historical records | Partial: current-price DB ranking (batch 23), single-query dashboard summary (batch 29), compact protected DISTINCT history filter metadata (batch 32); complete history and other unbounded lists remain unchanged/pending |
 | PY-21 | Reliable independent alerts | Application-side identified channel dependency complete in batch 24: failed email no longer skips push/WhatsApp; per-user/channel failures isolated; existing deduplication/count semantics retained. Delivery/retry operations remain PY-35 |
 | PY-22 | Efficient loading and accurate dashboard totals | Complete for identified dashboard scope in batch 29: all 14 original metrics preserved; one Admin-only aggregate API/DB snapshot, zero entity hydration; backend/PG/browser totals and outage recovery verified |
 | PY-23 | Preserve layout while fixing mobile overflow | Pending |
 | PY-24 | Keyboard/focus accessibility | Pending |
 | PY-25 | Safe and clearly aged offline prices | Pending; visible additions require approval |
-| PY-26 | Complete atomic administrative audit | Partial: payment, registration/referral, price create/edit/approve/reject/outdated and Admin user/subscription/access changes share atomic sanitized audits; concurrent price/status trails and rollback verified; other administrative writes pending |
+| PY-26 | Complete atomic administrative audit | Partial: payment, registration/referral, price create/edit/approve/reject/outdated, Admin user/subscription/access changes and FAQ create/edit/publication/delete share atomic sanitized audits; concurrent price/status/FAQ trails and rollback verified; other administrative writes pending |
 | PY-27 | Consistent existing editing/password inputs | Partial: feedback file replacement/removal/async ordering fixed without form changes in batch 26; remaining editing/password cases pending |
 | PY-28 | Historical record preservation | Partial: approved 0022 tested on fresh/populated synthetic PostgreSQL; future migration/history work pending |
 | PY-29 | Stable identities and dependent records | Pending; no automatic merge |
-| PY-30 | Isolated automated/browser verification | Partial: baseline guards, 12 original tests, six real browser workflows passed; expand with each batch |
+| PY-30 | Isolated automated/browser verification | Partial/ongoing: guarded 143 backend tests, 26 identity-pinned synthetic PostgreSQL cases, real original-browser workflows and before/after evidence verified through batch 33; expand with remaining work, live services forbidden |
 | PY-31 | Confirmed payment activation and recovery | Partial: atomic confirmation, retry/replay, owner-only callback recovery and approved indefinite-grant holds verified; unattended recovery and operational delivery/reconciliation decisions remain |
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches 14/21: carry forward dated paid/trial time; preserve indefinite grants, block new checkout and hold/recover old purchases without consuming days |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
@@ -1127,3 +1134,26 @@ unbounded lists and remaining administrative audits are still open.
 - Seventeen IDs complete; nineteen partial/pending. Full history itself remains
   unpaginated to preserve existing complete charts/exports pending a compatible
   implementation; no data is silently capped. Next: other atomic Admin writes.
+
+### Batch 33 — further PY-26/PY-28 (2026-10-17)
+
+- Existing FAQ create/edit/publish/hide/delete now save with their sanitized
+  audit in one transaction. Failure rolls back both, including a failed delete
+  restoring the FAQ. Existing-row actions lock and refresh the row before taking
+  the old snapshot, preserving continuous trails across simultaneous edits.
+- Keep original hidden-on-create, public list/detail boundaries, existing action
+  permissions, fields, content validation, deletion control and frontend unchanged.
+  Service default commits remain compatible; routes explicitly defer until audit.
+  Remove unnecessary post-commit refresh that could falsely report a saved failure.
+- Three focused before tests reproduced five audit-failure defects (0.405s), then
+  all passed (0.460s); all 143 backend tests pass, 34.004s. Coverage includes each
+  action's rollback, final-commit failure, public visibility and five audit snapshots.
+- Twenty-six pinned native PostgreSQL cases pass, 32.686s: failed FAQ delete loses
+  neither record nor history; simultaneous edits keep continuous old/new snapshots.
+  Prior password/logout/last-Admin/payment/referral/price/status cases remain passing.
+- Browser original create/edit/publish/hide/delete/reload controls pass. Hidden
+  content stays private; five audit records match successive saved states. Only
+  a newly fabricated FAQ is deleted. No application frontend changes or rebuild.
+- Manual: http://127.0.0.1:55446/admin/faq, admin@example.com / PriceYardDemo8!.
+  Evidence: batch-33-*.json. Seventeen IDs complete, nineteen partial/pending;
+  PY-26 remains partial for other Admin writers. No production/schema changes.

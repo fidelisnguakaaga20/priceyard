@@ -123,6 +123,37 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_faq_failed_delete_and_concurrent_edits_preserve_record_and_audit(self):
+        from app.models.faq_item import FAQItem
+        from app.routes import faq_routes
+        from app.schemas.faq_schema import FAQUpdate
+        from app.services.audit_service import snapshot_model
+        Base.metadata.create_all(self.engine)
+        with Session(self.engine) as db:
+            admin=User(full_name="Synthetic FAQ admin",email="pg-faq@example.com",password_hash="unused",role="admin",referral_code="PGFAQ")
+            db.add(admin);db.flush()
+            item=FAQItem(question="Synthetic saved question",answer="Synthetic saved answer",category="Local testing",created_by=admin.id,is_published=False)
+            db.add(item);db.commit();admin_id,item_id=admin.id,item.id;before=snapshot_model(item)
+            with patch.object(faq_routes,"create_audit_log",side_effect=RuntimeError("Synthetic FAQ audit failure")),self.assertRaisesRegex(RuntimeError,"Synthetic FAQ audit failure"):
+                faq_routes.remove_item(item_id,db,admin)
+            self.assertEqual(snapshot_model(db.get(FAQItem,item_id)),before)
+            self.assertEqual(db.scalars(select(AuditLog)).all(),[])
+        barrier=threading.Barrier(2);outcomes=[]
+        def worker(index):
+            with Session(self.engine) as db:
+                admin=db.get(User,admin_id);barrier.wait(timeout=15)
+                try:faq_routes.edit_item(item_id,FAQUpdate(answer=f"Synthetic corrected answer {index}"),db,admin);outcomes.append(200)
+                except BaseException as error:db.rollback();outcomes.append(type(error).__name__)
+        threads=[threading.Thread(target=worker,args=(index,)) for index in range(2)]
+        for thread in threads:thread.start()
+        for thread in threads:thread.join(25)
+        self.assertFalse(any(thread.is_alive() for thread in threads));self.assertEqual(outcomes,[200,200])
+        with Session(self.engine) as db:
+            logs=db.scalars(select(AuditLog).order_by(AuditLog.id)).all();self.assertEqual(len(logs),2)
+            self.assertEqual(logs[0].old_value,before);self.assertEqual(logs[1].old_value,logs[0].new_value)
+            self.assertEqual(logs[1].new_value,snapshot_model(db.get(FAQItem,item_id)))
+            self.assertFalse(db.get(FAQItem,item_id).is_published)
+
     def test_history_pair_metadata_is_distinct_without_loading_or_losing_old_records(self):
         from sqlalchemy import event
         from app.models.commodity import Commodity

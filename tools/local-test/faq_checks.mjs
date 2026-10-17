@@ -47,6 +47,16 @@ try {
   } else {
     await page.getByRole('heading',{name:question,exact:true}).waitFor();
     await page.getByLabel('FAQ ID',{exact:true}).fill(String(item.id));
+    const edit=page.locator('form.admin-form').nth(1);
+    await edit.getByLabel('Question',{exact:true}).fill(question);
+    await edit.getByLabel('Answer',{exact:true}).fill('Fabricated corrected local answer only.');
+    await edit.getByLabel('Category',{exact:true}).fill('Local testing');
+    const edited=page.waitForResponse(r=>r.url()===origin+`/api/faq/${item.id}`&&r.request().method()==='PATCH');
+    const reloaded=page.waitForResponse(r=>r.url()===origin+'/api/faq/admin');
+    await edit.getByRole('button',{name:'Save FAQ',exact:true}).click();
+    assert.equal((await edited).status(),200);await (await reloaded).finished();
+    await page.waitForFunction(()=>!document.querySelector('button:disabled'));
+    assert.equal((await publicView()).detail,404);
     async function action(label,kind) {
       const response=page.waitForResponse(r=>r.url()===origin+`/api/faq/${item.id}/${kind}`&&r.request().method()==='PATCH');
       await page.getByRole('button',{name:label,exact:true}).click();
@@ -68,7 +78,15 @@ try {
     await page.getByRole('button',{name:'Delete',exact:true}).click();
     assert.equal((await deletion).status(),204);
     await page.waitForFunction(text=>!Array.from(document.querySelectorAll('h3')).some(x=>x.textContent===text),question);
-    const report={hidden_draft_survives_reload:true,publish_hide_public_boundary:true,deleted_fake_draft_disappears:true,production_connections:0};
+    const audits=await page.evaluate(async id=>{
+      const token=localStorage.getItem('priceyard_access_token');
+      const rows=await fetch('/api/audit-logs',{headers:{Authorization:'Bearer '+token}}).then(r=>r.json());
+      return rows.filter(row=>row.table_name==='faq_items'&&row.record_id===id).sort((a,b)=>a.id-b.id);
+    },item.id);
+    assert.deepEqual(audits.map(row=>row.action),['faq.create','faq.edit','faq.publish','faq.hide','faq.delete']);
+    for(let index=1;index<audits.length;index++)assert.deepEqual(audits[index].old_value,audits[index-1].new_value);
+    assert.equal(audits[0].old_value,null);assert.equal(audits[4].new_value,null);
+    const report={hidden_draft_survives_reload:true,original_edit_control_preserves_hidden_status:true,publish_hide_public_boundary:true,deleted_fake_draft_disappears:true,five_continuous_audit_records:true,production_connections:0};
     fs.writeFileSync(path.join(lab,'runtime/faq-checks.json'),JSON.stringify(report,null,2));
     console.log(JSON.stringify(report));
   }

@@ -23,6 +23,16 @@ from app.utils.permissions import require_roles
 router = APIRouter(prefix="/faq", tags=["faq"])
 
 
+def _save_faq_audit(db: Session, admin: User, action: str, record_id: int, *, old_value: dict | None = None, new_value: dict | None = None) -> None:
+    try:
+        create_audit_log(db, actor=admin, action=action, table_name="faq_items", record_id=record_id,
+                         old_value=old_value, new_value=new_value, commit=False)
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+
+
 @router.get("", response_model=list[FAQPublicResponse])
 def get_published_items(db: Session = Depends(get_db)) -> list[FAQItem]:
     return list_published_faqs(db)
@@ -47,8 +57,8 @@ def add_item(
     db: Session = Depends(get_db),
     admin: User = Depends(require_roles("admin")),
 ) -> FAQItem:
-    item = create_faq(db, payload, admin)
-    create_audit_log(db, actor=admin, action="faq.create", table_name="faq_items", record_id=item.id, new_value=snapshot_model(item))
+    item = create_faq(db, payload, admin, commit=False)
+    _save_faq_audit(db, admin, "faq.create", item.id, new_value=snapshot_model(item))
     return item
 
 
@@ -59,10 +69,10 @@ def edit_item(
     db: Session = Depends(get_db),
     admin: User = Depends(require_roles("admin")),
 ) -> FAQItem:
-    item = get_faq_for_admin(db, faq_id)
+    item = get_faq_for_admin(db, faq_id, lock=True)
     old_value = snapshot_model(item)
-    item = update_faq(db, item, payload)
-    create_audit_log(db, actor=admin, action="faq.edit", table_name="faq_items", record_id=item.id, old_value=old_value, new_value=snapshot_model(item))
+    item = update_faq(db, item, payload, commit=False)
+    _save_faq_audit(db, admin, "faq.edit", item.id, old_value=old_value, new_value=snapshot_model(item))
     return item
 
 
@@ -72,10 +82,10 @@ def publish_item(
     db: Session = Depends(get_db),
     admin: User = Depends(require_roles("admin")),
 ) -> FAQItem:
-    item = get_faq_for_admin(db, faq_id)
+    item = get_faq_for_admin(db, faq_id, lock=True)
     old_value = snapshot_model(item)
-    item = set_faq_publication(db, item, is_published=True)
-    create_audit_log(db, actor=admin, action="faq.publish", table_name="faq_items", record_id=item.id, old_value=old_value, new_value=snapshot_model(item))
+    item = set_faq_publication(db, item, is_published=True, commit=False)
+    _save_faq_audit(db, admin, "faq.publish", item.id, old_value=old_value, new_value=snapshot_model(item))
     return item
 
 
@@ -85,10 +95,10 @@ def hide_item(
     db: Session = Depends(get_db),
     admin: User = Depends(require_roles("admin")),
 ) -> FAQItem:
-    item = get_faq_for_admin(db, faq_id)
+    item = get_faq_for_admin(db, faq_id, lock=True)
     old_value = snapshot_model(item)
-    item = set_faq_publication(db, item, is_published=False)
-    create_audit_log(db, actor=admin, action="faq.hide", table_name="faq_items", record_id=item.id, old_value=old_value, new_value=snapshot_model(item))
+    item = set_faq_publication(db, item, is_published=False, commit=False)
+    _save_faq_audit(db, admin, "faq.hide", item.id, old_value=old_value, new_value=snapshot_model(item))
     return item
 
 
@@ -98,9 +108,9 @@ def remove_item(
     db: Session = Depends(get_db),
     admin: User = Depends(require_roles("admin")),
 ) -> Response:
-    item = get_faq_for_admin(db, faq_id)
+    item = get_faq_for_admin(db, faq_id, lock=True)
     old_value = snapshot_model(item)
     record_id = item.id
-    delete_faq(db, item)
-    create_audit_log(db, actor=admin, action="faq.delete", table_name="faq_items", record_id=record_id, old_value=old_value)
+    delete_faq(db, item, commit=False)
+    _save_faq_audit(db, admin, "faq.delete", record_id, old_value=old_value)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
