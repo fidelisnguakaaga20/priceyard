@@ -6,6 +6,8 @@ from sqlalchemy.orm import Session
 
 from app.models.price_flag import PriceFlag
 from app.models.price_update import PriceUpdate
+from app.models.commodity import Commodity
+from app.models.market import Market
 from app.models.user import User
 from app.schemas.price_flag_schema import FlaggedPriceSummary
 
@@ -28,28 +30,19 @@ def list_flagged_price_updates(db: Session) -> list[FlaggedPriceSummary]:
     statement = (
         select(
             PriceFlag.price_update_id,
+            Commodity.name.label("commodity_name"),
+            Market.name.label("market_name"),
             func.count(PriceFlag.id).label("flag_count"),
             func.max(PriceFlag.created_at).label("latest_flag_at"),
         )
+        .join(PriceUpdate, PriceUpdate.id == PriceFlag.price_update_id)
+        .join(Commodity, Commodity.id == PriceUpdate.commodity_id)
+        .join(Market, Market.id == PriceUpdate.market_id)
         .where(PriceFlag.resolved.is_(False))
-        .group_by(PriceFlag.price_update_id)
-        .order_by(func.max(PriceFlag.created_at).desc())
+        .group_by(PriceFlag.price_update_id, Commodity.name, Market.name)
+        .order_by(func.max(PriceFlag.created_at).desc(), PriceFlag.price_update_id.desc())
     )
-    results: list[FlaggedPriceSummary] = []
-    for price_update_id, flag_count, latest_flag_at in db.execute(statement).all():
-        price_update = db.get(PriceUpdate, price_update_id)
-        if price_update is None:
-            continue
-        results.append(
-            FlaggedPriceSummary(
-                price_update_id=price_update_id,
-                commodity_name=price_update.commodity.name,
-                market_name=price_update.market.name,
-                flag_count=flag_count,
-                latest_flag_at=latest_flag_at,
-            )
-        )
-    return results
+    return [FlaggedPriceSummary(**row._mapping) for row in db.execute(statement)]
 
 
 def resolve_flags(db: Session, price_update_id: int, *, commit: bool = True) -> int:

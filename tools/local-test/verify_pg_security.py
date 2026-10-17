@@ -123,6 +123,36 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_flag_review_is_one_query_and_reason_matches_existing_storage_limit(self):
+        from pydantic import ValidationError
+        from sqlalchemy import event
+        from app.models.commodity import Commodity
+        from app.models.market import Market
+        from app.models.price_flag import PriceFlag
+        from app.models.price_update import PriceUpdate
+        from app.schemas.price_flag_schema import PriceFlagCreate
+        from app.services.price_flag_service import list_flagged_price_updates
+        Base.metadata.create_all(self.engine)
+        now=datetime.now(timezone.utc)
+        with Session(self.engine) as db:
+            users=[User(full_name="Synthetic flag query",email=f"pgflagq{i}@example.com",password_hash="unused",role="admin" if i==0 else "free_user",referral_code=f"PGFLAGQ{i}") for i in range(3)]
+            commodity,market=Commodity(name="Egusi",is_active=False),Market(name="Kwali Market",is_active=False)
+            db.add_all([*users,commodity,market]);db.flush()
+            for age,state in ((2,"approved"),(1,"rejected"),(0,"pending")):
+                price=PriceUpdate(commodity_id=commodity.id,market_id=market.id,unit="1 bag",bag_size=None,price_low=210000,price_high=220000,
+                    movement="unknown",confidence_level="Low confidence",status=state,update_date_time=now-timedelta(days=age),created_by=users[0].id)
+                db.add(price);db.flush()
+                for index,user in enumerate(users):db.add(PriceFlag(price_update_id=price.id,user_id=user.id,reason=PriceFlagCreate(reason="é"*50).reason,resolved=index==2,created_at=now-timedelta(hours=age)))
+            db.commit()
+        with Session(self.engine) as db:
+            tables=(PriceUpdate.__table__,PriceFlag.__table__);before={table.name:db.execute(select(table)).all() for table in tables};loaded=[];statements=[]
+            event.listen(db,"loaded_as_persistent",lambda session,instance:loaded.append(instance))
+            def capture(connection,cursor,statement,parameters,context,many):statements.append(statement)
+            event.listen(self.engine,"before_cursor_execute",capture);rows=list_flagged_price_updates(db);event.remove(self.engine,"before_cursor_execute",capture)
+            self.assertEqual(len(rows),3);self.assertEqual([row.flag_count for row in rows],[2,2,2]);self.assertEqual(len(statements),1);self.assertEqual(loaded,[])
+            with self.assertRaises(ValidationError):PriceFlagCreate(reason="é"*51)
+            for table in tables:self.assertEqual(db.execute(select(table)).all(),before[table.name])
+
     def test_moderation_failure_preserves_private_feedback_price_and_flags(self):
         from app.models.commodity import Commodity
         from app.models.feedback import Feedback

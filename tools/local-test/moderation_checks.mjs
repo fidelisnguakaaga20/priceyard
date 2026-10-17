@@ -42,6 +42,7 @@ try{
  for(const [name,value] of [['price_low','210000'],['price_high','220000'],['average_price','215000'],['bag_size','Unknown'],['update_date_time','2026-10-17T09:00']])await form.locator('[name='+name+']').fill(value);
  const created=admin.page.waitForResponse(r=>r.url()===origin+'/api/price-updates'&&r.request().method()==='POST');await form.getByRole('button',{name:'Create pending update',exact:true}).click();const priceResponse=await created;assert.equal(priceResponse.status(),201);const price=await priceResponse.json();
  const approved=admin.page.waitForResponse(r=>r.url()===origin+`/api/price-updates/${price.id}/approve`);await admin.page.getByRole('button',{name:'Approve',exact:true}).click();assert.equal((await approved).status(),200);
+ assert.equal((await api(customer.page,`/price-updates/${price.id}/flag`,'POST',{reason:'x'.repeat(51)})).status,422);
  assert.equal((await api(customer.page,`/price-updates/${price.id}/flag`,'POST',{reason:'Synthetic review'})).status,204);
  await admin.page.goto(origin+'/admin/flagged');await admin.page.getByRole('heading',{name:'Flagged prices',exact:true}).waitFor();
  const reviewed=admin.page.waitForResponse(r=>r.url()===origin+`/api/price-updates/${price.id}/flags/resolve`);await admin.page.getByRole('button',{name:'Mark reviewed',exact:true}).click();assert.equal((await reviewed).status(),204);
@@ -52,6 +53,6 @@ try{
  const audits=(await api(admin.page,'/audit-logs')).body;
  const feedbackLogs=audits.filter(row=>row.table_name==='feedback'&&row.record_id===id).sort((a,b)=>a.id-b.id);assert.equal(feedbackLogs.length,3);assert.ok(!JSON.stringify(feedbackLogs).includes('screenshot_data'));
  const priceLogs=audits.filter(row=>row.table_name==='price_updates'&&row.record_id===price.id);assert.ok(priceLogs.some(row=>row.action==='price_update.flags_resolve'));assert.equal(priceLogs.find(row=>row.action==='price_update.delete').new_value,null);assert.equal(outside,0);
- const report={original_testimonial_publish_hide_delete_controls:true,private_image_preserved_until_deliberate_fake_record_delete:true,new_audits_omit_image:true,original_flag_review_and_price_delete_controls:true,preexisting_synthetic_history_unchanged:true,external_page_requests:outside,production_connections:0};
+ const report={original_testimonial_publish_hide_delete_controls:true,private_image_preserved_until_deliberate_fake_record_delete:true,new_audits_omit_image:true,original_flag_review_and_price_delete_controls:true,overlong_flag_reason_rejected_without_server_error:true,preexisting_synthetic_history_unchanged:true,external_page_requests:outside,production_connections:0};
  fs.writeFileSync(path.join(lab,'runtime/moderation-checks.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report));
 }finally{await browser.close();}

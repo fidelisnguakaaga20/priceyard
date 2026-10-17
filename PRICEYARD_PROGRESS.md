@@ -169,6 +169,12 @@ pass. Seventeen complete, nineteen partial/pending. Comparison proposal awaits
 owner reply in docs/PRICE_COMPARISON_APPROVAL.md; do not infer approval. Next:
 flag input/query bounds and missing editorial/resource audits, then usability.
 
+Batch 36 verified: flag review uses one aggregate query with no private entity
+hydration; reason validation matches the existing 50-character database column.
+All 156 backend tests, 30 pinned PG cases and unchanged moderation/browser controls
+pass. Seventeen complete, nineteen partial/pending. Owner explicitly approved the
+comparison safeguard on 2026-10-17; implement that next from the approved doc.
+
 ## Checklist — do not repeat the audit
 
 | ID | Improvement | Current status |
@@ -1233,3 +1239,26 @@ flag input/query bounds and missing editorial/resource audits, then usability.
   audit coverage remains PY-26 work. A concrete visible price-comparison safeguard
   awaits explicit approval: docs/PRICE_COMPARISON_APPROVAL.md. No proposed chart,
   quantity-selection or message changes implemented from that pending proposal.
+
+### Batch 36 — further PY-08/PY-20 (2026-10-17)
+
+- Flag reason length now validates against the existing 50-character storage
+  limit before insertion; null/empty/50-character Unicode values remain valid.
+  No new form, business limit, quota or database column. Overlong browser/API
+  requests return 422 rather than reaching a PostgreSQL storage failure.
+- Admin flag overview replaces per-price/catalog lookups with one count/name
+  aggregate query and no ORM hydration of private prices/reasons. Preserve open
+  counts, original response fields and review of pending/rejected or inactive
+  catalog records. Add deterministic price-ID ordering only for equal timestamps.
+- Four focused before tests reproduced three failures, including ten statements
+  for three flagged records (0.212s); after tests pass (0.265s). All 156 backend
+  tests pass, 29.371s; thirty pinned PG cases pass, 30.210s. Native checks retain
+  every original price/flag row, validate Unicode storage and prove one query.
+- Original browser moderation/flag controls pass, including 51-character denial
+  followed by valid flag/review and restored preexisting history. No frontend build.
+  Manual: http://127.0.0.1:55446/admin/flagged, demo Admin credentials unchanged.
+- Evidence: batch-36-*.json. Seventeen complete, nineteen partial/pending.
+  Owner explicitly replied "Approve the comparison safeguard" on 2026-10-17.
+  docs/PRICE_COMPARISON_APPROVAL.md now records that approval. Three next-batch
+  specification tests reproduce current-selection failures and remain uncommitted
+  outside this verified batch until the approved safeguard is implemented.

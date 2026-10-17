@@ -1,7 +1,9 @@
-# Proposed price-comparison safeguard — awaiting owner approval
+# Approved price-comparison safeguard — local implementation authorized
 
 Scope: PY-12 and the existing Price History / commodity-detail charts only, in
-isolated local testing. No implementation or approval is implied by this file.
+isolated local testing. Owner explicitly approved on 2026-10-17:
+"Approve the comparison safeguard". Implementation and verification follow in
+small batches; this is not production authorization.
 
 Current code feeds all selected historical records into one trend line. A change
 of market, number of bags, bag size or commodity type can look like a price rise

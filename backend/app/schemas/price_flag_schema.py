@@ -1,10 +1,10 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class PriceFlagCreate(BaseModel):
-    reason: str | None = None
+    reason: str | None = Field(default=None, max_length=50)
 
 
 class FlaggedPriceSummary(BaseModel):
