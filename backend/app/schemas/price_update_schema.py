@@ -84,6 +84,15 @@ class PriceUpdateCreate(PriceUpdateWriteBase):
     pass
 
 
+class PriceHistoryPairName(BaseModel):
+    name: str
+
+
+class PriceHistoryPair(BaseModel):
+    commodity: PriceHistoryPairName
+    market: PriceHistoryPairName
+
+
 class PriceUpdateUpdate(BaseModel):
     commodity_id: int | None = Field(default=None, gt=0)
     market_id: int | None = Field(default=None, gt=0)

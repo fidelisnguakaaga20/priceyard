@@ -68,7 +68,7 @@ class PriceAccessBoundaryTests(unittest.TestCase):
         self.engine.dispose()
 
     def historical_urls(self):
-        return ["/price-updates/history", "/price-updates?date=" + self.old_date, "/price-updates/comparison?commodity=Egusi&date=" + self.old_date, "/price-updates/" + str(self.old_id)]
+        return ["/price-updates/history", "/price-updates/history/pairs", "/price-updates?date=" + self.old_date, "/price-updates/comparison?commodity=Egusi&date=" + self.old_date, "/price-updates/" + str(self.old_id)]
 
     def test_history_routes_enforce_existing_access_matrix(self):
         for name, headers in self.headers.items():

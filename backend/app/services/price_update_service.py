@@ -246,6 +246,20 @@ def list_price_history(
     return list(db.scalars(statement).all())
 
 
+def list_price_history_pairs(db: Session) -> list[dict[str, dict[str, str]]]:
+    """Existing history filter options, without loading every historical price."""
+    statement = (
+        select(Commodity.name, Market.name)
+        .select_from(PriceUpdate)
+        .join(Commodity, PriceUpdate.commodity_id == Commodity.id)
+        .join(Market, PriceUpdate.market_id == Market.id)
+        .where(PriceUpdate.status == "approved", Commodity.is_active.is_(True), Market.is_active.is_(True))
+        .distinct()
+        .order_by(Commodity.name, Market.name)
+    )
+    return [{"commodity": {"name": commodity}, "market": {"name": market}} for commodity, market in db.execute(statement)]
+
+
 def get_submission_stats(db: Session, user_id: int) -> dict[str, int]:
     """Counts of this user's own price-update submissions by status, so reporters
     (who otherwise get no feedback after submitting) can see their contributions."""

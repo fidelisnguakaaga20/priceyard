@@ -138,6 +138,14 @@ complete original Admin workflow pass; four backend price/audit regressions and
 Seventeen complete, nineteen partial/pending; date display/day-filter decisions
 remain separate. Next: bounded protected history metadata and other Admin audits.
 
+Batch 32 verified: history filter metadata uses a protected DISTINCT name-pair
+query instead of downloading every historical price a second time. Four new
+tests plus access matrix pass; all 140 backend and 25 pinned PG cases pass.
+Browser before/after, navigation ordering and eight role cases pass; original
+market options and complete filtered history preserved. TypeScript/build passes,
+original CSS unchanged. Seventeen complete, nineteen partial/pending; other
+unbounded lists and remaining administrative audits are still open.
+
 ## Checklist — do not repeat the audit
 
 | ID | Improvement | Current status |
@@ -161,7 +169,7 @@ remain separate. Next: bounded protected history metadata and other Admin audits
 | PY-17 | Correct market-detail loading | Complete for identified loading races/combined-failure defect in batch 16; obsolete commodity/account responses ignored and independent successful sections retained |
 | PY-18 | Accurate account/payment/access messages | Complete for identified account/expiry/callback defects in batches 4/11/19; verified return refreshes access, unconfirmed return never claims payment received in title |
 | PY-19 | Existing FAQ draft/hide/publish management | Complete in batch 12; hidden drafts remain available to Admin across reload, public publication boundary verified |
-| PY-20 | Bounded queries with accessible historical records | Partial: current/comparison selection ranks in the database and hydrates only latest records; history/access preserved in batch 23; remaining history/admin query bounds pending |
+| PY-20 | Database query/list performance | Partial: current-price DB ranking (batch 23), single-query dashboard summary (batch 29), compact protected DISTINCT history filter metadata (batch 32); complete history and other unbounded lists remain unchanged/pending |
 | PY-21 | Reliable independent alerts | Application-side identified channel dependency complete in batch 24: failed email no longer skips push/WhatsApp; per-user/channel failures isolated; existing deduplication/count semantics retained. Delivery/retry operations remain PY-35 |
 | PY-22 | Efficient loading and accurate dashboard totals | Complete for identified dashboard scope in batch 29: all 14 original metrics preserved; one Admin-only aggregate API/DB snapshot, zero entity hydration; backend/PG/browser totals and outage recovery verified |
 | PY-23 | Preserve layout while fixing mobile overflow | Pending |
@@ -1093,3 +1101,29 @@ remain separate. Next: bounded protected history metadata and other Admin audits
   admin@example.com / PriceYardDemo8!. Evidence: batch-31-*.json. Seventeen IDs
   complete, nineteen partial/pending. Nigerian calendar-day filter semantics and
   broader legacy price display remain open; no unapproved historical reinterpretation.
+
+### Batch 32 — further PY-20 (2026-10-17)
+
+- Original history filter choices now use a protected name-only DISTINCT query
+  instead of a second download of every approved historical price. Same active
+  catalogs, approved status and inclusion of outdated/history-only pairs as the
+  original full-history query. Original metadata effect cleanup retained.
+- Internal /price-updates/history/pairs requires the same full-access entitlement
+  as history. It returns only existing commodity/market names, with no private
+  sources, prices, new customer-entry fields or schema. Actual filtered history,
+  table/chart/card markup, catalog ordering and historical records unchanged.
+- Four new backend tests cover exact equivalence, outdated rows, duplicate pairs,
+  inactive/empty catalogs, one query/no ORM hydration and unchanged stored history.
+  Existing access matrix extended to the metadata URL. All 140 backend tests pass,
+  28.268s; twenty-five pinned PG cases pass, 36.378s, including 101 retained old
+  outdated prices producing one metadata pair without model hydration or writes.
+- Browser before/after: unfiltered history downloads 1 -> 0; one filtered history
+  request retained, one compact metadata request added. Original market options
+  and all matching rows preserved. Four navigation/overlap regressions and eight
+  Guest/Free/Trial/Paid/Reporter/Admin/expired-role cases also pass.
+- TypeScript/Vite passes, 3.32s, 100 modules, JS318.84kB/90.21kB gzip. Original
+  index-19youOJ7.css unchanged. Manual: http://127.0.0.1:55446/history after logging
+  in as trial@example.com / PriceYardDemo8!. Evidence: batch-32-*.json.
+- Seventeen IDs complete; nineteen partial/pending. Full history itself remains
+  unpaginated to preserve existing complete charts/exports pending a compatible
+  implementation; no data is silently capped. Next: other atomic Admin writes.

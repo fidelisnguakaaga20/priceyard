@@ -13,6 +13,7 @@ from app.schemas.price_update_schema import (
     Movement,
     PriceUpdateAdminResponse,
     PriceUpdateCreate,
+    PriceHistoryPair,
     PriceUpdatePublicResponse,
     PriceUpdateUpdate,
     SubmissionStats,
@@ -31,6 +32,7 @@ from app.services.price_update_service import (
     list_admin_price_updates,
     list_market_comparison,
     list_price_history,
+    list_price_history_pairs,
     mark_price_update_outdated,
     reject_price_update,
     update_price_update,
@@ -116,6 +118,14 @@ def get_price_history(
         movement=movement,
         time_of_day=time_of_day,
     )
+
+
+@router.get("/history/pairs", response_model=list[PriceHistoryPair])
+def get_price_history_pairs(
+    db: Session = Depends(get_db),
+    _current_user: User = Depends(require_full_access),
+) -> list[dict[str, dict[str, str]]]:
+    return list_price_history_pairs(db)
 
 
 @router.get("/comparison", response_model=list[PriceUpdatePublicResponse])

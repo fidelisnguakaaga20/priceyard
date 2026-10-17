@@ -123,6 +123,33 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_history_pair_metadata_is_distinct_without_loading_or_losing_old_records(self):
+        from sqlalchemy import event
+        from app.models.commodity import Commodity
+        from app.models.market import Market
+        from app.models.price_update import PriceUpdate
+        from app.services.price_update_service import list_price_history_pairs
+        Base.metadata.create_all(self.engine)
+        with Session(self.engine) as db:
+            admin=User(full_name="Synthetic history admin",email="pg-pairs@example.com",password_hash="unused",role="admin",referral_code="PGPAIRS")
+            commodity,market=Commodity(name="Egusi"),Market(name="Kwali Market")
+            db.add_all([admin,commodity,market]);db.flush()
+            for age in range(101):
+                db.add(PriceUpdate(commodity_id=commodity.id,market_id=market.id,price_low=210000,price_high=220000,
+                    unit="1 bag",bag_size=None,movement="unknown",confidence_level="Low confidence",status="approved",
+                    is_outdated=True,update_date_time=datetime.now(timezone.utc)-timedelta(hours=age),created_by=admin.id,source_1="PRIVATE-PAIR-SOURCE"))
+            db.commit()
+        with Session(self.engine) as db:
+            table=PriceUpdate.__table__;before=db.execute(select(table)).all();loaded=[];statements=[]
+            event.listen(db,"loaded_as_persistent",lambda session,instance:loaded.append(type(instance).__name__))
+            def capture(connection,cursor,statement,parameters,context,many):statements.append(statement)
+            event.listen(self.engine,"before_cursor_execute",capture)
+            pairs=list_price_history_pairs(db)
+            event.remove(self.engine,"before_cursor_execute",capture)
+            self.assertEqual(pairs,[{"commodity":{"name":"Egusi"},"market":{"name":"Kwali Market"}}])
+            self.assertEqual(loaded,[]);self.assertEqual(len(statements),1);self.assertIn("DISTINCT",statements[0])
+            self.assertEqual(db.execute(select(table)).all(),before);self.assertEqual(len(before),101)
+
     def test_utc_price_entry_round_trip_and_correction_preserve_other_history(self):
         from app.models.commodity import Commodity
         from app.models.market import Market

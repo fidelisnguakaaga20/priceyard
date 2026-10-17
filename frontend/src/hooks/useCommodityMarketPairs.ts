@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { apiFetch } from "../services/api";
 import type { PriceUpdate } from "../types/api";
 
-function buildPairs(items: PriceUpdate[]): Map<string, Set<string>> {
+type CommodityMarketPair = { commodity: { name: string }; market: { name: string } };
+
+function buildPairs(items: CommodityMarketPair[]): Map<string, Set<string>> {
   const map = new Map<string, Set<string>>();
   for (const item of items) {
     const set = map.get(item.commodity.name) ?? new Set<string>();
@@ -35,7 +37,7 @@ export function useHistoricalCommodityMarketPairs(token: string | null | undefin
     let current = true;
     setPairs(new Map());
     if (!token) return;
-    apiFetch<PriceUpdate[]>("/price-updates/history", {}, token)
+    apiFetch<CommodityMarketPair[]>("/price-updates/history/pairs", {}, token)
       .then((items) => { if (current) setPairs(buildPairs(items)); })
       .catch(() => undefined);
     return () => { current = false; };
