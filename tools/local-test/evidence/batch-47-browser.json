@@ -1,0 +1,10 @@
+{
+  "original_detail_sections_and_cost_formula_retained": true,
+  "three_intelligence_requests_filtered_on_server": true,
+  "original_unfiltered_admin_lists_retain_all_records": true,
+  "unrelated_rows_not_downloaded_or_displayed": true,
+  "historical_prices_unchanged": true,
+  "temporary_records_removed_and_catalog_restored": true,
+  "external_page_requests": 0,
+  "production_connections": 0
+}

@@ -65,8 +65,11 @@ def get_quality_signal(db: Session, signal_id: int, *, lock: bool = False) -> Qu
     return signal
 
 
-def list_quality_signals(db: Session) -> list[QualitySignal]:
-    return list(db.scalars(select(QualitySignal).order_by(QualitySignal.created_at.desc(), QualitySignal.id.desc())).all())
+def list_quality_signals(db: Session, *, commodity_id: int | None = None) -> list[QualitySignal]:
+    statement = select(QualitySignal)
+    if commodity_id is not None:
+        statement = statement.where(QualitySignal.commodity_id == commodity_id)
+    return list(db.scalars(statement.order_by(QualitySignal.created_at.desc(), QualitySignal.id.desc())).all())
 
 
 def update_quality_signal(db: Session, signal: QualitySignal, payload: QualitySignalUpdate, *, commit: bool = True) -> QualitySignal:

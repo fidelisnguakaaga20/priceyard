@@ -1,0 +1,5 @@
+{
+  "second_native_runner_rejected_before_database_import": true,
+  "postgresql_server_running_for_probe": false,
+  "production_connections": 0
+}

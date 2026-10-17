@@ -65,8 +65,11 @@ def get_market_signal(db: Session, signal_id: int, *, lock: bool = False) -> Mar
     return signal
 
 
-def list_market_signals(db: Session) -> list[MarketSignal]:
-    return list(db.scalars(select(MarketSignal).order_by(MarketSignal.created_at.desc(), MarketSignal.id.desc())).all())
+def list_market_signals(db: Session, *, commodity_id: int | None = None) -> list[MarketSignal]:
+    statement = select(MarketSignal)
+    if commodity_id is not None:
+        statement = statement.where(MarketSignal.commodity_id == commodity_id)
+    return list(db.scalars(statement.order_by(MarketSignal.created_at.desc(), MarketSignal.id.desc())).all())
 
 
 def update_market_signal(db: Session, signal: MarketSignal, payload: MarketSignalUpdate, *, commit: bool = True) -> MarketSignal:

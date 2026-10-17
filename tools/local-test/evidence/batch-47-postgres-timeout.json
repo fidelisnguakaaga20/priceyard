@@ -1,0 +1,8 @@
+{
+  "tests": 40,
+  "failures": 1,
+  "errors": 9,
+  "seconds": 82.598,
+  "cluster_identity_verified": true,
+  "production_contacts": 0
+}

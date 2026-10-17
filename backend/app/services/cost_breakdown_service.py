@@ -66,10 +66,13 @@ def get_cost_breakdown(db: Session, item_id: int, *, lock: bool = False) -> Cost
     return item
 
 
-def list_cost_breakdowns(db: Session) -> list[CostBreakdown]:
+def list_cost_breakdowns(db: Session, *, commodity_id: int | None = None) -> list[CostBreakdown]:
+    statement = select(CostBreakdown)
+    if commodity_id is not None:
+        statement = statement.where(CostBreakdown.commodity_id == commodity_id)
     return list(
         db.scalars(
-            select(CostBreakdown).order_by(CostBreakdown.created_at.desc(), CostBreakdown.id.desc())
+            statement.order_by(CostBreakdown.created_at.desc(), CostBreakdown.id.desc())
         ).all()
     )
 

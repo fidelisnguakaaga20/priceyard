@@ -244,6 +244,16 @@ reset/retry/login/revocation cases pass. Twenty-two complete, fourteen partial/
 pending; PY-27 still includes remaining edit consistency. Preview reseeded only
 in memory after tests; reset-request cooldown and real records remain unchanged.
 
+Batch 47 recovered and verified after the owner's forced restart (2026-10-17).
+All prior commits and interrupted source/test changes were intact at 0e1e118.
+Commodity detail now requests only its commodity's market/quality/cost records;
+unfiltered Admin lists, ordering, access, original UI/formulas and history remain.
+All190 backend tests and all40 native PostgreSQL tests pass, plus real browser
+scope, five detail regressions and all14 dashboard cards. PY-20 remains partial:
+other lists/full history still require compatible optimization. Exact total stays
+22 complete / 14 partial or pending. Recovery checks only; do not begin batch48
+without a subsequent instruction. See batch47 history for resource safeguards.
+
 ## Checklist — do not repeat the audit
 
 | ID | Improvement | Current status |
@@ -267,7 +277,7 @@ in memory after tests; reset-request cooldown and real records remain unchanged.
 | PY-17 | Correct market-detail loading | Complete for identified loading races/combined-failure defect in batch 16; obsolete commodity/account responses ignored and independent successful sections retained |
 | PY-18 | Accurate account/payment/access messages | Complete for identified account/expiry/callback defects in batches 4/11/19; verified return refreshes access, unconfirmed return never claims payment received in title |
 | PY-19 | Existing FAQ draft/hide/publish management | Complete in batch 12; hidden drafts remain available to Admin across reload, public publication boundary verified |
-| PY-20 | Bounded queries with accessible historical records | Partial: current-price DB ranking (batch 23), single-query dashboard summary (batch 29), compact protected DISTINCT history filter metadata (batch 32); complete history and other unbounded lists remain unchanged/pending |
+| PY-20 | Bounded queries with accessible historical records | Partial: current-price DB ranking (batch 23), single-query dashboard summary (batch 29), compact protected DISTINCT history filter metadata (batch 32), SQL commodity scoping for market/quality/cost detail requests with complete default Admin lists (batch47); complete history and other unbounded lists remain unchanged/pending |
 | PY-21 | Reliable independent alerts | Application-side identified channel dependency complete in batch 24: failed email no longer skips push/WhatsApp; per-user/channel failures isolated; existing deduplication/count semantics retained. Delivery/retry operations remain PY-35 |
 | PY-22 | Efficient loading and accurate dashboard totals | Complete for identified dashboard scope in batch 29: all 14 original metrics preserved; one Admin-only aggregate API/DB snapshot, zero entity hydration; backend/PG/browser totals and outage recovery verified |
 | PY-23 | Preserve layout while fixing mobile overflow | Complete for identified original critical-layout/price-card overflow scope in batches 42/43: 78 normal and twelve long-name viewport checks, 320–1366px, Easy reading both modes; ordinary card/badge geometry and all fourteen Admin cards preserved |
@@ -277,7 +287,7 @@ in memory after tests; reset-request cooldown and real records remain unchanged.
 | PY-27 | Consistent existing editing/password inputs | Partial: feedback async file selection fixed in batch26; original password forms now enforce the existing Unicode-character/72-byte rules without truncating input, reset byte rejection is422 and preserves the link/access (batch46). Remaining edit consistency pending |
 | PY-28 | Historical record preservation | Partial: approved 0022 tested on fresh/populated synthetic PostgreSQL; future migration/history work pending |
 | PY-29 | Stable identities and dependent records | Partial: catalog IDs/fields and referenced-price deletion rejection verified with atomic audit writes in batch 34; broader identity/duplicate/rename issues pending, no automatic merge |
-| PY-30 | Isolated automated/browser verification | Partial/ongoing: guarded184 backend tests,39 identity-pinned synthetic PostgreSQL cases, original-browser workflows and before/after evidence verified through batch46; actual worker source uses fake transport only, native browser workers/providers disabled; expand with remaining work, live services forbidden |
+| PY-30 | Isolated automated/browser verification | Partial/ongoing: guarded190 backend tests,40 identity-pinned synthetic PostgreSQL cases and original-browser regressions verified through batch47; native suites serialized by exclusive file lock, retained-schema budget80, smaller recovery fixture and sequential heavy checks; actual worker source uses fake transport only, native browser workers/providers disabled; expand with remaining work, live services forbidden |
 | PY-31 | Confirmed payment activation and recovery | Partial: atomic confirmation, retry/replay, owner-only callback recovery and approved indefinite-grant holds verified; unattended recovery and operational delivery/reconciliation decisions remain |
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches 14/21: carry forward dated paid/trial time; preserve indefinite grants, block new checkout and hold/recover old purchases without consuming days |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
@@ -1600,3 +1610,72 @@ in memory after tests; reset-request cooldown and real records remain unchanged.
   remain. Demo reset requests use only /__test__/inbox; no email is delivered.
 - Twenty-two IDs complete; fourteen partial/pending. Remaining edit/query/security
   and owner/operational decisions remain. No production, push, merge or deployment.
+
+### Batch 47 — interrupted query batch and post-restart recovery (2026-10-17)
+
+- Recovery started on codex/priceyard-original-preserved-20261016 at
+  0e1e1187c460134d580e2e511b88404009d4a7f3. Keyboard commit6c0efbf, offline
+  commitdf74e55 and all previous work remain in ancestry; nine modified tracked
+  files and all new batch47 tests/evidence survived. Master remains76dbd27588de4aa37f3163d8b263d4b72a2cff32;
+  backup remains258991019e5af8b36eff407a8efa2c9fd03dd644. No discarded changes.
+- Preserved interrupted changes: optional positive commodity_id on existing
+  market-signal, quality-signal and cost-breakdown GET lists applies SQL filtering
+  before materialization. Commodity detail supplies its existing ID. Default Admin
+  lists retain every record/order; original permissions, defensive UI filtering,
+  independent failure/race handling, cost formula, measurements and markup remain.
+  No database/form fields, business rules, prices, history edits or new features.
+- Before evidence: six tests reproduced three failures/three errors before the
+  optimization; a separate missing fixture import was fixed before interruption.
+  Preserve the later failed native report as batch-47-postgres-timeout.json:
+  40 tests,1 failure,9 errors,82.598s with local connection timeouts. Do not erase
+  that result or describe the original heavy cluster as successfully recovered.
+- Confirmed local test-infrastructure problem: retained per-test schemas left
+  139,451 files/about1458MiB in its synthetic database directory. Old logs show a
+  startup fsync scan reaching160s, checkpoints syncing6060–11128 files, then many
+  autovacuum worker-start warnings. Checkpoint write pacing near269s alone is not
+  proof of a freeze. Windows41/6008 confirm an unclean restart; available evidence
+  does not establish a single OS-level cause or prove pre-restart memory exhaustion.
+  Repeated full-suite retries on the growing fixture were an unsafe resource habit.
+- Old pinned fixture postgres-revocation (identifier7697280512362447984,port55447)
+  is stopped, with its stale PID/control evidence and all synthetic schemas retained.
+  Its control state reflects interrupted shutdown; it was not restarted or repaired
+  during this recovery because another large fsync scan would add disk pressure.
+  The separate pre-existing PostgreSQL service/process tree was left untouched.
+- Initialized a separate empty workspace-only postgres-recovery-20261017 fixture:
+  identifier7697651361316763724, literal127.0.0.1:55448, same synthetic-only test
+  user/database/purpose. Explicit --recovery-cluster selects only this hard-pinned
+  profile; arbitrary marker paths/ports/identities still fail. Shared buffers32MB,
+  max_connections12, maintenance_work_mem16MB, autovacuum_max_workers1; fsync and
+  normal durability stay enabled. No production configurations/credentials used.
+- Native runner now acquires one nonblocking exclusive lock before database imports
+  and refuses a run that would exceed80 retained synthetic schemas. A real second
+  runner was rejected before any database import with the server stopped. No schema
+  was dropped. Each connection/mutation still checks live directory/system identity;
+  TCP/DNS/provider and negative-destination guards remain enabled. Full native suite
+  passes40/40 in27.681s. Graceful shutdown completes8.035s checkpoint; control state
+  verified shut down. Never start the old heavy fixture automatically on resume.
+- Run heavy phases sequentially: PostgreSQL then stop; full backend190/190 in23.669s;
+  then a single in-memory preview and one browser at a time. No dependency install.
+  Avoided another build/copy: all73 current frontend source files match the already
+  TypeScript/Vite-verified frontend-7cf451c3d7a54985a699a81d503125d4 exactly. Existing
+  batch47 build:2.65s/102modules, JS323.84kB/91.95kB gzip; CSS index-BEBH-Ai6.css
+  unchanged. Current browser verification uses that exact matching artifact.
+- New scope browser checks pass for three scoped responses, complete default Admin
+  lists, unchanged Egusi history and calculator totals210200/420400, with temporary
+  fixtures removed/catalog restored. Five detail error/navigation races pass; all14
+  original Admin labels/totals, one summary request and outage recovery pass. All
+  browser requests literal loopback, native service workers blocked, providers off.
+- Old preview PID1252 was reused by Windows fontdrvhost.exe after restart. Launcher
+  refused to stop it, correctly. Verified PID metadata predates boot and55446 was
+  unused; archived only the stale PID record, leaving that Windows process untouched.
+  New synthetic preview launcher18556/worker25204 was identity-verified for checks.
+  After checks, only those verified processes were stopped; both55446/55448 were
+  confirmed unbound. No added test workload remains running (stop-recovery evidence).
+- Recovery evidence: tools/local-test/evidence/batch-47-*-recovery.json,
+  batch-47-postgres.json, batch-47-run-lock.json and earlier before/after records.
+  Current post-restart machine had about2.8GiB available initially/3.3GiB later and
+  about214GiB disk free; these snapshots cannot diagnose its earlier memory state.
+- Exactly22 IDs complete /14 partial or pending; this extends PY-20 without claiming
+  it complete. Remaining IDs02,05,07,08,13,14,20,27,28,29,30,31,35,36. Preserve
+  14-day trial, NGN2500/30days, NGN6000/90days and all approved rules. Stop after
+  recovery report; no new batch, production access, push, merge or deployment.

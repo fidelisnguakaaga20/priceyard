@@ -1,0 +1,9 @@
+{
+  "tests_run": 6,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "duration_seconds": 0.736,
+  "pattern": "test_intelligence_scope.py",
+  "runtime": "in-process synthetic SQLite; TCP and DNS denied"
+}

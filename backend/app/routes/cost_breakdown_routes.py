@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, Response, status
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -26,8 +28,9 @@ router = APIRouter(prefix="/cost-breakdowns", tags=["cost-breakdowns"])
 def get_items(
     db: Session = Depends(get_db),
     _: User = Depends(require_full_access),
+    commodity_id: Annotated[int | None, Query(gt=0)] = None,
 ) -> list[CostBreakdown]:
-    return list_cost_breakdowns(db)
+    return list_cost_breakdowns(db, commodity_id=commodity_id)
 
 
 @router.get("/{item_id}", response_model=CostBreakdownResponse)

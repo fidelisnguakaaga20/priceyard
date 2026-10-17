@@ -1,0 +1,7 @@
+﻿{
+    "stale_pid_older_than_boot":  true,
+    "unrelated_process_untouched":  true,
+    "preview_port_free":  true,
+    "old_pid_record_preserved":  true,
+    "reused_pid_process":  "fontdrvhost.exe"
+}

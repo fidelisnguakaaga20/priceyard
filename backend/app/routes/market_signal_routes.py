@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, Response, status
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -22,8 +24,9 @@ router = APIRouter(prefix="/market-signals", tags=["market-signals"])
 def get_signals(
     db: Session = Depends(get_db),
     _: User = Depends(get_current_user),
+    commodity_id: Annotated[int | None, Query(gt=0)] = None,
 ) -> list[MarketSignal]:
-    return list_market_signals(db)
+    return list_market_signals(db, commodity_id=commodity_id)
 
 
 @router.get("/{signal_id}", response_model=MarketSignalResponse)

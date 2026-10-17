@@ -2,16 +2,40 @@
 import importlib
 import importlib.util
 import json
+import argparse
+import msvcrt
 from pathlib import Path
 import sys
 
 LAB = Path(__file__).resolve().parent
 ROOT = LAB.parents[1]
 sys.path.insert(0, str(LAB))
-marker = json.loads((LAB / "runtime/postgres-marker.json").read_text(encoding="utf-8-sig"))
-EXPECTED_DIR = (LAB / "runtime/postgres-revocation").resolve()
-if (Path(marker["data_directory"]).resolve() != EXPECTED_DIR or marker["system_identifier"] != "7697280512362447984"
-        or marker["host"] != "127.0.0.1" or marker["port"] != 55447 or marker["user"] != "priceyard_revocation_test"
+parser = argparse.ArgumentParser()
+parser.add_argument("--recovery-cluster", action="store_true")
+options = parser.parse_args()
+# Acquire before importing application/database code. Two native suites must never
+# run concurrently, even when different synthetic profiles were selected.
+run_lock = (LAB / "runtime/postgres-test-run.lock").open("a+b")
+if run_lock.tell() == 0:
+    run_lock.write(b"0")
+    run_lock.flush()
+run_lock.seek(0)
+try:
+    msvcrt.locking(run_lock.fileno(), msvcrt.LK_NBLCK, 1)
+except OSError as error:
+    raise RuntimeError("Another local PostgreSQL verification is already running") from error
+
+# Both profiles have literal directory/port/system-identifier pins. Selecting the
+# small recovery fixture cannot authorize an arbitrary marker or server.
+cluster_name, marker_name, expected_identifier, expected_port = (
+    ("postgres-recovery-20261017", "postgres-recovery-marker.json", "7697651361316763724", 55448)
+    if options.recovery_cluster else
+    ("postgres-revocation", "postgres-marker.json", "7697280512362447984", 55447)
+)
+marker = json.loads((LAB / "runtime" / marker_name).read_text(encoding="utf-8-sig"))
+EXPECTED_DIR = (LAB / "runtime" / cluster_name).resolve()
+if (Path(marker["data_directory"]).resolve() != EXPECTED_DIR or marker["system_identifier"] != expected_identifier
+        or marker["host"] != "127.0.0.1" or marker["port"] != expected_port or marker["user"] != "priceyard_revocation_test"
         or marker["database"] != "priceyard_isolated_test" or marker["purpose"] != "new-synthetic-only-security-migration"):
     raise RuntimeError("Unapproved PostgreSQL identity marker")
 
@@ -23,7 +47,7 @@ original_connect = psycopg.Connection.connect
 import guard
 guard.isolate()
 import os
-URL = "postgresql+psycopg://priceyard_revocation_test@127.0.0.1:55447/priceyard_isolated_test"
+URL = f"postgresql+psycopg://priceyard_revocation_test@127.0.0.1:{expected_port}/priceyard_isolated_test"
 os.environ["DATABASE_URL"] = URL
 os.environ["PGPASSFILE"] = str(LAB / "runtime/nonexistent-synthetic-passfile")
 os.environ["PGSERVICEFILE"] = str(LAB / "runtime/nonexistent-synthetic-services")
@@ -36,10 +60,10 @@ def pinned_connect(conninfo="", **kwargs):
     connect_values = {key: value for key, value in kwargs.items() if key not in {"autocommit", "context"}}
     info = conninfo_to_dict(conninfo, **connect_values)
     if (set(info) - {"host", "port", "user", "dbname", "connect_timeout", "application_name", "sslmode"}
-            or info.get("host") != "127.0.0.1" or str(info.get("port")) != "55447"
+            or info.get("host") != "127.0.0.1" or str(info.get("port")) != str(expected_port)
             or info.get("user") != marker["user"] or info.get("dbname") not in {"postgres", marker["database"]}
             or info.get("sslmode") not in {None, "disable"}):
-        raise RuntimeError("Only the marked local synthetic PostgreSQL connection is permitted: " + repr({"keys": sorted(info), "host_matches": info.get("host") == "127.0.0.1", "port_matches": str(info.get("port")) == "55447", "user_matches": info.get("user") == marker["user"], "database_matches": info.get("dbname") in {"postgres", marker["database"]}}))
+        raise RuntimeError("Only the marked local synthetic PostgreSQL connection is permitted: " + repr({"keys": sorted(info), "host_matches": info.get("host") == "127.0.0.1", "port_matches": str(info.get("port")) == str(expected_port), "user_matches": info.get("user") == marker["user"], "database_matches": info.get("dbname") in {"postgres", marker["database"]}}))
     # Literal loopback fixture only: no certificate/key discovery or hanging DNS.
     kwargs.update(sslmode="disable", connect_timeout=5)
     connection = original_connect(conninfo, **kwargs)
@@ -81,7 +105,7 @@ importlib.import_module("sqlalchemy.engine.create").create_engine = pinned_engin
 
 # Identity verification above precedes every connection, including this database
 # creation. Never choose or mutate an existing arbitrary application database.
-with pinned_connect(host="127.0.0.1", port=55447, user=marker["user"], dbname="postgres", autocommit=True) as connection:
+with pinned_connect(host="127.0.0.1", port=expected_port, user=marker["user"], dbname="postgres", autocommit=True) as connection:
     exists = connection.execute("SELECT 1 FROM pg_database WHERE datname = %s", (marker["database"],)).fetchone()
     if not exists:
         connection.execute('CREATE DATABASE "priceyard_isolated_test"')
@@ -123,6 +147,27 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_intelligence_commodity_scope_bounds_hydration_without_losing_history(self):
+        from sqlalchemy import event
+        from app.models.price_update import PriceUpdate
+        cases_spec=importlib.util.spec_from_file_location("local_scope_cases",ROOT/"backend/tests/test_intelligence_scope.py")
+        cases=importlib.util.module_from_spec(cases_spec);cases_spec.loader.exec_module(cases)
+        Base.metadata.create_all(self.engine)
+        with Session(self.engine) as db:
+            fixture=cases.seed_scope_records(db)
+            before={model.__tablename__:db.execute(select(model.__table__)).all() for model in [PriceUpdate,*(row[2] for row in cases.RESOURCES)]}
+        for kind,_,model,_,_ in cases.RESOURCES:
+            with Session(self.engine) as db:
+                service=importlib.import_module("app.services."+kind+"_service")
+                method={"market_signal":"list_market_signals","quality_signal":"list_quality_signals","cost_breakdown":"list_cost_breakdowns"}[kind]
+                loaded=[]
+                event.listen(db,"loaded_as_persistent",lambda session,item:loaded.append(item.id) if isinstance(item,model) else None)
+                rows=getattr(service,method)(db,commodity_id=fixture["commodity"])
+                self.assertEqual([item.id for item in rows],fixture["expected"][kind]);self.assertEqual(loaded,fixture["expected"][kind])
+                self.assertEqual(len(getattr(service,method)(db)),42)
+        with Session(self.engine) as db:
+            self.assertEqual({model.__tablename__:db.execute(select(model.__table__)).all() for model in [PriceUpdate,*(row[2] for row in cases.RESOURCES)]},before)
+
     def test_password_utf8_rejection_preserves_reset_link_paid_access_and_retry(self):
         from app.utils.password import verify_password
         from app.utils.permissions import get_current_user
@@ -1090,13 +1135,20 @@ class PostgreSQLSecurityTests(unittest.TestCase):
 
 if __name__ == "__main__":
     # Negative connection checks reject before any native/network call.
-    for arguments in (dict(host="127.0.0.1",port=5432,user=marker["user"],dbname=marker["database"]),dict(host="service.example.invalid",port=55447,user=marker["user"],dbname=marker["database"])):
+    for arguments in (dict(host="127.0.0.1",port=5432,user=marker["user"],dbname=marker["database"]),dict(host="service.example.invalid",port=expected_port,user=marker["user"],dbname=marker["database"])):
         try:pinned_connect(**arguments)
         except RuntimeError:pass
         else:raise RuntimeError("Connection isolation negative failed")
+    suite=unittest.defaultTestLoader.loadTestsFromTestCase(PostgreSQLSecurityTests)
+    # Retain earlier synthetic evidence, but refuse unbounded schema/file growth.
+    # A new marked fixture is required instead of dropping any preserved schema.
+    with pinned_connect(host="127.0.0.1",port=expected_port,user=marker["user"],dbname=marker["database"]) as connection:
+        schemas_before=connection.execute("SELECT count(*) FROM pg_namespace WHERE nspname LIKE 'pyrev_%'").fetchone()[0]
+    if schemas_before + suite.countTestCases() > 80:
+        raise RuntimeError("Synthetic schema budget exceeded; preserve this fixture and prepare a fresh pinned cluster")
     started=time.monotonic()
-    result=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromTestCase(PostgreSQLSecurityTests))
-    report={"tests":result.testsRun,"failures":len(result.failures),"errors":len(result.errors),"seconds":round(time.monotonic()-started,3),"cluster_identity_verified":True,"production_contacts":0}
+    result=unittest.TextTestRunner(verbosity=2).run(suite)
+    report={"tests":result.testsRun,"failures":len(result.failures),"errors":len(result.errors),"seconds":round(time.monotonic()-started,3),"cluster_identity_verified":True,"production_contacts":0,"cluster_profile":cluster_name,"schemas_before":schemas_before,"schema_budget":80,"single_native_suite":True}
     (LAB / "runtime/postgres-security.json").write_text(json.dumps(report,indent=2))
     print(json.dumps(report))
     raise SystemExit(not result.wasSuccessful())
