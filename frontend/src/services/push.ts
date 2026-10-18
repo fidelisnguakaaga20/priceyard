@@ -68,7 +68,7 @@ export async function disablePushAlerts(token: string): Promise<void> {
 /** Best-effort current-device cleanup, bounded so a broken worker/provider
  * cannot indefinitely delay server logout. No VAPID setting or new permission
  * is needed to remove an already existing browser subscription. */
-export async function finishLogout(token: string, isStillLoggedOut: () => boolean): Promise<void> {
+export async function finishLogout(token: string, isStillLoggedOut: () => boolean): Promise<boolean> {
   const controller = new AbortController();
   let current = true;
   let timer: ReturnType<typeof setTimeout> | undefined;
@@ -93,6 +93,9 @@ export async function finishLogout(token: string, isStillLoggedOut: () => boolea
     clearTimeout(timer);
     controller.abort();
     // Always attempt revocation, even if native lookup/removal fails or hangs.
-    await apiFetch<void>("/auth/logout", { method: "POST", keepalive: true }, token).catch(() => undefined);
+    try {
+      await apiFetch<void>("/auth/logout", { method: "POST", keepalive: true }, token);
+      return true;
+    } catch { return false; }
   }
 }

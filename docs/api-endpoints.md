@@ -14,8 +14,13 @@ preview's `/__test__/...` controls are not application endpoints.
 
 - Guest has no account role. Trial and paid access are subscription states,
   separate from stored roles `free_user`, `paid_user`, `reporter`, `admin`.
-- `get_current_user` checks the bearer JWT, account activation, current account
+- `get_current_user` checks bearer or protected-cookie JWT, activation, current account
   security version and revoked token hashes on the server.
+- Browser login uses HttpOnly/Secure/SameSite=Lax host-only cookies; the test-only
+  HTTP exception is literal127.0.0.1:55446 in APP_ENV=test. Browser writes require
+  exact approved Origin and session-bound CSRF. RememberMe controls cookie
+  persistence; bearer API clients remain supported. Login routes share quotas.
+  Session/CSRF metadata is noncredential; no browser JWT is returned by these routes.
 - `require_roles(...)` additionally restricts staff operations to the named roles.
   `require_full_access` checks current trial/paid entitlement; Admin bypasses that
   entitlement check. Reporter authority does not itself grant paid entitlement.
@@ -59,14 +64,18 @@ from declarations for traceability; follow the linked handler for all checks.
 | GET | `/audit-logs` | `require_roles('admin')` | [get_logs](../backend/app/routes/audit_log_routes.py#L16) |
 | GET | `/audit-logs/page` | `require_roles('admin')` | [get_logs_page](../backend/app/routes/audit_log_routes.py#L25) |
 | GET | `/audit-logs/{audit_log_id}` | `require_roles('admin')` | [get_log](../backend/app/routes/audit_log_routes.py#L35) |
-| POST | `/auth/forgot-password` | `—` | [forgot_password](../backend/app/routes/auth_routes.py#L87) |
-| POST | `/auth/google` | `—` | [login_with_google](../backend/app/routes/auth_routes.py#L46) |
-| POST | `/auth/login` | `—` | [login](../backend/app/routes/auth_routes.py#L39) |
-| POST | `/auth/logout` | `bearer_scheme` | [logout](../backend/app/routes/auth_routes.py#L52) |
-| GET | `/auth/me` | `get_current_user` | [me](../backend/app/routes/auth_routes.py#L66) |
-| GET | `/auth/referral-summary` | `get_current_user` | [referral_summary](../backend/app/routes/auth_routes.py#L71) |
-| POST | `/auth/register` | `—` | [register](../backend/app/routes/auth_routes.py#L27) |
-| POST | `/auth/reset-password` | `—` | [change_forgotten_password](../backend/app/routes/auth_routes.py#L92) |
+| POST | `/auth/browser/google` | `—` | [browser_google](../backend/app/routes/auth_routes.py#L92) |
+| POST | `/auth/browser/login` | `—` | [browser_login](../backend/app/routes/auth_routes.py#L83) |
+| GET | `/auth/browser/session` | `—` | [browser_session](../backend/app/routes/auth_routes.py#L100) |
+| POST | `/auth/browser/upgrade` | `bearer_scheme` | [browser_upgrade](../backend/app/routes/auth_routes.py#L109) |
+| POST | `/auth/forgot-password` | `—` | [forgot_password](../backend/app/routes/auth_routes.py#L143) |
+| POST | `/auth/google` | `—` | [login_with_google](../backend/app/routes/auth_routes.py#L48) |
+| POST | `/auth/login` | `—` | [login](../backend/app/routes/auth_routes.py#L41) |
+| POST | `/auth/logout` | `bearer_scheme` | [logout](../backend/app/routes/auth_routes.py#L54) |
+| GET | `/auth/me` | `get_current_user` | [me](../backend/app/routes/auth_routes.py#L122) |
+| GET | `/auth/referral-summary` | `get_current_user` | [referral_summary](../backend/app/routes/auth_routes.py#L127) |
+| POST | `/auth/register` | `—` | [register](../backend/app/routes/auth_routes.py#L29) |
+| POST | `/auth/reset-password` | `—` | [change_forgotten_password](../backend/app/routes/auth_routes.py#L148) |
 | GET | `/buying-zones` | `require_full_access` | [get_zones](../backend/app/routes/buying_zone_routes.py#L23) |
 | POST | `/buying-zones` | `require_roles('admin')` | [add_zone](../backend/app/routes/buying_zone_routes.py#L53) |
 | GET | `/buying-zones/admin/page` | `require_roles('admin')` | [get_admin_zones_page](../backend/app/routes/buying_zone_routes.py#L34) |
@@ -102,7 +111,7 @@ from declarations for traceability; follow the linked handler for all checks.
 | GET | `/feedback/{feedback_id}` | `require_roles('admin')` | [get_feedback_item](../backend/app/routes/feedback_routes.py#L93) |
 | PATCH | `/feedback/{feedback_id}/testimonial/hide` | `require_roles('admin')` | [hide_testimonial](../backend/app/routes/feedback_routes.py#L116) |
 | PATCH | `/feedback/{feedback_id}/testimonial/publish` | `require_roles('admin')` | [publish_testimonial](../backend/app/routes/feedback_routes.py#L102) |
-| GET | `/health` | `—` | [health_check](../backend/app/main.py#L84) |
+| GET | `/health` | `—` | [health_check](../backend/app/main.py#L82) |
 | GET | `/market-signals` | `get_current_user` | [get_signals](../backend/app/routes/market_signal_routes.py#L24) |
 | POST | `/market-signals` | `require_roles('admin')` | [add_signal](../backend/app/routes/market_signal_routes.py#L54) |
 | GET | `/market-signals/admin/page` | `require_roles('admin')` | [get_admin_signals_page](../backend/app/routes/market_signal_routes.py#L35) |

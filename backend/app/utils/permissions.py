@@ -1,6 +1,6 @@
 from collections.abc import Callable
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt import InvalidTokenError
 from sqlalchemy.orm import Session
@@ -10,8 +10,21 @@ from app.models.user import User
 from app.security import decode_access_claims
 from app.services.login_revocation_service import is_revoked
 from app.services.subscription_service import get_subscription_for_user, has_full_access
+from app.services.browser_session_service import browser_token, validate_browser_request
 
-bearer_scheme = HTTPBearer(auto_error=False)
+class BrowserOrBearer(HTTPBearer):
+    async def __call__(self, request: Request) -> HTTPAuthorizationCredentials | None:
+        if request.headers.get('authorization') is not None:
+            # Explicit invalid bearer credentials must never fall back to a cookie.
+            return await super().__call__(request)
+        token = browser_token(request)
+        if token:
+            validate_browser_request(request, token)
+            return HTTPAuthorizationCredentials(scheme='Bearer', credentials=token)
+        return None
+
+
+bearer_scheme = BrowserOrBearer(auto_error=False)
 VALID_MVP_ROLES = frozenset({"admin", "free_user", "paid_user", "reporter"})
 
 

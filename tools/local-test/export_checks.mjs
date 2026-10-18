@@ -33,7 +33,7 @@ try{
   assert.ok(!content.includes('LOCAL-PRIVATE-SOURCE'));
   assert.ok(!content.includes('grade'));
   const access=await page.evaluate(async()=>{
-    const guest=await fetch('/api/reports/prices.csv');
+    const guest=await fetch('/api/reports/prices.csv',{credentials:'omit'});
     const response=await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:'trial@example.com',password:'PriceYardDemo8!'})});
     const trial=await response.json();
     const restricted=await fetch('/api/reports/prices.csv',{headers:{Authorization:'Bearer '+trial.access_token}});

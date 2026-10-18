@@ -10,7 +10,7 @@ fixes remain mandatory within their respective items.
 
 1. Automated backend service/API tests exercise the existing critical account,
    access, payment, data-preservation and notification workflows with synthetic
-   data. Latest full suite:281 tests, zero failures/errors/skips in batch78.
+   data. Latest full suite:283 tests, zero failures/errors/skips in batch80.
 2. PostgreSQL tests exercise material lock/transaction behavior rather than
    substituting SQLite for concurrency. Last full40-case native baseline is
    batch47. Later recovery/migration/export/catalog changes have focused native
@@ -71,7 +71,9 @@ Google, email/push delivery, production TLS or backup restoration. PY-35 retains
 these operational approvals/checks. No live service or CI deployment was run.
 
 Untested future policy changes must not be presented as completed safeguards.
-Remaining PY-02/05/07/08/13/14/20/29/35 work retains its own decisions and tests.
+Remaining PY-20/35 work retains its own decisions and tests.
+Cookie/CSRF/race evidence:batch80; new price-claim evidence:batch79.
+Earlier evidence links remain historical, not the newest completion counts.
 Use [the progress tracker](../PRICEYARD_PROGRESS.md) for exact current counts and
 [the local workflow](LOCAL_DEVELOPMENT.md) for commands, fixture limits and safe
 resumption. Do not copy dependencies or rerun expensive phases merely because

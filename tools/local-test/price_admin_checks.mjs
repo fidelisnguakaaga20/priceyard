@@ -76,8 +76,8 @@ try {
     assert.ok((await row().locator('td').nth(2).innerText()).includes('210500'));
     assert.equal(await page.getByLabel(/grade/i).count(),0);
     const audits=await page.evaluate(async id=>{
-      const token=localStorage.getItem('priceyard_access_token')||sessionStorage.getItem('priceyard_access_token');
-      const response=await fetch('/api/audit-logs',{headers:{Authorization:'Bearer '+token}});
+      const session=await fetch('/api/auth/browser/session').then(r=>r.json());
+      const response=await fetch('/api/audit-logs',{headers:{'X-PriceYard-CSRF':session.csrf_token,'X-PriceYard-Session':session.session_id}});
       if(!response.ok)throw Error('Could not verify local audit');
       return (await response.json()).filter(item=>item.table_name==='price_updates'&&item.record_id===id).sort((a,b)=>a.id-b.id);
     },created.id);

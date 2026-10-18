@@ -58,9 +58,17 @@ Password reset invalidates earlier login versions. Logout revokes the presented
 token; disabling/re-enabling an account must not revive previous credentials.
 Never save raw login tokens in the revocation table. Google subject ownership
 must be verified: matching an existing email alone cannot attach a Google account.
-Existing password/reset fallback remains. Session duration and RememberMe policy
-remain unchanged; JS token-storage and offline revocation limits are still open
-PY-07 work, not a claim of complete protection.
+Existing password/reset fallback remains. Approved browser sessions use HttpOnly,
+Secure, host-only SameSite=Lax cookies, preserving90 days and RememberMe. Session
+cookies share the browser profile; offline logout clears the view and queues
+revocation rather than claiming a remote action succeeded. Cookie writes use
+exact Origin/CSRF and old-session identity guards. Web Locks serialize cross-tab
+cookie mutations; unsupported browsers fail closed and need an update. Existing
+bearer API clients remain. Valid stored logins convert with the identical expiry.
+No new JWT is stored in JavaScript. Shared devices should explicitly log out:
+browser session restoration settings may restore session cookies. HTTPS/CORS,
+phone-browser compatibility and multi-tab legacy cutover require PY-35 validation.
+See [the approved scope](SESSION_COOKIE_APPROVAL.md). Cookies do not eliminate XSS.
 
 Watchlist/push/account operations enforce ownership. Channel failure must not
 skip other alert channels. Notifications occur after durable business writes;
@@ -135,3 +143,9 @@ For each small batch: inspect existing changes, implement only unfinished scope,
 run relevant backend/native/browser checks sequentially, fix failures, record
 exact counts/limits/evidence, commit locally and leave resumable progress. Preserve
 master and the old backup; never merge the old hardening branch wholesale.
+
+New/changed price claims follow [approved evidence safeguards](PRICE_CLAIM_EVIDENCE_APPROVAL.md):
+two distinct private references for Verified by2 sources; movement supported by
+the strictly preceding approved/nonoutdated record with matching complete recorded
+specifications and both endpoints. Otherwise use existing unknown. No guessed
+weights, historical relabeling or claim of independently verified source people.

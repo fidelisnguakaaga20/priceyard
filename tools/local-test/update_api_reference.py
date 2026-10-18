@@ -20,8 +20,13 @@ preview's `/__test__/...` controls are not application endpoints.
 
 - Guest has no account role. Trial and paid access are subscription states,
   separate from stored roles `free_user`, `paid_user`, `reporter`, `admin`.
-- `get_current_user` checks the bearer JWT, account activation, current account
+- `get_current_user` checks bearer or protected-cookie JWT, activation, current account
   security version and revoked token hashes on the server.
+- Browser login uses HttpOnly/Secure/SameSite=Lax host-only cookies; the test-only
+  HTTP exception is literal127.0.0.1:55446 in APP_ENV=test. Browser writes require
+  exact approved Origin and session-bound CSRF. RememberMe controls cookie
+  persistence; bearer API clients remain supported. Login routes share quotas.
+  Session/CSRF metadata is noncredential; no browser JWT is returned by these routes.
 - `require_roles(...)` additionally restricts staff operations to the named roles.
   `require_full_access` checks current trial/paid entitlement; Admin bypasses that
   entitlement check. Reporter authority does not itself grant paid entitlement.

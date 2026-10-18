@@ -15,14 +15,13 @@ async function page(){
 }
 async function mode(value){assert.equal(await control.evaluate(async mode=>(await fetch('/__test__/google-mode',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode})})).status,value),200);}
 async function googleLogin(p){return p.evaluate(async()=>{
- const response=await fetch('/api/auth/google',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id_token:'synthetic-preview-google-token'})});
+ const response=await fetch('/api/auth/browser/google',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id_token:'synthetic-preview-google-token'})});
  const data=await response.json();
- if(response.ok)localStorage.setItem('priceyard_access_token',data.access_token);
  return {status:response.status,detail:data.detail};
 });}
 async function account(p){return p.evaluate(async()=>{
- const token=localStorage.getItem('priceyard_access_token')||sessionStorage.getItem('priceyard_access_token');
- const headers={Authorization:'Bearer '+token};
+ const session=await fetch('/api/auth/browser/session').then(r=>r.json());
+ const headers={'X-PriceYard-CSRF':session.csrf_token,'X-PriceYard-Session':session.session_id};
  const userResponse=await fetch('/api/auth/me',{headers});if(!userResponse.ok)throw Error('Local account read failed');
  const user=await userResponse.json(),subscriptionResponse=await fetch('/api/subscriptions/'+user.id,{headers});
  if(!subscriptionResponse.ok)throw Error('Local subscription read failed');

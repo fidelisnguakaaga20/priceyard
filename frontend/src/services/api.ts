@@ -1,3 +1,4 @@
+import { browserSession, serializeCookieMutation } from "./sessionTransport";
 const API_BASE = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, "") || "/api";
 
 export class ApiError extends Error {
@@ -36,12 +37,23 @@ export async function apiFetch<T>(
   options: RequestInit = {},
   token?: string | null,
   onProvenance?: (savedAt: string | null) => void,
+  format: "json" | "blob" = "json",
 ): Promise<T> {
   const headers = new Headers(options.headers);
   if (options.body && !headers.has("Content-Type")) headers.set("Content-Type", "application/json");
-  if (token) headers.set("Authorization", `Bearer ${token}`);
+  const cookie = Boolean(token?.startsWith("cookie:"));
+  if (cookie && token) {
+    const session = browserSession(token);
+    if (!session) throw new ApiError(401, "Browser session changed");
+    headers.set("X-PriceYard-Session", session.session_id);
+    headers.set("X-PriceYard-CSRF", session.csrf_token);
+  } else if (token) headers.set("Authorization", `Bearer ${token}`);
 
-  const response = await fetch(`${API_BASE}${path}`, { ...options, headers });
+  const send = () => fetch(`${API_BASE}${path}`, { ...options, headers,
+    credentials: cookie || path.startsWith("/auth/browser/") ? "include" : "omit",
+    ...((cookie || path.startsWith("/auth/browser/")) ? { cache: "no-store" as RequestCache } : {}) });
+  const cookieMutation = (cookie && path === "/auth/logout") || ["/auth/browser/login", "/auth/browser/google", "/auth/browser/upgrade"].includes(path);
+  const response = await (cookieMutation ? serializeCookieMutation(send) : send());
   if (!response.ok) {
     let payload: unknown = null;
     try {
@@ -61,7 +73,7 @@ export async function apiFetch<T>(
     // A legacy/invalid saved copy has no trustworthy device-save timestamp.
     throw new ApiError(503, "Request failed with status 503");
   }
-  const data = response.status === 204 ? undefined as T : await response.json() as T;
+  const data = response.status === 204 ? undefined as T : await (format === "blob" ? response.blob() : response.json()) as T;
   onProvenance?.(cached ? stamp : null);
   return data;
 }

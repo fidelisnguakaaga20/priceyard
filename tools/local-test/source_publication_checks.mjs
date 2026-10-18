@@ -11,7 +11,7 @@ let outside=0;
 await context.route('**/*',route=>{if(new URL(route.request().url()).origin===origin)return route.continue();outside++;return route.abort();});
 await context.addInitScript(()=>localStorage.setItem('priceyard_onboarding_seen','1'));
 const page=await context.newPage();page.setDefaultTimeout(15000);
-async function api(url,text=false){return page.evaluate(async({url,text})=>{const token=localStorage.getItem('priceyard_access_token');const r=await fetch('/api'+url,{headers:token?{Authorization:'Bearer '+token}:{}});if(!r.ok)throw Error('Synthetic read failed '+r.status);return text?r.text():r.json();},{url,text});}
+async function api(url,text=false){return page.evaluate(async({url,text})=>{const session=await fetch('/api/auth/browser/session').then(r=>r.ok?r.json():null);const r=await fetch('/api'+url,{headers:session?{'X-PriceYard-CSRF':session.csrf_token,'X-PriceYard-Session':session.session_id}:{}});if(!r.ok)throw Error('Synthetic read failed '+r.status);return text?r.text():r.json();},{url,text});}
 try{
  await page.goto(origin+'/prices');await page.locator('.price-card').first().waitFor();const current=await api('/price-updates');
  assert.ok(current.every(row=>!('source_1' in row)&&!('source_2' in row)));assert.ok(!(await page.locator('main').innerText()).includes('LOCAL-PRIVATE-SOURCE'));

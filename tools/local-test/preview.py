@@ -636,7 +636,7 @@ class LocalOnly:
             return await JSONResponse({"detail": "Synthetic temporary outage"}, status_code=503)(scope, receive, secured)
         if scope["type"] == "http":
             async with self.request_lock:
-                if scope.get("path") == "/api/auth/google":
+                if scope.get("path") in {"/api/auth/google", "/api/auth/browser/google"}:
                     await serve_fake_google(self.app, scope, receive, secured)
                 elif notification_mode["enabled"] and scope.get("method") == "PATCH" and re.fullmatch(r"/api/price-updates/[0-9]+/approve", scope.get("path", "")):
                     await serve_fake_notifications(self.app, scope, receive, secured)

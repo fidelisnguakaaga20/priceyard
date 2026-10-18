@@ -22,7 +22,7 @@ async function login(page,email,password='PriceYardDemo8!'){
   await page.getByRole('button',{name:'Log in',exact:true}).click();
   await page.waitForURL('**/dashboard');
   await page.getByRole('heading',{name:/^Welcome, Test /}).waitFor();
-  return page.evaluate(()=>localStorage.getItem('priceyard_access_token'));
+  return (await page.context().cookies()).find(cookie=>cookie.name==='priceyard_local_session').value;
 }
 try{
   {

@@ -1,0 +1,13 @@
+{
+  "typescript_and_vite_passed": true,
+  "modules": 107,
+  "vite_seconds": 1.32,
+  "source_files_matched": 88,
+  "original_css_byte_identical": true,
+  "assets_sha256": {
+    "index-BdLOC5KP.js": "94034251d6dfdc5de03615a4c7d0fe546d5834aedc6a3943b019882fd0af5ceb",
+    "index-BEBH-Ai6.css": "1cb3438f14a262d4ad7efa4ad11153cf61867917aabf51e88a04c6655cffdb28"
+  },
+  "dependencies_installed": 0,
+  "dependencies_copied": 0
+}

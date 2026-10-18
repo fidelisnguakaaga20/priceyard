@@ -75,14 +75,15 @@ sources. Keep the original CSS and visible behavior unless specifically approved
 ## Smaller native PostgreSQL fixture
 
 Follow [the test harness guide](../tools/local-test/README.md) for exact commands.
-Only the pinned `postgres-recovery-20261017` fixture on literal127.0.0.1:55448
-(system identifier7697651361316763724) is permitted. The runner verifies the live
+The current pinned `postgres-paging-20261018` fixture is literal127.0.0.1:55449
+(system identifier7697910732590408300). The old recovery fixture is exhausted80/80
+and must remain stopped/intact. The runner verifies the live
 directory/system identity on every connection and rejects all other destinations.
 Never start the old oversized `postgres-revocation` fixture or touch the unrelated
 Windows PostgreSQL service. Do not supply production credentials.
 
 The runner has an exclusive lock and80-schema budget. Select one or two relevant
-methods with repeated `--test NAME` arguments plus `--recovery-cluster`. Current
+methods with repeated `--test NAME` arguments plus `--paging-cluster`. Current
 usage is in the latest progress entry/report. Each case retains its fresh schema,
 including failed setup evidence. Do not drop schemas, raise the budget, repeatedly
 run the whole suite or weaken identity checks. Prepare a fresh pinned empty
@@ -110,3 +111,11 @@ Formatting is not a substitute for TypeScript/build and browser checks.
 Read [application contracts](APPLICATION_CONTRACTS.md) before changing access,
 pricing, comparisons, account behavior or stored evidence. Keep unfinished owner
 decisions visible and separate from production readiness claims.
+
+Browser sessions now use protected HttpOnly cookies. Same-profile tabs share
+login/logout; use separate browser profiles/contexts to review independent roles.
+New browser JWTs are absent from localStorage/sessionStorage/document.cookie.
+Only the isolated55446 fixture permits non-Secure cookies. Production needs
+HTTPS/same-site cookie compatibility and supported cross-tab Web Locks; do not
+weaken this to make a hosted preview appear to work. Existing API bearer clients
+remain supported. Focused browser check:cookie_session_checks.mjs.

@@ -25,9 +25,10 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
-Latest verified: batch79,33 complete /3 partial or pending:
-07,20,35. PY-14 approved evidence safeguards are complete locally.
-Owner approved protected browser sessions07; implementation remains next.
+Latest verified: batch80,34 complete /2 partial or pending:
+20,35. Approved PY-07 protected browser sessions and PY-14 evidence safeguards
+are complete in the isolated application scope; operational/browser-hosting gates
+remain PY-35. Original designs/forms and all14 dashboard cards preserved.
 See docs/PRICE_CLAIM_EVIDENCE_APPROVAL.md and docs/SESSION_COOKIE_APPROVAL.md. PY-02 approved source-publication scope is complete locally:
 both original Admin Notes controls explain their public visibility; private
 source fields/access and historical evidence stay intact. Six-role backend,
@@ -48,7 +49,7 @@ checks, original price/source workflows, seven baseline views and all14 dashboar
 cards pass.87 build source hashes match; original CSS byte-identical. No data repair.
 Old recovery fixture80/80 remains stopped/intact. Fresh small native fixture
 postgres-paging-20261018 at127.0.0.1:55449, identifier7697910732590408300,
-uses --paging-cluster:14/80 schemas, stopped. Same12 connections/32MB buffers,
+uses --paging-cluster:16/80 schemas, stopped. Same12 connections/32MB buffers,
 fsync enabled/exclusive lock and identity guards. Build refuses its active port.
 Review controls: /__test__/admin-paging, /__test__/catalog-paging and
 /__test__/faq-audit-paging and /__test__/signal-paging on http://127.0.0.1:55446;
@@ -65,7 +66,7 @@ maximum3 new seven-day bonuses per rolling30 elapsed UTC days; existing days,
 qualification, further signups/referral counts and14-day child trials preserved.
 Full281 backend tests, UTC-boundary/rollback/native last-slot concurrency and real
 registration/dashboard browser checks pass. No new identity verification claims.
-Session/storage07 and claim evidence14 explicitly approved2026-10-18;14 verified79,07 not yet implemented.
+Session/storage07 and claim evidence14 explicitly approved2026-10-18; verified80/79 respectively.
 Live operational work35 remains unauthorized. PY-02 approved safeguards complete72.
 Owner policy and production gates stay explicit. Testing foundation PY-30 stays
 complete; new regression tests belong with their respective improvements.
@@ -408,7 +409,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-04 | Password reset and login revocation | Complete in batch 5; actual HTTP/browser and PostgreSQL reset/logout races passed |
 | PY-05 | Referral abuse protection | Owner-approved application scope complete78: atomic/duplicate-safe registration-reward-audit, maximum3 seven-day bonuses per referrer per rolling30 elapsed UTC days enforced under existing parent lock; exact boundary, failed-award rollback and concurrent last-slot signup verified. Further signups/14-day child trials/referral counts and all earned/purchased value preserved; existing dashboard/share explanation states limit. No inferred legacy awards or new identity verification; broader fraud elimination not claimed. Approval: docs/REFERRAL_ABUSE_DECISION.md; live clock/legacy review stays PY-35 |
 | PY-06 | Safe push notification destinations | Application-side complete in batch 13; known-provider/key validation, bounded TLS transport, no redirects; live provider compatibility remains operational verification |
-| PY-07 | Shared-device/session safety | Partial: server revocation, stale UI protection, possession-based push ownership/concurrent registration and bounded current-device logout cleanup verified; JS token storage/offline cleanup limits remain |
+| PY-07 | Shared-device/session safety | Approved local application scope complete80: browser HttpOnly cookies, exact Origin/session-bound CSRF, credentialed allowlisted CORS, no-store private responses, shared login quota, server logout/reset revocation, original RememberMe/90-day ceiling and validated same-expiry legacy conversion. Ten browser scenarios cover shared tabs/offline retry/stale responses/cookie-mutation locking; no weaker unsupported-browser fallback. Original forms/API bearer clients/push cleanup/CSV preserved. Browser-session restore settings, live HTTPS/CORS and supported-device/legacy cutover validation remain PY-35; offline remote revocation and XSS elimination not claimed |
 | PY-08 | Input/upload/request abuse bounds | Identified application-side bounds complete66: existing push/query/numeric/required-value/storage rules plus4MiB aggregate HTTP body,8KiB URL,64KiB headers before parsing/DB/provider work; declared/chunked/malformed lengths, disconnects and bounded fragment buffering tested. Global body budget bounds all submitted text; existing2MiB screenshot limit and valid fields unchanged. Share path matches existing100-character catalog storage. No historical rewrite or arbitrary new editorial character limits; production proxy/timeouts/distributed throttling remain PY-35 |
 | PY-09 | Concurrent security-action safety | Complete for identified reset/logout/last-Admin cases in batches 5/6; six PostgreSQL cases passed |
 | PY-10 | Spreadsheet export safety | Complete in batch 3; text/numeric regressions and original browser download/access checks passed |
@@ -3047,3 +3048,56 @@ Evidence:tools/local-test/evidence/batch-79-*.json. Exactly33 complete /3 partia
 pending:07,20,35. Next protected browser sessions, remaining full-history query
 bounds and local operational readiness evidence; live/provider/restore gates
 remain unauthorized. No production, push, merge or deployment.
+
+
+### Batch 80 - approved PY-07 protected browser sessions (2026-10-18)
+
+Continuede60cdc7. Explicit owner approval:docs/SESSION_COOKIE_APPROVAL.md. New
+browser-only login/Google/bootstrap/upgrade endpoints return noncredential
+CSRF/session metadata, never JWT. Host-only HttpOnly/Secure/SameSite=Lax cookies
+keep original90-day token maximum and RememberMe; unremembered is a browser-
+session cookie. Only literal127.0.0.1:55446 under APP_ENV=test permits HTTP.
+Existing bearer API routes/clients stay. Valid legacy JS tokens convert only after
+server validation, retaining the identical signed expiry, then are removed.
+
+Cookie writes require exact configured Origin and token-bound CSRF. Session IDs
+reject old-account requests after a cookie switch. Private/auth responses are
+no-store, including mounted API errors. Old/new login endpoints share5/min quota.
+Logout revokes server token and expires cookie; reset/version revocation still
+applies. Device view clears immediately offline, with a nonsecret pending marker
+that prevents automatic return and retries after reconnection. Existing bounded
+current-device push cleanup/other devices remain. Cross-tab Web Locks serialize
+cookie-changing requests so delayed logout responses cannot erase a new login.
+Unsupported browsers fail before sign-in with the existing error display rather
+than using an unsafe tab-only lock. Verify the target phone/browser matrix and
+HTTPS/same-site hosting under35 before release. Browser restore settings can retain
+session cookies; shared-device users should explicitly log out. No new DB fields.
+
+Browser races found/fixed:old bootstrap401 could acknowledge a newer logout
+marker; an older logout broadcast could cancel an explicit queued new sign-in.
+Deterministic regressions cover both. Test navigation now waits for the original
+logout-home transition and clicks the existing Log in link, preserving one document.
+The offline harness explicitly aborts API requests because routing can override
+Playwright offline emulation. Node APIRequest transport stayed forbidden; the
+negative replay uses the already-approved guarded page transport. New Google route
+was connected to the existing synthetic verifier after the guard blocked its first
+certificate lookup before DNS/network; no provider contacted/guard weakened.
+Original CSV download had a separate bearer fetch; now uses shared authenticated
+blob transport, preserving form/filename/content and Admin-only access.
+
+Verification:283 full backend tests pass35.342s (zero failures/errors/skips),
+versus124.786s verbose run. Reused stdout/stderr logs avoid console backpressure;
+no overlapping heavy test suites. Focused final native case2.172s covers cookie
+CSRF, reset/logout/replacement hashes, exact legacy expiry, shared quota, mounted
+no-store and production Secure behavior; fixture14->15 first run,15->16 final,
+stopped. Full suite preceded tiny mounted-cache fix; that fix and its added test
+pass in the final native case. TypeScript/Vite107 modules1.32s;88 source hashes
+match, original CSS byte-identical, no installs/dependency copies. Ten cookie
+browser scenarios pass, including delayed200/401, cross-tab queued sign-in,
+unsupported-lock refusal and offline retry. Original payment failure/recovery/
+replay, fabricated Google/password fallback/new14-day trial, reset/single-use,
+three push-cleanup cases, source privacy, price editing, CSV, seven baseline
+views and all14 full-total dashboard cards pass. External/production contacts0.
+Evidence:tools/local-test/evidence/batch-80-*.json. Exactly34 complete /2 partial-
+pending:20,35. Live cookie/provider/device/cutover/backup/rollout gates remain.
+No production, push, merge or deployment.

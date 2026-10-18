@@ -23,6 +23,23 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
 
 
+class BrowserLoginRequest(LoginRequest):
+    remember: bool = True
+
+
+class BrowserGoogleLoginRequest(GoogleLoginRequest):
+    remember: bool = True
+
+
+class BrowserUpgradeRequest(BaseModel):
+    remember: bool = True
+
+
+class BrowserSessionResponse(BaseModel):
+    session_id: str
+    csrf_token: str
+
+
 class ForgotPasswordRequest(BaseModel):
     email: EmailStr
 

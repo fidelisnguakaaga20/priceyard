@@ -1,0 +1,20 @@
+{
+  "before": {
+    "subscription": "free",
+    "end": null,
+    "history": 403,
+    "live_initiation": 503
+  },
+  "wrong_amount_rejected": true,
+  "activation_failure_keeps_pending_and_retry_recovers": true,
+  "valid_synthetic_event_credited": true,
+  "repeat_keeps_same_expiry": true,
+  "after": {
+    "subscription": "active",
+    "end": "2026-11-17",
+    "history": 200,
+    "live_initiation": 503
+  },
+  "original_dashboard_verified": true,
+  "production_connections": 0
+}

@@ -152,6 +152,12 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_browser_cookie_revocation_reset_and_legacy_transport(self):
+        spec = importlib.util.spec_from_file_location('local_browser_sessions', ROOT / 'backend/tests/test_browser_sessions.py')
+        cases = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cases)
+        cases.verify_browser_sessions(self, self.engine)
+
     def test_price_claim_evidence_matches_recorded_specs_and_preserves_history(self):
         spec = importlib.util.spec_from_file_location("local_price_claim_evidence", ROOT / "backend/tests/test_price_claim_evidence.py")
         cases = importlib.util.module_from_spec(spec)

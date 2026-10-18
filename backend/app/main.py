@@ -6,6 +6,7 @@ from slowapi.errors import RateLimitExceeded
 from app.config import get_settings
 from app.rate_limit import limiter
 from app.request_bounds import RequestBoundsMiddleware
+from app.services.browser_session_service import allowed_browser_origins, BrowserSessionCacheMiddleware
 from app.routes.activity_routes import router as activity_router
 from app.routes.admin_summary_routes import router as admin_summary_router
 from app.routes.audit_log_routes import router as audit_log_router
@@ -40,17 +41,14 @@ app = FastAPI(
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(RequestBoundsMiddleware)
+app.add_middleware(BrowserSessionCacheMiddleware)
 
-allowed_origins = [
-    origin.strip().rstrip("/")
-    for origin in settings.cors_origins.split(",")
-    if origin.strip()
-]
+allowed_origins = sorted(allowed_browser_origins())
 if allowed_origins:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=allowed_origins,
-        allow_credentials=False,
+        allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )

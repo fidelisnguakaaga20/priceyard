@@ -1,0 +1,10 @@
+{
+  "both_existing_notes_controls_labelled_public": true,
+  "accessible_hint_original_labels_preserved": true,
+  "legitimate_admin_source_prefill_preserved": true,
+  "public_prices_export_share_exclude_private_source": true,
+  "raw_source_history_public_notes_and_audits_unchanged": true,
+  "original_fields_and_mobile_layout": true,
+  "external_requests": 0,
+  "production_connections": 0
+}
