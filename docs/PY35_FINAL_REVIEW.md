@@ -6,6 +6,84 @@ No production services, credentials, customer data, migrations, provider sends,
 push, merge or deployment were used. Conditional deployment approval does not
 substitute for the required evidence.
 
+## Owner-confirmed hosting update - 2026-10-18
+
+These references were supplied by the owner from Render, not independently
+queried through production access. Repository: `fidelisnguakaaga20/priceyard`.
+
+| Setting | Backend | Frontend |
+| --- | --- | --- |
+| Render service | `priceyard-api` | `priceyard` |
+| Service ID | `srv-da6d9gqjnfac73e2sbfg` | `srv-da6ddb2jnfac73e39490` |
+| Public address | `https://priceyard-api.onrender.com` | `https://priceyard.onrender.com` |
+| Linked branch | `master` | `master` |
+| Deployed commit shown | `a9cf1b9` | `76dbd27` |
+| Root directory | `backend` | Not supplied; historical notes say `frontend` |
+| Auto-Deploy | **On Commit** | Not supplied; do not assume disabled |
+| Build command | `pip install -r requirements.txt && alembic upgrade head` | Not supplied |
+
+**Release blocker: backend builds automatically run migrations.** A push/merge to
+linked master can start a deployment and database changes before runtime health
+checks. Do not publish/merge candidate code or use a deployment/rebuild/rollback
+action while this remains unreviewed. No production setting was changed here.
+The different deployed commit labels are a compatibility question, not proof of
+a defect; obtain exact artifact/full-commit identities before selecting rollback.
+Neither label establishes the database's installed Alembic revision.
+
+Separate frontend/backend hosts require exact cookie, Origin/CORS and API routing
+verification; public HTTPS addresses alone do not close that gate. The owner has
+identified services/repository, but authenticated access, actual settings review,
+runtime compatibility, backup and provider verification remain outstanding.
+
+### Next information only: identify Supabase and backup availability
+
+Owner opens the existing project at `https://supabase.com/dashboard`. Provide
+only project name, project reference (the non-secret dashboard URL identifier),
+current plan and what **Database > Backups** shows:available backup date/time or
+unavailable. Do not share Connect strings, passwords, API keys, customer rows or
+unredacted settings screenshots. Do not restore/download/create anything yet.
+Official reference: https://supabase.com/docs/guides/platform/backups.
+
+After identifying the project, prepare a bounded read-only SQL review for owner
+approval: exact target/operator, read-only transaction, short query/lock timeouts,
+PostgreSQL version, Alembic revision and application schema/constraint/index/
+permission metadata; no customer-row selection, DDL, migration or app startup.
+Credentials stay in approved protected storage; no new role or grant without
+separate authorization. Metadata-only review cannot prove historical data quality
+or substitute for backup restoration. No SQL or production connection run here.
+
+### Required safe migration/backup/rollback sequence - not authorized or run
+
+1. Identify source/project and exact deployed artifacts. Approve and execute only
+   the scoped read-only compatibility review. Unknown/older populated revisions
+   stop for explicit migration review; never stamp or replay migrations blindly.
+2. Approve backup source/scope/operator, encryption and separate storage,
+   retention/recovery objectives, and an isolated restore target with sufficient
+   resources. A plan's backup listing is not recoverability evidence. Confirm
+   provider auth/roles/RLS/extensions/configuration and any Storage files required
+   for recovery:database backups do not contain Storage file contents. Free-plan
+   availability must be checked; no paid upgrade assumed or approved.
+3. Take a consistent real backup via an approved, version-compatible procedure;
+   protect temporary output and encrypt durable copies, retain integrity evidence,
+   verify retrieval/decryption, then restore to the explicitly approved isolated
+   empty target. No overwrite/clean/restore of production. Keep actual records out
+   of Git, chat and the synthetic-only test fixture. Disable provider egress,
+   notifications and scheduled jobs; verify protected data/constraints/security/
+   payment-value equivalence privately and record only redacted results.
+4. Using that verified isolated restoration, rehearse the exact reviewed migration
+   delta and compatible application rollback. Preserve all business and revocation
+   evidence. Do not assume Render code rollback reverses database changes; never
+   use a destructive downgrade or old backup to erase intervening transactions.
+5. Only after other release gates pass, review an explicit production change
+   proposal:control automatic deployment and decouple migrations from ordinary
+   builds, define operators/window/write and payment-reconciliation coordination,
+   fresh accepted backup, exact migration steps and stop/rollback thresholds.
+   Any change to Auto-Deploy/build settings, migration, push or deployment still
+   needs owner approval. Failed rehearsal or missing recovery blocks release.
+
+This update supplies requirements, not authorization to access customer records
+or run a backup. All nine live gates remain unrun; count stays35/36.
+
 ## Recovered state and confirmed fix
 
 Started from actual `5bce117438aae2c77fc735ffb787fb3dc5dd17f8` on
@@ -87,9 +165,9 @@ remote candidate publication are unverified. No remote fetch/push was performed.
 
 | Area | Missing information/access | How the owner can provide it securely |
 | --- | --- | --- |
-| Render | Workspace, exact frontend/backend service IDs/domains, linked branch, current runtime/build/start/proxy settings; authorized isolated hosted test target/operator | Log into Render yourself; share service names/IDs and redacted settings, or grant a supported least-privilege operator connection. Confirm auto-deploy cannot publish this branch. Do not alter live settings yet |
+| Render | Owner confirmed services/domains/master and migration-running backend build above. Still need workspace/operator access, frontend Auto-Deploy/build/root, current runtime/start/routing settings and isolated hosted test target | Share only remaining non-secret settings or supported least-privilege operator access. Backend Auto-Deploy is On Commit: no push/merge to master or setting changes now |
 | Supabase | Exact project reference, approved read-only revision/schema/permission/pooler preflight and operator; current compatibility unknown | Share project reference and approve a bounded metadata-only review separately. Keep any dedicated read-only connection in approved secret storage accessible only to the approved tool/operator; never paste its URL/password here |
-| GitHub | Access to the historically recorded repository `fidelisnguakaaga20/priceyard`; candidate branch is local and repository permissions/current remote state are unverified | Confirm the repository name; authorize the existing GitHub connection for only that repository if necessary. Publishing the reviewed branch requires separate approval; do not enable production auto-deploy |
+| GitHub | Owner confirmed `fidelisnguakaaga20/priceyard`; authenticated repository permissions/current remote state and full deployed commits remain unverified; candidate branch is local | Authorize the existing GitHub connection for only that repository if needed. No push/merge now: linked master automatically builds and migrates production |
 | Actual backup/rollback | Approved backup source, encrypted off-host destination/retrieval access, isolated restore target, operator, retention and recovery objectives; compatible rollback artifact | Choose the targets/operator and approve actual-backup handling separately. Use host secret storage and private encrypted files; share only storage references and redacted verification results, never a customer dump in chat |
 | Provider verification | Paystack TEST credentials and reachable nonproduction callback/webhook; Google test origin/client/accounts; test message sender and consenting recipients | Enter test-only configuration into approved protected storage yourself/operator; share only secure storage references, URLs and approved recipient identities. Never share account passwords, live keys or real cards |
 

@@ -25,6 +25,13 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest planning update:batch88 records owner-confirmed Render service IDs,
+repository/master links and deployed labels. Backend Auto-Deploy On Commit and
+build-time `alembic upgrade head` are explicit release blockers. Do not push/merge,
+rebuild, change production settings or run migrations. Next:owner supplies only
+Supabase project reference/plan/backup availability, then approves a bounded
+read-only compatibility review and separate actual-backup/isolated-restore scope.
+docs/PY35_FINAL_REVIEW.md records the sequence; no production gate passed.
 Latest verified: batch87,35 complete /1 partial or pending:35.
 Resumed actual5bce117 and preserved both interrupted expiry files before editing.
 Confirmed/fixed single-account expiry GET overwriting a concurrent renewal;
@@ -3407,3 +3414,30 @@ GitHub connector available but repo permissions/publication unverified; no remot
 fetch, service access, credentials/production data, migration, push, merge or deploy.
 35/36 complete, PY-35 partial; mandatory external release checks have NOT passed.
 Stop before deployment until approved evidence/backup/rollback prerequisites close.
+
+### Batch 88 - confirmed hosting references and migration release block
+
+Owner supplied Render backend priceyard-api/srv-da6d9gqjnfac73e2sbfg,
+https://priceyard-api.onrender.com, master/backend, deployed labela9cf1b9;
+Auto-Deploy On Commit; build invokes pip install and alembic upgrade head.
+Frontend priceyard/srv-da6ddb2jnfac73e39490,
+https://priceyard.onrender.com, master, deployed label76dbd27. Frontend
+Auto-Deploy/root/build remain unconfirmed. Repository confirmed by owner:
+fidelisnguakaaga20/priceyard. These are owner-reported, not independently fetched
+production facts; labels do not establish installed database revision.
+
+Updated final review/deployment plan with exact references, the risk that master
+push/merge triggers migrations during build, and remaining requirements. No
+production settings, connections, credentials, records or provider actions touched.
+Next information-only step:Supabase project name/reference, plan, backup listing.
+Read-only revision/schema/permissions review needs bounded target/operator approval;
+actual encrypted backup handling/isolated restoration need separate approval.
+Rehearse exact migration and compatible rollback against verified restoration
+before any proposed live change. Never treat code rollback as database rollback.
+Official Supabase backup guidance reviewed; database backup excludes Storage file
+contents, plan availability unconfirmed, no upgrade/purchase assumed.
+
+Documentation-only batch; diff/link/reference checks, no redundant application
+tests or build. Previous307 backend/five native/browser evidence retained;35/36
+complete, PY-35 partial and all nine live gates still unrun. No cloud project,
+production access, migration, settings changes, push, merge or deployment.

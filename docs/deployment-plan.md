@@ -5,6 +5,18 @@ directions below are retained as history; they do not authorize a push, migratio
 production connection or deployment. Current release remains blocked by the
 owner-approved gates in [OPERATIONAL_READINESS.md](OPERATIONAL_READINESS.md).
 
+Owner-confirmed hosting2026-10-18: repository fidelisnguakaaga20/priceyard;
+backend priceyard-api (srv-da6d9gqjnfac73e2sbfg), master/backend, deployed label
+a9cf1b9, Auto-Deploy On Commit. Build command runs
+`pip install -r requirements.txt && alembic upgrade head`.
+Frontend priceyard (srv-da6ddb2jnfac73e39490), master, deployed label76dbd27;
+frontend Auto-Deploy/root/build not yet supplied. These are owner-reported facts,
+not a production inspection. No push/merge/rebuild/setting change is authorized.
+Automatic build-time migrations are an explicit release blocker pending read-only
+compatibility evidence, actual encrypted backup/verified isolated restore, migration
+rehearsal, compatible rollback and separately approved release controls.
+Current details:[PY35_FINAL_REVIEW.md](PY35_FINAL_REVIEW.md).
+
 Status: Stage 22 IN PROGRESS by owner-approved change control.
 
 Approved deployment direction as of 2026-08-25:
