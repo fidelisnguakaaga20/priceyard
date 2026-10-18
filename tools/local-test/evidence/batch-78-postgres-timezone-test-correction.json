@@ -1,0 +1,16 @@
+{
+  "tests": 2,
+  "failures": 1,
+  "errors": 0,
+  "seconds": 2.975,
+  "cluster_identity_verified": true,
+  "production_contacts": 0,
+  "cluster_profile": "postgres-paging-20261018",
+  "schemas_before": 9,
+  "schema_budget": 80,
+  "single_native_suite": true,
+  "selected_tests": [
+    "test_referral_cap_keeps_signup_trial_earned_days_and_three_audited_awards",
+    "test_concurrent_referrals_cannot_both_consume_the_last_bonus_slot"
+  ]
+}

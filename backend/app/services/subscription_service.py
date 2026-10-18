@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from app.config import get_settings
 from app.models.subscription import Subscription
 from app.models.user import User
+from app.models.audit_log import AuditLog
 
 TRIAL_DURATION_DAYS = 14
 
@@ -243,6 +244,8 @@ def activate_paid_subscription(db: Session, subscription: Subscription, *, plan:
 
 
 REFERRAL_REWARD_DAYS = 7
+REFERRAL_REWARD_LIMIT = 3
+REFERRAL_REWARD_WINDOW_DAYS = 30
 
 
 def apply_referral_reward(db: Session, referrer: User, *, commit: bool = True) -> bool:
@@ -257,6 +260,18 @@ def apply_referral_reward(db: Session, referrer: User, *, commit: bool = True) -
     now = utc_now()
     trial_expired = apply_trial_expiry(subscription, now=now)
     paid_expired = apply_paid_expiry(subscription, now=now)
+    if subscription.status in {"trial", "free"}:
+        # The parent-account lock above serializes this check with registration's
+        # atomic award/audit commit. Count known awards only; never rewrite days
+        # or infer missing legacy evidence. The window uses elapsed UTC time.
+        recent = db.scalar(select(func.count(AuditLog.id)).where(
+            AuditLog.user_id == referrer.id, AuditLog.action == "referral.reward_granted",
+            AuditLog.table_name == "subscriptions",
+            AuditLog.created_at > now - timedelta(days=REFERRAL_REWARD_WINDOW_DAYS),
+            AuditLog.created_at <= now,
+        )) or 0
+        if recent >= REFERRAL_REWARD_LIMIT:
+            return False
     if subscription.status == "trial":
         current_end = subscription.trial_ends_at or now
         if current_end.tzinfo is None:

@@ -24,9 +24,15 @@ entitlement or overwrite an indefinite grant. See
 [the exact approval](PURCHASE_VALUE_APPROVAL.md) and
 [reconciliation operations](PAYMENT_RECONCILIATION.md).
 
-Keep the existing seven-day referral reward and its current registration
-qualification. Changing qualification, caps, verification requirements, renewal
-pricing or plan duration needs a separate owner decision.
+Keep the seven-day referral reward and current free/live-trial registration
+qualification. Owner approved at most three new bonuses per referrer in a rolling
+30 elapsed days (UTC); known reward audits enforce it under the parent-account
+lock. An award exactly30 days old no longer consumes a slot. Existing earned/
+purchased days stay; further referrals still register with their own14-day trials
+and count as referrals even when no bonus is available. Existing dashboard/share
+explanations state the cap. No guessed legacy awards or new identity checks.
+See [the approval](REFERRAL_ABUSE_DECISION.md). Further qualification/cap/verification,
+renewal pricing or plan duration changes need a separate owner decision.
 
 Current/history dropdowns retain their original labels but submit existing catalog
 IDs, distinguishing prefix names and same-named markets. Newly generated detail

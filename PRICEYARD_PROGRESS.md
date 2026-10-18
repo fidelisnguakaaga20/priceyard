@@ -25,8 +25,8 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
-Latest verified: batch77,31 complete /5 partial or pending:
-05,07,14,20,35. PY-02 approved source-publication scope is complete locally:
+Latest verified: batch78,32 complete /4 partial or pending:
+07,14,20,35. PY-02 approved source-publication scope is complete locally:
 both original Admin Notes controls explain their public visibility; private
 source fields/access and historical evidence stay intact. Six-role backend,
 native PostgreSQL and browser checks pass. Owner approved the exact scope in
@@ -46,7 +46,7 @@ checks, original price/source workflows, seven baseline views and all14 dashboar
 cards pass.87 build source hashes match; original CSS byte-identical. No data repair.
 Old recovery fixture80/80 remains stopped/intact. Fresh small native fixture
 postgres-paging-20261018 at127.0.0.1:55449, identifier7697910732590408300,
-uses --paging-cluster:9/80 schemas, stopped. Same12 connections/32MB buffers,
+uses --paging-cluster:13/80 schemas, stopped. Same12 connections/32MB buffers,
 fsync enabled/exclusive lock and identity guards. Build refuses its active port.
 Review controls: /__test__/admin-paging, /__test__/catalog-paging and
 /__test__/faq-audit-paging and /__test__/signal-paging on http://127.0.0.1:55446;
@@ -58,8 +58,11 @@ Market/Quality signals71, Buying/Sell-watch73, Storage/Cost74, Feedback75,
 Subscriptions76, Prices/flags77). PY-20 still partial for public full-history/query
 materialization; never truncate charts or historical records to claim completion.
 Owner answered "do the best option" to the explicit three-bonus rolling30-day
-PY-05 proposal in docs/REFERRAL_ABUSE_DECISION.md. Implement that local scope next;
-seven-day rewards, existing days and eligibility stay. Not implemented yet.
+PY-05 proposal in docs/REFERRAL_ABUSE_DECISION.md. Scope implemented/verified78:
+maximum3 new seven-day bonuses per rolling30 elapsed UTC days; existing days,
+qualification, further signups/referral counts and14-day child trials preserved.
+Full281 backend tests, UTC-boundary/rollback/native last-slot concurrency and real
+registration/dashboard browser checks pass. No new identity verification claims.
 Session/storage choices07 and movement/confidence14 retain owner-policy gates.
 Live operational work35 remains unauthorized. PY-02 approved safeguards complete72.
 Owner policy and production gates stay explicit. Testing foundation PY-30 stays
@@ -401,7 +404,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-02 | Confidential/restricted market information | Approved application scope complete72: existing premium boundaries, response allowlists and legacy audit redaction retain private evidence/Admin source access; owner-approved hints beside both original Notes controls explain public visibility and private source fields. Six-role/backend/native/browser checks cover prices/history/CSV/audits/shares and unchanged raw records. Public notes/generic categories/access unchanged; arbitrary confidential-text detection not claimed. Any production historical editorial review requires separate PY-35 authorization |
 | PY-03 | Google ownership and safe account linking | Application-side approved scope complete in batch 27: stable subject ownership, no email-only linking/overwrite, existing password/reset fallback and original trials; cryptographic/HTTP/PG/browser verified. Live Google popup/provider compatibility remains operational PY-35 |
 | PY-04 | Password reset and login revocation | Complete in batch 5; actual HTTP/browser and PostgreSQL reset/logout races passed |
-| PY-05 | Referral abuse protection | Partial: atomic registration/reward/audit, duplicate-registration safety and concurrent seven-day reward preservation verified in batch 20; qualification/abuse-cap changes require approval and remain unchanged |
+| PY-05 | Referral abuse protection | Owner-approved application scope complete78: atomic/duplicate-safe registration-reward-audit, maximum3 seven-day bonuses per referrer per rolling30 elapsed UTC days enforced under existing parent lock; exact boundary, failed-award rollback and concurrent last-slot signup verified. Further signups/14-day child trials/referral counts and all earned/purchased value preserved; existing dashboard/share explanation states limit. No inferred legacy awards or new identity verification; broader fraud elimination not claimed. Approval: docs/REFERRAL_ABUSE_DECISION.md; live clock/legacy review stays PY-35 |
 | PY-06 | Safe push notification destinations | Application-side complete in batch 13; known-provider/key validation, bounded TLS transport, no redirects; live provider compatibility remains operational verification |
 | PY-07 | Shared-device/session safety | Partial: server revocation, stale UI protection, possession-based push ownership/concurrent registration and bounded current-device logout cleanup verified; JS token storage/offline cleanup limits remain |
 | PY-08 | Input/upload/request abuse bounds | Identified application-side bounds complete66: existing push/query/numeric/required-value/storage rules plus4MiB aggregate HTTP body,8KiB URL,64KiB headers before parsing/DB/provider work; declared/chunked/malformed lengths, disconnects and bounded fragment buffering tested. Global body budget bounds all submitted text; existing2MiB screenshot limit and valid fields unchanged. Share path matches existing100-character catalog storage. No historical rewrite or arbitrary new editorial character limits; production proxy/timeouts/distributed throttling remain PY-35 |
@@ -2967,3 +2970,47 @@ recommended local three-bonus/rolling30-day PY-05 scope; documented exact decisi
 in docs/REFERRAL_ABUSE_DECISION.md, not yet implemented. Next batch implements and
 tests it without reducing historical bonuses, purchased days or signup access.
 Other policy/production gates remain. No production, push, merge or deployment.
+
+
+### Batch 78 - approved PY-05 rolling referral cap (2026-10-18)
+
+Continued6f0b14c. Owner answered "do the best option" to the explicit recommended
+three-bonus rolling30-day proposal; approval recorded before implementation in
+docs/REFERRAL_ABUSE_DECISION.md. Existing seven-day reward and registration/free-
+or-live-trial eligibility remain. Under the parent-account lock, count only known
+successful reward audits within30 elapsed UTC days (strictly after the lower
+boundary, through now); grant at most3. Current registration/reward/audit stays
+atomic. Beyond the cap, new people still register/get14-day trials and referral
+counts increase. No old award/days/purchased time removed or legacy history guessed.
+Existing dashboard/share explanation states cap and eligibility; forms/layout,
+summary fields, all14 Admin cards, prices and subscription plan rules stay.
+
+Verification:
+- Four focused cases passed1.838s after correcting test UTC normalization. Full281
+  backend tests passed37.270s, zero failures/errors/skips, before that test-only
+  correction. Exact30-day boundary/microsecond, actor/action/table scope, existing
+  free/trial/paid/expired/cancelled value/staff roles and failed-third-award rollback
+  pass. Five signups produce only3 bonuses with all child trials/referrals intact.
+- First native flow assertion incorrectly stripped WAT/UTC offsets, comparing the
+  same instant as different wall times. Preserved failed evidence and corrected
+  only the test to compare UTC instants. Concurrent last-slot test already passed.
+  Re-run both cases passed2.845s: two simultaneous children both register/get14-day
+  trials; only one consumes the final available slot, preserving all prior days.
+  Pinned55449 schemas9->11 retained correction run,11->13 successful; stopped before
+  build. No application timestamp conversion, historical rewrite or migration.
+- TypeScript/Vite passed106 modules1.11s.87 source/public/config hashes match reused
+  snapshot; original CSS byte-identical; no dependencies installed/copied.
+- Original referral-link UI signup plus four total browser referrals pass: first
+  three add21 days; fourth succeeds, counts as a referral and retains14-day trial
+  without another bonus. Dashboard/share text state limit; mobile375px preserved.
+  No message sent. Seven baseline views and all14 dashboard full totals/outage
+  recovery pass. Heavy phases/browser runs sequential, no external/production access.
+
+Evidence: tools/local-test/evidence/batch-78-*.json. Exactly32 complete /4 partial-
+pending:07,14,20,35. Approved Admin pagination16/16 complete. PY-07 storage/session
+and PY-14 movement/confidence policy choices need concrete owner approvals before
+behavior changes. PY-20 full public-history/query materialization remains, with
+no chart/history truncation approval. PY-35 production/provider/restore/rollout,
+application/database clock alignment and legacy reward evidence review remain
+unauthorized. Local cap does not prove unique human identities/eliminate all fraud.
+No production, push, merge or deployment. Resume these unfinished scopes only.

@@ -111,7 +111,7 @@ export function DashboardPage() {
       <article className="card">
         <span className="eyebrow">Invite a friend</span>
         <h2>Get {referral.reward_days} extra trial days per referral</h2>
-        <p>Share your link. When someone registers with it, you get {referral.reward_days} extra trial days automatically.</p>
+        <p>Share your link. While you have free access or an active trial, each registration can add {referral.reward_days} trial days, up to 3 bonuses in any 30 days. Existing earned days stay yours.</p>
         <dl className="data-list compact"><div><dt>Your referral code</dt><dd>{referral.referral_code}</dd></div><div><dt>People referred so far</dt><dd>{referral.referred_count}</dd></div></dl>
         <div className="button-row">
           <button type="button" className="button button-small button-secondary" onClick={() => void copyReferralLink()}>{copied ? "Link copied!" : "Copy referral link"}</button>

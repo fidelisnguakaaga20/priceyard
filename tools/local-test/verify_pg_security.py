@@ -152,6 +152,45 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_referral_cap_keeps_signup_trial_earned_days_and_three_audited_awards(self):
+        spec = importlib.util.spec_from_file_location("local_referral_cap", ROOT / "backend/tests/test_referral_cap.py")
+        cases = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cases)
+        cases.verify_referral_cap_flow(self, self.engine)
+
+    def test_concurrent_referrals_cannot_both_consume_the_last_bonus_slot(self):
+        Base.metadata.create_all(self.engine)
+        now = datetime.now(timezone.utc)
+        with Session(self.engine) as db:
+            parent = User(full_name="Synthetic last-slot referrer", email="cap-last-slot@example.com",
+                          password_hash="unused", role="free_user", referral_code="CAPLAST")
+            parent.subscription = build_trial_subscription(user=parent, now=now)
+            parent.subscription.trial_ends_at += timedelta(days=14)
+            db.add(parent); db.flush(); parent_id = parent.id; original_end = parent.subscription.trial_ends_at
+            for _ in range(2):
+                db.add(AuditLog(user_id=parent.id, action="referral.reward_granted", table_name="subscriptions",
+                    record_id=parent.subscription.id, created_at=now-timedelta(hours=1), new_value={"bonus_days":7}))
+            db.commit()
+        barrier = threading.Barrier(2); outcomes = []
+        def worker(index):
+            with Session(self.engine) as db:
+                barrier.wait(timeout=10)
+                try:
+                    child = register_user(db, RegisterRequest(full_name="Synthetic last-slot child",
+                        email=f"cap-race-{index}@example.com", password="PriceYardDemo8!", referral_code="CAPLAST"))
+                    outcomes.append((201, child.subscription.trial_ends_at-child.subscription.trial_started_at))
+                except BaseException as error: db.rollback(); outcomes.append((type(error).__name__, None))
+        threads = [threading.Thread(target=worker, args=(index,)) for index in range(2)]
+        for thread in threads: thread.start()
+        for thread in threads: thread.join(15)
+        self.assertFalse(any(thread.is_alive() for thread in threads))
+        self.assertEqual(outcomes, [(201,timedelta(days=14)), (201,timedelta(days=14))])
+        with Session(self.engine) as db:
+            parent = db.get(User, parent_id)
+            self.assertEqual(parent.subscription.trial_ends_at, original_end+timedelta(days=7))
+            self.assertEqual(len(db.scalars(select(User).where(User.referred_by_id == parent_id)).all()), 2)
+            self.assertEqual(len(db.scalars(select(AuditLog).where(AuditLog.user_id == parent_id, AuditLog.action == "referral.reward_granted")).all()), 3)
+
     def test_price_flag_pages_preserve_all_statuses_sources_counts_and_latest_pair(self):
         spec = importlib.util.spec_from_file_location("local_price_admin_paging", ROOT / "backend/tests/test_price_admin_paging.py")
         cases = importlib.util.module_from_spec(spec)
