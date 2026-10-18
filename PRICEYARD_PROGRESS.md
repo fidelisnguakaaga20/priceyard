@@ -25,8 +25,12 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
-Latest verified: batch80,34 complete /2 partial or pending:
-20,35. Approved PY-07 protected browser sessions and PY-14 evidence safeguards
+Latest verified: batch81,35 complete /1 partial or pending:35.
+PY-20 committed558f756eea2eb7db727708b9a72f81e5f40fd5a7 successfully before
+advancing this count. History uses one ordered query and100-row ORM batches,
+without truncation. Browser memory still scales with the selected full result;
+this is not an infinite-client or production-load guarantee.
+Approved PY-07 protected browser sessions and PY-14 evidence safeguards
 are complete in the isolated application scope; operational/browser-hosting gates
 remain PY-35. Original designs/forms and all14 dashboard cards preserved.
 See docs/PRICE_CLAIM_EVIDENCE_APPROVAL.md and docs/SESSION_COOKIE_APPROVAL.md. PY-02 approved source-publication scope is complete locally:
@@ -49,7 +53,7 @@ checks, original price/source workflows, seven baseline views and all14 dashboar
 cards pass.87 build source hashes match; original CSS byte-identical. No data repair.
 Old recovery fixture80/80 remains stopped/intact. Fresh small native fixture
 postgres-paging-20261018 at127.0.0.1:55449, identifier7697910732590408300,
-uses --paging-cluster:16/80 schemas, stopped. Same12 connections/32MB buffers,
+uses --paging-cluster:18/80 schemas, stopped after81. Same12 connections/32MB buffers,
 fsync enabled/exclusive lock and identity guards. Build refuses its active port.
 Review controls: /__test__/admin-paging, /__test__/catalog-paging and
 /__test__/faq-audit-paging and /__test__/signal-paging on http://127.0.0.1:55446;
@@ -422,7 +426,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-17 | Correct market-detail loading | Complete for identified loading races/combined-failure defect in batch 16; obsolete commodity/account responses ignored and independent successful sections retained |
 | PY-18 | Accurate account/payment/access messages | Complete for identified account/expiry/callback defects in batches 4/11/19; verified return refreshes access, unconfirmed return never claims payment received in title |
 | PY-19 | Existing FAQ draft/hide/publish management | Complete in batch 12; hidden drafts remain available to Admin across reload, public publication boundary verified |
-| PY-20 | Bounded queries with accessible historical records | Partial: approved Admin pagination complete77 for16/16 lists, full snapshot counts, complete streaming legacy arrays, original access/sources/filters/actions, all-account expiry under renewal-safe locks and global latest-pair price prefill retained. Current ranking/dashboard/history metadata/commodity scopes/CSV earlier verified. Public full-history/query materialization remains; never truncate chart/history. Scope: docs/ADMIN_LIST_PAGING_APPROVAL.md |
+| PY-20 | Bounded queries with accessible historical records | Identified application query scope complete81, committed558f756:16/16 approved Admin pages/full totals/complete legacy streams; current ranking/dashboard/metadata/CSV/commodity scopes verified earlier. Public full history now uses one ordered query and100-row ORM batches, unchanged filters/access/public allowlist and cursor/session cleanup. All251 approved rows retained in native/browser tests including mobile; raw history unchanged. Browser memory/output still scales with selected history size; no infinite-client or production-load certification. No public pagination or chart truncation |
 | PY-21 | Reliable independent alerts | Application-side identified channel dependency complete in batch 24: failed email no longer skips push/WhatsApp; per-user/channel failures isolated; existing deduplication/count semantics retained. Delivery/retry operations remain PY-35 |
 | PY-22 | Efficient loading and accurate dashboard totals | Complete for identified dashboard scope in batch 29: all 14 original metrics preserved; one Admin-only aggregate API/DB snapshot, zero entity hydration; backend/PG/browser totals and outage recovery verified |
 | PY-23 | Preserve layout while fixing mobile overflow | Complete for identified original critical-layout/price-card overflow scope in batches 42/43: 78 normal and twelve long-name viewport checks, 320–1366px, Easy reading both modes; ordinary card/badge geometry and all fourteen Admin cards preserved |
@@ -3101,3 +3105,36 @@ views and all14 full-total dashboard cards pass. External/production contacts0.
 Evidence:tools/local-test/evidence/batch-80-*.json. Exactly34 complete /2 partial-
 pending:20,35. Live cookie/provider/device/cutover/backup/rollout gates remain.
 No production, push, merge or deployment.
+
+### Batch 81 - PY-20 complete history streaming (2026-10-18)
+
+Continued08c9e38. Complete JSON history uses one ordered query, scalar catalog
+joins and100-row ORM fetch batches. Existing active/approved/outdated rules,
+catalog IDs/text/WAT-date/movement/time filters, chronological time/ID order,
+entitlement and public response schema remain. Owned cursor/session closes on
+completion, query failure, disconnect and cancellation. No history/chart cap,
+public pagination, design change, new measurement or record rewrite.
+
+Previously verified:6 existing access tests and3 new history cases; full286
+backend tests35.733s with0 failures/errors/skips. Full251-row preservation,
+one SQL query, first batch<=100, peak hydrated prices<=200 during batch turnover,
+privacy, WAT filtering, missing measurements and failure cleanup pass. Native
+first run rejected a test-only13-character referral code against VARCHAR12;
+corrected only the fixture code, retained failed evidence/schema16->17. Focused
+rerun passes1.191s,17->18/80 schemas, cluster stopped. No schema changes.
+
+Browser:251 desktop rows/mobile cards, full ordered response, original market/
+time filters, no-store/source privacy and unchanged current prices pass. Fixed
+249-record add-on uses original Egusi/Kwali/1bag/null size/type, older timestamps.
+Fresh original seven-workflow baseline, all14 dashboard totals/outage recovery
+and CSV pass; external/production contacts0. No frontend change or redundant
+build; last validated80 snapshot remains. Browser still renders the complete
+selected result and scales with its size; this is not unlimited-load evidence.
+
+The next commit attempt was not executed because automatic approval review hit
+the usage limit; no unsafe-action determination. On resume, inspected actual diff,
+clean whitespace and saved reports without repeating passed tests. Source/tests/
+evidence committed558f756eea2eb7db727708b9a72f81e5f40fd5a7, then confirmed clean
+Git status and unchanged master76dbd275/backup25899101 before advancing35/36.
+Evidence:tools/local-test/evidence/batch-81-*.json. PY-35 remains the only partial
+item. No production, push, merge or deployment.
