@@ -25,19 +25,20 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
-Latest verified: batch66,29 complete /7 partial or pending:
-02,05,07,13,14,20,35. PY-08 finite application input-bound scope is complete:
-HTTP bodies capped4MiB before parsing/DB/providers, URL8KiB and headers64KiB;
-existing decoded2MiB screenshots still save unchanged. Original field/storage
-limits stay; all submitted text is within the global byte budget. No truncation
-or historical rewrites. Malformed lengths/chunked overflow fail before writes.
-Full252 backend tests pass; one focused native case proves zero DB/provider
-work on rejection. Browser request/screenshot, original baseline/feedback/
-checkout/all14 dashboard checks pass.85 frontend source hashes unchanged since
-verified65 build; original CSS identical. Small native fixture76/80, stopped.
+Latest verified: batch67,29 complete /7 partial or pending:
+02,05,07,13,14,20,35. PY-29 complete65; PY-08 complete66. Approved PY-20 paging
+now covers Users and Payments:100 records/page, full snapshot totals, original
+forms/columns/styles, refresh/back/edit safety and complete streamed legacy APIs.
+All205 synthetic records reachable; no arbitrary truncation or historical edits.
+Full258 backend tests, one focused native paging/stream case and seven paging
+browser checks pass; original last-Admin/access/baseline and all14 dashboard
+totals verified with both small and205-record fixtures. TypeScript/Vite passed,
+86 source/config hashes match reused build, original CSS byte-identical.
+Small native fixture77/80, stopped. Local review sample is disposable, fixed205
+users/payments: http://127.0.0.1:55446/__test__/admin-paging (Load synthetic sample).
 Owner approved docs/ADMIN_LIST_PAGING_APPROVAL.md on2026-10-18:100-record Admin
 pages with Previous/Next, complete totals/records, original forms/styles/cards.
-Next: implement that PY-20 scope in small list batches; public history/charts
+Next: remaining approved Admin lists in small PY-20 batches; public history/charts
 remain separate and unchanged. PY-29 complete65; no repeated identity work.
 owner-policy/production gates stay explicit. Testing foundation PY-30 stays
 complete; new regression tests belong with their respective improvements.
@@ -393,7 +394,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-17 | Correct market-detail loading | Complete for identified loading races/combined-failure defect in batch 16; obsolete commodity/account responses ignored and independent successful sections retained |
 | PY-18 | Accurate account/payment/access messages | Complete for identified account/expiry/callback defects in batches 4/11/19; verified return refreshes access, unconfirmed return never claims payment received in title |
 | PY-19 | Existing FAQ draft/hide/publish management | Complete in batch 12; hidden drafts remain available to Admin across reload, public publication boundary verified |
-| PY-20 | Bounded queries with accessible historical records | Partial: current-price DB ranking23, single-query dashboard29, protected DISTINCT history metadata32, SQL commodity scoping47–49, streamed complete CSV60; full JSON history/other lists still pending. Owner approved100-record Admin pages/Previous-Next on2026-10-18 in docs/ADMIN_LIST_PAGING_APPROVAL.md; implement in small batches with full totals/records and compatible APIs, preserving charts/public history |
+| PY-20 | Bounded queries with accessible historical records | Partial: current-price DB ranking23, dashboard29, DISTINCT history metadata32, commodity scoping47–49, full CSV streaming60; owner-approved100-record Users/Payments pages67 use one DB snapshot for complete counts/rows and bounded legacy JSON streaming, original actions/styles retained. Remaining approved Admin lists and full public JSON/history still pending; no chart/history truncation. Scope: docs/ADMIN_LIST_PAGING_APPROVAL.md |
 | PY-21 | Reliable independent alerts | Application-side identified channel dependency complete in batch 24: failed email no longer skips push/WhatsApp; per-user/channel failures isolated; existing deduplication/count semantics retained. Delivery/retry operations remain PY-35 |
 | PY-22 | Efficient loading and accurate dashboard totals | Complete for identified dashboard scope in batch 29: all 14 original metrics preserved; one Admin-only aggregate API/DB snapshot, zero entity hydration; backend/PG/browser totals and outage recovery verified |
 | PY-23 | Preserve layout while fixing mobile overflow | Complete for identified original critical-layout/price-card overflow scope in batches 42/43: 78 normal and twelve long-name viewport checks, 320–1366px, Easy reading both modes; ordinary card/badge geometry and all fourteen Admin cards preserved |
@@ -403,7 +404,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-27 | Consistent existing editing/password inputs | Complete for identified scope: feedback selection in batch26, existing Unicode/72-byte password rules and reset validation in batch46, owner-approved six Admin edit forms in batches50–52. Saved values/costs, one-field edits, reload, explicit clearing, switching/unknown/blank IDs and creation verified in61 actual browser checks |
 | PY-28 | Historical record preservation | Current application-side scope complete in batch59: read-only legacy/unversioned preflight before migration steps, empty/reviewed0021-to0022 paths, unchanged raw history/catalog IDs/active flags/cost links/sources/audits, preserved paid/payment records and0022 downgrade refusal verified. No guesses to repair already-changed historical data; production backup/restore/rollout and any repairs require owner approval under PY-35 |
 | PY-29 | Stable identities and dependent records | Application-side identified scope complete65: catalog IDs/referenced deletion/atomic audits34; duplicate/rename/rollback races62; locked parent-price and same-commodity/market observation links64; exact existing-ID current/history filters and rename-safe detail/share links65. Current shares never publish historical amounts. Original labels, measurements and all records preserved; no automatic merge, legacy alias guesses, rewrites or invented cost units. Historical repairs require separate PY-35 approval |
-| PY-30 | Isolated automated/browser verification | Identified local testing-foundation/coverage scope complete63: criteria/workflow map/evidence retained; full252 backend tests66, full40 native baseline47 plus later focused cases (scope race64, exact identity65, request boundary66), six isolation probes63; original baseline/filter/navigation/detail/14-card browser65. Native76/80 schemas stopped, phases serialized,85 source hashes match reused build; original CSS unchanged, no dependency copies. Not100% coverage or production/provider certification; future tests stay with remaining items, operational checks remain PY-35 |
+| PY-30 | Isolated automated/browser verification | Identified local testing-foundation/coverage scope complete63: criteria/workflow map/evidence retained; full258 backend tests67, full40 native baseline47 plus later focused scope/identity/request/paging cases, six isolation probes63; original baseline/access/last-Admin/14-card browser67 and205-row paging. Native77/80 schemas stopped, phases serialized,86 source hashes match reused build; original CSS unchanged, no dependency copies. Not100% coverage or production/provider certification; future tests stay with remaining items, operational checks remain PY-35 |
 | PY-31 | Confirmed payment activation and recovery | Application-side approved scope complete in batch58: atomic confirmation, owner callback and explicit bounded/resumable reconciliation for missed webhook/return; dry-run default, strict existing evidence/activation, single PG worker, error isolation, replay safety and purchased-time/manual-grant preservation verified. Live scheduling/checkpoints/monitoring and ambiguous legacy repairs require owner approval under PY-35 |
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches 14/21: carry forward dated paid/trial time; preserve indefinite grants, block new checkout and hold/recover old purchases without consuming days |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
@@ -2458,3 +2459,51 @@ No expansion of completed null-guard/account/UI scopes is needed.
   paging code included in66. Start with Users/Payments; public history/charts
   remain separate. Evidence: tools/local-test/evidence/batch-66-*.json.
 - Count:29 complete /7 partial or pending:02,05,07,13,14,20,35.
+
+
+### Batch 67 ? approved PY-20 Users/Payments paging (2026-10-18)
+
+- Started froma512630. Owner approved the exact Admin paging scope recorded in
+  docs/ADMIN_LIST_PAGING_APPROVAL.md. First two lists only: Users and Payments.
+  Remaining lists/public history are not counted complete.
+- New Admin-only /users/page and /payments/page return at most100 original-schema
+  records. A single CTE statement returns full count and selected rows from one
+  DB snapshot, even for an empty/out-of-range page. Original sort plus ID tie
+  breaker; no mutation, new DB field, migrations or hidden100-record total cap.
+- Existing full-list APIs still return complete arrays through schema-checked
+  100-record native cursor batches. Private password/provider fields excluded;
+  raw evidence unchanged. Each stream owns and closes its cursor/session after
+  completion, query/send failure or cancellation. CSV implementation untouched.
+- Original Users total uses the full count. Existing role/status controls stay;
+  edit refresh keeps page, URL retains position on browser refresh/back, old
+  responses/errors cannot overwrite a new page, and empty last pages move back.
+  Payments remains read-only with original columns. Original CSS unchanged.
+  No controls appear for short lists; approved Previous/Next appear above100.
+- Six focused paging/stream/lifecycle tests passed1.679s. Full258 backend tests
+  passed84.677s, zero failures/errors/skips. One native case covers both205-row
+  resources, all pages/ties/full counts, one-query snapshots, bounded ORM loads,
+  complete legacy streams and unchanged raw rows. Passed3.331s; small pinned
+  fixture77/80 schemas retained, stopped before build/browser. No full native rerun.
+- TypeScript/Vite passed105 modules/4.04s using the existing snapshot, no installs
+  or dependency copies.86 source/config hashes match build. CSS matches verified
+  original asset; a typo in an ad-hoc expected-hash assertion was corrected by
+  comparing against the existing verified65 artifact, without rebuilding.
+- Browser: seven paging scenarios passed for205 fabricated users/payments,100
+  visible records maximum; all IDs reachable, full totals, edit/refresh/back/
+  obsolete response+error, out-of-range page and375px original cards/layout.
+  Original last-Admin rejection, full role/status/revocation/grant/audit workflow,
+  seven baseline workflows and14 dashboard totals/one-query/outage recovery pass.
+  Dashboard verified with both205-record and original small fixtures. External/
+  production connections zero; phases sequential, one browser at a time.
+- Disposable testing wrapper has a fixed-size sample control at
+  http://127.0.0.1:55446/__test__/admin-paging. Its Load synthetic sample button
+  and original demo login were browser-verified. Only in-memory example.com
+  accounts/pending fake payments; no arbitrary fixture sizes, SQL or connections.
+  Restarting preview resets sample. Current preview has the205-row sample for
+  review; reseed before unrelated tests. No sample fields/markets/measurements
+  added to application source or real business data.
+- API source reference updated108 operations. Evidence:
+  tools/local-test/evidence/batch-67-*.json. Counts remain29 complete /7 partial
+  or pending:02,05,07,13,14,20,35. PY-20 next: other approved Admin lists; all
+  public history/chart results remain unchanged and separate. Master/backup
+  preserved; no production access, push, merge or deployment.

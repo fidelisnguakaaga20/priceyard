@@ -1,12 +1,13 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query, Response
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.user import User
 from app.schemas.user_schema import AdminUserUpdate, UserResponse
 from app.services.audit_service import create_audit_log, snapshot_model
+from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, stream_admin_records
 from app.services.subscription_service import apply_paid_expiry, apply_trial_expiry
-from app.services.user_service import get_user, list_users, prepare_user_update, update_user
+from app.services.user_service import get_user, prepare_user_update, update_user
 from app.utils.permissions import require_roles
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -16,8 +17,17 @@ router = APIRouter(prefix="/users", tags=["users"])
 def get_users(
     db: Session = Depends(get_db),
     _: User = Depends(require_roles("admin")),
-) -> list[User]:
-    return list_users(db)
+) -> Response:
+    return AdminJSONResponse(stream_admin_records(db.get_bind(), User, UserResponse, order=(("id", False),)))
+
+
+@router.get("/page", response_model=AdminRecordPage[UserResponse])
+def get_users_page(
+    offset: int = Query(default=0, ge=0, le=2_147_483_647),
+    db: Session = Depends(get_db),
+    _: User = Depends(require_roles("admin")),
+) -> AdminRecordPage[UserResponse]:
+    return admin_record_page(db, User, UserResponse, offset=offset, order=(("id", False),))
 
 
 @router.get("/{user_id}", response_model=UserResponse)

@@ -29,7 +29,7 @@ try{
  const row=admin.page.locator('.admin-table-view tbody tr').filter({hasText:'free@example.com'});
  async function userAction(action){
   const saved=admin.page.waitForResponse(r=>r.url()===origin+'/api/users/'+id&&r.request().method()==='PATCH');
-  const reloaded=admin.page.waitForResponse(r=>r.url()===origin+'/api/users'&&r.request().method()==='GET');
+  const reloaded=admin.page.waitForResponse(r=>r.url()===origin+'/api/users/page?offset=0'&&r.request().method()==='GET');
   await action();assert.equal((await saved).status(),200);await (await reloaded).finished();
   await admin.page.locator('.status-box.success').getByText('User updated.',{exact:true}).waitFor();
   await row.waitFor();

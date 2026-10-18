@@ -349,6 +349,31 @@ async def offline_price_controls(request):
         return JSONResponse(saved_copy_demo)
     return HTMLResponse('''<!doctype html><html><head><title>Local saved-price simulation</title></head><body style="font:18px system-ui;max-width:760px;margin:32px auto;padding:16px"><h1>Local saved-price simulation</h1><p>Fabricated local prices only. This control simulates saved-copy response metadata so you can review the approved warning in the original interface. Actual worker caching is tested separately with an isolated fake network; native service workers stay disabled here.</p><button onclick="mode(true)">Show simulated saved copy</button> <button onclick="mode(false)">Restore normal responses</button><p><a href="/prices" target="_blank">Open Current Prices</a> and reload after choosing a mode.</p><p id="result" role="status"></p><script>async function mode(enabled){const r=await fetch('/__test__/offline-prices',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({enabled})});if(!r.ok)throw Error('Control failed');document.querySelector('#result').textContent=enabled?'Saved-copy simulation enabled. Reload Current Prices.':'Normal responses restored. Reload Current Prices.'}</script></body></html>''')
 
+async def admin_paging_fixture(request):
+    # Fixed-size, fabricated accounts/payments only. No caller-supplied SQL,
+    # connection details, identities or arbitrary fixture-size parameters.
+    if request.method == "GET":
+        return HTMLResponse('''<!doctype html><html><head><title>Local Admin paging sample</title></head><body style="font:18px system-ui;max-width:760px;margin:32px auto;padding:16px"><h1>Local Admin paging sample</h1><p>Load205 fabricated users and205 pending payments in the disposable local preview to try Previous/Next. The sample stays in memory. Restarting the synthetic preview clears it.</p><p>Demo login: <b>admin@example.com</b>, password <b>PriceYardDemo8!</b>.</p><button id="load" onclick="seed()">Load synthetic sample</button><p id="result" role="status"></p><p><a href="/login">Log in</a> · <a href="/admin/users">Open Users</a> · <a href="/admin/payments">Open Payments</a></p><script>async function seed(){const r=await fetch('/__test__/admin-paging',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({seed:true})});const data=await r.json();document.querySelector('#result').textContent=r.ok?'205 synthetic users and205 synthetic payments ready.':data.detail;document.querySelector('#load').disabled=r.ok;}</script></body></html>''')
+    if await request.json() != {"seed": True}:
+        return JSONResponse({"detail": "Expected synthetic seed control"}, status_code=422)
+    from sqlalchemy import func, select
+    with Session(engine) as db:
+        users = db.scalar(select(func.count()).select_from(User))
+        payments = db.scalar(select(func.count()).select_from(Payment))
+        if users > 205 or payments > 205:
+            return JSONResponse({"detail": "Reseed preview before this check"}, status_code=409)
+        now = datetime.now(timezone.utc)
+        for index in range(205 - users):
+            db.add(User(full_name=f"Synthetic paging {index:03}", email=f"paging-{index:03}@example.com",
+                        password_hash="not-a-login-credential", role="free_user", referral_code=f"UIPAGE{index:03}", created_at=now))
+        owner = db.scalar(select(User.id).where(User.email == "admin@example.com"))
+        for index in range(205 - payments):
+            db.add(Payment(user_id=owner, reference=f"py_ui_paging_{index:03}", plan="monthly", amount=2500,
+                           currency="NGN", status="pending", created_at=now))
+        db.commit()
+    return JSONResponse({"users": 205, "payments": 205, "synthetic_only": True, "reseed_after_check": True})
+
+
 class LocalOnly:
     def __init__(self, app):
         self.app = app
@@ -394,7 +419,7 @@ class LocalOnly:
         else:
             await self.app(scope, receive, secured)
 
-preview = LocalOnly(Starlette(routes=[Route("/__test__/status", status), Route("/__test__/reconciliation", reconciliation_control, methods=["POST"]), Route("/__test__/offline-prices", offline_price_controls, methods=["GET", "POST"]), Route("/__test__/google-mode", set_google_mode, methods=["POST"]), Route("/__test__/alerts", notification_controls, methods=["GET", "POST"]), Route("/__test__/inbox", inbox), Route("/__test__/controls", controls), Route("/__test__/push", push_controls), Route("/__test__/payments", payment_controls), Route("/__test__/manual-review", manual_review_controls), Route("/__test__/purchase-value", purchase_value_controls), Route("/__test__/verification", verification_controls), Route("/__test__/verification-mode", set_verification_mode, methods=["POST"]), Route("/__test__/checkout", checkout_controls), Route("/__test__/checkout-mode", set_checkout_mode, methods=["POST"]), Route("/__test__/payment-event", payment_event, methods=["POST"]), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
+preview = LocalOnly(Starlette(routes=[Route("/__test__/admin-paging", admin_paging_fixture, methods=["GET", "POST"]), Route("/__test__/status", status), Route("/__test__/reconciliation", reconciliation_control, methods=["POST"]), Route("/__test__/offline-prices", offline_price_controls, methods=["GET", "POST"]), Route("/__test__/google-mode", set_google_mode, methods=["POST"]), Route("/__test__/alerts", notification_controls, methods=["GET", "POST"]), Route("/__test__/inbox", inbox), Route("/__test__/controls", controls), Route("/__test__/push", push_controls), Route("/__test__/payments", payment_controls), Route("/__test__/manual-review", manual_review_controls), Route("/__test__/purchase-value", purchase_value_controls), Route("/__test__/verification", verification_controls), Route("/__test__/verification-mode", set_verification_mode, methods=["POST"]), Route("/__test__/checkout", checkout_controls), Route("/__test__/checkout-mode", set_checkout_mode, methods=["POST"]), Route("/__test__/payment-event", payment_event, methods=["POST"]), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
 
 if __name__ == "__main__":
     import uvicorn

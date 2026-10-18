@@ -1,0 +1,11 @@
+{
+  "original_admin_role_and_status_controls": true,
+  "existing_indefinite_grant_rule_preserved": true,
+  "deactivation_denies_access": true,
+  "reactivation_rejects_old_token": true,
+  "original_password_still_works": true,
+  "original_subscription_control_restores_free_role": true,
+  "six_sanitized_audit_records": true,
+  "external_page_requests": 0,
+  "production_connections": 0
+}

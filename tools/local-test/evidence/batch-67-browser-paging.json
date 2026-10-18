@@ -1,0 +1,18 @@
+{
+  "checks": {
+    "users_keep_complete_totals_and_edit_current_page": true,
+    "page_navigation_refresh_and_previous_preserved": true,
+    "obsolete_page_rows_and_errors_cannot_replace_browser_back": true,
+    "out_of_range_last_page_moves_back_without_dropping_records": true,
+    "mobile_original_cards_and_paging_fit": true,
+    "all_payment_records_reachable_in_original_columns": true,
+    "legacy_api_results_remain_complete": true
+  },
+  "synthetic_users": 205,
+  "synthetic_payments": 205,
+  "maximum_rows_per_visible_list": 100,
+  "original_forms_columns_and_styles_preserved": true,
+  "temporary_preview_reseed_required": true,
+  "external_requests": 0,
+  "production_connections": 0
+}

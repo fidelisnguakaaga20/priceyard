@@ -148,6 +148,12 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_admin_users_payments_pages_and_complete_streams_preserve_records(self):
+        spec = importlib.util.spec_from_file_location("local_admin_paging", ROOT / "backend/tests/test_admin_paging.py")
+        cases = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cases)
+        cases.verify_pages(self, self.engine)
+
     def test_request_bounds_reject_before_database_and_preserve_prices(self):
         spec = importlib.util.spec_from_file_location("local_request_bounds", ROOT / "backend/tests/test_request_bounds.py")
         cases = importlib.util.module_from_spec(spec)

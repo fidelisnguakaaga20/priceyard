@@ -108,10 +108,11 @@ from declarations for traceability; follow the linked handler for all checks.
 | DELETE | `/markets/{market_id}` | `require_roles('admin')` | [remove_market](../backend/app/routes/market_routes.py#L72) |
 | GET | `/markets/{market_id}` | `—` | [get_market_by_id](../backend/app/routes/market_routes.py#L39) |
 | PATCH | `/markets/{market_id}` | `require_roles('admin')` | [edit_market](../backend/app/routes/market_routes.py#L58) |
-| GET | `/payments` | `require_roles('admin')` | [get_payments](../backend/app/routes/payment_routes.py#L64) |
-| POST | `/payments/initiate` | `get_current_user` | [start_payment](../backend/app/routes/payment_routes.py#L39) |
-| POST | `/payments/webhook` | `—` | [paystack_webhook](../backend/app/routes/payment_routes.py#L48) |
-| POST | `/payments/{reference}/verify` | `_verification_user` | [verify_payment](../backend/app/routes/payment_routes.py#L29) |
+| GET | `/payments` | `require_roles('admin')` | [get_payments](../backend/app/routes/payment_routes.py#L65) |
+| POST | `/payments/initiate` | `get_current_user` | [start_payment](../backend/app/routes/payment_routes.py#L40) |
+| GET | `/payments/page` | `require_roles('admin')` | [get_payments_page](../backend/app/routes/payment_routes.py#L74) |
+| POST | `/payments/webhook` | `—` | [paystack_webhook](../backend/app/routes/payment_routes.py#L49) |
+| POST | `/payments/{reference}/verify` | `_verification_user` | [verify_payment](../backend/app/routes/payment_routes.py#L30) |
 | GET | `/price-updates` | `bearer_scheme` | [get_latest_price_updates](../backend/app/routes/price_update_routes.py#L83) |
 | POST | `/price-updates` | `require_roles('admin', 'reporter')` | [add_price_update](../backend/app/routes/price_update_routes.py#L190) |
 | GET | `/price-updates/admin/flagged` | `require_roles('admin')` | [get_flagged_price_updates](../backend/app/routes/price_update_routes.py#L163) |
@@ -152,9 +153,10 @@ from declarations for traceability; follow the linked handler for all checks.
 | GET | `/subscriptions/{user_id}` | `get_current_user` | [get_user_subscription](../backend/app/routes/subscription_routes.py#L39) |
 | PATCH | `/subscriptions/{user_id}/status` | `require_roles('admin')` | [set_subscription_status](../backend/app/routes/subscription_routes.py#L74) |
 | GET | `/testimonials` | `—` | [get_public_testimonials](../backend/app/routes/feedback_routes.py#L48) |
-| GET | `/users` | `require_roles('admin')` | [get_users](../backend/app/routes/user_routes.py#L16) |
-| GET | `/users/{user_id}` | `require_roles('admin')` | [get_user_by_id](../backend/app/routes/user_routes.py#L24) |
-| PATCH | `/users/{user_id}` | `require_roles('admin')` | [edit_user](../backend/app/routes/user_routes.py#L33) |
+| GET | `/users` | `require_roles('admin')` | [get_users](../backend/app/routes/user_routes.py#L17) |
+| GET | `/users/page` | `require_roles('admin')` | [get_users_page](../backend/app/routes/user_routes.py#L25) |
+| GET | `/users/{user_id}` | `require_roles('admin')` | [get_user_by_id](../backend/app/routes/user_routes.py#L34) |
+| PATCH | `/users/{user_id}` | `require_roles('admin')` | [edit_user](../backend/app/routes/user_routes.py#L43) |
 | GET | `/watchlist` | `get_current_user` | [get_own_watchlist](../backend/app/routes/watchlist_routes.py#L28) |
 | POST | `/watchlist` | `get_current_user` | [save_item](../backend/app/routes/watchlist_routes.py#L19) |
 | DELETE | `/watchlist/{item_id}` | `get_current_user` | [remove_item](../backend/app/routes/watchlist_routes.py#L36) |

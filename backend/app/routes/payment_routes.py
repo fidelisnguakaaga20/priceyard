@@ -1,13 +1,14 @@
 import json
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, Response, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.payment import Payment
 from app.models.user import User
 from app.schemas.payment_schema import PaymentInitiateRequest, PaymentInitiateResponse, PaymentResponse
-from app.services.payment_service import handle_webhook_event, initiate_payment, list_payments, verify_recorded_payment, verify_webhook_signature
+from app.services.payment_service import handle_webhook_event, initiate_payment, verify_recorded_payment, verify_webhook_signature
+from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, stream_admin_records
 from app.rate_limit import limiter
 from app.utils.permissions import get_current_user, require_roles
 
@@ -64,5 +65,16 @@ async def paystack_webhook(request: Request, db: Session = Depends(get_db)) -> d
 def get_payments(
     db: Session = Depends(get_db),
     _: User = Depends(require_roles("admin")),
-) -> list[Payment]:
-    return list_payments(db)
+) -> Response:
+    return AdminJSONResponse(stream_admin_records(db.get_bind(), Payment, PaymentResponse,
+                                                order=(("created_at", True), ("id", True))))
+
+
+@router.get("/page", response_model=AdminRecordPage[PaymentResponse])
+def get_payments_page(
+    offset: int = Query(default=0, ge=0, le=2_147_483_647),
+    db: Session = Depends(get_db),
+    _: User = Depends(require_roles("admin")),
+) -> AdminRecordPage[PaymentResponse]:
+    return admin_record_page(db, Payment, PaymentResponse, offset=offset,
+                             order=(("created_at", True), ("id", True)))

@@ -1,0 +1,15 @@
+{
+  "tests": 1,
+  "failures": 0,
+  "errors": 0,
+  "seconds": 3.331,
+  "cluster_identity_verified": true,
+  "production_contacts": 0,
+  "cluster_profile": "postgres-recovery-20261017",
+  "schemas_before": 76,
+  "schema_budget": 80,
+  "single_native_suite": true,
+  "selected_tests": [
+    "test_admin_users_payments_pages_and_complete_streams_preserve_records"
+  ]
+}

@@ -79,6 +79,15 @@ The original decoded2MiB screenshot allowance fits the encoded-body budget.
 Existing field/storage rules and stored long records remain; no new per-field
 editorial character policy or truncation is inferred from these technical bounds.
 
+Owner-approved Admin paging is recorded in [the exact scope](ADMIN_LIST_PAGING_APPROVAL.md).
+Users and Payments currently have100-record pages, Previous/Next, complete totals,
+preserved refresh/back/edit behavior and unchanged forms/columns/styles. New
+`/users/page` and `/payments/page` are Admin only. Counts and rows share one DB
+statement/snapshot. Existing `/users` and `/payments` still return complete schema-
+checked JSON arrays using100-record cursor batches, with guaranteed close on
+completion/disconnect/cancellation. Other Admin lists/public history remain PY-20
+work; never silently truncate an old API or chart to mark paging complete.
+
 ## Honest completion boundaries
 
 Completion means the finite identified application requirement and its evidence
