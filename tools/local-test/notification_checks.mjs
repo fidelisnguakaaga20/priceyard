@@ -31,7 +31,9 @@ try{
  await form.getByLabel('Low',{exact:true}).fill('211000');await form.getByLabel('High',{exact:true}).fill('221000');
  await form.getByLabel('Average',{exact:true}).fill('216000');await form.getByLabel('Bag size (kg)',{exact:true}).fill('Unknown');
  await form.locator('select[name="confidence_level"]').selectOption('Low confidence');
- await form.getByLabel('Update date/time',{exact:true}).fill(new Date().toISOString().slice(0,16));
+ // Original form accepts WAT wall time. Use a tiny synthetic future offset so
+ // minute precision cannot put this record before the fixture's current instant.
+ await form.getByLabel('Update date/time',{exact:true}).fill(new Date(Date.now()+3600000+120000).toISOString().slice(0,16));
  const createdResponse=admin.waitForResponse(r=>r.url()===origin+'/api/price-updates'&&r.request().method()==='POST');
  await form.getByRole('button',{name:'Create pending update',exact:true}).click();
  const created=await createdResponse;assert.equal(created.status(),201);const item=await created.json();

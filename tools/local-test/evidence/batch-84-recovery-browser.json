@@ -1,0 +1,9 @@
+{
+  "dry_run_never_verifies_or_activates": true,
+  "mismatched_evidence_stays_pending": true,
+  "missed_webhook_recovers_without_callback": true,
+  "original_dashboard_and_history_access_reflect_recovery": true,
+  "repeated_job_does_not_recredit": true,
+  "external_page_requests": 0,
+  "production_connections": 0
+}

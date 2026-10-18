@@ -1,0 +1,16 @@
+{
+  "tests": 2,
+  "failures": 0,
+  "errors": 0,
+  "seconds": 1.435,
+  "cluster_identity_verified": true,
+  "production_contacts": 0,
+  "cluster_profile": "postgres-paging-20261018",
+  "schemas_before": 19,
+  "schema_budget": 80,
+  "single_native_suite": true,
+  "selected_tests": [
+    "test_bounded_payment_reconciliation_preserves_existing_rules",
+    "test_reconciliation_single_worker_and_webhook_apply_once"
+  ]
+}

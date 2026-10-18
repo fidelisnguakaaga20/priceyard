@@ -1,0 +1,26 @@
+{
+  "local_monitoring_drill_passed": true,
+  "liveness_does_not_mask_failed_price_read": true,
+  "normal": {
+    "health": 200,
+    "prices": 200,
+    "guest_history": 401,
+    "public_sources_absent": true
+  },
+  "failed": {
+    "health": 200,
+    "prices": 503,
+    "guest_history": 401,
+    "public_sources_absent": null
+  },
+  "recovered": {
+    "health": 200,
+    "prices": 200,
+    "guest_history": 401,
+    "public_sources_absent": true
+  },
+  "original_error_apply_recovery": true,
+  "live_monitor_or_alerts_enabled": false,
+  "external_requests": 0,
+  "production_connections": 0
+}

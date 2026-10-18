@@ -1,0 +1,12 @@
+{
+  "tests": 1,
+  "failures": 0,
+  "errors": 0,
+  "seconds": 0.171,
+  "finite_tick_count": 3,
+  "restart_checkpoint_readback": true,
+  "synthetic_provider_only": true,
+  "operating_system_jobs_created": 0,
+  "production_connections": 0,
+  "hosted_scheduler_verified": false
+}

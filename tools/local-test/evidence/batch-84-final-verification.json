@@ -1,0 +1,17 @@
+{
+  "phase1_evidence_verified": true,
+  "staged_backend_tests": 15,
+  "native_cases": 2,
+  "isolation_probes": 6,
+  "finite_scheduler_tests": 1,
+  "serial_browser_reads": 24,
+  "phase1_gate_counts": {
+    "Awaiting Production Approval": 2,
+    "Failed": 5,
+    "Passed": 2
+  },
+  "all_original_live_gates_still_unrun": true,
+  "production_release_authorized": false,
+  "production_connections": 0,
+  "application_source_and_staging_hashes_match": true
+}

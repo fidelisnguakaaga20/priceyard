@@ -1,0 +1,44 @@
+{
+  "passed": true,
+  "profile": "isolated loopback HTTP rehearsal; not hosted staging",
+  "chromium_version": "141.0.7390.37",
+  "original_admin_cards": 14,
+  "mobile_width": 375,
+  "http_only_cookie": true,
+  "javascript_bearer_storage_absent": true,
+  "browser_secure_context": true,
+  "web_locks_available": true,
+  "tls_verified": false,
+  "serial_requests": 24,
+  "concurrency": 1,
+  "performance_sample": {
+    "results": {
+      "/health": {
+        "requests": 8,
+        "median_ms": 6,
+        "p95_ms": 13.1,
+        "max_ms": 13.1
+      },
+      "/price-updates": {
+        "requests": 8,
+        "median_ms": 8.3,
+        "p95_ms": 8.8,
+        "max_ms": 8.8
+      },
+      "/admin/summary": {
+        "requests": 8,
+        "median_ms": 7.7,
+        "p95_ms": 10.4,
+        "max_ms": 10.4
+      }
+    },
+    "elapsed_ms": 180,
+    "web_locks": true,
+    "secure_context": true
+  },
+  "production_capacity_or_slo_proven": false,
+  "google_provider_verified": false,
+  "paystack_test_mode_verified": false,
+  "external_requests": 0,
+  "production_connections": 0
+}

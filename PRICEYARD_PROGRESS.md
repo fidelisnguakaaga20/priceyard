@@ -25,7 +25,10 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
-Latest verified: batch83,35 complete /1 partial or pending:35.
+Latest verified: batch84,35 complete /1 partial or pending:35.
+Owner approved safe Phase 1 staging/testing2026-10-18, without production access.
+Separate staging package and synthetic checks pass; hosted/provider prerequisites
+were not supplied. See docs/PY35_PHASE1_REPORT.md and docs/PY35_PHASE1_RESULTS.json.
 All currently authorized local PY-35 preparation is verified; nine live approval
 gates remain explicit in docs/OPERATIONAL_READINESS.md and docs/RELEASE_GATES.json.
 Local success does not authorize production release or establish36/36 completion.
@@ -56,7 +59,7 @@ checks, original price/source workflows, seven baseline views and all14 dashboar
 cards pass.87 build source hashes match; original CSS byte-identical. No data repair.
 Old recovery fixture80/80 remains stopped/intact. Fresh small native fixture
 postgres-paging-20261018 at127.0.0.1:55449, identifier7697910732590408300,
-uses --paging-cluster:19/80 schemas, stopped after83. Same12 connections/32MB buffers,
+uses --paging-cluster:21/80 schemas, stopped after84. Same12 connections/32MB buffers,
 fsync enabled/exclusive lock and identity guards. Build refuses its active port.
 Review controls: /__test__/admin-paging, /__test__/catalog-paging and
 /__test__/faq-audit-paging and /__test__/signal-paging on http://127.0.0.1:55446;
@@ -3214,3 +3217,49 @@ ignored in runtime/local-release-check.json to avoid rewriting committed evidenc
 Only verified source/docs/test evidence is committed; archives/dependency trees/
 runtime stay untracked. PY-35 remains partial until separately approved live gates
 pass. No push, merge or deployment.
+
+### Batch 84 - PY-35 approved Phase 1 staging verification (2026-10-18)
+
+Continuedc797db8. Owner authorized separate staging, provider TEST mode and
+approved recipients only; no production. No staging URL/host, TEST credentials,
+Google test identities or recipient list were supplied. Reply "do best option for
+the app" supplies no credentials or production permission. Documented blockers;
+no provider contact, external changes, purchases, messages or production fallback.
+Full nine-gate statuses:docs/PY35_PHASE1_REPORT.md/PY35_PHASE1_RESULTS.json.
+
+Separate ignored source/artifact package125 files/740043 bytes verified,300-file/
+5MiB cap, no dotenv/config/secrets/customer data/dependency-tree copy. Not hosted
+staging.15 focused existing tests actually import the copied staged backend with
+fresh synthetic SQLite:session1,recovery7,reset2,notification5; zero failures/
+errors/skips. Six isolation probes pass. One finite three-tick scheduler test
+checks persisted/reloaded checkpoint/fixed ceiling and no duplicate credit; no OS
+job enabled. Native recovery/single-worker/webhook cases2 pass1.435s,19->21/80
+schemas retained, pinned cluster stopped. Existing batch83 actual synthetic
+restore reverified read-only:21 tables/14 rows, archive/source/restored evidence
+unchanged; no new restore/archive/customer-backup claim.
+
+Browser14-card exact totals,375px layout, cookie/no-JS-bearer, reset/logout,
+recovery/replay and independent mocked notifications pass; process200/price503
+and original Apply recovery pass.24 serial read samples180ms total,concurrency1;
+max/p95 health13.1ms/prices8.8ms/Admin10.4ms. Not hosted load/TLS/capacity evidence.
+Offline60 Python packages/74 active requirements including requested extras have
+no conflicts;123 resolved npm
+entries source/integrity valid.89 source hashes match existing build; no new
+installs, redundant build or fresh advisory/Linux certification. Local constraints
+inventory is not a portable backend lock.
+
+Retained three test-only setup/assertion failures:Python-I local import path;
+obsolete Bearer-null header overriding approved cookies; UTC timestamp in WAT
+notification form. Fixed invocation and only two browser harnesses, fresh fake
+data reruns pass; no application edits. Confirmed staging-send issue:watchlist
+email body hard-codes deployed-site link. Left product content unchanged; actual
+test sends blocked until staging-safe handling/credentials/recipients reviewed.
+Starlette/httpx test deprecation warning remains without installing replacements.
+
+Phase1 statuses:2 Passed(synthetic backup/recovery and finite scheduler),5 Failed
+because missing staging/provider prerequisites,2 Awaiting Production Approval.
+Passed subchecks never close original live gates;35/36 complete,PY-35 partial.
+All application backend/TSX/CSS files and approved policies unchanged. Evidence:
+tools/local-test/evidence/batch-84-*.json. Fresh local HTTP preview55446 only;
+runtime package/checkpoints/constraints remain ignored. Stop after reporting;
+no production approval requested, push, merge, deployment or live job.

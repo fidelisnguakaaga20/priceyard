@@ -143,3 +143,12 @@ Its ignored runtime report inventories installed packages and checks evidence,
 build/source/lock identity and preserved Git references. It never connects to a
 database/provider, deploys or authorizes production. The [nine live release gates](OPERATIONAL_READINESS.md)
 remain separately approved work even when this local command passes.
+
+Phase1 safe staging was subsequently approved; [results and blockers](PY35_PHASE1_REPORT.md)
+distinguish the separate ignored source/artifact package from unavailable hosted
+HTTPS/provider testing. `run_phase1_backend.py` runs only selected original tests
+against that verified source copy with fresh memory data and closed transport.
+`run_phase1_native.ps1` uses only the pinned small fixture and stops it afterward;
+do not rerun just to refresh results. `verify_phase1_results.py` checks saved
+evidence and all nine scoped statuses without contacting any service. The staging
+package has no credentials or live URL and is not a production startup shortcut.

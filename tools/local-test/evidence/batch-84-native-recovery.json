@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "read_only_reverification": true,
+  "reuses_actual_synthetic_restore_batch": 83,
+  "tables": 21,
+  "business_rows": 14,
+  "source_and_restored_data_structure_preserved": true,
+  "archive_sha256": "e855144d4866cfa31d2fa773b6fe4625946841fbc2ade2319a632e89a78e6c8b",
+  "cluster_identity_verified": true,
+  "retained_schemas": 21,
+  "schema_budget": 80,
+  "new_backup_or_restore_executed": false,
+  "actual_customer_backup_verified": false,
+  "production_connections": 0
+}

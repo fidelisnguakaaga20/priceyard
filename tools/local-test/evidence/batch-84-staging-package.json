@@ -1,0 +1,19 @@
+{
+  "purpose": "synthetic-only-phase1-staging-preparation",
+  "source_commit": "c797db8c13ef30ebd16c69734daa4aeb8feb0950",
+  "file_count": 125,
+  "bytes": 740043,
+  "production_credentials_copied": false,
+  "provider_credentials_available": false,
+  "hosted_staging_available": false,
+  "deployed": false,
+  "application_started": false,
+  "database": "No connection configured; only pinned synthetic fixtures may be used",
+  "live_services_enabled": false,
+  "package_is_not_a_hosted_environment": true,
+  "copied_files_verified": true,
+  "maximum_files": 300,
+  "maximum_bytes": 5242880,
+  "production_connections": 0,
+  "network_requests": 0
+}

@@ -2,6 +2,10 @@
 
 Current checklist:35 of36 complete. PY-35 remains partial until the owner-approved
 live gates below pass. A local check returning success never authorizes release.
+Phase 1 staging verification was authorized subsequently on2026-10-18. See
+[Phase 1 results](PY35_PHASE1_REPORT.md):separate local package and synthetic checks
+pass; hosted/provider checks are blocked by missing staging/credentials. Original
+live gate statuses remain unrun; no production authorization is implied.
 No production configuration, provider account, database or hosting service was
 accessed. No migration, live job, push, merge or deployment was performed.
 

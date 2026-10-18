@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "installed_python_packages": 60,
+  "active_requirements_checked": 74,
+  "application_requested_extras_included": true,
+  "dependency_conflicts": [],
+  "frontend_resolved_entries": 123,
+  "official_registry_integrity_checks_passed": true,
+  "new_packages_installed": 0,
+  "network_requests": 0,
+  "hosted_linux_install_verified": false,
+  "fresh_advisory_scan_performed": false,
+  "local_constraints_are_not_a_portable_production_lock": true,
+  "production_connections": 0
+}

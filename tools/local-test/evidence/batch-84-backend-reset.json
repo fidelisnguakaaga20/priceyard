@@ -1,0 +1,14 @@
+{
+  "batch": "reset",
+  "pattern": "test_password_reset.py",
+  "tests": 2,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "seconds": 0.953,
+  "separate_staging_source_verified": true,
+  "database": "fresh synthetic in-memory SQLite",
+  "tcp_dns_and_native_postgres_denied": true,
+  "provider_delivery_verified": false,
+  "production_connections": 0
+}

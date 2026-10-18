@@ -1,0 +1,27 @@
+{
+  "production_connections": 0,
+  "failures": [
+    {
+      "check": "initial isolation probe invocation",
+      "cause": "Python -I excludes script directory; existing helper could not import guard",
+      "scope": "test launcher only; no application imports or connections occurred",
+      "resolution": "explicit local tools path through runpy; six isolation probes subsequently passed"
+    },
+    {
+      "check": "synthetic reconciliation browser history read",
+      "expected_status": 200,
+      "observed_status": 401,
+      "cause": "old test injected Authorization: Bearer null from removed JavaScript token storage, overriding valid cookie authentication",
+      "scope": "test harness; original dashboard had already reflected recovered paid access",
+      "resolution": "use existing browser cookie fetch, restart only disposable preview before rerun; application authentication unchanged"
+    },
+    {
+      "check": "synthetic notification browser latest price assertion",
+      "expected_record_id": 3,
+      "observed_record_id": 2,
+      "cause": "old test supplied UTC wall time to the approved WAT input, placing the new record an hour before the current fixture record; all three independent channel attempts had passed",
+      "scope": "test timestamp only; no application time conversion changed",
+      "resolution": "enter explicit WAT wall time with a small synthetic future offset to avoid minute-precision ties; rerun with fresh synthetic preview"
+    }
+  ]
+}

@@ -19,7 +19,7 @@ try{
   assert.ok(!(await page.locator('body').innerText()).includes('Active Paid'));
   const recovered=await trigger('valid');assert.equal(recovered.report.outcomes[0].outcome,'confirmed');assert.equal(recovered.subscription_status,'active');
   await page.reload();await page.getByRole('heading',{name:'Welcome, Test Verify',exact:true}).waitFor();assert.ok((await page.locator('body').innerText()).includes('Active Paid'));
-  const historyStatus=await page.evaluate(async()=>{const response=await fetch('/api/price-updates/history',{headers:{Authorization:'Bearer '+localStorage.getItem('priceyard_access_token')}});return response.status;});assert.equal(historyStatus,200);
+  const historyStatus=await page.evaluate(async()=>{const response=await fetch('/api/price-updates/history');return response.status;});assert.equal(historyStatus,200);
   const repeated=await trigger('valid');assert.equal(repeated.provider_calls,0);assert.equal(repeated.end_date,recovered.end_date);assert.equal(outside,0);
   const report={dry_run_never_verifies_or_activates:true,mismatched_evidence_stays_pending:true,missed_webhook_recovers_without_callback:true,original_dashboard_and_history_access_reflect_recovery:true,repeated_job_does_not_recredit:true,external_page_requests:outside,production_connections:0};
   fs.writeFileSync(path.join(lab,'runtime/reconciliation-checks.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report));
