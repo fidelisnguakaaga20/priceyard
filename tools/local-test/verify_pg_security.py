@@ -152,6 +152,12 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_price_claim_evidence_matches_recorded_specs_and_preserves_history(self):
+        spec = importlib.util.spec_from_file_location("local_price_claim_evidence", ROOT / "backend/tests/test_price_claim_evidence.py")
+        cases = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cases)
+        cases.verify_claim_evidence(self, self.engine)
+
     def test_referral_cap_keeps_signup_trial_earned_days_and_three_audited_awards(self):
         spec = importlib.util.spec_from_file_location("local_referral_cap", ROOT / "backend/tests/test_referral_cap.py")
         cases = importlib.util.module_from_spec(spec)

@@ -1,0 +1,14 @@
+{
+  "result": {
+    "original_home_and_price_cards": true,
+    "real_api_synthetic_fixture_and_guest_boundary": true,
+    "original_price_filters": true,
+    "trial_login_plans_and_history": true,
+    "original_admin_login_and_price_form": true,
+    "mobile_original_loaded": true,
+    "mobile_document_overflow": false,
+    "original_login_rate_limit_preserved": true
+  },
+  "external_page_requests_blocked": 0,
+  "production_connections": 0
+}

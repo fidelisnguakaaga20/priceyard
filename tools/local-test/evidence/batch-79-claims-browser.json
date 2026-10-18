@@ -1,0 +1,11 @@
+{
+  "original_admin_form": true,
+  "missing_or_duplicate_private_references_rejected": true,
+  "unknown_measurements_cannot_support_up_claim": true,
+  "explicit_unknown_saves_and_approves": true,
+  "private_evidence_excluded_from_public_response": true,
+  "no_grade_or_measurement_fields_added": true,
+  "mobile_layout_preserved": true,
+  "external_requests": 0,
+  "production_connections": 0
+}

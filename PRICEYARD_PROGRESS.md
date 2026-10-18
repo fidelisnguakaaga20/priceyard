@@ -25,8 +25,10 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
-Latest verified: batch78,32 complete /4 partial or pending:
-07,14,20,35. PY-02 approved source-publication scope is complete locally:
+Latest verified: batch79,33 complete /3 partial or pending:
+07,20,35. PY-14 approved evidence safeguards are complete locally.
+Owner approved protected browser sessions07; implementation remains next.
+See docs/PRICE_CLAIM_EVIDENCE_APPROVAL.md and docs/SESSION_COOKIE_APPROVAL.md. PY-02 approved source-publication scope is complete locally:
 both original Admin Notes controls explain their public visibility; private
 source fields/access and historical evidence stay intact. Six-role backend,
 native PostgreSQL and browser checks pass. Owner approved the exact scope in
@@ -46,7 +48,7 @@ checks, original price/source workflows, seven baseline views and all14 dashboar
 cards pass.87 build source hashes match; original CSS byte-identical. No data repair.
 Old recovery fixture80/80 remains stopped/intact. Fresh small native fixture
 postgres-paging-20261018 at127.0.0.1:55449, identifier7697910732590408300,
-uses --paging-cluster:13/80 schemas, stopped. Same12 connections/32MB buffers,
+uses --paging-cluster:14/80 schemas, stopped. Same12 connections/32MB buffers,
 fsync enabled/exclusive lock and identity guards. Build refuses its active port.
 Review controls: /__test__/admin-paging, /__test__/catalog-paging and
 /__test__/faq-audit-paging and /__test__/signal-paging on http://127.0.0.1:55446;
@@ -63,7 +65,7 @@ maximum3 new seven-day bonuses per rolling30 elapsed UTC days; existing days,
 qualification, further signups/referral counts and14-day child trials preserved.
 Full281 backend tests, UTC-boundary/rollback/native last-slot concurrency and real
 registration/dashboard browser checks pass. No new identity verification claims.
-Session/storage choices07 and movement/confidence14 retain owner-policy gates.
+Session/storage07 and claim evidence14 explicitly approved2026-10-18;14 verified79,07 not yet implemented.
 Live operational work35 remains unauthorized. PY-02 approved safeguards complete72.
 Owner policy and production gates stay explicit. Testing foundation PY-30 stays
 complete; new regression tests belong with their respective improvements.
@@ -413,7 +415,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-11 | Correct saved administrator price state | Complete in batch 10; actual create/approve/correct/outdated/reject/reload browser regression passed |
 | PY-12 | Accurate existing quantity/type/market comparisons | Complete for owner-approved current-record/history-chart safeguards in batch 37: separate recorded specifications, matching commodity/market/unit/size/type only, no inferred missing measurements; all historical rows preserved. Cost-reference quantity linkage remains separate PY-29 work |
 | PY-13 | Consistent Nigerian dates/times | Complete for approved local scope69: Nigerian WAT price displays, Admin/Reporter entry/correction and current/history/comparison/CSV day filters. Inclusive WAT midnight/exclusive next midnight, exact UTC instants and unchanged raw history verified backend/PG; Lagos/UTC forms and desktop/mobile displays pass. No guessed zone for ambiguous legacy values; actual historical review remains35. Earlier UTC trial parsing31 and paid UTC expiry unchanged. Approval: docs/NIGERIAN_PRICE_TIME_APPROVAL.md, owner discretion2026-10-18 |
-| PY-14 | Evidence-based movement/confidence | Pending; wording/policy changes require approval |
+| PY-14 | Evidence-based movement/confidence | Approved application scope complete79: new/changed two-source claims require distinct private references; new movement and pending approval require preceding approved, nonoutdated comparable recorded evidence. Both endpoints determine up/down/stable; unsupported claims require existing unknown. Historical labels/records retained; private evidence stays private. No proof of independent humans or retrospective editorial review claimed. Scope: docs/PRICE_CLAIM_EVIDENCE_APPROVAL.md |
 | PY-15 | Prices recover after failed loading | Complete in batch 1; before/after browser regression passed |
 | PY-16 | Correct filters and response ordering | Complete for identified current/history/navigation scope in batches 22/28: applied filters, overlap, URL navigation, stale history/error/metadata and access-role browser regressions verified |
 | PY-17 | Correct market-detail loading | Complete for identified loading races/combined-failure defect in batch 16; obsolete commodity/account responses ignored and independent successful sections retained |
@@ -3014,3 +3016,34 @@ no chart/history truncation approval. PY-35 production/provider/restore/rollout,
 application/database clock alignment and legacy reward evidence review remain
 unauthorized. Local cap does not prove unique human identities/eliminate all fraud.
 No production, push, merge or deployment. Resume these unfinished scopes only.
+
+
+### Batch 79 - approved PY-14 claim evidence (2026-10-18)
+
+Owner explicitly approved both docs/PRICE_CLAIM_EVIDENCE_APPROVAL.md and
+docs/SESSION_COOKIE_APPROVAL.md. This batch implements only14;07 remains open.
+New/changed Verified by2 sources requires distinct nonblank existing private
+references. New movement/approval checks latest strictly preceding approved,
+nonoutdated price with same catalog IDs and complete normalized recorded
+quantity/bag size/type. Both range endpoints must rise/fall/equal; supplied
+previous ranges must match that evidence. Otherwise existing unknown is required,
+with422 before mutation/audit. No guessed units, grades, source identity claims,
+fields, forms, historical rewriting or automatic relabeling. Unrelated historical
+notes corrections and idempotent approval remain possible. Evidence is checked
+at write time; later editorial corrections do not silently rewrite old claims.
+
+Verification:282 backend tests passed35.365s (zero failures/errors/skips); focused
+claim case and24 existing price cases pass. Native pinned55449 case passed1.864s;
+schemas13->14/80, stopped. Accepted up/down/stable/unknown, mixed endpoints,
+time/measurement mismatch, missing/duplicate references and failed approval/
+correction preservation covered. Guarded original-form browser checks reject
+unsupported claims, save/approve explicit unknown and hide private evidence.
+Original source/Notes, price create/approve/correct/outdated/reject/reload, seven
+baseline workflows and all14 dashboard cards pass; mobile375px unchanged, zero
+external/production contacts. Frontend unchanged:87 hashes and compiled assets
+match last validated78 build (reused, not a fresh build). Heavy tests sequential.
+
+Evidence:tools/local-test/evidence/batch-79-*.json. Exactly33 complete /3 partial-
+pending:07,20,35. Next protected browser sessions, remaining full-history query
+bounds and local operational readiness evidence; live/provider/restore gates
+remain unauthorized. No production, push, merge or deployment.

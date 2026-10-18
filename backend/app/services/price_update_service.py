@@ -13,6 +13,7 @@ from app.models.user import User
 from app.schemas.price_update_schema import Movement, PriceUpdateCreate, PriceUpdateUpdate, TimeOfDay
 from app.services.price_scope_service import lock_price_scope, validate_price_scope_change
 from app.services.price_time_service import price_day_bounds
+from app.services.price_claim_service import CONFIDENCE_INPUTS, MOVEMENT_INPUTS, model_claim_values, validate_price_claims
 
 
 PRICE_UPDATE_LOAD_OPTIONS = (
@@ -132,6 +133,7 @@ def create_price_update(db: Session, payload: PriceUpdateCreate, creator: User, 
         values["source_type"] = None
         values["source_1"] = None
         values["source_2"] = None
+    validate_price_claims(db, values)
     price_update = PriceUpdate(
         **values,
         status="pending",
@@ -362,6 +364,10 @@ def update_price_update(db: Session, price_update: PriceUpdate, payload: PriceUp
 
     _validate_final_ranges(price_update, changes)
 
+    changed = {name for name, value in changes.items() if value != getattr(price_update, name)}
+    validate_price_claims(db, model_claim_values(price_update, changes), record_id=price_update.id,
+                          movement=bool(changed & MOVEMENT_INPUTS), confidence=bool(changed & CONFIDENCE_INPUTS))
+
     for field, value in changes.items():
         setattr(price_update, field, value)
 
@@ -374,6 +380,8 @@ def update_price_update(db: Session, price_update: PriceUpdate, payload: PriceUp
 
 
 def approve_price_update(db: Session, price_update: PriceUpdate, approver: User, *, commit: bool = True) -> PriceUpdate:
+    if price_update.status != "approved":
+        validate_price_claims(db, model_claim_values(price_update), record_id=price_update.id)
     price_update.status = "approved"
     price_update.approved_by = approver.id
     db.commit() if commit else db.flush()

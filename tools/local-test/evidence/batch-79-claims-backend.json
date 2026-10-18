@@ -1,0 +1,9 @@
+{
+  "tests_run": 1,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "duration_seconds": 0.073,
+  "pattern": "test_price_claim_evidence.py",
+  "runtime": "in-process synthetic SQLite; TCP and DNS denied"
+}
