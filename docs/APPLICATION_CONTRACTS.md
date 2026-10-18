@@ -84,7 +84,8 @@ Existing field/storage rules and stored long records remain; no new per-field
 editorial character policy or truncation is inferred from these technical bounds.
 
 Owner-approved Admin paging is recorded in [the exact scope](ADMIN_LIST_PAGING_APPROVAL.md).
-Users, Payments, Commodities, Markets, FAQs, Audit logs and both signal lists have
+Users, Payments, Commodities, Markets, FAQs, Audit logs, both signal lists,
+Buying zones and Sell-watch windows have
 100-record pages, Previous/Next, complete totals,
 preserved refresh/back/edit behavior and unchanged forms/columns/styles. New
 `/users/page`, `/payments/page`, `/commodities/admin/page` and `/markets/admin/page`
@@ -93,7 +94,7 @@ statement/snapshot. Existing `/users` and `/payments` still return complete sche
 checked JSON arrays using100-record cursor batches, with guaranteed close on
 completion/disconnect/cancellation. Full catalog APIs also stream; public paths
 keep active-only complete results and public cache eligibility. Completing a
-save after changing pages refreshes the current page. Paged signal editors use
+save after changing pages refreshes the current page. Paged intelligence editors use
 existing authorized ID endpoints for off-page saved values; stale or mismatched
 responses cannot replace a newer selection. Other Admin lists/public history remain PY-20
 work; never silently truncate an old API or chart to mark paging complete.

@@ -39,8 +39,8 @@ native suites repeatedly when connection/worker timeouts recur.
 
 The old `runtime/postgres-revocation` fixture is stopped and retained as evidence;
 its many accumulated schemas caused excessive file growth. Do not start it on
-resume. Use `verify_pg_security.py --recovery-cluster` only after verifying and
-starting `runtime/postgres-recovery-20261017` on literal127.0.0.1:55448. Both
+resume. The recovery fixture at literal127.0.0.1:55448 is also exhausted and must
+stay stopped; use the current `--paging-cluster` profile described above. All
 profiles keep hard-coded directory/port/system-identifier checks. The ignored
 recovery marker records identifier7697651361316763724; no arbitrary cluster is
 authorized by editing a marker. Reduced settings used during recovery are
@@ -55,7 +55,7 @@ deleting schemas or weakening identity/budget guards. Existing tests use at most
 two concurrent application operations only where necessary to check races.
 
 For a small batch, select existing relevant cases with repeated `--test NAME`
-arguments to `verify_pg_security.py --recovery-cluster`. The report lists the
+arguments to `verify_pg_security.py --paging-cluster`. The report lists the
 exact cases; do not label a focused run as a full suite. Identity checks, the
 exclusive lock and the80-schema budget apply equally. Full40-case baseline last
 passed in batch47; batch48 adds only three schemas (40 to43).

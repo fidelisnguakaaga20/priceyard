@@ -152,6 +152,12 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_trade_window_pages_preserve_scopes_disclaimers_and_saved_values(self):
+        spec = importlib.util.spec_from_file_location("local_trade_window_paging", ROOT / "backend/tests/test_trade_window_paging.py")
+        cases = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cases)
+        cases.verify_window_pages(self, self.engine)
+
     def test_source_publication_preserves_private_evidence_and_existing_access(self):
         spec = importlib.util.spec_from_file_location("local_source_publication", ROOT / "backend/tests/test_source_publication.py")
         cases = importlib.util.module_from_spec(spec)

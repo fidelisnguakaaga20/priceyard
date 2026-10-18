@@ -1,0 +1,9 @@
+{
+  "tests_run": 2,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "duration_seconds": 0.773,
+  "pattern": "test_trade_window_paging.py",
+  "runtime": "in-process synthetic SQLite; TCP and DNS denied"
+}

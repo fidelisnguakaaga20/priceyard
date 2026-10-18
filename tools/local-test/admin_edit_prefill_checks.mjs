@@ -41,7 +41,7 @@ try {
       checks[test.endpoint+'_invalid_edits_preserve_records_and_audits']=JSON.stringify((await api('/'+test.endpoint)).body)===JSON.stringify(known)&&JSON.stringify((await api('/audit-logs')).body)===JSON.stringify(audits);
     }
     let release;const held=new Promise(resolve=>{release=resolve;});
-    const paged=['market-signals','quality-signals'].includes(test.endpoint);
+    const paged=['market-signals','quality-signals','buying-zones','sell-watch-windows'].includes(test.endpoint);
     await context.route('**/api/'+test.endpoint+(paged?'/admin/page?offset=0':''),async route=>{await held;await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(paged?{items:known,total:known.length,offset:0,limit:100}:known)});},{times:1});
     await page.goto(origin+'/admin/'+test.route);await page.getByRole('heading',{name:test.heading,exact:true}).waitFor();
     const form=page.locator('form.admin-form'),id=form.locator('[name=id]');

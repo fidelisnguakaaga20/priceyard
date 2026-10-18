@@ -1,10 +1,11 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.services.audit_service import save_audited_resource, snapshot_model
+from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, stream_admin_records
 from app.models.sell_watch_window import SellWatchWindow
 from app.models.user import User
 from app.schemas.sell_watch_window_schema import (
@@ -15,7 +16,6 @@ from app.schemas.sell_watch_window_schema import (
 from app.services.sell_watch_window_service import (
     create_sell_watch_window,
     get_sell_watch_window,
-    list_sell_watch_windows,
     update_sell_watch_window,
 )
 from app.utils.permissions import require_full_access, require_roles
@@ -28,8 +28,20 @@ def get_windows(
     db: Session = Depends(get_db),
     _: User = Depends(require_full_access),
     commodity_id: Annotated[int | None, Query(gt=0)] = None,
-) -> list[SellWatchWindow]:
-    return list_sell_watch_windows(db, commodity_id=commodity_id)
+) -> Response:
+    conditions = (SellWatchWindow.commodity_id == commodity_id,) if commodity_id is not None else ()
+    return AdminJSONResponse(stream_admin_records(db.get_bind(), SellWatchWindow, SellWatchWindowResponse,
+        order=(("created_at", True), ("id", True)), where=conditions))
+
+
+@router.get("/admin/page", response_model=AdminRecordPage[SellWatchWindowResponse])
+def get_admin_windows_page(
+    offset: int = Query(default=0, ge=0, le=2_147_483_647),
+    db: Session = Depends(get_db),
+    _: User = Depends(require_roles("admin")),
+) -> AdminRecordPage[SellWatchWindowResponse]:
+    return admin_record_page(db, SellWatchWindow, SellWatchWindowResponse, offset=offset,
+        order=(("created_at", True), ("id", True)))
 
 
 @router.get("/{window_id}", response_model=SellWatchWindowResponse)

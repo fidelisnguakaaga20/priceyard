@@ -1,0 +1,14 @@
+{
+  "checklist_items": 36,
+  "completed": 31,
+  "partial_or_pending": 5,
+  "remaining_ids": [
+    "05",
+    "07",
+    "14",
+    "20",
+    "35"
+  ],
+  "approved_admin_lists_paged": 10,
+  "approved_admin_lists_total": 16
+}

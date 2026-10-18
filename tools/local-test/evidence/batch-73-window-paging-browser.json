@@ -1,0 +1,22 @@
+{
+  "checks": {
+    "buying-zones_all_ids_and_full_totals_reachable": true,
+    "buying-zones_reload_previous_next_browser_back": true,
+    "buying-zones_off_page_edit_preserves_dates_values_disclaimer_and_page": true,
+    "buying-zones_late_lookup_cannot_overwrite_new_selection": true,
+    "buying-zones_unknown_id_cannot_submit_wrong_record": true,
+    "sell-watch-windows_all_ids_and_full_totals_reachable": true,
+    "sell-watch-windows_reload_previous_next_browser_back": true,
+    "sell-watch-windows_off_page_edit_preserves_dates_values_disclaimer_and_page": true,
+    "sell-watch-windows_late_lookup_cannot_overwrite_new_selection": true,
+    "sell-watch-windows_unknown_id_cannot_submit_wrong_record": true
+  },
+  "records_per_resource": 205,
+  "page_size": 100,
+  "existing_price_records_unchanged": true,
+  "original_forms_and_mobile_layout": true,
+  "no_delete_feature_added": true,
+  "external_requests": 0,
+  "production_connections": 0,
+  "reseed_preview_after_check": true
+}

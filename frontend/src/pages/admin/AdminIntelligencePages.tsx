@@ -3,13 +3,14 @@ import { apiFetch } from "../../services/api";
 import { StaleBadge } from "../../components/StaleBadge";
 import type { BuyingZone, CostBreakdown, SellWatchWindow, StorageSuitability } from "../../types/api";
 import { useAdminEditForm } from "./useAdminEditForm";
+import { AdminPagination, useAdminPagedList } from "./adminPaging";
 import { AdminActionButton, AdminLoading, AdminStatus, errorText, optionalNumber, useAdminList } from "./adminUtils";
 export function AdminBuyingZonesPage() {
-    const r = useAdminList<BuyingZone>("/buying-zones");
+    const r = useAdminPagedList<BuyingZone>("/buying-zones/admin/page");
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const [busy, setBusy] = useState(false);
-    const editor = useAdminEditForm(r.data, r.loading, setError);
+    const editor = useAdminEditForm(r.data, r.loading, setError, { path: "/buying-zones", token: r.token });
     async function save(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
         if (!r.token || busy || !editor.canSubmit())
@@ -92,14 +93,15 @@ export function AdminBuyingZonesPage() {
             <StaleBadge updatedAt={x.updated_at}/>
             </article>)}
         </div>}
+    <AdminPagination page={r} label="Buying zones"/>
     </div>;
 }
 export function AdminSellWatchPage() {
-    const r = useAdminList<SellWatchWindow>("/sell-watch-windows");
+    const r = useAdminPagedList<SellWatchWindow>("/sell-watch-windows/admin/page");
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const [busy, setBusy] = useState(false);
-    const editor = useAdminEditForm(r.data, r.loading, setError);
+    const editor = useAdminEditForm(r.data, r.loading, setError, { path: "/sell-watch-windows", token: r.token });
     async function save(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
         if (!r.token || busy || !editor.canSubmit())
@@ -174,6 +176,7 @@ export function AdminSellWatchPage() {
             <StaleBadge updatedAt={x.updated_at}/>
             </article>)}
         </div>}
+    <AdminPagination page={r} label="Sell-watch windows"/>
     </div>;
 }
 export function AdminStoragePage() {

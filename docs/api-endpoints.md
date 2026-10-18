@@ -68,9 +68,10 @@ from declarations for traceability; follow the linked handler for all checks.
 | POST | `/auth/register` | `—` | [register](../backend/app/routes/auth_routes.py#L27) |
 | POST | `/auth/reset-password` | `—` | [change_forgotten_password](../backend/app/routes/auth_routes.py#L92) |
 | GET | `/buying-zones` | `require_full_access` | [get_zones](../backend/app/routes/buying_zone_routes.py#L23) |
-| POST | `/buying-zones` | `require_roles('admin')` | [add_zone](../backend/app/routes/buying_zone_routes.py#L41) |
-| GET | `/buying-zones/{zone_id}` | `require_full_access` | [get_zone](../backend/app/routes/buying_zone_routes.py#L32) |
-| PATCH | `/buying-zones/{zone_id}` | `require_roles('admin')` | [edit_zone](../backend/app/routes/buying_zone_routes.py#L52) |
+| POST | `/buying-zones` | `require_roles('admin')` | [add_zone](../backend/app/routes/buying_zone_routes.py#L53) |
+| GET | `/buying-zones/admin/page` | `require_roles('admin')` | [get_admin_zones_page](../backend/app/routes/buying_zone_routes.py#L34) |
+| GET | `/buying-zones/{zone_id}` | `require_full_access` | [get_zone](../backend/app/routes/buying_zone_routes.py#L44) |
+| PATCH | `/buying-zones/{zone_id}` | `require_roles('admin')` | [edit_zone](../backend/app/routes/buying_zone_routes.py#L64) |
 | GET | `/commodities` | `—` | [get_commodities](../backend/app/routes/commodity_routes.py#L32) |
 | POST | `/commodities` | `require_roles('admin')` | [add_commodity](../backend/app/routes/commodity_routes.py#L64) |
 | GET | `/commodities/admin/all` | `require_roles('admin')` | [get_all_commodities_for_admin](../backend/app/routes/commodity_routes.py#L38) |
@@ -145,9 +146,10 @@ from declarations for traceability; follow the linked handler for all checks.
 | PATCH | `/quality-signals/{signal_id}` | `require_roles('admin')` | [edit_signal](../backend/app/routes/quality_signal_routes.py#L65) |
 | GET | `/reports/prices.csv` | `require_roles('admin')` | [export_price_report_csv](../backend/app/routes/report_export_routes.py#L33) |
 | GET | `/sell-watch-windows` | `require_full_access` | [get_windows](../backend/app/routes/sell_watch_window_routes.py#L27) |
-| POST | `/sell-watch-windows` | `require_roles('admin')` | [add_window](../backend/app/routes/sell_watch_window_routes.py#L45) |
-| GET | `/sell-watch-windows/{window_id}` | `require_full_access` | [get_window](../backend/app/routes/sell_watch_window_routes.py#L36) |
-| PATCH | `/sell-watch-windows/{window_id}` | `require_roles('admin')` | [edit_window](../backend/app/routes/sell_watch_window_routes.py#L56) |
+| POST | `/sell-watch-windows` | `require_roles('admin')` | [add_window](../backend/app/routes/sell_watch_window_routes.py#L57) |
+| GET | `/sell-watch-windows/admin/page` | `require_roles('admin')` | [get_admin_windows_page](../backend/app/routes/sell_watch_window_routes.py#L38) |
+| GET | `/sell-watch-windows/{window_id}` | `require_full_access` | [get_window](../backend/app/routes/sell_watch_window_routes.py#L48) |
+| PATCH | `/sell-watch-windows/{window_id}` | `require_roles('admin')` | [edit_window](../backend/app/routes/sell_watch_window_routes.py#L68) |
 | GET | `/share/commodities/{commodity_name}` | `—` | [share_commodity_card](../backend/app/routes/share_routes.py#L49) |
 | GET | `/storage-suitability` | `require_full_access` | [get_items](../backend/app/routes/storage_suitability_routes.py#L27) |
 | POST | `/storage-suitability` | `require_roles('admin')` | [add_item](../backend/app/routes/storage_suitability_routes.py#L45) |
