@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -8,13 +8,12 @@ from app.models.faq_item import FAQItem
 from app.models.user import User
 from app.schemas.faq_schema import FAQAdminResponse, FAQCreate, FAQPublicResponse, FAQUpdate
 from app.services.audit_service import create_audit_log, snapshot_model
+from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, stream_admin_records
 from app.services.faq_service import (
     create_faq,
     delete_faq,
     get_faq_for_admin,
     get_published_faq,
-    list_published_faqs,
-    list_admin_faqs,
     set_faq_publication,
     update_faq,
 )
@@ -34,16 +33,28 @@ def _save_faq_audit(db: Session, admin: User, action: str, record_id: int, *, ol
 
 
 @router.get("", response_model=list[FAQPublicResponse])
-def get_published_items(db: Session = Depends(get_db)) -> list[FAQItem]:
-    return list_published_faqs(db)
+def get_published_items(db: Session = Depends(get_db)) -> Response:
+    return AdminJSONResponse(stream_admin_records(db.get_bind(), FAQItem, FAQPublicResponse,
+        order=(("category", False), ("id", False)), where=(FAQItem.is_published.is_(True),)), private=False)
 
 
 @router.get("/admin", response_model=list[FAQAdminResponse])
 def get_admin_items(
     db: Session = Depends(get_db),
     _: User = Depends(require_roles("admin")),
-) -> list[FAQItem]:
-    return list_admin_faqs(db)
+) -> Response:
+    return AdminJSONResponse(stream_admin_records(db.get_bind(), FAQItem, FAQAdminResponse,
+        order=(("category", False), ("id", False))))
+
+
+@router.get("/admin/page", response_model=AdminRecordPage[FAQAdminResponse])
+def get_admin_faq_page(
+    offset: int = Query(default=0, ge=0, le=2_147_483_647),
+    db: Session = Depends(get_db),
+    _: User = Depends(require_roles("admin")),
+) -> AdminRecordPage[FAQAdminResponse]:
+    return admin_record_page(db, FAQItem, FAQAdminResponse, offset=offset,
+        order=(("is_published", True), ("category", False), ("id", False)))
 
 
 @router.get("/{faq_id}", response_model=FAQPublicResponse)

@@ -52,7 +52,7 @@ try {
     await edit.getByLabel('Answer',{exact:true}).fill('Fabricated corrected local answer only.');
     await edit.getByLabel('Category',{exact:true}).fill('Local testing');
     const edited=page.waitForResponse(r=>r.url()===origin+`/api/faq/${item.id}`&&r.request().method()==='PATCH');
-    const reloaded=page.waitForResponse(r=>r.url()===origin+'/api/faq/admin');
+    const reloaded=page.waitForResponse(r=>r.url()===origin+'/api/faq/admin/page?offset=0');
     await edit.getByRole('button',{name:'Save FAQ',exact:true}).click();
     assert.equal((await edited).status(),200);await (await reloaded).finished();
     await page.waitForFunction(()=>!document.querySelector('button:disabled'));

@@ -390,6 +390,32 @@ async def catalog_paging_fixture(request):
     return JSONResponse({"commodities":205,"markets":205,"synthetic_only":True})
 
 
+async def faq_audit_paging_fixture(request):
+    if request.method == "GET":
+        return HTMLResponse('''<!doctype html><html><head><title>Local FAQ and audit sample</title></head><body style="font:18px system-ui;max-width:760px;margin:32px auto;padding:16px"><h1>Local FAQ and audit paging sample</h1><p>Load205 fabricated records per list in memory only. Extra FAQs stay hidden; audit entries contain fake private markers to test redaction. Restarting the preview clears this sample.</p><button onclick="seed()">Load synthetic FAQ and audit sample</button><p id="result" role="status"></p><p><a href="/admin/faq">FAQs</a> · <a href="/admin/audit">Audit logs</a></p><script>async function seed(){const r=await fetch('/__test__/faq-audit-paging',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({seed:true})});const d=await r.json();document.querySelector('#result').textContent=r.ok?'205 synthetic FAQs and audit entries ready.':d.detail;}</script></body></html>''')
+    if await request.json() != {"seed": True}:
+        return JSONResponse({"detail": "Expected synthetic seed control"}, status_code=422)
+    from sqlalchemy import func, select
+    from uuid import uuid4
+    with Session(engine) as db:
+        counts = {model: db.scalar(select(func.count()).select_from(model)) for model in (FAQItem, AuditLog)}
+        if any(count > 205 for count in counts.values()):
+            return JSONResponse({"detail": "Reseed preview before this check"}, status_code=409)
+        owner = db.scalar(select(User.id).where(User.email == "admin@example.com"))
+        sample_id = uuid4().hex[:8]
+        for index in range(205-counts[FAQItem]):
+            db.add(FAQItem(question=f"ZZ synthetic FAQ {sample_id} {index:03}", answer="Fabricated paging answer",
+                           category="ZZ synthetic", is_published=False, created_by=owner))
+        moment = datetime.now(timezone.utc)
+        for index in range(205-counts[AuditLog]):
+            db.add(AuditLog(user_id=owner, action="local.synthetic_paging", table_name="faq_items", record_id=None,
+                           old_value={"note":"Retained synthetic paging evidence", "source_1":"PRIVATE-PAGING-SOURCE"},
+                           new_value={"nested":[{"SOURCE_2":"PRIVATE-PAGING-SOURCE", "password_hash":"PRIVATE-PAGING-HASH"}]},
+                           created_at=moment))
+        db.commit()
+    return JSONResponse({"faqs":205,"audit_logs":205,"synthetic_only":True})
+
+
 async def admin_paging_fixture(request):
     # Fixed-size, fabricated accounts/payments only. No caller-supplied SQL,
     # connection details, identities or arbitrary fixture-size parameters.
@@ -460,7 +486,7 @@ class LocalOnly:
         else:
             await self.app(scope, receive, secured)
 
-preview = LocalOnly(Starlette(routes=[Route("/__test__/catalog-paging", catalog_paging_fixture, methods=["GET", "POST"]), Route("/__test__/admin-paging", admin_paging_fixture, methods=["GET", "POST"]), Route("/__test__/status", status), Route("/__test__/reconciliation", reconciliation_control, methods=["POST"]), Route("/__test__/offline-prices", offline_price_controls, methods=["GET", "POST"]), Route("/__test__/google-mode", set_google_mode, methods=["POST"]), Route("/__test__/alerts", notification_controls, methods=["GET", "POST"]), Route("/__test__/inbox", inbox), Route("/__test__/controls", controls), Route("/__test__/push", push_controls), Route("/__test__/payments", payment_controls), Route("/__test__/manual-review", manual_review_controls), Route("/__test__/purchase-value", purchase_value_controls), Route("/__test__/verification", verification_controls), Route("/__test__/verification-mode", set_verification_mode, methods=["POST"]), Route("/__test__/checkout", checkout_controls), Route("/__test__/checkout-mode", set_checkout_mode, methods=["POST"]), Route("/__test__/payment-event", payment_event, methods=["POST"]), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
+preview = LocalOnly(Starlette(routes=[Route("/__test__/faq-audit-paging", faq_audit_paging_fixture, methods=["GET", "POST"]), Route("/__test__/catalog-paging", catalog_paging_fixture, methods=["GET", "POST"]), Route("/__test__/admin-paging", admin_paging_fixture, methods=["GET", "POST"]), Route("/__test__/status", status), Route("/__test__/reconciliation", reconciliation_control, methods=["POST"]), Route("/__test__/offline-prices", offline_price_controls, methods=["GET", "POST"]), Route("/__test__/google-mode", set_google_mode, methods=["POST"]), Route("/__test__/alerts", notification_controls, methods=["GET", "POST"]), Route("/__test__/inbox", inbox), Route("/__test__/controls", controls), Route("/__test__/push", push_controls), Route("/__test__/payments", payment_controls), Route("/__test__/manual-review", manual_review_controls), Route("/__test__/purchase-value", purchase_value_controls), Route("/__test__/verification", verification_controls), Route("/__test__/verification-mode", set_verification_mode, methods=["POST"]), Route("/__test__/checkout", checkout_controls), Route("/__test__/checkout-mode", set_checkout_mode, methods=["POST"]), Route("/__test__/payment-event", payment_event, methods=["POST"]), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
 
 if __name__ == "__main__":
     import uvicorn

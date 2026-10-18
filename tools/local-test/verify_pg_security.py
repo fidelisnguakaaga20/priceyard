@@ -148,6 +148,12 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_faq_audit_pages_preserve_publication_groups_and_private_history(self):
+        spec = importlib.util.spec_from_file_location("local_faq_audit_paging", ROOT / "backend/tests/test_faq_audit_paging.py")
+        cases = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cases)
+        cases.verify_faq_audit_pages(self, self.engine)
+
     def test_nigerian_price_days_preserve_timestamptz_history_and_export(self):
         spec = importlib.util.spec_from_file_location("local_nigeria_price_time", ROOT / "backend/tests/test_nigeria_price_time.py")
         cases = importlib.util.module_from_spec(spec)

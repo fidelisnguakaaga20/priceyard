@@ -25,28 +25,34 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
-Latest verified: batch69,30 complete /6 partial or pending:
+Latest verified: batch70,30 complete /6 partial or pending:
 02,05,07,14,20,35. PY-13 approved Nigerian price time is complete locally:
 WAT input/display/day filters, explicit UTC instants, unchanged stored history,
 existing history access and billing/paid-expiry rules. Owner's2026-10-18 reply
 "do the best for app that is going to be mostly user friendly" authorizes the
 recommended WAT scope in docs/NIGERIAN_PRICE_TIME_APPROVAL.md. No production scope.
-Full263 backend tests, one focused native midnight/history/CSV case, original
-Admin/Reporter forms in Lagos/UTC, WAT desktop/mobile displays, legacy ambiguity,
-price moderation, comparison charts, seven baseline and all14 dashboard browser
-checks pass. TypeScript/Vite passed;87 source hashes match reused build; original
-CSS identical. No new fields, measurements, policies, dependencies or data repair.
-Small native fixture79/80, stopped. Review controls: /__test__/admin-paging and
-/__test__/catalog-paging on http://127.0.0.1:55446; load disposable samples only.
+Batch70 adds approved FAQ/audit paging:100 rows, complete totals, original FAQ
+published/hidden groups and known-ID actions, audit redaction and raw evidence
+preserved. Old full APIs stream complete arrays; public FAQ publication/caching
+unchanged. Full265 backend tests, one focused native FAQ/audit case, original FAQ
+workflow,205-record paging/off-page edit/publication/delete/redaction/mobile,
+seven baseline and all14 dashboard browser checks pass. TypeScript/Vite passed;
+87 source hashes match reused build; original CSS identical. WAT evidence69 kept.
+No new fields, measurements, policies, dependencies or data repair.
+Small native fixture80/80, stopped: do not run another case in this fixture or
+raise its cap/delete schemas. Prepare a separately pinned small synthetic fixture
+before the next native batch, preserving all existing fixtures and evidence.
+Review controls: /__test__/admin-paging, /__test__/catalog-paging and
+/__test__/faq-audit-paging on http://127.0.0.1:55446; disposable samples only.
 Owner approved docs/ADMIN_LIST_PAGING_APPROVAL.md on2026-10-18:100-record Admin
 pages with Previous/Next, complete totals/records, original forms/styles/cards.
-Next:12 remaining approved Admin lists in small PY-20 batches;4/16 already paged
-(Users/Payments67, Commodities/Markets68), complete snapshot totals/legacy arrays
-retained. Public history/charts must remain complete. PY-29 complete65.
+Next:10 remaining approved Admin lists in small PY-20 batches;6/16 already paged
+(Users/Payments67, Commodities/Markets68, FAQs/Audit70), complete snapshot totals/
+legacy arrays retained. Public history/charts must remain complete. PY-29 complete65.
 Policy gates remain for source disclosure02, referral qualification/caps05,
 session/storage choices07 and movement/confidence14. Live operational work35
-remains unauthorized. Before a new native case, check the80-schema budget;
-only one case remains in the current pinned fixture. Preserve its evidence.
+remains unauthorized. The current native80-schema budget is exhausted; retain
+its database and evidence intact and do not rerun tests in it.
 Owner policy and production gates stay explicit. Testing foundation PY-30 stays
 complete; new regression tests belong with their respective improvements.
 Do not reopen completed scope or mistake earlier historical counts for current.
@@ -401,7 +407,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-17 | Correct market-detail loading | Complete for identified loading races/combined-failure defect in batch 16; obsolete commodity/account responses ignored and independent successful sections retained |
 | PY-18 | Accurate account/payment/access messages | Complete for identified account/expiry/callback defects in batches 4/11/19; verified return refreshes access, unconfirmed return never claims payment received in title |
 | PY-19 | Existing FAQ draft/hide/publish management | Complete in batch 12; hidden drafts remain available to Admin across reload, public publication boundary verified |
-| PY-20 | Bounded queries with accessible historical records | Partial: current ranking23, dashboard29, history metadata32, commodity scoping47–49, CSV streaming60; approved100-record Users/Payments pages67 and Commodities/Markets68 use full snapshot counts and complete legacy streams. Public active catalog arrays/caching unchanged. Save-completes-after-navigation race reproduced/fixed68.4/16 Admin lists paged;12 others/public history remain. No chart/history truncation. Scope: docs/ADMIN_LIST_PAGING_APPROVAL.md |
+| PY-20 | Bounded queries with accessible historical records | Partial: current ranking23, dashboard29, history metadata32, commodity scoping47–49, CSV streaming60; approved100-record Users/Payments pages67, Commodities/Markets68, FAQs/Audit70 use full snapshot counts and complete legacy streams. FAQ published/hidden visual order, off-page known-ID actions, public publication and audit redaction/raw evidence retained. Public catalogs/FAQ complete/caching unchanged; save-navigation race fixed68.6/16 Admin lists paged;10 others/public history remain. No chart/history truncation. Scope: docs/ADMIN_LIST_PAGING_APPROVAL.md |
 | PY-21 | Reliable independent alerts | Application-side identified channel dependency complete in batch 24: failed email no longer skips push/WhatsApp; per-user/channel failures isolated; existing deduplication/count semantics retained. Delivery/retry operations remain PY-35 |
 | PY-22 | Efficient loading and accurate dashboard totals | Complete for identified dashboard scope in batch 29: all 14 original metrics preserved; one Admin-only aggregate API/DB snapshot, zero entity hydration; backend/PG/browser totals and outage recovery verified |
 | PY-23 | Preserve layout while fixing mobile overflow | Complete for identified original critical-layout/price-card overflow scope in batches 42/43: 78 normal and twelve long-name viewport checks, 320–1366px, Easy reading both modes; ordinary card/badge geometry and all fourteen Admin cards preserved |
@@ -411,7 +417,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-27 | Consistent existing editing/password inputs | Complete for identified scope: feedback selection in batch26, existing Unicode/72-byte password rules and reset validation in batch46, owner-approved six Admin edit forms in batches50–52. Saved values/costs, one-field edits, reload, explicit clearing, switching/unknown/blank IDs and creation verified in61 actual browser checks |
 | PY-28 | Historical record preservation | Current application-side scope complete in batch59: read-only legacy/unversioned preflight before migration steps, empty/reviewed0021-to0022 paths, unchanged raw history/catalog IDs/active flags/cost links/sources/audits, preserved paid/payment records and0022 downgrade refusal verified. No guesses to repair already-changed historical data; production backup/restore/rollout and any repairs require owner approval under PY-35 |
 | PY-29 | Stable identities and dependent records | Application-side identified scope complete65: catalog IDs/referenced deletion/atomic audits34; duplicate/rename/rollback races62; locked parent-price and same-commodity/market observation links64; exact existing-ID current/history filters and rename-safe detail/share links65. Current shares never publish historical amounts. Original labels, measurements and all records preserved; no automatic merge, legacy alias guesses, rewrites or invented cost units. Historical repairs require separate PY-35 approval |
-| PY-30 | Isolated automated/browser verification | Identified local testing-foundation/coverage scope complete63: criteria/workflow map/evidence retained; full263 backend tests69, full40 native baseline47 plus focused cases including WAT midnight/history/CSV69, six isolation probes63. Original baseline/14-card/time/price/chart browser69 and earlier access/catalog/paging/save-race proof retained. Native79/80 schemas stopped, phases serialized,87 source hashes match reused build; original CSS unchanged, no dependency copies. Synthetic-only SQLite adapter restores known UTC price instants to match native TIMESTAMPTZ; never used on real/ambiguous data. Not100% coverage or production/provider certification; future tests stay with remaining items, operational checks remain PY-35 |
+| PY-30 | Isolated automated/browser verification | Identified local testing-foundation/coverage scope complete63: criteria/workflow map/evidence retained; full265 backend tests70, full40 native baseline47 plus focused cases through WAT69/FAQ-audit70, six isolation probes63. Original baseline/14-card/FAQ/paging/redaction/mobile browser70, time/price/chart69 and earlier evidence retained. Native80/80 schemas stopped: new pinned small fixture required before further native cases; do not raise cap/delete evidence. Phases serialized,87 source hashes match build; original CSS unchanged, no dependency copies. Synthetic-only SQLite adapter restores known UTC price instants, never real/ambiguous data. Not100% coverage or production/provider certification; future tests stay with remaining items, operational checks remain PY-35 |
 | PY-31 | Confirmed payment activation and recovery | Application-side approved scope complete in batch58: atomic confirmation, owner callback and explicit bounded/resumable reconciliation for missed webhook/return; dry-run default, strict existing evidence/activation, single PG worker, error isolation, replay safety and purchased-time/manual-grant preservation verified. Live scheduling/checkpoints/monitoring and ambiguous legacy repairs require owner approval under PY-35 |
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches 14/21: carry forward dated paid/trial time; preserve indefinite grants, block new checkout and hold/recover old purchases without consuming days |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
@@ -2618,3 +2624,46 @@ public-history/chart completeness. Source/referral/session/movement policy gates
 and all live operations remain explicit. One native schema slot remains; preserve
 this fixture and its evidence when preparing any separately pinned replacement.
 No production access, push, merge or deployment.
+
+
+### Batch 70 - approved PY-20 FAQ/audit paging (2026-10-18)
+
+Continued from verified local96a855d (Nigerian time69), without reopening it.
+- Added /faq/admin/page and /audit-logs/page:100-record pages/full snapshot counts,
+  one SQL statement, unchanged schemas/permissions. Empty/out-of-range pages keep
+  complete totals. FAQ visual order is published first, hidden second, then the
+  original category/ID order within each group; audit order stays newest/ID first.
+- Old /faq/admin and /audit-logs return complete arrays via bounded owned-session
+  streams. Public /faq remains complete/published-only and eligible for public
+  caching; legacy full FAQ category/ID ordering stays unchanged.
+- Existing FAQ forms/actions and audit columns retained with shared Previous/Next
+  controls. Saves reload the current page, without injecting off-page records or
+  exceeding100 displayed rows. Known-ID editing/publish/hide/delete works beyond
+  the current page; removing the final tail moves back safely. No hidden draft
+  publication, source disclosure or historical audit rewrite.
+- Added fixed205-record /__test__/faq-audit-paging fixture control to the guarded
+  in-memory preview only. Extra FAQs stay hidden; fake private markers exercise
+  existing audit redaction. No customer/market/price data is copied or invented.
+
+Verification:
+- All265 backend tests passed,28.877s, no failures/errors/skips. Full pages/groups,
+  stable ties, old complete arrays, public drafts boundary, invalid offsets and
+  raw saved FAQ/audit evidence preservation verified.
+- One native PostgreSQL case passed0.809s; fixture79->80/80 schemas and stopped.
+  This cap is now reached. Do not run further cases in it, raise its cap or delete
+  preserved schemas; prepare a new separately pinned small fixture for next work.
+- Original FAQ create/edit/publish/hide/reload/delete and five continuous audits
+  passed.205-row browser sample verified every FAQ/audit ID reachable, old arrays
+  complete, redaction, off-page known-ID edit/publication, safe last-page deletion,
+  public FAQ and saved prices unchanged,375px layouts. No external/prod contacts.
+- Original seven browser baseline workflows and all14 dashboard cards/totals plus
+  outage recovery passed. TypeScript/Vite106 modules1.18s;87 source/public/config
+  hashes match reused build, original CSS byte-identical; no dependency copies or
+  installations. Source-only API index now112 declared operations.
+
+Evidence: tools/local-test/evidence/batch-70-*.json. Count remains30 complete and
+6 partial/pending (02,05,07,14,20,35); PY-20 now6/16 approved Admin lists paged,
+10 lists and complete public-history materialization remain. Next small lists
+must preserve existing subscription expiry/filter/source/ID-action semantics,
+using a new pinned native fixture before tests. No production, push, merge or
+ deployment; source/referral/session/movement and live-operation gates remain.

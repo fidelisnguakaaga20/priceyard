@@ -44,3 +44,11 @@ price history is requested here. API implementation details must be verified
 before changing callers.
 
 Decision: APPROVED by owner2026-10-18; implement/test/commit locally in small batches.
+
+Verified through batch70:6/16 lists (Users/Payments67, Commodities/Markets68,
+FAQs/Audit70). FAQ pages keep the original visible published-first/hidden-second
+group ordering, then category/ID within groups; legacy full FAQ arrays retain
+their original category/ID order. Known-ID editing/publication works beyond the
+current page. Public FAQ arrays remain complete and published-only. Audit pages
+and full streams apply the existing response-time redaction, retaining raw
+historical evidence. No subscription expiry or other listing rules changed.

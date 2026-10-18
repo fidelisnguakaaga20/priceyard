@@ -1,0 +1,15 @@
+{
+  "checks": {
+    "audit_all_ids_reachable_redaction_and_reload": true,
+    "faq_all_ids_reachable_original_publication_groups": true,
+    "off_page_known_id_edit_publish_hide_preserve_page_and_public_rules": true,
+    "deleting_only_disposable_hidden_tail_returns_to_existing_page": true,
+    "original_public_faq_prices_and_mobile_layout_preserved": true
+  },
+  "records_per_sample": 205,
+  "page_size": 100,
+  "private_audit_markers_hidden": true,
+  "external_requests": 0,
+  "production_connections": 0,
+  "reseed_preview_after_check": true
+}
