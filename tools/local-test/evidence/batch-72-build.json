@@ -1,0 +1,13 @@
+{
+  "typescript_and_vite_passed": true,
+  "matched_frontend_source_public_config_files": 87,
+  "reused_existing_snapshot": true,
+  "original_css_byte_identical": true,
+  "assets_sha256": {
+    "index-BEBH-Ai6.css": "1cb3438f14a262d4ad7efa4ad11153cf61867917aabf51e88a04c6655cffdb28",
+    "index-CZPHdJux.js": "115321930fd1071c40d56042a7eb8fc30a1ca543d53e5f174da16adfe73c0fa6"
+  },
+  "dependencies_installed": 0,
+  "dependencies_copied": 0,
+  "single_build_after_native_fixture_stopped": true
+}

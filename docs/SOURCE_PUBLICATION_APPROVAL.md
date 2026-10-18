@@ -1,4 +1,4 @@
-# PY-02 source publication safeguard - proposed local scope
+# PY-02 source publication safeguard - approved local scope
 
 Current rules: explicit source_1/source_2 identities are omitted from public price,
 CSV and audit responses; legitimate Admin price management retains them. Public
@@ -22,4 +22,5 @@ This is publishing guidance and disclosure prevention using the existing source
 fields, not a claim that arbitrary confidential text can be identified perfectly.
 Implementation is local only. The hint is visible and requires owner approval.
 
-Decision: pending owner approval.
+Decision: owner answered "Approve the source safeguard" on2026-10-18.
+Only this local scope is approved; no production review/mutation is authorized.

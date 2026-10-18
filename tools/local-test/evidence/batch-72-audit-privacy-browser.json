@@ -1,0 +1,8 @@
+{
+  "legacy_list_detail_and_original_audit_screen_redacted": true,
+  "retained_action_and_nonprivate_evidence": true,
+  "public_price_sources_hidden": true,
+  "legitimate_admin_price_sources_retained": true,
+  "external_page_requests": 0,
+  "production_connections": 0
+}

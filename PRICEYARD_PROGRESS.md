@@ -25,8 +25,14 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
-Latest verified: batch71,30 complete /6 partial or pending:
-02,05,07,14,20,35. PY-13 approved Nigerian price time is complete locally:
+Latest verified: batch72,31 complete /5 partial or pending:
+05,07,14,20,35. PY-02 approved source-publication scope is complete locally:
+both original Admin Notes controls explain their public visibility; private
+source fields/access and historical evidence stay intact. Six-role backend,
+native PostgreSQL and browser checks pass. Owner approved the exact scope in
+docs/SOURCE_PUBLICATION_APPROVAL.md on2026-10-18. Arbitrary text classification
+and production historical-note review are not claimed or authorized.
+PY-13 approved Nigerian price time is complete locally:
 WAT input/display/day filters, explicit UTC instants, unchanged stored history,
 existing history access and billing/paid-expiry rules. Owner's2026-10-18 reply
 "do the best for app that is going to be mostly user friendly" authorizes the
@@ -42,7 +48,7 @@ dashboard browser checks pass. TypeScript/Vite passed;
 No new fields, measurements, policies, dependencies or data repair.
 Old recovery fixture80/80 remains stopped/intact. Fresh small native fixture
 postgres-paging-20261018 at127.0.0.1:55449, identifier7697910732590408300,
-uses --paging-cluster:1/80 schemas, stopped. Same12 connections/32MB buffers,
+uses --paging-cluster:2/80 schemas, stopped. Same12 connections/32MB buffers,
 fsync enabled/exclusive lock and identity guards. Build refuses its active port.
 Review controls: /__test__/admin-paging, /__test__/catalog-paging and
 /__test__/faq-audit-paging and /__test__/signal-paging on http://127.0.0.1:55446;
@@ -52,11 +58,10 @@ pages with Previous/Next, complete totals/records, original forms/styles/cards.
 Next:8 remaining approved Admin lists in small PY-20 batches;8/16 already paged
 (Users/Payments67, Commodities/Markets68, FAQs/Audit70, two Signals71), full snapshot totals/
 legacy arrays retained. Public history/charts must remain complete. PY-29 complete65.
-Policy gates remain for source disclosure02, referral qualification/caps05,
+Policy gates remain for referral qualification/caps05,
 session/storage choices07 and movement/confidence14. Live operational work35
-remains unauthorized. PY-02 visible source-publication hint proposed in
-docs/SOURCE_PUBLICATION_APPROVAL.md; owner question pending. Do not implement
-that hint or change source/access policies without the answer.
+remains unauthorized. PY-02 approved hint/source safeguards are verified72;
+no change to public notes, generic source categories or premium access.
 Owner policy and production gates stay explicit. Testing foundation PY-30 stays
 complete; new regression tests belong with their respective improvements.
 Do not reopen completed scope or mistake earlier historical counts for current.
@@ -393,7 +398,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | ID | Improvement | Current status |
 |---|---|---|
 | PY-01 | Consistent historical access checks | Complete in batch 7; date/comparison/ID routes enforce existing history entitlement; current summaries preserved |
-| PY-02 | Confidential/restricted market information | Partial: quality list/detail match existing premium screen; new and legacy audit responses redact private fields without rewriting evidence, public price responses omit source identities and legitimate Admin source access stays; remaining source policy review pending, public basic guidance unchanged |
+| PY-02 | Confidential/restricted market information | Approved application scope complete72: existing premium boundaries, response allowlists and legacy audit redaction retain private evidence/Admin source access; owner-approved hints beside both original Notes controls explain public visibility and private source fields. Six-role/backend/native/browser checks cover prices/history/CSV/audits/shares and unchanged raw records. Public notes/generic categories/access unchanged; arbitrary confidential-text detection not claimed. Any production historical editorial review requires separate PY-35 authorization |
 | PY-03 | Google ownership and safe account linking | Application-side approved scope complete in batch 27: stable subject ownership, no email-only linking/overwrite, existing password/reset fallback and original trials; cryptographic/HTTP/PG/browser verified. Live Google popup/provider compatibility remains operational PY-35 |
 | PY-04 | Password reset and login revocation | Complete in batch 5; actual HTTP/browser and PostgreSQL reset/logout races passed |
 | PY-05 | Referral abuse protection | Partial: atomic registration/reward/audit, duplicate-registration safety and concurrent seven-day reward preservation verified in batch 20; qualification/abuse-cap changes require approval and remain unchanged |
@@ -2722,3 +2727,36 @@ new native fixture; never restart exhausted fixtures or raise their budgets.
 PY-02 publication hint proposal recorded in docs/SOURCE_PUBLICATION_APPROVAL.md;
 owner question pending, no hint/policy implementation without its answer.
 No production, push, merge or deployment.
+
+
+### Batch 72 - approved PY-02 source publication (2026-10-18)
+
+Preserved497e228 and the interrupted working tree. Owner explicitly answered
+"Approve the source safeguard". Both original Admin Notes textareas now have an
+accessible hint explaining public visibility and the existing private source
+fields. No new fields, source categories, paid-access rules or historical edits.
+
+Verification:
+- Focused six-role backend policy case passed0.365s, covering current/history,
+  CSV, audit list/page/detail and share paths. Existing public notes/guidance stay;
+  private fabricated markers remain absent and Admin source management remains.
+- Relevant native case passed1.480s on the pinned small127.0.0.1:55449 fixture;
+  schemas1->2/80, stopped before the build. Raw price/audit evidence unchanged.
+- Interrupted TypeScript/Vite build passed106 modules4.00s.87 whitelisted source,
+  public and config hashes match the reused build; original CSS byte-identical.
+  No dependencies installed/copied or overlapping heavy phases.
+- Normal approval retry succeeded. Previous command was not executed because
+  automatic approval review hit a usage limit, not a finding that it was unsafe.
+  No guard/restriction was bypassed. Identity-checked synthetic preview restarted.
+- Browser confirms both hints/descriptions, original Notes labels, private-source
+  prefill, mobile375px layout, unchanged records and public CSV/share privacy.
+  Existing legacy-audit privacy and original create/approve/correct/outdated/
+  reject/reload workflows pass. Seven baseline views and all14 Admin labels/
+  totals/outage recovery pass. Zero external/production contacts.
+
+Evidence: tools/local-test/evidence/batch-72-*.json. Exactly31 complete and5
+partial/pending:05,07,14,20,35. PY-02 complete for this finite approved scope;
+free-text editorial discipline is still necessary, and no production historical
+text review is authorized. Next approved small batch: Buying zones/Sell-watch
+Admin paging under PY-20 (8/16 lists paged). Referral/session/movement decisions
+and live operations retain their gates. No production, push, merge or deployment.

@@ -152,6 +152,12 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_source_publication_preserves_private_evidence_and_existing_access(self):
+        spec = importlib.util.spec_from_file_location("local_source_publication", ROOT / "backend/tests/test_source_publication.py")
+        cases = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cases)
+        cases.verify_source_publication(self, self.engine)
+
     def test_signal_pages_keep_complete_scopes_and_saved_observations(self):
         spec = importlib.util.spec_from_file_location("local_signal_paging", ROOT / "backend/tests/test_signal_paging.py")
         cases = importlib.util.module_from_spec(spec)

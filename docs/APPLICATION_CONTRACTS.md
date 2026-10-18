@@ -43,6 +43,10 @@ and customer entitlement are checked separately. Server-side authorization is
 required even when a button/route is hidden in the browser. Private source
 identities must not leak through public prices, CSV, audit responses or errors.
 Legitimate Admin source access and underlying audit evidence stay available.
+Owner approved the existing Admin Notes hints: notes are shown to users; source
+names/contact details belong in the existing private source fields. Existing
+public notes, generic source categories and premium access stay unchanged. This
+does not classify arbitrary confidential text or authorize historical text edits.
 
 Password reset invalidates earlier login versions. Logout revokes the presented
 token; disabling/re-enabling an account must not revive previous credentials.
