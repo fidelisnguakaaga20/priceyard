@@ -1,0 +1,14 @@
+{
+  "typescript_and_vite_passed": true,
+  "vite": "6.4.4",
+  "modules": 104,
+  "vite_seconds": 4.65,
+  "source_files_matched": 89,
+  "application_source_and_styles_unchanged": true,
+  "compiled_css_format_changed": true,
+  "old_build_retained": true,
+  "assets_sha256": {
+    "index-CpbS-jqb.js": "42cea5d3aa361abbd6ec11a517d8793898ff83403dd81bb8ab38219b8ebb4e80",
+    "index-Cs9saEqb.css": "185783d23220b0b18337f631d09b38cfb9e73948578d9019a2e8d72c43567484"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "direct_versions": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-router-dom": "6.30.6",
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
+    "@vitejs/plugin-react": "4.3.4",
+    "typescript": "5.6.3",
+    "vite": "6.4.4"
+  },
+  "lock_sha256": "22e59438d5768d936fd7f58edbeb2e2b111124a36b5705d6130e12537bdfe1fc",
+  "resolved_packages": 123,
+  "registry": "https://registry.npmjs.org/",
+  "lifecycle_scripts_executed": 0,
+  "previous_snapshot_retained": true,
+  "production_contacts": 0
+}

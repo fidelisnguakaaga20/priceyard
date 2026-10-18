@@ -44,6 +44,8 @@ def main():
     source = ROOT / "frontend"
     for name in ("package.json", "index.html", "tsconfig.json", "tsconfig.app.json", "tsconfig.node.json", "vite.config.ts"):
         shutil.copyfile(source / name, target / name)
+    if (source / 'package-lock.json').exists():
+        shutil.copyfile(source / 'package-lock.json', target / 'package-lock.json')
     for name in (("src", "public") if options.reuse else ("src", "public", "node_modules")):
         if options.reuse:
             source_files = {item.relative_to(source / name) for item in (source / name).rglob("*") if item.is_file()}

@@ -25,7 +25,7 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
-Latest verified: batch81,35 complete /1 partial or pending:35.
+Latest verified: batch82,35 complete /1 partial or pending:35.
 PY-20 committed558f756eea2eb7db727708b9a72f81e5f40fd5a7 successfully before
 advancing this count. History uses one ordered query and100-row ORM batches,
 without truncation. Browser memory still scales with the selected full result;
@@ -3138,3 +3138,34 @@ evidence committed558f756eea2eb7db727708b9a72f81e5f40fd5a7, then confirmed clean
 Git status and unchanged master76dbd275/backup25899101 before advancing35/36.
 Evidence:tools/local-test/evidence/batch-81-*.json. PY-35 remains the only partial
 item. No production, push, merge or deployment.
+
+### Batch 82 - PY-35 approved dependency security updates (2026-10-18)
+
+Continued3e523ad after confirming PY-20 commit558f756. Targeted maintainer
+advisories include declared Vite5.4.11/router6.28.0; package presence is not proof
+of exploitation. Vite dev-server exposure differs from the compiled Python
+preview; router advisories have mode/untrusted-navigation conditions. Exact
+links and limits:docs/DEPENDENCY_READINESS.md. Owner answered "do best option"
+to the explicit isolated Vite6.4.4/router6.30.6 install exception. Approval
+recorded before fetching. Only official npm registry, integrity-bearing lockfile,
+no inherited user/npm credentials, no lifecycle scripts, no production services.
+
+New fixed runtime/frontend-security-20261018 retains old snapshot/dependencies.
+Lock123 entries;73 applicable packages installed. React18.3.1/plugin4.3.4/TS5.6.3
+unchanged; plugin peer range supports Vite6. Source declarations plus reviewed
+package-lock updated only after guarded TypeScript/Vite build104 modules4.65s.
+No application TSX/CSS/public source change. Compiler CSS bytes differ; computed
+layout/font/padding/colors/borders match the old build at1366/375px. Existing
+commodity-ID deep link, ten protected-session cases, seven original baseline
+workflows, all14 accurate dashboard cards/outage recovery, payment failure/retry/
+replay, CSV, original price editing, fabricated Google and full251-row history
+pass. Five build-recovery tests0.098s pass after optional lockfile snapshot copy.
+Backend application code unchanged; reused286-test/native81 evidence, not a new
+full suite. All browser/provider tests isolated, external page/production contacts0.
+Authorized registry downloads/public advisory reads are separate from app tests.
+
+Evidence:tools/local-test/evidence/batch-82-*.json. Counts remain35/36;35 partial
+for remaining operational work. Do not claim all dependencies/CVEs or Linux/live
+hosting certified. Old root node_modules is retained; use marked55446 preview.
+Next tiny synthetic backup/restore, monitoring and release gate/runbooks. No
+production, push, merge or deployment.
