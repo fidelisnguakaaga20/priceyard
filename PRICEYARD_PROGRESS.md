@@ -25,7 +25,7 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
-Latest verified: batch74,31 complete /5 partial or pending:
+Latest verified: batch75,31 complete /5 partial or pending:
 05,07,14,20,35. PY-02 approved source-publication scope is complete locally:
 both original Admin Notes controls explain their public visibility; private
 source fields/access and historical evidence stay intact. Six-role backend,
@@ -48,15 +48,15 @@ dashboard browser checks pass. TypeScript/Vite passed;
 No new fields, measurements, policies, dependencies or data repair.
 Old recovery fixture80/80 remains stopped/intact. Fresh small native fixture
 postgres-paging-20261018 at127.0.0.1:55449, identifier7697910732590408300,
-uses --paging-cluster:5/80 schemas, stopped. Same12 connections/32MB buffers,
+uses --paging-cluster:6/80 schemas, stopped. Same12 connections/32MB buffers,
 fsync enabled/exclusive lock and identity guards. Build refuses its active port.
 Review controls: /__test__/admin-paging, /__test__/catalog-paging and
 /__test__/faq-audit-paging and /__test__/signal-paging on http://127.0.0.1:55446;
 disposable samples only.
 Owner approved docs/ADMIN_LIST_PAGING_APPROVAL.md on2026-10-18:100-record Admin
 pages with Previous/Next, complete totals/records, original forms/styles/cards.
-Next:4 remaining approved Admin lists in small PY-20 batches;12/16 already paged
-(Users/Payments67, Commodities/Markets68, FAQs/Audit70, all six intelligence71/73/74), full snapshot totals/
+Next:3 remaining approved Admin lists in small PY-20 batches;13/16 already paged
+(Users/Payments67, Commodities/Markets68, FAQs/Audit70, all six intelligence71/73/74, Feedback75), full snapshot totals/
 legacy arrays retained. Public history/charts must remain complete. PY-29 complete65.
 Policy gates remain for referral qualification/caps05,
 session/storage choices07 and movement/confidence14. Live operational work35
@@ -416,7 +416,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-17 | Correct market-detail loading | Complete for identified loading races/combined-failure defect in batch 16; obsolete commodity/account responses ignored and independent successful sections retained |
 | PY-18 | Accurate account/payment/access messages | Complete for identified account/expiry/callback defects in batches 4/11/19; verified return refreshes access, unconfirmed return never claims payment received in title |
 | PY-19 | Existing FAQ draft/hide/publish management | Complete in batch 12; hidden drafts remain available to Admin across reload, public publication boundary verified |
-| PY-20 | Bounded queries with accessible historical records | Partial: current ranking23, dashboard29, history metadata32, commodity scoping47-49, CSV streaming60; approved100-record Admin pages67-74 now cover12/16 lists (Users,Payments,Commodities,Markets,FAQs,Audit,all six intelligence). Full snapshot counts, complete legacy/scoped streams, original access/publication/redaction and off-page ID edits retained. Late/wrong-ID lookup protection71 verified. Four Admin lists/public history remain; no chart/history truncation. Scope: docs/ADMIN_LIST_PAGING_APPROVAL.md |
+| PY-20 | Bounded queries with accessible historical records | Partial: current ranking23, dashboard29, history metadata32, commodity scoping47-49, CSV streaming60; approved100-record Admin pages67-75 now cover13/16 lists (Users,Payments,Commodities,Markets,FAQs,Audit,Feedback,all six intelligence). Full snapshot counts, complete legacy/scoped streams, original access/publication/redaction and off-page ID edits retained. Late/wrong-ID lookup protection71 verified. Three Admin lists/public history remain; no chart/history truncation. Scope: docs/ADMIN_LIST_PAGING_APPROVAL.md |
 | PY-21 | Reliable independent alerts | Application-side identified channel dependency complete in batch 24: failed email no longer skips push/WhatsApp; per-user/channel failures isolated; existing deduplication/count semantics retained. Delivery/retry operations remain PY-35 |
 | PY-22 | Efficient loading and accurate dashboard totals | Complete for identified dashboard scope in batch 29: all 14 original metrics preserved; one Admin-only aggregate API/DB snapshot, zero entity hydration; backend/PG/browser totals and outage recovery verified |
 | PY-23 | Preserve layout while fixing mobile overflow | Complete for identified original critical-layout/price-card overflow scope in batches 42/43: 78 normal and twelve long-name viewport checks, 320–1366px, Easy reading both modes; ordinary card/badge geometry and all fourteen Admin cards preserved |
@@ -2836,3 +2836,48 @@ purchased-time preservation; do not page away those side effects. Full public
 history/chart materialization stays separate and must not be truncated.
 Referral/session/movement decisions and live operations retain their gates.
 No production, push, merge or deployment.
+
+
+### Batch 75 - approved PY-20 filtered Feedback paging (2026-10-18)
+
+Continued verified ecf133a. Original Feedback view now uses100-record Admin pages
+and the existing rating filter; filter changes start at page1, and reload/back
+retain rating/page. Shared snapshot helper accepts explicit SQL conditions for
+both count and rows. Default callers keep identical unfiltered behavior. Old
+full/rating-filtered Feedback arrays stream complete100-row batches.
+
+The original summary remains global count/average, independent of page/rating.
+Summary requests abort/ignore obsolete responses after navigation/account change;
+record actions reload the current page and global summary. Existing private
+screenshots, testimonial display-name field, publish/hide/delete controls and
+public testimonial allowlist remain. No new fields, policies or product design.
+
+Verification:
+- New focused contract case passed0.238s. Full273 backend tests passed32.414s,
+  no failures/errors/skips; broad run justified by the shared filtered-page helper.
+ 205 tied records,1/204/empty rating scopes, full/global counts/averages, complete
+  legacy streams, private attachments/Admin rights and public allowlists pass.
+- Focused native case passed1.030s; pinned55449 schemas5->6/80, stopped before
+  build. Original feedback rows unchanged; no production/schema migration.
+- TypeScript/Vite passed106 modules0.982s.87 whitelisted source/public/config
+  hashes match reused snapshot; original CSS byte-identical. Zero installations
+  or dependency copies. Source-only API index now119 declared operations.
+- Six205-record browser checks pass: all IDs/full totals/private screenshots;
+  Previous/reload/browser Back; rating reset/retention/empty results and unchanged
+  global summary; original testimonial feature/hide with private evidence intact;
+ 375px layout; filtered-tail deletion moves back while retaining rating and
+  refreshing global/filtered totals. Corrected only the test selector for the
+  original wrapped rating select; no product label/accessibility rule changed.
+- Existing customer feedback attachment/last-file-wins/submit checks pass.
+  Fresh tiny-preview seven baseline workflows and all14 dashboard labels/full
+  totals/outage recovery pass. Raw prices unchanged; one heavy phase/browser
+  at a time, zero external requests/production contacts.
+
+Evidence: tools/local-test/evidence/batch-75-*.json. Exactly31 complete /5 partial
+or pending:05,07,14,20,35. Approved Admin paging13/16; next Subscriptions, Prices
+and flags. Subscription paging must preserve the original all-account expiry
+sweep, original User->Subscription writer lock order, staff authority and all
+purchased/trial value; never process just the visible page. Full public history
+materialization is still separate, with no approval to truncate chart/history.
+Referral/session/movement owner decisions remain unchanged; live operational
+PY-35 work remains forbidden. No production, push, merge or deployment.

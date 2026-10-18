@@ -26,11 +26,11 @@ def _ordering(entity, order):
             for name, descending in order]
 
 
-def admin_record_page(db: Session, model, schema: type[T], *, offset: int, order) -> AdminRecordPage[T]:
+def admin_record_page(db: Session, model, schema: type[T], *, offset: int, order, where=()) -> AdminRecordPage[T]:
     # One statement gives count and rows the same DB snapshot, including an
     # empty/out-of-range page. Count never hydrates the rest of the catalog.
-    total = select(func.count().label("total")).select_from(model).cte("matched_total")
-    page = select(model).order_by(*_ordering(model, order)).offset(offset).limit(PAGE_SIZE).cte("page_rows")
+    total = select(func.count().label("total")).select_from(model).where(*where).cte("matched_total")
+    page = select(model).where(*where).order_by(*_ordering(model, order)).offset(offset).limit(PAGE_SIZE).cte("page_rows")
     entity = aliased(model, page)
     rows = db.execute(select(entity, total.c.total).select_from(total).outerjoin(entity, true())
                       .order_by(*_ordering(entity, order))).all()

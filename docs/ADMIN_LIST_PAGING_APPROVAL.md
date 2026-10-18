@@ -45,8 +45,12 @@ before changing callers.
 
 Decision: APPROVED by owner2026-10-18; implement/test/commit locally in small batches.
 
-Verified through batch74:12/16 lists (Users/Payments67, Commodities/Markets68,
-FAQs/Audit70, Market/Quality signals71, Buying zones/Sell-watch73, Storage/Cost74).
+Verified through batch75:13/16 lists (Users/Payments67, Commodities/Markets68,
+FAQs/Audit70, Market/Quality signals71, Buying zones/Sell-watch73, Storage/Cost74,
+Feedback75). Feedback keeps its original rating filter and global count/average;
+changing the filter resets the page, and reload/back retain the selected filter.
+Filtered count/rows share one snapshot. Private screenshots and testimonial
+publish/hide/delete actions remain; public testimonial fields stay restricted.
 All six intelligence editors preserve off-page ID
 loading through existing detail endpoints, cancel obsolete requests and reject
 mismatched IDs; old full/scoped streams and access rules stay intact.

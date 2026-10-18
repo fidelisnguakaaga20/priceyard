@@ -96,11 +96,12 @@ from declarations for traceability; follow the linked handler for all checks.
 | PATCH | `/faq/{faq_id}/publish` | `require_roles('admin')` | [publish_item](../backend/app/routes/faq_routes.py#L91) |
 | GET | `/feedback` | `require_roles('admin')` | [get_feedback_list](../backend/app/routes/feedback_routes.py#L70) |
 | POST | `/feedback` | `get_current_user` | [submit_feedback](../backend/app/routes/feedback_routes.py#L53) |
+| GET | `/feedback/admin/page` | `require_roles('admin')` | [get_feedback_page](../backend/app/routes/feedback_routes.py#L81) |
 | GET | `/feedback/summary` | `require_roles('admin')` | [get_feedback_summary](../backend/app/routes/feedback_routes.py#L62) |
-| DELETE | `/feedback/{feedback_id}` | `require_roles('admin')` | [remove_feedback](../backend/app/routes/feedback_routes.py#L115) |
-| GET | `/feedback/{feedback_id}` | `require_roles('admin')` | [get_feedback_item](../backend/app/routes/feedback_routes.py#L79) |
-| PATCH | `/feedback/{feedback_id}/testimonial/hide` | `require_roles('admin')` | [hide_testimonial](../backend/app/routes/feedback_routes.py#L102) |
-| PATCH | `/feedback/{feedback_id}/testimonial/publish` | `require_roles('admin')` | [publish_testimonial](../backend/app/routes/feedback_routes.py#L88) |
+| DELETE | `/feedback/{feedback_id}` | `require_roles('admin')` | [remove_feedback](../backend/app/routes/feedback_routes.py#L129) |
+| GET | `/feedback/{feedback_id}` | `require_roles('admin')` | [get_feedback_item](../backend/app/routes/feedback_routes.py#L93) |
+| PATCH | `/feedback/{feedback_id}/testimonial/hide` | `require_roles('admin')` | [hide_testimonial](../backend/app/routes/feedback_routes.py#L116) |
+| PATCH | `/feedback/{feedback_id}/testimonial/publish` | `require_roles('admin')` | [publish_testimonial](../backend/app/routes/feedback_routes.py#L102) |
 | GET | `/health` | `—` | [health_check](../backend/app/main.py#L84) |
 | GET | `/market-signals` | `get_current_user` | [get_signals](../backend/app/routes/market_signal_routes.py#L24) |
 | POST | `/market-signals` | `require_roles('admin')` | [add_signal](../backend/app/routes/market_signal_routes.py#L54) |

@@ -14,12 +14,12 @@ from app.schemas.feedback_schema import (
     TestimonialResponse,
 )
 from app.services.audit_service import create_audit_log, snapshot_model
+from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, stream_admin_records
 from app.services.feedback_service import (
     create_feedback,
     delete_feedback,
     feedback_summary,
     get_feedback,
-    list_feedback,
     list_public_testimonials,
     set_testimonial_publication,
 )
@@ -71,8 +71,22 @@ def get_feedback_list(
     rating: int | None = Query(default=None, ge=1, le=5),
     db: Session = Depends(get_db),
     _admin: User = Depends(require_roles("admin")),
-) -> list[Feedback]:
-    return list_feedback(db, rating=rating)
+) -> Response:
+    conditions = (Feedback.rating == rating,) if rating is not None else ()
+    return AdminJSONResponse(stream_admin_records(db.get_bind(), Feedback, FeedbackResponse,
+        order=(("created_at", True), ("id", True)), where=conditions))
+
+
+@router.get("/admin/page", response_model=AdminRecordPage[FeedbackResponse])
+def get_feedback_page(
+    offset: int = Query(default=0, ge=0, le=2_147_483_647),
+    rating: int | None = Query(default=None, ge=1, le=5),
+    db: Session = Depends(get_db),
+    _admin: User = Depends(require_roles("admin")),
+) -> AdminRecordPage[FeedbackResponse]:
+    conditions = (Feedback.rating == rating,) if rating is not None else ()
+    return admin_record_page(db, Feedback, FeedbackResponse, offset=offset,
+        order=(("created_at", True), ("id", True)), where=conditions)
 
 
 @router.get("/{feedback_id}", response_model=FeedbackResponse)
