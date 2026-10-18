@@ -10,7 +10,7 @@ fixes remain mandatory within their respective items.
 
 1. Automated backend service/API tests exercise the existing critical account,
    access, payment, data-preservation and notification workflows with synthetic
-   data. Latest full suite:258 tests, zero failures/errors/skips in batch67.
+   data. Latest full suite:260 tests, zero failures/errors/skips in batch68.
 2. PostgreSQL tests exercise material lock/transaction behavior rather than
    substituting SQLite for concurrency. Last full40-case native baseline is
    batch47. Later recovery/migration/export/catalog changes have focused native

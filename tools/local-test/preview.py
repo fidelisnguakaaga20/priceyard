@@ -349,6 +349,25 @@ async def offline_price_controls(request):
         return JSONResponse(saved_copy_demo)
     return HTMLResponse('''<!doctype html><html><head><title>Local saved-price simulation</title></head><body style="font:18px system-ui;max-width:760px;margin:32px auto;padding:16px"><h1>Local saved-price simulation</h1><p>Fabricated local prices only. This control simulates saved-copy response metadata so you can review the approved warning in the original interface. Actual worker caching is tested separately with an isolated fake network; native service workers stay disabled here.</p><button onclick="mode(true)">Show simulated saved copy</button> <button onclick="mode(false)">Restore normal responses</button><p><a href="/prices" target="_blank">Open Current Prices</a> and reload after choosing a mode.</p><p id="result" role="status"></p><script>async function mode(enabled){const r=await fetch('/__test__/offline-prices',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({enabled})});if(!r.ok)throw Error('Control failed');document.querySelector('#result').textContent=enabled?'Saved-copy simulation enabled. Reload Current Prices.':'Normal responses restored. Reload Current Prices.'}</script></body></html>''')
 
+async def catalog_paging_fixture(request):
+    if request.method == "GET":
+        return HTMLResponse('''<!doctype html><html><head><title>Local catalog paging sample</title></head><body style="font:18px system-ui;max-width:760px;margin:32px auto;padding:16px"><h1>Local catalog paging sample</h1><p>Load205 fabricated catalog entries per list. Extra entries are inactive and stay out of public prices and dropdowns. This disposable in-memory sample resets when the preview restarts.</p><button onclick="seed()">Load synthetic catalog sample</button><p id="result" role="status"></p><p><a href="/login">Log in as demo Admin</a> · <a href="/admin/commodities">Commodities</a> · <a href="/admin/markets">Markets</a></p><script>async function seed(){const r=await fetch('/__test__/catalog-paging',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({seed:true})});const data=await r.json();document.querySelector('#result').textContent=r.ok?'205 synthetic catalog entries per list ready.':data.detail;}</script></body></html>''')
+    if await request.json() != {"seed": True}:
+        return JSONResponse({"detail": "Expected synthetic seed control"}, status_code=422)
+    from sqlalchemy import func, select
+    from uuid import uuid4
+    sample_id = uuid4().hex[:8]
+    with Session(engine) as db:
+        for model, label in ((Commodity, "commodity"), (Market, "market")):
+            count = db.scalar(select(func.count()).select_from(model))
+            if count > 205:
+                return JSONResponse({"detail": "Reseed preview before this check"}, status_code=409)
+            for index in range(205-count):
+                db.add(model(name=f"ZZ synthetic {label} {sample_id} {index:03}", description="Synthetic catalog paging fixture", is_active=False))
+        db.commit()
+    return JSONResponse({"commodities":205,"markets":205,"synthetic_only":True})
+
+
 async def admin_paging_fixture(request):
     # Fixed-size, fabricated accounts/payments only. No caller-supplied SQL,
     # connection details, identities or arbitrary fixture-size parameters.
@@ -419,7 +438,7 @@ class LocalOnly:
         else:
             await self.app(scope, receive, secured)
 
-preview = LocalOnly(Starlette(routes=[Route("/__test__/admin-paging", admin_paging_fixture, methods=["GET", "POST"]), Route("/__test__/status", status), Route("/__test__/reconciliation", reconciliation_control, methods=["POST"]), Route("/__test__/offline-prices", offline_price_controls, methods=["GET", "POST"]), Route("/__test__/google-mode", set_google_mode, methods=["POST"]), Route("/__test__/alerts", notification_controls, methods=["GET", "POST"]), Route("/__test__/inbox", inbox), Route("/__test__/controls", controls), Route("/__test__/push", push_controls), Route("/__test__/payments", payment_controls), Route("/__test__/manual-review", manual_review_controls), Route("/__test__/purchase-value", purchase_value_controls), Route("/__test__/verification", verification_controls), Route("/__test__/verification-mode", set_verification_mode, methods=["POST"]), Route("/__test__/checkout", checkout_controls), Route("/__test__/checkout-mode", set_checkout_mode, methods=["POST"]), Route("/__test__/payment-event", payment_event, methods=["POST"]), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
+preview = LocalOnly(Starlette(routes=[Route("/__test__/catalog-paging", catalog_paging_fixture, methods=["GET", "POST"]), Route("/__test__/admin-paging", admin_paging_fixture, methods=["GET", "POST"]), Route("/__test__/status", status), Route("/__test__/reconciliation", reconciliation_control, methods=["POST"]), Route("/__test__/offline-prices", offline_price_controls, methods=["GET", "POST"]), Route("/__test__/google-mode", set_google_mode, methods=["POST"]), Route("/__test__/alerts", notification_controls, methods=["GET", "POST"]), Route("/__test__/inbox", inbox), Route("/__test__/controls", controls), Route("/__test__/push", push_controls), Route("/__test__/payments", payment_controls), Route("/__test__/manual-review", manual_review_controls), Route("/__test__/purchase-value", purchase_value_controls), Route("/__test__/verification", verification_controls), Route("/__test__/verification-mode", set_verification_mode, methods=["POST"]), Route("/__test__/checkout", checkout_controls), Route("/__test__/checkout-mode", set_checkout_mode, methods=["POST"]), Route("/__test__/payment-event", payment_event, methods=["POST"]), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
 
 if __name__ == "__main__":
     import uvicorn

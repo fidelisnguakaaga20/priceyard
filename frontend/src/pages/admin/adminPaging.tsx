@@ -15,6 +15,7 @@ export function useAdminPagedList<T>(path: string) {
   const [error, setError] = useState("");
   const sequence = useRef(0);
   const active = useRef({ path, token, offset });
+  const mounted = useRef(true);
   active.current = { path, token, offset };
   const move = useCallback((value: number, replace = false) => {
     sequence.current++; setLoading(true); setError("");
@@ -24,18 +25,24 @@ export function useAdminPagedList<T>(path: string) {
       return next;
     }, { replace });
   }, [setSearchParams]);
+  const navigation = useRef(move);
+  navigation.current = move;
 
   const reload = useCallback(async () => {
+    if (!mounted.current) return;
+    // A save may finish after navigation. Reload the current page rather than
+    // capturing the page on which that asynchronous save originally started.
+    const { path, token, offset } = active.current;
     const request = ++sequence.current;
     if (!token) { setResult(null); setLoading(false); return; }
     setLoading(true); setError("");
-    const current = () => request === sequence.current && active.current.path === path && active.current.token === token && active.current.offset === offset;
+    const current = () => mounted.current && request === sequence.current && active.current.path === path && active.current.token === token && active.current.offset === offset;
     try {
       const page = await apiFetch<RecordPage<T>>(`${path}${path.includes("?") ? "&" : "?"}offset=${offset}`, {}, token);
       if (!current()) return;
       if (offset > 0 && !page.items.length) {
         const last = page.total ? Math.floor((page.total - 1) / page.limit) * page.limit : 0;
-        if (last !== offset) { move(last, true); return; }
+        if (last !== offset) { navigation.current(last, true); return; }
       }
       setResult({ path, token, page });
     } catch (err) {
@@ -43,8 +50,8 @@ export function useAdminPagedList<T>(path: string) {
     } finally {
       if (current()) setLoading(false);
     }
-  }, [path, token, offset, move]);
-  useEffect(() => { void reload(); return () => { sequence.current++; }; }, [reload]);
+  }, []);
+  useEffect(() => { mounted.current = true; void reload(); return () => { mounted.current = false; sequence.current++; }; }, [path, token, offset, reload]);
   const owned = result?.path === path && result.token === token ? result.page : null;
   const data = owned?.offset === offset ? owned.items : [];
   const total = owned?.total ?? 0;

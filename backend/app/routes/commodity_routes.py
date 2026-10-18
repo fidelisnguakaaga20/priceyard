@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -6,11 +6,11 @@ from app.models.commodity import Commodity
 from app.models.user import User
 from app.schemas.commodity_schema import CommodityCreate, CommodityResponse, CommodityUpdate
 from app.services.audit_service import create_audit_log, snapshot_model
+from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, stream_admin_records
 from app.services.commodity_service import (
     create_commodity,
     delete_commodity,
     get_commodity,
-    list_commodities,
     update_commodity,
 )
 from app.utils.permissions import require_roles
@@ -29,16 +29,27 @@ def _save_catalog_audit(db: Session, admin: User, action: str, record_id: int, *
 
 
 @router.get("", response_model=list[CommodityResponse])
-def get_commodities(db: Session = Depends(get_db)) -> list[Commodity]:
-    return list_commodities(db, active_only=True)
+def get_commodities(db: Session = Depends(get_db)) -> Response:
+    return AdminJSONResponse(stream_admin_records(db.get_bind(), Commodity, CommodityResponse,
+        order=(("name", False), ("id", False)), where=(Commodity.is_active.is_(True),)), private=False)
 
 
 @router.get("/admin/all", response_model=list[CommodityResponse])
 def get_all_commodities_for_admin(
     db: Session = Depends(get_db),
     _admin: User = Depends(require_roles("admin")),
-) -> list[Commodity]:
-    return list_commodities(db)
+) -> Response:
+    return AdminJSONResponse(stream_admin_records(db.get_bind(), Commodity, CommodityResponse,
+        order=(("name", False), ("id", False))))
+
+
+@router.get("/admin/page", response_model=AdminRecordPage[CommodityResponse])
+def get_commodities_page(
+    offset: int = Query(default=0, ge=0, le=2_147_483_647),
+    db: Session = Depends(get_db),
+    _admin: User = Depends(require_roles("admin")),
+) -> AdminRecordPage[CommodityResponse]:
+    return admin_record_page(db, Commodity, CommodityResponse, offset=offset, order=(("name", False), ("id", False)))
 
 
 @router.get("/{commodity_id}", response_model=CommodityResponse)

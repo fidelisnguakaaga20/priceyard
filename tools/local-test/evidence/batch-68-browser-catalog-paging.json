@@ -1,0 +1,18 @@
+{
+  "checks": {
+    "commodities_all_ids_reachable_and_original_edit_fields_preserved": true,
+    "commodities_deleting_disposable_tail_returns_to_last_existing_page": true,
+    "markets_all_ids_reachable_and_original_edit_fields_preserved": true,
+    "markets_deleting_disposable_tail_returns_to_last_existing_page": true,
+    "public_catalogs_and_saved_prices_unchanged": true
+  },
+  "synthetic_entries_per_catalog": 205,
+  "page_size": 100,
+  "extra_sample_entries_inactive": true,
+  "only_disposable_unlinked_tail_entries_deleted": true,
+  "existing_public_prices_and_measurements_preserved": true,
+  "original_css_and_form_layout": true,
+  "external_requests": 0,
+  "production_connections": 0,
+  "reseed_preview_after_check": true
+}

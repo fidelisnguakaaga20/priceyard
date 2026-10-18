@@ -25,22 +25,25 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
-Latest verified: batch67,29 complete /7 partial or pending:
+Latest verified: batch68,29 complete /7 partial or pending:
 02,05,07,13,14,20,35. PY-29 complete65; PY-08 complete66. Approved PY-20 paging
-now covers Users and Payments:100 records/page, full snapshot totals, original
-forms/columns/styles, refresh/back/edit safety and complete streamed legacy APIs.
-All205 synthetic records reachable; no arbitrary truncation or historical edits.
-Full258 backend tests, one focused native paging/stream case and seven paging
-browser checks pass; original last-Admin/access/baseline and all14 dashboard
-totals verified with both small and205-record fixtures. TypeScript/Vite passed,
-86 source/config hashes match reused build, original CSS byte-identical.
-Small native fixture77/80, stopped. Local review sample is disposable, fixed205
-users/payments: http://127.0.0.1:55446/__test__/admin-paging (Load synthetic sample).
+covers4 of16 Admin lists: Users, Payments, Commodities, Markets.100/page, full
+snapshot totals, original forms/styles, complete legacy arrays via cursor
+streams. Public catalogs still return every active record and remain eligible
+for public-only caching. No silent truncation, added measurements or real data.
+Reproduced/fixed a pending-save navigation race: completion refreshes the current
+page instead of the old page; old responses/errors still ignored.
+Full260 backend tests, one focused native catalog case, catalog/edit/delete/
+save-race/original access/baseline/all14 dashboard browser checks pass. TypeScript/
+Vite passed;86 source hashes match reused build; original CSS identical.
+Small native fixture78/80, stopped. Review controls: /__test__/admin-paging and
+/__test__/catalog-paging on http://127.0.0.1:55446; load disposable samples only.
 Owner approved docs/ADMIN_LIST_PAGING_APPROVAL.md on2026-10-18:100-record Admin
 pages with Previous/Next, complete totals/records, original forms/styles/cards.
-Next: remaining approved Admin lists in small PY-20 batches; public history/charts
-remain separate and unchanged. PY-29 complete65; no repeated identity work.
-owner-policy/production gates stay explicit. Testing foundation PY-30 stays
+Next:12 remaining approved Admin lists in small PY-20 batches; public history/charts
+remain separate and unchanged. PY-13 Nigeria-time proposal awaits approval;
+no time-rule or input-label changes implemented. PY-29 complete65.
+Owner policy and production gates stay explicit. Testing foundation PY-30 stays
 complete; new regression tests belong with their respective improvements.
 Do not reopen completed scope or mistake earlier historical counts for current.
 
@@ -387,14 +390,14 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-10 | Spreadsheet export safety | Complete in batch 3; text/numeric regressions and original browser download/access checks passed |
 | PY-11 | Correct saved administrator price state | Complete in batch 10; actual create/approve/correct/outdated/reject/reload browser regression passed |
 | PY-12 | Accurate existing quantity/type/market comparisons | Complete for owner-approved current-record/history-chart safeguards in batch 37: separate recorded specifications, matching commodity/market/unit/size/type only, no inferred missing measurements; all historical rows preserved. Cost-reference quantity linkage remains separate PY-29 work |
-| PY-13 | Consistent Nigerian dates/times | Partial: legacy naive trial timestamps treated as UTC; original Admin create/correction inputs now convert local time to UTC like Reporter, with Lagos/UTC browser and PG persistence verified; remaining display/day-filter semantics pending, original paid UTC policy unchanged |
+| PY-13 | Consistent Nigerian dates/times | Partial: legacy naive trial timestamps treated as UTC; original Admin create/correction inputs convert local time to UTC like Reporter, Lagos/UTC browser/PG verified. Display/day-filter/input market-time standard requires owner approval: docs/NIGERIAN_PRICE_TIME_APPROVAL.md proposed2026-10-18; not implemented. Original paid UTC policy unchanged |
 | PY-14 | Evidence-based movement/confidence | Pending; wording/policy changes require approval |
 | PY-15 | Prices recover after failed loading | Complete in batch 1; before/after browser regression passed |
 | PY-16 | Correct filters and response ordering | Complete for identified current/history/navigation scope in batches 22/28: applied filters, overlap, URL navigation, stale history/error/metadata and access-role browser regressions verified |
 | PY-17 | Correct market-detail loading | Complete for identified loading races/combined-failure defect in batch 16; obsolete commodity/account responses ignored and independent successful sections retained |
 | PY-18 | Accurate account/payment/access messages | Complete for identified account/expiry/callback defects in batches 4/11/19; verified return refreshes access, unconfirmed return never claims payment received in title |
 | PY-19 | Existing FAQ draft/hide/publish management | Complete in batch 12; hidden drafts remain available to Admin across reload, public publication boundary verified |
-| PY-20 | Bounded queries with accessible historical records | Partial: current-price DB ranking23, dashboard29, DISTINCT history metadata32, commodity scoping47–49, full CSV streaming60; owner-approved100-record Users/Payments pages67 use one DB snapshot for complete counts/rows and bounded legacy JSON streaming, original actions/styles retained. Remaining approved Admin lists and full public JSON/history still pending; no chart/history truncation. Scope: docs/ADMIN_LIST_PAGING_APPROVAL.md |
+| PY-20 | Bounded queries with accessible historical records | Partial: current ranking23, dashboard29, history metadata32, commodity scoping47–49, CSV streaming60; approved100-record Users/Payments pages67 and Commodities/Markets68 use full snapshot counts and complete legacy streams. Public active catalog arrays/caching unchanged. Save-completes-after-navigation race reproduced/fixed68.4/16 Admin lists paged;12 others/public history remain. No chart/history truncation. Scope: docs/ADMIN_LIST_PAGING_APPROVAL.md |
 | PY-21 | Reliable independent alerts | Application-side identified channel dependency complete in batch 24: failed email no longer skips push/WhatsApp; per-user/channel failures isolated; existing deduplication/count semantics retained. Delivery/retry operations remain PY-35 |
 | PY-22 | Efficient loading and accurate dashboard totals | Complete for identified dashboard scope in batch 29: all 14 original metrics preserved; one Admin-only aggregate API/DB snapshot, zero entity hydration; backend/PG/browser totals and outage recovery verified |
 | PY-23 | Preserve layout while fixing mobile overflow | Complete for identified original critical-layout/price-card overflow scope in batches 42/43: 78 normal and twelve long-name viewport checks, 320–1366px, Easy reading both modes; ordinary card/badge geometry and all fourteen Admin cards preserved |
@@ -404,7 +407,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-27 | Consistent existing editing/password inputs | Complete for identified scope: feedback selection in batch26, existing Unicode/72-byte password rules and reset validation in batch46, owner-approved six Admin edit forms in batches50–52. Saved values/costs, one-field edits, reload, explicit clearing, switching/unknown/blank IDs and creation verified in61 actual browser checks |
 | PY-28 | Historical record preservation | Current application-side scope complete in batch59: read-only legacy/unversioned preflight before migration steps, empty/reviewed0021-to0022 paths, unchanged raw history/catalog IDs/active flags/cost links/sources/audits, preserved paid/payment records and0022 downgrade refusal verified. No guesses to repair already-changed historical data; production backup/restore/rollout and any repairs require owner approval under PY-35 |
 | PY-29 | Stable identities and dependent records | Application-side identified scope complete65: catalog IDs/referenced deletion/atomic audits34; duplicate/rename/rollback races62; locked parent-price and same-commodity/market observation links64; exact existing-ID current/history filters and rename-safe detail/share links65. Current shares never publish historical amounts. Original labels, measurements and all records preserved; no automatic merge, legacy alias guesses, rewrites or invented cost units. Historical repairs require separate PY-35 approval |
-| PY-30 | Isolated automated/browser verification | Identified local testing-foundation/coverage scope complete63: criteria/workflow map/evidence retained; full258 backend tests67, full40 native baseline47 plus later focused scope/identity/request/paging cases, six isolation probes63; original baseline/access/last-Admin/14-card browser67 and205-row paging. Native77/80 schemas stopped, phases serialized,86 source hashes match reused build; original CSS unchanged, no dependency copies. Not100% coverage or production/provider certification; future tests stay with remaining items, operational checks remain PY-35 |
+| PY-30 | Isolated automated/browser verification | Identified local testing-foundation/coverage scope complete63: criteria/workflow map/evidence retained; full260 backend tests68, full40 native baseline47 plus focused scope/identity/request/paging/catalog cases, six isolation probes63; original baseline/access/catalog/14-card browser68,205-row paging and before/after save-race proof. Native78/80 schemas stopped, phases serialized,86 source hashes match reused build; original CSS unchanged, no dependency copies. Not100% coverage or production/provider certification; future tests stay with remaining items, operational checks remain PY-35 |
 | PY-31 | Confirmed payment activation and recovery | Application-side approved scope complete in batch58: atomic confirmation, owner callback and explicit bounded/resumable reconciliation for missed webhook/return; dry-run default, strict existing evidence/activation, single PG worker, error isolation, replay safety and purchased-time/manual-grant preservation verified. Live scheduling/checkpoints/monitoring and ambiguous legacy repairs require owner approval under PY-35 |
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches 14/21: carry forward dated paid/trial time; preserve indefinite grants, block new checkout and hold/recover old purchases without consuming days |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
@@ -2507,3 +2510,58 @@ No expansion of completed null-guard/account/UI scopes is needed.
   or pending:02,05,07,13,14,20,35. PY-20 next: other approved Admin lists; all
   public history/chart results remain unchanged and separate. Master/backup
   preserved; no production access, push, merge or deployment.
+
+
+### Batch 68 ? approved PY-20 catalog paging and pending-save race (2026-10-18)
+
+- Started fromb57c749. Extended the approved100-record Admin paging to Commodities
+  and Markets. Full count/selected rows use one DB snapshot; original fields,
+  forms, name ordering plus ID tie breaker and all record identities remain.
+  Admin full-list APIs still return complete arrays through bounded streams.
+- Public catalog APIs now stream every active record with unchanged schemas,
+  preserving active/upcoming/state metadata. Public responses deliberately keep
+  cache eligibility; Admin responses remain private/no-store. No inactive sample
+  entries become public or acquire prices. Legacy callers are not truncated.
+- During extension, reproduced a new67 hook race: a save held on page100, then
+  navigation to200, completed by reloading100 and leaving loading stuck. Before
+  browser evidence records actual reload100. Hook reload now reads current refs,
+  uses the current navigator and avoids requests after unmount. After browser
+  evidence records reload200, five visible records and enabled Previous. No
+  business-rule changes; fault injection used a fabricated PATCH response only.
+- Two focused catalog tests passed1.101s. Full260 backend tests passed86.934s,
+  zero failures/errors/skips. One native case for both205-row catalogs verifies
+  all pages/counts/name ties/states/active flags/public streams and unchanged raw
+  rows. Passed3.039s; small pinned fixture78/80 retained, stopped before build.
+- TypeScript/Vite passed105 modules/4.09s. Same snapshot reused;86 source/config
+  hashes match. CSS identical to verified original asset; no installs/dependency
+  copies or concurrent heavy phases.
+- Five catalog browser checks pass: all205 IDs per catalog reachable, unchanged
+  edit fields/inactive flags, saved values on page2, refresh and deleting only
+  five disposable unlinked tail samples automatically returns to last page.
+  Public catalogs and all saved prices compare unchanged;375px layout fits.
+  Initial fixture selectors assumed exact textarea label text and a Market-card
+  description display that the original app never had; corrected tests to use
+  original textarea names and verify Market description in its existing editor.
+  No application layout/fields were added to satisfy these assumptions.
+- Original catalog checks pass: four continuous sanitized audits, restored fields,
+  referenced-delete and duplicate conflicts, unchanged historical price values.
+  Seven original baseline workflows, original account/grant/revocation/six-audit
+  workflow and all14 dashboard totals/one-query/outage recovery pass. All browser
+  external/production contacts zero. Evidence: tools/local-test/evidence/batch-68-*.json.
+- Disposable catalog sample control: http://127.0.0.1:55446/__test__/catalog-paging.
+  Additional example entries are inactive, uniquely marked synthetic and created
+  only in the memory fixture. No real extra market, commodity, unit or grade.
+  Original preview reseeded after mutations. Reseed before unrelated testing;
+  optional sample buttons give browser proof without changing app design.
+- Source-only API reference now110 operations.4/16 Admin lists paged; remaining12:
+  Prices, Flagged, Market signals, Quality, Buying zones, Sell-watch, Storage,
+  Costs, FAQ, Subscriptions, Feedback, Audit. Full public history/chart paging
+  remains separate; never claim PY-20 complete or truncate charts.
+- PY-13 Nigeria price-time proposal is recorded in docs/NIGERIAN_PRICE_TIME_APPROVAL.md
+  and submitted for owner approval. No time-rule/input-label changes implemented
+  in68; preserve current stored timestamps/access/billing rules pending reply.
+- Count unchanged29 complete /7 partial or pending:02,05,07,13,14,20,35.
+  Next authorized technical work: remaining Admin paging in small batches.
+  Native budget has two schemas left; preserve existing fixture/evidence and
+  prepare a separately pinned small fixture when needed, without destructive
+  cleanup or repeated full native suites. No production/push/merge/deployment.

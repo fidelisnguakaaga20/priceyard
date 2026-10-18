@@ -1,0 +1,11 @@
+{
+  "original_commodity_and_market_edit_controls": true,
+  "original_names_ids_fields_and_descriptions_preserved": true,
+  "referenced_delete_still_denied": true,
+  "case_whitespace_duplicates_show_original_conflict_without_saving": true,
+  "complete_price_history_preserved": true,
+  "four_continuous_audit_records": true,
+  "new_catalog_records": 0,
+  "external_page_requests": 0,
+  "production_connections": 0
+}

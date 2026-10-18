@@ -26,7 +26,7 @@ try{
    await card.getByRole('button',{name:'Edit',exact:true}).click();const form=page.locator('form.admin-form');
    await form.locator('textarea[name="description"]').fill(description);
    const saved=page.waitForResponse(r=>r.url()===origin+'/api/'+plural+'/'+original.id&&r.request().method()==='PATCH');
-   const reloaded=page.waitForResponse(r=>r.url()===origin+'/api/'+plural+'/admin/all');
+   const reloaded=page.waitForResponse(r=>r.url()===origin+'/api/'+plural+'/admin/page?offset=0');
    await form.getByRole('button',{name:'Save '+kind,exact:true}).click();assert.equal((await saved).status(),200);await (await reloaded).finished();await card.waitFor();
    await page.waitForFunction(()=>!document.querySelector('button:disabled'));
   }

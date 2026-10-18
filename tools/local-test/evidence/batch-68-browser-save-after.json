@@ -1,0 +1,10 @@
+{
+  "before": false,
+  "pending_save_then_navigation_reproduced": true,
+  "completion_reloads_current_page": true,
+  "actual_reload_offset": 200,
+  "synthetic_patch_response_only": true,
+  "underlying_user_not_modified": true,
+  "external_requests": 0,
+  "production_connections": 0
+}

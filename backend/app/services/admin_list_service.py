@@ -38,8 +38,8 @@ def admin_record_page(db: Session, model, schema: type[T], *, offset: int, order
                            total=rows[0][1], offset=offset)
 
 
-def stream_admin_records(engine: Engine, model, schema: type[T], *, order) -> Iterator[str]:
-    statement = select(model).order_by(*_ordering(model, order)).execution_options(yield_per=100)
+def stream_admin_records(engine: Engine, model, schema: type[T], *, order, where=()) -> Iterator[str]:
+    statement = select(model).where(*where).order_by(*_ordering(model, order)).execution_options(yield_per=100)
 
     def content():
         with Session(engine) as db:
@@ -58,9 +58,9 @@ def stream_admin_records(engine: Engine, model, schema: type[T], *, order) -> It
 
 
 class AdminJSONResponse(StreamingResponse):
-    def __init__(self, content):
+    def __init__(self, content, *, private=True):
         self._content = content
-        super().__init__(content, media_type="application/json", headers={"Cache-Control": "private, no-store"})
+        super().__init__(content, media_type="application/json", headers={"Cache-Control": "private, no-store"} if private else None)
 
     async def __call__(self, scope, receive, send):
         try:

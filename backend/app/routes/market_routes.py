@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -6,7 +6,8 @@ from app.models.market import Market
 from app.models.user import User
 from app.schemas.market_schema import MarketCreate, MarketResponse, MarketUpdate
 from app.services.audit_service import create_audit_log, snapshot_model
-from app.services.market_service import create_market, delete_market, get_market, list_markets, update_market
+from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, stream_admin_records
+from app.services.market_service import create_market, delete_market, get_market, update_market
 from app.utils.permissions import require_roles
 
 router = APIRouter(prefix="/markets", tags=["markets"])
@@ -23,16 +24,27 @@ def _save_catalog_audit(db: Session, admin: User, action: str, record_id: int, *
 
 
 @router.get("", response_model=list[MarketResponse])
-def get_markets(db: Session = Depends(get_db)) -> list[Market]:
-    return list_markets(db, active_only=True)
+def get_markets(db: Session = Depends(get_db)) -> Response:
+    return AdminJSONResponse(stream_admin_records(db.get_bind(), Market, MarketResponse,
+        order=(("name", False), ("id", False)), where=(Market.is_active.is_(True),)), private=False)
 
 
 @router.get("/admin/all", response_model=list[MarketResponse])
 def get_all_markets_for_admin(
     db: Session = Depends(get_db),
     _admin: User = Depends(require_roles("admin")),
-) -> list[Market]:
-    return list_markets(db)
+) -> Response:
+    return AdminJSONResponse(stream_admin_records(db.get_bind(), Market, MarketResponse,
+        order=(("name", False), ("id", False))))
+
+
+@router.get("/admin/page", response_model=AdminRecordPage[MarketResponse])
+def get_markets_page(
+    offset: int = Query(default=0, ge=0, le=2_147_483_647),
+    db: Session = Depends(get_db),
+    _admin: User = Depends(require_roles("admin")),
+) -> AdminRecordPage[MarketResponse]:
+    return admin_record_page(db, Market, MarketResponse, offset=offset, order=(("name", False), ("id", False)))
 
 
 @router.get("/{market_id}", response_model=MarketResponse)
