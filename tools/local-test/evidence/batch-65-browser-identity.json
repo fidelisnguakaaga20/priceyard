@@ -1,0 +1,15 @@
+{
+  "checks": {
+    "current_exact_ids_exclude_prefix_and_same_named_market": true,
+    "history_exact_ids_preserve_all_matching_records": true,
+    "same_named_market_can_be_selected_by_existing_id": true,
+    "pre_rename_link_retains_original_commodity_identity": true,
+    "existing_price_rows_and_amounts_unchanged": true,
+    "literal_percent_name_not_decoded_twice": true,
+    "id_bookmark_restores_existing_filter_dropdowns": true
+  },
+  "original_labels_and_form_fields_preserved": true,
+  "synthetic_preview_reseed_required": true,
+  "external_requests": 0,
+  "production_connections": 0
+}

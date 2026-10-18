@@ -83,6 +83,8 @@ def _require_history_access(
 def get_latest_price_updates(
     commodity: str | None = Query(default=None, min_length=1, max_length=100),
     market: str | None = Query(default=None, min_length=1, max_length=150),
+    commodity_id: int | None = Query(default=None, gt=0, le=2_147_483_647),
+    market_id: int | None = Query(default=None, gt=0, le=2_147_483_647),
     selected_date: date | None = Query(default=None, alias="date"),
     movement: Movement | None = Query(default=None),
     db: Session = Depends(get_db),
@@ -92,6 +94,7 @@ def get_latest_price_updates(
         db,
         commodity_search=commodity,
         market_search=market,
+        commodity_id=commodity_id, market_id=market_id,
         selected_date=selected_date,
         movement=movement,
     )
@@ -104,6 +107,8 @@ def get_latest_price_updates(
 def get_price_history(
     commodity: str | None = Query(default=None, min_length=1, max_length=100),
     market: str | None = Query(default=None, min_length=1, max_length=150),
+    commodity_id: int | None = Query(default=None, gt=0, le=2_147_483_647),
+    market_id: int | None = Query(default=None, gt=0, le=2_147_483_647),
     selected_date: date | None = Query(default=None, alias="date"),
     movement: Movement | None = Query(default=None),
     time_of_day: TimeOfDay | None = Query(default=None),
@@ -114,6 +119,7 @@ def get_price_history(
         db,
         commodity_search=commodity,
         market_search=market,
+        commodity_id=commodity_id, market_id=market_id,
         selected_date=selected_date,
         movement=movement,
         time_of_day=time_of_day,

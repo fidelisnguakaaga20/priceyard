@@ -1,0 +1,11 @@
+{
+  "checks": {
+    "older_refresh_cannot_replace_applied_filter": true,
+    "draft_filter_waits_for_apply": true,
+    "background_refresh_does_not_duplicate_foreground_request": true,
+    "foreground_loading_finishes": true
+  },
+  "expected_original_bug": false,
+  "external_page_requests": 0,
+  "production_connections": 0
+}

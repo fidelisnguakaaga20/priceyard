@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { CommodityImage } from "../components/CommodityImage";
 import { ConfidenceInfo } from "../components/ConfidenceInfo";
 import { CostCalculator } from "../components/CostCalculator";
@@ -17,11 +17,15 @@ import { agingClass, commodityTitleColor, confidenceClass, isWithinSeasonalMonth
 
 export function CommodityDetailPage() {
   const { commodityName = "" } = useParams();
-  const name = decodeURIComponent(commodityName);
-  useDocumentTitle(name || "Commodity");
+  const name = commodityName;
+  const [searchParams] = useSearchParams();
+  const requestedId = searchParams.get("commodity_id");
+  const scope = requestedId !== null ? `id:${requestedId}` : `name:${name}`;
   const { token, user, hasFullAccess } = useAuth();
   const [priceResult, setPriceResult] = useState<{ name: string; items: PriceUpdate[]; savedAt: string | null }>({ name: "", items: [], savedAt: null });
-  const prices = priceResult.name === name ? priceResult.items : [];
+  const prices = priceResult.name === scope ? priceResult.items : [];
+  const displayName = prices[0]?.commodity.name || name;
+  useDocumentTitle(displayName || "Commodity");
   const [signals, setSignals] = useState<MarketSignal[]>([]);
   const [quality, setQuality] = useState<QualitySignal[]>([]);
   const [zones, setZones] = useState<BuyingZone[]>([]);
@@ -40,12 +44,20 @@ export function CommodityDetailPage() {
     let current = true;
     setError("");
     setLoading(true);
-    apiFetchWithProvenance<PriceUpdate[]>(`/price-updates?commodity=${encodeURIComponent(name)}`)
-      .then(({ data: items, savedAt }) => { if (current) setPriceResult({ name, items, savedAt }); })
+    const query = new URLSearchParams();
+    if (requestedId !== null) query.set("commodity_id", requestedId);
+    else query.set("commodity", name);
+    apiFetchWithProvenance<PriceUpdate[]>(`/price-updates?${query}`)
+      .then(({ data, savedAt }) => {
+        const items = requestedId !== null ? data : data.filter((item) => item.commodity.name.toLowerCase() === name.toLowerCase());
+        // An old name-only bookmark cannot choose between legacy duplicate IDs.
+        if (new Set(items.map((item) => item.commodity_id)).size > 1) throw new Error("Choose this commodity from Current Prices to view its records.");
+        if (current) setPriceResult({ name: scope, items, savedAt });
+      })
       .catch((err: Error) => { if (current) setError(err.message); })
       .finally(() => { if (current) setLoading(false); });
     return () => { current = false; };
-  }, [name]);
+  }, [scope]);
 
   useEffect(() => {
     let current = true;
@@ -90,8 +102,8 @@ export function CommodityDetailPage() {
 
   return <section className="page page-section">
     <div className="page-title detail-title-row">
-      <CommodityImage src={prices[0]?.commodity.image_url} alt={name} className="commodity-image-detail" />
-      <div><span className="eyebrow">Commodity intelligence</span><h1 style={{ color: commodityTitleColor(name) }}>{name}</h1><p>Current approved market records plus full-access intelligence where your subscription permits.</p></div>
+      <CommodityImage src={prices[0]?.commodity.image_url} alt={displayName} className="commodity-image-detail" />
+      <div><span className="eyebrow">Commodity intelligence</span><h1 style={{ color: commodityTitleColor(displayName) }}>{displayName}</h1><p>Current approved market records plus full-access intelligence where your subscription permits.</p></div>
     </div>
     {(error || intelligenceError) && <div className="status-box error">{error || intelligenceError}</div>}
     {!loading && prices.length > 0 && <SavedPriceNotice savedAt={priceResult.savedAt} />}

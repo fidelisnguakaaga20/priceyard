@@ -25,14 +25,17 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
-Latest verified: batch64,27 complete /9 partial or pending:
-02,05,07,08,13,14,20,29,35. PY-29 now preserves same commodity/market across
-price corrections and linked market/quality/storage observations, including
-simultaneous saves. No automatic rewrites; valid unlinked corrections stay.
-Full236 backend tests pass, one focused native case covers six save-order races,
-linked-record browser checks and original price-edit/all14 dashboard checks pass.
-84 frontend source/config hashes unchanged. Small native fixture74/80 schemas,
-stopped. Next: remaining PY-29 stable-filter identity and PY-20 full JSON lists;
+Latest verified: batch65,28 complete /8 partial or pending:
+02,05,07,08,13,14,20,35. PY-29 application-side identity/link scope is complete:
+unchanged dropdown labels use existing IDs; commodity/detail/share links survive
+renames; prefix names and same-named markets no longer mix selected records.
+Legacy text-search API semantics remain; ambiguous name-only links never guess
+between duplicate identities. No aliases, merges or historical rewrites.
+Full242 backend tests, one focused native identity case,34 worker checks and
+identity/baseline/filter/navigation/detail/all14 dashboard browser checks pass.
+TypeScript/Vite passed;85 frontend source/config hashes match the reused build;
+original CSS byte-identical. Small native fixture75/80 schemas, stopped.
+Next: remaining PY-08 request/input bounds and PY-20 full JSON lists;
 owner-policy/production gates stay explicit. Testing foundation PY-30 stays
 complete; new regression tests belong with their respective improvements.
 Do not reopen completed scope or mistake earlier historical counts for current.
@@ -396,8 +399,8 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-26 | Complete atomic administrative audit | Complete for identified business-record writers through batch 40: payment/referral, price/moderation/flags, account/subscription, FAQ/catalog and all six intelligence resources save sanitized audits atomically; native concurrent edits and failed-audit rollback verified. External delivery operations remain PY-35 |
 | PY-27 | Consistent existing editing/password inputs | Complete for identified scope: feedback selection in batch26, existing Unicode/72-byte password rules and reset validation in batch46, owner-approved six Admin edit forms in batches50–52. Saved values/costs, one-field edits, reload, explicit clearing, switching/unknown/blank IDs and creation verified in61 actual browser checks |
 | PY-28 | Historical record preservation | Current application-side scope complete in batch59: read-only legacy/unversioned preflight before migration steps, empty/reviewed0021-to0022 paths, unchanged raw history/catalog IDs/active flags/cost links/sources/audits, preserved paid/payment records and0022 downgrade refusal verified. No guesses to repair already-changed historical data; production backup/restore/rollout and any repairs require owner approval under PY-35 |
-| PY-29 | Stable identities and dependent records | Partial: catalog IDs/fields and referenced deletion rejection with atomic audits verified34; duplicate/rename/rollback races62; parent-price and market/quality/storage links share a fresh parent lock and enforce existing same-commodity/market invariant64. Valid unlinked corrections/metadata edits remain. Remaining stable-filter identity pending; no automatic merge, legacy rewrites or invented cost units |
-| PY-30 | Isolated automated/browser verification | Identified local testing-foundation/coverage scope complete63: criteria/workflow map/evidence retained; full236 backend tests64, full40 native baseline47 plus later focused cases (price-scope race64), six isolation probes/seven original browser workflows63; price-edit/14-card browser64. Native74/80 schemas stopped, phases serialized,84 frontend hashes unchanged without rebuild/copies. Not100% coverage or production/provider certification; future tests stay with remaining items, operational checks remain PY-35 |
+| PY-29 | Stable identities and dependent records | Application-side identified scope complete65: catalog IDs/referenced deletion/atomic audits34; duplicate/rename/rollback races62; locked parent-price and same-commodity/market observation links64; exact existing-ID current/history filters and rename-safe detail/share links65. Current shares never publish historical amounts. Original labels, measurements and all records preserved; no automatic merge, legacy alias guesses, rewrites or invented cost units. Historical repairs require separate PY-35 approval |
+| PY-30 | Isolated automated/browser verification | Identified local testing-foundation/coverage scope complete63: criteria/workflow map/evidence retained; full242 backend tests65, full40 native baseline47 plus later focused cases (scope race64, exact identity65), six isolation probes63; original baseline/filter/navigation/detail/14-card browser65. Native75/80 schemas stopped, phases serialized,85 source hashes match reused build; original CSS unchanged, no dependency copies. Not100% coverage or production/provider certification; future tests stay with remaining items, operational checks remain PY-35 |
 | PY-31 | Confirmed payment activation and recovery | Application-side approved scope complete in batch58: atomic confirmation, owner callback and explicit bounded/resumable reconciliation for missed webhook/return; dry-run default, strict existing evidence/activation, single PG worker, error isolation, replay safety and purchased-time/manual-grant preservation verified. Live scheduling/checkpoints/monitoring and ambiguous legacy repairs require owner approval under PY-35 |
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches 14/21: carry forward dated paid/trial time; preserve indefinite grants, block new checkout and hold/recover old purchases without consuming days |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
@@ -2364,3 +2367,50 @@ No expansion of completed null-guard/account/UI scopes is needed.
   claim complete from linked-record protection alone. Next that finite task.
 - Existing trial/prices/referral/session rules preserved. Local commits only;
   no production credentials/services/data/migrations, push, merge or deployment.
+
+
+### Batch 65 ? PY-29 stable filters and rename-safe links (2026-10-18)
+
+- Resumed preserved uncommitted work from427c670; no audit restart. Current and
+  history endpoints accept optional existing commodity_id/market_id INTEGER IDs,
+  with positive/storage bounds. Existing text search remains compatible and
+  combines with explicit IDs rather than overriding them. No schema additions.
+- Original dropdown labels/layout/options remain; values submit existing IDs,
+  keeping prefix commodities and same-name markets separate. Detail links carry
+  commodity IDs, ignore obsolete path names after rename and show the current
+  saved name. Literal percent names are not decoded twice in the browser.
+- Existing shared-price pu IDs resolve the commodity only; previews still use
+  current approved public prices, never the historical row's values or sources.
+  Coming-soon links carry the existing commodity ID. Invalid/conflicting IDs and
+  ambiguous legacy names fail closed. No automatic aliases, catalog merges,
+  historical edits, new measurements, forms or subscription changes.
+- Public-only worker caching supports the exact current-price query IDs and
+  commodity navigation ID. History, private/authenticated resources, unknown
+  query parameters and cross-origin requests remain excluded.34 worker checks
+  passed. No new caching policy, age threshold or visible wording.
+- Backend: six focused identity/share tests and full242 tests passed, zero
+  failures/errors/skips,117.822s. A literal-percent legacy handler test uses its
+  once-decoded ASGI path directly because TestClient double-decodes that escape;
+  the actual browser literal-percent navigation is separately verified.
+- Native: one selected exact-ID/history/rename case passed4.294s on the pinned
+  small recovery fixture.75/80 synthetic schemas retained; native fixture stopped
+  in finally. No full native rerun, new cluster or dependency copies.
+- TypeScript/Vite passed104 modules/2.19s using the existing snapshot. Restricted
+  runner denied esbuild directory traversal; the same guarded build succeeded
+  through approved escalation. No security guard/marker bypass.85 source/public/
+  config hashes match; original CSS SHA256 remains1cb3438f14a262d4ad7efa4ad11153cf61867917aabf51e88a04c6655cffdb28.
+- Browser: seven exact-ID/rename/record-preservation checks, seven original
+  baseline workflows, four applied-filter cases, four navigation/history races,
+  five detail-loading cases and all14 original dashboard labels/values/one-query/
+  outage recovery passed. Initial new fixture missed existing required fields;
+  corrected fixture only. Literal-name test awaited loaded rows. Navigation
+  regression now checks unchanged visible labels and intercepts actual ID query,
+  retaining its original stale-response assertions. All external requests zero.
+- Evidence: tools/local-test/evidence/batch-65-*.json. Source-only API reference
+  refreshed106 existing operations. Synthetic preview reseeded after temporary
+  collision/rename fixtures; current local link http://127.0.0.1:55446/prices.
+- Count:28 complete /8 partial or pending:02,05,07,08,13,14,20,35.
+  PY-29 finite application-side scope complete. Existing unknown legacy links,
+  historical repair decisions and production/provider verification remain PY-35;
+  no automatic repair or production readiness claim. Next: PY-08/PY-20 unfinished
+  technical bounds, preserving original full results and approved policies.

@@ -1,0 +1,9 @@
+{
+  "before": false,
+  "tests": 34,
+  "failures": [],
+  "actual_service_worker_source": true,
+  "in_memory_cache_and_fake_fetch": true,
+  "native_network_available_to_worker": false,
+  "production_connections": 0
+}

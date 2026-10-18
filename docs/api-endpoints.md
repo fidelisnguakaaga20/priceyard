@@ -113,21 +113,21 @@ from declarations for traceability; follow the linked handler for all checks.
 | POST | `/payments/webhook` | `—` | [paystack_webhook](../backend/app/routes/payment_routes.py#L48) |
 | POST | `/payments/{reference}/verify` | `_verification_user` | [verify_payment](../backend/app/routes/payment_routes.py#L29) |
 | GET | `/price-updates` | `bearer_scheme` | [get_latest_price_updates](../backend/app/routes/price_update_routes.py#L83) |
-| POST | `/price-updates` | `require_roles('admin', 'reporter')` | [add_price_update](../backend/app/routes/price_update_routes.py#L184) |
-| GET | `/price-updates/admin/flagged` | `require_roles('admin')` | [get_flagged_price_updates](../backend/app/routes/price_update_routes.py#L157) |
-| GET | `/price-updates/admin/history` | `require_roles('admin')` | [get_admin_price_history](../backend/app/routes/price_update_routes.py#L149) |
-| GET | `/price-updates/comparison` | `bearer_scheme` | [get_market_comparison](../backend/app/routes/price_update_routes.py#L132) |
-| GET | `/price-updates/history` | `require_full_access` | [get_price_history](../backend/app/routes/price_update_routes.py#L104) |
-| GET | `/price-updates/history/pairs` | `require_full_access` | [get_price_history_pairs](../backend/app/routes/price_update_routes.py#L124) |
-| GET | `/price-updates/my-stats` | `get_current_user` | [get_my_submission_stats](../backend/app/routes/price_update_routes.py#L165) |
-| DELETE | `/price-updates/{price_update_id}` | `require_roles('admin')` | [remove_price_update](../backend/app/routes/price_update_routes.py#L282) |
-| GET | `/price-updates/{price_update_id}` | `bearer_scheme` | [get_price_update](../backend/app/routes/price_update_routes.py#L173) |
-| PATCH | `/price-updates/{price_update_id}` | `require_roles('admin')` | [edit_price_update](../backend/app/routes/price_update_routes.py#L195) |
-| PATCH | `/price-updates/{price_update_id}/approve` | `require_roles('admin')` | [approve_update](../backend/app/routes/price_update_routes.py#L212) |
-| POST | `/price-updates/{price_update_id}/flag` | `get_current_user` | [flag_price](../backend/app/routes/price_update_routes.py#L239) |
-| POST | `/price-updates/{price_update_id}/flags/resolve` | `require_roles('admin')` | [resolve_price_flags](../backend/app/routes/price_update_routes.py#L250) |
-| PATCH | `/price-updates/{price_update_id}/mark-outdated` | `require_roles('admin')` | [mark_outdated](../backend/app/routes/price_update_routes.py#L269) |
-| PATCH | `/price-updates/{price_update_id}/reject` | `require_roles('admin')` | [reject_update](../backend/app/routes/price_update_routes.py#L226) |
+| POST | `/price-updates` | `require_roles('admin', 'reporter')` | [add_price_update](../backend/app/routes/price_update_routes.py#L190) |
+| GET | `/price-updates/admin/flagged` | `require_roles('admin')` | [get_flagged_price_updates](../backend/app/routes/price_update_routes.py#L163) |
+| GET | `/price-updates/admin/history` | `require_roles('admin')` | [get_admin_price_history](../backend/app/routes/price_update_routes.py#L155) |
+| GET | `/price-updates/comparison` | `bearer_scheme` | [get_market_comparison](../backend/app/routes/price_update_routes.py#L138) |
+| GET | `/price-updates/history` | `require_full_access` | [get_price_history](../backend/app/routes/price_update_routes.py#L107) |
+| GET | `/price-updates/history/pairs` | `require_full_access` | [get_price_history_pairs](../backend/app/routes/price_update_routes.py#L130) |
+| GET | `/price-updates/my-stats` | `get_current_user` | [get_my_submission_stats](../backend/app/routes/price_update_routes.py#L171) |
+| DELETE | `/price-updates/{price_update_id}` | `require_roles('admin')` | [remove_price_update](../backend/app/routes/price_update_routes.py#L288) |
+| GET | `/price-updates/{price_update_id}` | `bearer_scheme` | [get_price_update](../backend/app/routes/price_update_routes.py#L179) |
+| PATCH | `/price-updates/{price_update_id}` | `require_roles('admin')` | [edit_price_update](../backend/app/routes/price_update_routes.py#L201) |
+| PATCH | `/price-updates/{price_update_id}/approve` | `require_roles('admin')` | [approve_update](../backend/app/routes/price_update_routes.py#L218) |
+| POST | `/price-updates/{price_update_id}/flag` | `get_current_user` | [flag_price](../backend/app/routes/price_update_routes.py#L245) |
+| POST | `/price-updates/{price_update_id}/flags/resolve` | `require_roles('admin')` | [resolve_price_flags](../backend/app/routes/price_update_routes.py#L256) |
+| PATCH | `/price-updates/{price_update_id}/mark-outdated` | `require_roles('admin')` | [mark_outdated](../backend/app/routes/price_update_routes.py#L275) |
+| PATCH | `/price-updates/{price_update_id}/reject` | `require_roles('admin')` | [reject_update](../backend/app/routes/price_update_routes.py#L232) |
 | POST | `/push/subscribe` | `get_current_user` | [subscribe](../backend/app/routes/push_routes.py#L35) |
 | GET | `/push/subscribed` | `get_current_user` | [check_subscribed](../backend/app/routes/push_routes.py#L16) |
 | POST | `/push/unsubscribe` | `get_current_user` | [unsubscribe](../backend/app/routes/push_routes.py#L44) |
@@ -141,7 +141,7 @@ from declarations for traceability; follow the linked handler for all checks.
 | POST | `/sell-watch-windows` | `require_roles('admin')` | [add_window](../backend/app/routes/sell_watch_window_routes.py#L45) |
 | GET | `/sell-watch-windows/{window_id}` | `require_full_access` | [get_window](../backend/app/routes/sell_watch_window_routes.py#L36) |
 | PATCH | `/sell-watch-windows/{window_id}` | `require_roles('admin')` | [edit_window](../backend/app/routes/sell_watch_window_routes.py#L56) |
-| GET | `/share/commodities/{commodity_name}` | `—` | [share_commodity_card](../backend/app/routes/share_routes.py#L48) |
+| GET | `/share/commodities/{commodity_name}` | `—` | [share_commodity_card](../backend/app/routes/share_routes.py#L49) |
 | GET | `/storage-suitability` | `require_full_access` | [get_items](../backend/app/routes/storage_suitability_routes.py#L27) |
 | POST | `/storage-suitability` | `require_roles('admin')` | [add_item](../backend/app/routes/storage_suitability_routes.py#L45) |
 | GET | `/storage-suitability/{item_id}` | `require_full_access` | [get_item](../backend/app/routes/storage_suitability_routes.py#L36) |

@@ -69,6 +69,8 @@ def _approved_price_statement(
     *,
     commodity_search: str | None = None,
     market_search: str | None = None,
+    commodity_id: int | None = None,
+    market_id: int | None = None,
     selected_date: date | None = None,
     movement: Movement | None = None,
     time_of_day: TimeOfDay | None = None,
@@ -88,6 +90,11 @@ def _approved_price_statement(
 
     if not include_outdated:
         statement = statement.where(PriceUpdate.is_outdated.is_(False))
+
+    if commodity_id is not None:
+        statement = statement.where(PriceUpdate.commodity_id == commodity_id)
+    if market_id is not None:
+        statement = statement.where(PriceUpdate.market_id == market_id)
 
     if commodity_search:
         statement = statement.where(Commodity.name.ilike(f"%{commodity_search}%"))
@@ -177,6 +184,8 @@ def _latest_approved_price_statement(
     *,
     commodity_search: str | None = None,
     market_search: str | None = None,
+    commodity_id: int | None = None,
+    market_id: int | None = None,
     selected_date: date | None = None,
     movement: Movement | None = None,
 ):
@@ -189,6 +198,7 @@ def _latest_approved_price_statement(
     ranked = _approved_price_statement(
         commodity_search=commodity_search,
         market_search=market_search,
+        commodity_id=commodity_id, market_id=market_id,
         selected_date=selected_date,
         movement=None,
         include_outdated=True,
@@ -224,11 +234,14 @@ def list_latest_approved_price_updates(
     *,
     commodity_search: str | None = None,
     market_search: str | None = None,
+    commodity_id: int | None = None,
+    market_id: int | None = None,
     selected_date: date | None = None,
     movement: Movement | None = None,
 ) -> list[PriceUpdate]:
     return list(db.scalars(_latest_approved_price_statement(
         commodity_search=commodity_search, market_search=market_search,
+        commodity_id=commodity_id, market_id=market_id,
         selected_date=selected_date, movement=movement,
     )).all())
 
@@ -238,6 +251,8 @@ def list_price_history(
     *,
     commodity_search: str | None = None,
     market_search: str | None = None,
+    commodity_id: int | None = None,
+    market_id: int | None = None,
     selected_date: date | None = None,
     movement: Movement | None = None,
     time_of_day: TimeOfDay | None = None,
@@ -245,6 +260,7 @@ def list_price_history(
     statement = _approved_price_statement(
         commodity_search=commodity_search,
         market_search=market_search,
+        commodity_id=commodity_id, market_id=market_id,
         selected_date=selected_date,
         movement=movement,
         time_of_day=time_of_day,

@@ -7,6 +7,7 @@ import { useAuth } from "../context/AuthContext";
 import { useHistoricalCommodityMarketPairs } from "../hooks/useCommodityMarketPairs";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { apiFetch } from "../services/api";
+import { addIdentityFilter, identityLabel, identityValue, nameSelection, selectedIdentity } from "../services/priceIdentity";
 import type { Commodity, Market, PriceUpdate } from "../types/api";
 import { confidenceClass, money, movementIcon, shortDate } from "../utils";
 
@@ -16,11 +17,13 @@ export function PriceHistoryPage() {
   const [items, setItems] = useState<PriceUpdate[]>([]);
   const [commodities, setCommodities] = useState<Commodity[]>([]);
   const [markets, setMarkets] = useState<Market[]>([]);
-  const [commodity, setCommodity] = useState("Egusi");
+  const [commodity, setCommodity] = useState(nameSelection("Egusi"));
   const [market, setMarket] = useState("");
   const commodityMarketPairs = useHistoricalCommodityMarketPairs(hasFullAccess ? token : null);
-  const availableMarkets = commodity && commodityMarketPairs.has(commodity)
-    ? markets.filter((item) => commodityMarketPairs.get(commodity)!.has(item.name))
+  const commodityLabel = identityLabel(commodity, commodities);
+  const marketLabel = identityLabel(market, markets);
+  const availableMarkets = commodityLabel && commodityMarketPairs.has(commodityLabel)
+    ? markets.filter((item) => commodityMarketPairs.get(commodityLabel)!.has(item.name))
     : markets;
   const [timeOfDay, setTimeOfDay] = useState("");
   const [error, setError] = useState("");
@@ -29,7 +32,7 @@ export function PriceHistoryPage() {
   const activeAccess = useRef({ token, hasFullAccess });
   activeAccess.current = { token, hasFullAccess };
 
-  const load = async () => {
+  const load = async (selection = { commodity, market, timeOfDay }) => {
     const sequence = ++requestSequence.current;
     if (!token || !hasFullAccess) {
       setItems([]);
@@ -41,9 +44,9 @@ export function PriceHistoryPage() {
     setError("");
     const isCurrent = () => sequence === requestSequence.current && token === activeAccess.current.token && activeAccess.current.hasFullAccess;
     const query = new URLSearchParams();
-    if (commodity) query.set("commodity", commodity);
-    if (market) query.set("market", market);
-    if (timeOfDay) query.set("time_of_day", timeOfDay);
+    addIdentityFilter(query, "commodity", selectedIdentity(selection.commodity, commodities));
+    addIdentityFilter(query, "market", selectedIdentity(selection.market, markets));
+    if (selection.timeOfDay) query.set("time_of_day", selection.timeOfDay);
 
     try {
       const data = await apiFetch<PriceUpdate[]>(`/price-updates/history?${query}`, {}, token);
@@ -60,7 +63,7 @@ export function PriceHistoryPage() {
   useEffect(() => {
     let current = true;
     if (!authLoading && hasFullAccess) {
-      void load();
+      setLoading(true);
       void Promise.all([
         apiFetch<Commodity[]>("/commodities"),
         apiFetch<Market[]>("/markets"),
@@ -68,7 +71,11 @@ export function PriceHistoryPage() {
         if (!current) return;
         setCommodities(commodityItems);
         setMarkets(marketItems);
-      }).catch(() => undefined);
+        const chosenCommodity = selectedIdentity(commodity, commodityItems);
+        const chosenMarket = selectedIdentity(market, marketItems);
+        setCommodity(chosenCommodity); setMarket(chosenMarket);
+        void load({ commodity: chosenCommodity, market: chosenMarket, timeOfDay });
+      }).catch((err: Error) => { if (current) { setError(err.message); setLoading(false); } });
     } else if (!authLoading) {
       setItems([]); setError(""); setLoading(false);
     }
@@ -82,7 +89,8 @@ export function PriceHistoryPage() {
 
   const changeCommodity = (value: string) => {
     setCommodity(value);
-    if (market && value && commodityMarketPairs.has(value) && !commodityMarketPairs.get(value)!.has(market)) setMarket("");
+    const label = identityLabel(value, commodities);
+    if (market && label && commodityMarketPairs.has(label) && !commodityMarketPairs.get(label)!.has(marketLabel)) setMarket("");
   };
 
   return <section className="page page-section">
@@ -94,8 +102,8 @@ export function PriceHistoryPage() {
 
     {authLoading ? <LoadingSpinner label="Checking price-history access…" /> : !hasFullAccess ? <PremiumGate><></></PremiumGate> : <>
       <form className="filter-bar" onSubmit={submit}>
-        <label>Commodity<select value={commodity} onChange={(e) => changeCommodity(e.target.value)}><option value="">Choose a commodity</option>{commodities.map((item) => <option key={item.id}>{item.name}</option>)}</select></label>
-        <label>Market<select value={market} onChange={(e) => setMarket(e.target.value)}><option value="">Choose a market</option>{availableMarkets.map((item) => <option key={item.id}>{item.name}</option>)}</select>{commodity && availableMarkets.length < markets.length && <small className="muted">{commodity} is only tracked at {availableMarkets.length} market{availableMarkets.length === 1 ? "" : "s"} here.</small>}</label>
+        <label>Commodity<select value={selectedIdentity(commodity, commodities)} onChange={(e) => changeCommodity(e.target.value)}><option value="">Choose a commodity</option>{commodities.map((item) => <option value={identityValue(item.id)} key={item.id}>{item.name}</option>)}</select></label>
+        <label>Market<select value={selectedIdentity(market, markets)} onChange={(e) => setMarket(e.target.value)}><option value="">Choose a market</option>{availableMarkets.map((item) => <option value={identityValue(item.id)} key={item.id}>{item.name}</option>)}</select>{commodity && availableMarkets.length < markets.length && <small className="muted">{commodityLabel} is only tracked at {availableMarkets.length} market{availableMarkets.length === 1 ? "" : "s"} here.</small>}</label>
         <label>Time of day<select value={timeOfDay} onChange={(e) => setTimeOfDay(e.target.value)}><option value="">Any time</option><option>morning</option><option>afternoon</option><option>evening</option><option>closing</option></select></label>
         <div className="filter-actions"><button className="button button-small" disabled={loading}>{loading ? <ButtonSpinner label="Please wait…" /> : "Search history"}</button></div>
       </form>
@@ -129,7 +137,7 @@ export function PriceHistoryPage() {
             <div className="guidance"><div><span>Possible Meaning</span><p>{item.possible_meaning || "No observation supplied."}</p></div><div><span>Suggested Action</span><strong>{item.suggested_action || "Watch"}</strong></div></div>
           </article>)}
         </div>
-        {!items.length && <div className="status-box">No history records found{commodity ? ` for ${commodity}` : ""}{market ? ` at ${market}` : ""}. Try a different market, commodity, or time of day.</div>}
+        {!items.length && <div className="status-box">No history records found{commodity ? ` for ${commodityLabel}` : ""}{market ? ` at ${marketLabel}` : ""}. Try a different market, commodity, or time of day.</div>}
       </>}
     </>}
 

@@ -1,0 +1,14 @@
+{
+  "typescript_and_vite_passed": true,
+  "matched_frontend_source_public_config_files": 85,
+  "reused_existing_snapshot": true,
+  "original_css_byte_identical": true,
+  "assets_sha256": {
+    "index-BEBH-Ai6.css": "1cb3438f14a262d4ad7efa4ad11153cf61867917aabf51e88a04c6655cffdb28",
+    "index-DOGHQmOK.js": "1755639d4355d2e5dca408358dca1b15c2b635fb2bc02aa97fd6fb5c3f491a91"
+  },
+  "dependencies_installed": 0,
+  "dependencies_copied": 0,
+  "retry_after_windows_runner_directory_denial": true,
+  "ready_marker_present_only_after_success": true
+}

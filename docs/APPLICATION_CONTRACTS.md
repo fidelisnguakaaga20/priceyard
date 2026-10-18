@@ -28,6 +28,14 @@ Keep the existing seven-day referral reward and its current registration
 qualification. Changing qualification, caps, verification requirements, renewal
 pricing or plan duration needs a separate owner decision.
 
+Current/history dropdowns retain their original labels but submit existing catalog
+IDs, distinguishing prefix names and same-named markets. Newly generated detail
+and share links carry existing identity; renaming does not change the referenced
+commodity. Shared-price IDs select a commodity's current public records, never
+publish a historical row's amounts or private sources. Legacy text-search API
+parameters retain substring semantics. Name-only detail/share links require exact
+unambiguous identity; do not invent aliases or guess legacy duplicate ownership.
+
 ## Accounts and authorization
 
 Trial/paid are entitlement states, not additional staff roles. Staff authority
@@ -70,7 +78,8 @@ Completion means the finite identified application requirement and its evidence
 are satisfied. Do not keep reopening completed items for hypothetical work, or
 mark pending owner policies as implemented. Dates/day-filter display semantics,
 movement/confidence rules, broader text/body limits, remaining list bounds,
-catalog identity issues and session-storage policy retain their tracker statuses.
+session-storage policy retain their tracker statuses. Current catalog/filter/link
+identity safeguards are complete in PY-29; legacy repairs remain separate.
 
 PY-35 owns production/provider compatibility, deployment permissions, backups and
 restore rehearsal, shared production rate limits, live scheduling/checkpoint

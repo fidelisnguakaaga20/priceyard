@@ -7,6 +7,7 @@ import { NativeShareButton } from "./ShareButtons";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { apiFetch, ApiError } from "../services/api";
+import { commodityLink } from "../services/priceIdentity";
 import type { PriceUpdate } from "../types/api";
 import { agingClass, commodityTitleColor, confidenceClass, money, movementIcon, priceShareContent, relativeTime, whatsAppShareUrl } from "../utils";
 
@@ -56,7 +57,7 @@ export function PriceCard({ item }: { item: PriceUpdate }) {
       </div>
       {item.notes && <p className="price-card-note"><strong>Note from PriceYard:</strong> {item.notes}</p>}
       <div className="card-actions">
-        <Link className="text-link-cta" to={`/commodities/${encodeURIComponent(item.commodity.name)}`}>See what this price means →</Link>
+        <Link className="text-link-cta" to={commodityLink(item.commodity)}>See what this price means →</Link>
         <a className="text-link" href={whatsAppShareUrl(item)} target="_blank" rel="noopener noreferrer">Share on WhatsApp</a>
         <NativeShareButton content={priceShareContent(item)} />
         {token ? (

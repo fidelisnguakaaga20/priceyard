@@ -22,8 +22,8 @@ try{
  {
   const {context,page}=await fixture();await page.goto(origin+'/prices');await page.locator('.price-card').first().waitFor();
   await navigate(page,'?commodity=Egusi&market=Kwali+Market');await settle(page);
-  if(!expectBug)await page.waitForFunction(()=>document.querySelector('.filter-bar select')?.value==='Egusi');
-  checks.navigation_updates_existing_filter_controls=(await page.locator('.filter-bar select').nth(0).inputValue())==='Egusi'&&(await page.locator('.filter-bar select').nth(1).inputValue())==='Kwali Market';
+  if(!expectBug)await page.waitForFunction(()=>document.querySelector('.filter-bar select')?.selectedOptions[0]?.textContent==='Egusi');
+  checks.navigation_updates_existing_filter_controls=(await page.locator('.filter-bar select').nth(0).locator('option:checked').textContent())==='Egusi'&&(await page.locator('.filter-bar select').nth(1).locator('option:checked').textContent())==='Kwali Market';
   await context.close();
  }
  {
@@ -40,14 +40,16 @@ try{
  for(const failure of [false,true]){
   const {context,page}=await fixture(true);await page.goto(origin+'/history');await page.locator('.history-table-view tbody tr').first().waitFor();
   const history=await page.evaluate(async()=>{const token=localStorage.getItem('priceyard_access_token');return fetch('/api/price-updates/history?commodity=Egusi',{headers:{Authorization:'Bearer '+token}}).then(r=>r.json());});
+  const value=await page.locator('.filter-bar select').first().inputValue();
+  const historyUrl=origin+'/api/price-updates/history?'+(value.startsWith('id:')?'commodity_id='+value.slice(3):'commodity=Egusi');
   const ready=deferred(),release=deferred();
-  await context.route('**/api/price-updates/history?commodity=Egusi',async route=>{ready.resolve();await release.promise;await route.fulfill({status:failure?503:200,contentType:'application/json',body:JSON.stringify(failure?{detail:'Synthetic superseded history error'}:history)});});
+  await context.route(historyUrl,async route=>{ready.resolve();await release.promise;await route.fulfill({status:failure?503:200,contentType:'application/json',body:JSON.stringify(failure?{detail:'Synthetic superseded history error'}:history)});});
   // Fault injection submits two native form events while the first is pending;
   // ordinary disabled buttons already prevent most accidental double-clicks.
   await page.locator('.filter-bar').evaluate(form=>form.requestSubmit());await ready.promise;
   await page.locator('.filter-bar select').nth(2).selectOption('morning');
   await page.locator('.filter-bar').evaluate(form=>form.requestSubmit());await page.getByText(/No history records found/).waitFor();
-  const response=page.waitForResponse(r=>r.url()===origin+'/api/price-updates/history?commodity=Egusi'&&r.status()===(failure?503:200));
+  const response=page.waitForResponse(r=>r.url()===historyUrl&&r.status()===(failure?503:200));
   release.resolve();await response;await settle(page);
   checks[failure?'old_history_error_is_ignored':'old_history_rows_do_not_replace_latest_filters']=failure?await page.locator('.status-box.error').count()===0:await page.locator('.history-table-view tbody tr').count()===0;
   await context.close();

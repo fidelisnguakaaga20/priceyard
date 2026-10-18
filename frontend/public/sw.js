@@ -22,14 +22,16 @@ function publicApiResource(url) {
   if (!url.pathname.startsWith(prefix + "/")) return false;
   const endpoint = url.pathname.slice(prefix.length);
   if (endpoint === "/price-updates") {
-    return [...url.searchParams.keys()].every(key => ["commodity", "market", "movement"].includes(key));
+    return [...url.searchParams.keys()].every(key => ["commodity", "market", "movement", "commodity_id", "market_id"].includes(key));
   }
   return !url.search && (/^\/(commodities|markets|faq)(\/\d+)?$/.test(endpoint) || ["/market-days", "/testimonials"].includes(endpoint));
 }
 
 function publicNavigation(url) {
-  return url.origin === APP_ORIGIN && !url.search &&
-    (["/", "/prices", "/market-days", "/faq"].includes(url.pathname) || url.pathname.startsWith("/commodities/"));
+  return url.origin === APP_ORIGIN && (
+    (!url.search && ["/", "/prices", "/market-days", "/faq"].includes(url.pathname)) ||
+    (url.pathname.startsWith("/commodities/") && [...url.searchParams.keys()].every(key => key === "commodity_id"))
+  );
 }
 
 function staticAsset(url) {

@@ -8,6 +8,7 @@ import { useCommodityMarketPairs } from "../hooks/useCommodityMarketPairs";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { usePreferences } from "../context/PreferencesContext";
 import { apiFetch, apiFetchWithProvenance } from "../services/api";
+import { addIdentityFilter, identityLabel, identityValue, selectedIdentity, selectionFromQuery } from "../services/priceIdentity";
 import type { Commodity, Market, PriceUpdate } from "../types/api";
 
 const AUTO_REFRESH_MS = 60_000;
@@ -21,11 +22,13 @@ export function PricesPage() {
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [commodities, setCommodities] = useState<Commodity[]>([]);
   const [markets, setMarkets] = useState<Market[]>([]);
-  const [commodity, setCommodity] = useState(() => searchParams.get("commodity") || "");
-  const [market, setMarket] = useState(() => searchParams.get("market") || "");
+  const [commodity, setCommodity] = useState(() => selectionFromQuery(searchParams, "commodity"));
+  const [market, setMarket] = useState(() => selectionFromQuery(searchParams, "market"));
   const commodityMarketPairs = useCommodityMarketPairs();
-  const availableMarkets = commodity && commodityMarketPairs.has(commodity)
-    ? markets.filter((item) => commodityMarketPairs.get(commodity)!.has(item.name))
+  const commodityLabel = identityLabel(commodity, commodities);
+  const marketLabel = identityLabel(market, markets);
+  const availableMarkets = commodityLabel && commodityMarketPairs.has(commodityLabel)
+    ? markets.filter((item) => commodityMarketPairs.get(commodityLabel)!.has(item.name))
     : markets;
   const [movement, setMovement] = useState("");
   const [error, setError] = useState("");
@@ -44,8 +47,8 @@ export function PricesPage() {
       setLoading(true); setError("");
     }
     const query = new URLSearchParams();
-    if (params?.commodity) query.set("commodity", params.commodity);
-    if (params?.market) query.set("market", params.market);
+    addIdentityFilter(query, "commodity", params?.commodity);
+    addIdentityFilter(query, "market", params?.market);
     if (params?.movement) query.set("movement", params.movement);
     try {
       const { data, savedAt } = await apiFetchWithProvenance<PriceUpdate[]>(`/price-updates${query.size ? `?${query}` : ""}`);
@@ -64,8 +67,8 @@ export function PricesPage() {
   };
 
   useEffect(() => {
-    const commodity = searchParams.get("commodity") || "";
-    const market = searchParams.get("market") || "";
+    const commodity = selectionFromQuery(searchParams, "commodity");
+    const market = selectionFromQuery(searchParams, "market");
     setCommodity(commodity); setMarket(market); setMovement("");
     void load({ commodity, market });
     return () => { requestSequence.current++; foregroundPending.current = false; };
@@ -93,24 +96,25 @@ export function PricesPage() {
     return () => clearInterval(interval);
   }, [dataSaver]);
 
-  const submit = (event: FormEvent) => { event.preventDefault(); void load({ commodity, market, movement }); };
+  const submit = (event: FormEvent) => { event.preventDefault(); void load({ commodity: selectedIdentity(commodity, commodities), market: selectedIdentity(market, markets), movement }); };
   const clear = () => { setCommodity(""); setMarket(""); setMovement(""); void load(); };
   const changeCommodity = (value: string) => {
     setCommodity(value);
-    if (market && value && commodityMarketPairs.has(value) && !commodityMarketPairs.get(value)!.has(market)) setMarket("");
+    const label = identityLabel(value, commodities);
+    if (market && label && commodityMarketPairs.has(label) && !commodityMarketPairs.get(label)!.has(marketLabel)) setMarket("");
   };
 
   return <section className="page page-section">
     <div className="page-title"><span className="eyebrow">Latest approved records</span><h1>Prices</h1><p>Search current commodity price ranges by commodity, market and movement.</p></div>
     <form className="filter-bar" onSubmit={submit}>
-      <label>Commodity<select value={commodity} onChange={(e) => changeCommodity(e.target.value)}><option value="">Choose a commodity</option>{commodities.map((item) => <option key={item.id}>{item.name}</option>)}</select></label>
-      <label>Market<select value={market} onChange={(e) => setMarket(e.target.value)}><option value="">Choose a market</option>{availableMarkets.map((item) => <option key={item.id}>{item.name}</option>)}</select>{commodity && availableMarkets.length < markets.length && <small className="muted">{commodity} is only tracked at {availableMarkets.length} market{availableMarkets.length === 1 ? "" : "s"} here.</small>}</label>
+      <label>Commodity<select value={selectedIdentity(commodity, commodities)} onChange={(e) => changeCommodity(e.target.value)}><option value="">Choose a commodity</option>{commodities.map((item) => <option value={identityValue(item.id)} key={item.id}>{item.name}</option>)}</select></label>
+      <label>Market<select value={selectedIdentity(market, markets)} onChange={(e) => setMarket(e.target.value)}><option value="">Choose a market</option>{availableMarkets.map((item) => <option value={identityValue(item.id)} key={item.id}>{item.name}</option>)}</select>{commodity && availableMarkets.length < markets.length && <small className="muted">{commodityLabel} is only tracked at {availableMarkets.length} market{availableMarkets.length === 1 ? "" : "s"} here.</small>}</label>
       <label>Movement<select value={movement} onChange={(e) => setMovement(e.target.value)}><option value="">Any movement</option><option value="up">Up</option><option value="down">Down</option><option value="stable">Stable</option><option value="unknown">Unknown</option></select></label>
       <div className="filter-actions"><button className="button button-small" type="submit" disabled={loading}>{loading ? <ButtonSpinner label="Please wait…" /> : "Apply"}</button><button className="button button-ghost button-small" type="button" onClick={clear} disabled={loading}>Clear</button></div>
     </form>
     {error && <div className="status-box error">{error}</div>}
     {!loading && items.length > 0 && <SavedPriceNotice savedAt={savedAt} />}
-    {loading || filtersLoading ? <LoadingSpinner label="Loading approved prices…" /> : items.length ? <div className="card-grid">{items.map((item) => <PriceCard key={item.id} item={item} />)}</div> : <div className="status-box">No current prices found{commodity ? ` for ${commodity}` : ""}{market ? ` at ${market}` : ""}. Try clearing the filters or check back soon for new records.</div>}
+    {loading || filtersLoading ? <LoadingSpinner label="Loading approved prices…" /> : items.length ? <div className="card-grid">{items.map((item) => <PriceCard key={item.id} item={item} />)}</div> : <div className="status-box">No current prices found{commodity ? ` for ${commodityLabel}` : ""}{market ? ` at ${marketLabel}` : ""}. Try clearing the filters or check back soon for new records.</div>}
     <Disclaimer>{PRICE_DISCLAIMER}</Disclaimer>
   </section>;
 }

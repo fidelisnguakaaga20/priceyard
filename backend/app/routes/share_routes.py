@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from html import escape as html_escape
 from urllib.parse import quote
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import HTMLResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from app.config import get_settings
 from app.database import get_db
 from app.models.commodity import Commodity
+from app.models.price_update import PriceUpdate
 from app.services.activity_service import log_activity_event
 from app.services.price_update_service import list_latest_approved_price_updates
 
@@ -45,7 +46,12 @@ def _relative_age(moment: datetime) -> str:
 
 
 @router.get("/commodities/{commodity_name}", response_class=HTMLResponse)
-def share_commodity_card(commodity_name: str, db: Session = Depends(get_db)) -> HTMLResponse:
+def share_commodity_card(
+    commodity_name: str,
+    pu: int | None = Query(default=None, gt=0, le=2_147_483_647),
+    commodity_id: int | None = Query(default=None, gt=0, le=2_147_483_647),
+    db: Session = Depends(get_db),
+) -> HTMLResponse:
     """Serve a crawler-friendly HTML card with per-commodity Open Graph tags, then hand
     real visitors off to the React app. Social crawlers (WhatsApp, Facebook, Twitter, ...)
     don't execute JavaScript, so the SPA's single static index.html can't vary its preview
@@ -58,7 +64,30 @@ def share_commodity_card(commodity_name: str, db: Session = Depends(get_db)) -> 
 
     log_activity_event(db, event_type="share_view", label=commodity_name)
 
-    items = list_latest_approved_price_updates(db, commodity_search=commodity_name)
+    # Existing shared-price links carry a price ID. Use only its commodity
+    # identity, never that historical row's amounts or confidential fields.
+    commodity = None
+    if pu is not None:
+        linked_id = db.scalar(select(PriceUpdate.commodity_id).where(
+            PriceUpdate.id == pu, PriceUpdate.status == "approved"
+        ))
+        if linked_id is not None and (commodity_id is None or commodity_id == linked_id):
+            commodity = db.get(Commodity, linked_id)
+    elif commodity_id is not None:
+        commodity = db.get(Commodity, commodity_id)
+    else:
+        matches = list(db.scalars(select(Commodity).where(Commodity.name.ilike(commodity_name))))
+        # ILIKE treats literal % and _ as wildcards: confirm the exact name.
+        matches = [row for row in matches if row.name.casefold() == commodity_name.casefold()]
+        if len(matches) == 1:
+            commodity = matches[0]
+        elif len(matches) > 1:
+            raise HTTPException(status_code=404, detail="Commodity not found")
+    if (pu is not None or commodity_id is not None) and commodity is None:
+        raise HTTPException(status_code=404, detail="Commodity not found")
+    if commodity is not None:
+        target_url = f"{frontend_url}/commodities/{quote(commodity.name, safe='')}?commodity_id={commodity.id}"
+    items = list_latest_approved_price_updates(db, commodity_id=commodity.id) if commodity is not None else []
     item = items[0] if items else None
 
     if item is not None:
@@ -71,7 +100,6 @@ def share_commodity_card(commodity_name: str, db: Session = Depends(get_db)) -> 
         )
         image = _social_preview_image(item.commodity.image_url or fallback_image)
     else:
-        commodity = db.scalar(select(Commodity).where(Commodity.name.ilike(commodity_name)))
         if commodity is not None and commodity.is_upcoming:
             title = f"{commodity.name} — Coming Soon | PriceYard"
             when = f" Expected {commodity.expected_available_date:%B %Y}." if commodity.expected_available_date else ""
