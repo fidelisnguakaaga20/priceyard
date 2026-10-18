@@ -1,0 +1,11 @@
+{
+  "checks": 3,
+  "failures": 0,
+  "trusted_matching_name_passed": true,
+  "wrong_name_rejected": true,
+  "untrusted_certificate_rejected": true,
+  "tls_protocol": "TLSv1.3",
+  "network_used_for_memory_checks": false,
+  "system_trust_store_changed": false,
+  "production_keys_read": false
+}

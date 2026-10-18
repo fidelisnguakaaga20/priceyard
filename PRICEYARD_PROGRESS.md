@@ -25,7 +25,10 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
-Latest verified: batch85,35 complete /1 partial or pending:35.
+Latest verified: batch86,35 complete /1 partial or pending:35.
+Owner chose existing local isolation with no new cloud resources. Identified
+remaining local TLS/browser and simulated email transport gaps verified86; see
+docs/PY35_OFFLINE_READINESS.md. Public-host/provider/actual-record gates stay open.
 Owner authorized notification URL fix and staging instructions2026-10-18. Exact
 setup checklist:docs/STAGING_SETUP_GUIDE.md. External checks are Blocked/not
 attempted, not failed product tests; batch84 initial failures remain historical.
@@ -3308,3 +3311,40 @@ Only authorized watchlist URL handling changes in application code; original
 design,14 cards,prices/measurements/history/trial/subscription/referral/access
 rules preserved. No production credentials/data, provider contacts, real charges,
 purchase, migration, push, merge or deploy. Stop after providing setup instructions.
+
+### Batch 86 - PY-35 remaining identified offline checks (2026-10-18)
+
+Continued8dd9d1c. Owner prefers existing local isolation, no new Render service or
+Supabase project. Reused passed baseline/native/browser/value/recovery/backup/
+dependency evidence instead of repeating it. New6 simulated email transport tests
+pass0.341s:missing configuration, API rejection/error privacy, verified STARTTLS/
+SMTPS context/order and failed TLS cannot send credentials/message. No provider
+traffic or message. No application source changes or dependency installs.
+
+Closed real local TLS gap:one generated synthetic loopback certificate/key,
+memory handshakes3 pass(trusted matching IP, wrong name denied, untrusted denied),
+actual TLS1.3 Chromium browser login/reload/logout with Secure __Host-/HttpOnly/
+SameSite cookies, session-only RememberMe, CSRF403, private no-store, no JS bearer
+and server-revoked token401 pass. Only this generated SPKI trusted in disposable
+browser; no broad HTTPS ignore flag, OS trust-store edit or production key read.
+Original isolation guard unchanged. Literal HTTPS127.0.0.1:55446/Host/Origin gate,
+serial SQLite requests, external requests0. The original compiled UI/API reused;
+transient fixture uses staging cookie mode. No production configuration touched.
+
+TLS bootstrap creates/loads only its own new certificate files before app imports;
+then original guard applies. New file tree bounded to one small ignored pair and
+public identity; no copied dependencies/databases. Exact-script owned TLS worker
+stopped and fresh ordinary HTTP preview restored. Native PostgreSQL stays stopped
+at21/80; no schema/file growth from repeating native suites. TLS evidence is not
+public CA/DNS/reverse-proxy/Android/Safari or actual-host compatibility proof.
+
+docs/PY35_OFFLINE_READINESS.md maps every remaining live gate to its unavailable
+evidence and explains minimum launch prerequisites. Existing provider TEST access/
+consenting recipients, reachable isolated callback host, target-runtime install/
+advisory review, actual-backup restoration/read-only revision review, monitoring/
+scheduler ownership and separate release approval remain. No claim that all
+possible offline tests or real-world operations are certified. Known identified
+local gaps now covered;35/36 complete,PY-35 partial. Evidence86 retained; no failed
+new check, heavy load, virtualization or repeated prior full suite. No production,
+customer records, actual charges/messages, purchase, cloud creation, push, merge,
+deployment or jobs enabled. Stop after reporting; no credentials requested.

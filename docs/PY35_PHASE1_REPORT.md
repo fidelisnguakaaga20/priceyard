@@ -10,6 +10,10 @@ prerequisites and simple steps. Batch85 fixes notification destinations locally;
 batch84 package/test results below remain historical evidence for its source
 revision. The preserved package must be reviewed/refreshed before testing a newer
 hosted candidate; do not overwrite it or claim it contains this later fix.
+Local-only follow-up86 adds real loopback TLS1.3/browser checks and six simulated
+email transport tests without rerunning existing passing suites. See
+[offline results and minimum launch requirements](PY35_OFFLINE_READINESS.md).
+Real public-host TLS/proxy and provider gates below remain Blocked/not attempted.
 
 ## Prepared and verified
 

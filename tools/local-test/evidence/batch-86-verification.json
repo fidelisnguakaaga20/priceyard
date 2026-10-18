@@ -1,0 +1,10 @@
+{
+  "new_simulated_email_tests": 6,
+  "memory_tls_checks": 3,
+  "real_loopback_tls_browser_passed": true,
+  "earlier_passing_suites_rerun": false,
+  "system_trust_store_changed": false,
+  "new_cloud_resources": 0,
+  "production_connections": 0,
+  "production_release_authorized": false
+}

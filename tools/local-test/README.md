@@ -86,3 +86,12 @@ The approved dependency exception is documented in `docs/DEPENDENCY_READINESS.md
 the new marked snapshot retains old trees. It does not authorize other installs.
 `check_local_release.py --require-clean` performs read-only local evidence/source/
 lock/Git checks and inventories versions; it cannot grant deployment permission.
+
+Batch86 completed `run_local_tls.ps1` once. It owns one short-lived synthetic
+certificate pair under ignored `runtime/local-tls-20261018`; do not install it in
+any OS/browser trust store or rerun just to refresh evidence. Trusted bootstrap
+generates/loads only its own new key before application imports; the unchanged
+guard remains active during app execution. A disposable browser pins that public
+SPKI, allows only literal HTTPS127.0.0.1:55446, then closes. Only exact-script owned
+TLS processes are stopped; the normal HTTP preview is restored. No deployed TLS,
+certificate authority, reverse proxy, actual provider or real-device claim follows.
