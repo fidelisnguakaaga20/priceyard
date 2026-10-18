@@ -25,7 +25,10 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
-Latest verified: batch84,35 complete /1 partial or pending:35.
+Latest verified: batch85,35 complete /1 partial or pending:35.
+Owner authorized notification URL fix and staging instructions2026-10-18. Exact
+setup checklist:docs/STAGING_SETUP_GUIDE.md. External checks are Blocked/not
+attempted, not failed product tests; batch84 initial failures remain historical.
 Owner approved safe Phase 1 staging/testing2026-10-18, without production access.
 Separate staging package and synthetic checks pass; hosted/provider prerequisites
 were not supplied. See docs/PY35_PHASE1_REPORT.md and docs/PY35_PHASE1_RESULTS.json.
@@ -3263,3 +3266,45 @@ All application backend/TSX/CSS files and approved policies unchanged. Evidence:
 tools/local-test/evidence/batch-84-*.json. Fresh local HTTP preview55446 only;
 runtime package/checkpoints/constraints remain ignored. Stop after reporting;
 no production approval requested, push, merge, deployment or live job.
+
+### Batch 85 - PY-35 safe notification origins and owner setup guide (2026-10-18)
+
+Continuedd3f7aad. Owner explicitly approved replacing the hard-coded live email
+URL, configuration validation/tests and concise staging instructions. Watchlist
+email/push/WhatsApp share an explicit validated FRONTEND_URL origin plus/prices.
+HTTPS outside test/development loopback; no missing/default fallback, userinfo,
+query/fragment/path/control/encoded/private staging destination. Nonproduction
+rejects the original known production hostname. Additional live aliases require
+review before any provider test. No new settings fields/database fields/forms.
+Bad configuration returns0 before watcher queries/provider sends; saved approval
+is not undone. Correctly configured original production destination/content,
+deduplication, targets and independent-channel behaviour preserved. Actual
+production settings were not read; explicit FRONTEND_URL is a release prerequisite.
+
+Passed:9 focused URL/delivery/configuration tests2.399s;5 existing notification
+channel tests6.545s;4 price approval/audit tests1.037s. No failures/errors/skips.
+Original watchlist/Admin approval, three independent mocked channel attempts,
+latest price/reload and all14 correct Admin cards/outage recovery pass in browser;
+external requests0, no actual emails/push/WhatsApp sent. No frontend source change
+or redundant build/native suite. Restarted only verified disposable preview.
+
+docs/STAGING_SETUP_GUIDE.md lists hostname/HTTPS host, synthetic PostgreSQL and
+new staging secret, Paystack TEST keys, Google client/test identities, message
+credentials/approved recipients and exact existing configuration names. Seven
+plain-language steps; secure storage references only, no provider changes/purchases
+performed or keys requested. No new global recipient restriction is falsely
+claimed:restricted provider harness/sandbox still required before actual sends.
+
+Report/JSON now distinguish2 Passed synthetic scopes,5 Blocked/not attempted
+external checks,2 Awaiting Production Approval. Earlier84 "Failed—blocked" counts
+remain historical; actual three test failures were resolved and retained. No
+unresolved executed check is failing. Existing84 source package/evidence is
+preserved at its historical revision and does not contain85; do not overwrite or
+use its checker to claim the updated source was staged. Refresh only under a
+reviewed next staging batch. Original live gates remain unrun;35/36 complete,
+PY-35 partial. Evidence:tools/local-test/evidence/batch-85-*.json.
+
+Only authorized watchlist URL handling changes in application code; original
+design,14 cards,prices/measurements/history/trial/subscription/referral/access
+rules preserved. No production credentials/data, provider contacts, real charges,
+purchase, migration, push, merge or deploy. Stop after providing setup instructions.

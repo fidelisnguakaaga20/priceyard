@@ -21,7 +21,7 @@ def main():
             'Do not claim unavailable infrastructure')
     gates = results['gates']
     require(len(gates) == 9 and {item['id'] for item in gates} == GATE_IDS, 'Missing or repeated Phase 1 gate')
-    allowed = {'Passed', 'Failed', 'Awaiting Production Approval'}
+    allowed = {'Passed', 'Failed', 'Blocked', 'Awaiting Production Approval'}
     require(all(item['phase1_status'] in allowed and item['production_gate_status'] == 'Awaiting Production Approval'
                 for item in gates), 'Incorrect scope or status')
     require({item['id'] for item in gates if item['phase1_status'] == 'Passed'} ==
