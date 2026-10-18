@@ -1,0 +1,21 @@
+{
+  "checks": {
+    "market-signals_all_ids_reachable": true,
+    "market-signals_off_page_edit_preserves_other_fields_and_page": true,
+    "market-signals_late_off_page_lookup_cannot_overwrite_new_selection": true,
+    "market-signals_mismatched_id_response_rejected": true,
+    "market-signals_disposable_tail_delete_returns_to_existing_page": true,
+    "quality-signals_all_ids_reachable": true,
+    "quality-signals_off_page_edit_preserves_other_fields_and_page": true,
+    "quality-signals_late_off_page_lookup_cannot_overwrite_new_selection": true,
+    "quality-signals_mismatched_id_response_rejected": true,
+    "quality-signals_disposable_tail_delete_returns_to_existing_page": true
+  },
+  "records_per_resource": 205,
+  "page_size": 100,
+  "existing_price_records_unchanged": true,
+  "original_forms_and_mobile_layout": true,
+  "external_requests": 0,
+  "production_connections": 0,
+  "reseed_preview_after_check": true
+}

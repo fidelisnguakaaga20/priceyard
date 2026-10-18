@@ -1,0 +1,15 @@
+{
+  "tests": 1,
+  "failures": 0,
+  "errors": 0,
+  "seconds": 0.852,
+  "cluster_identity_verified": true,
+  "production_contacts": 0,
+  "cluster_profile": "postgres-paging-20261018",
+  "schemas_before": 0,
+  "schema_budget": 80,
+  "single_native_suite": true,
+  "selected_tests": [
+    "test_signal_pages_keep_complete_scopes_and_saved_observations"
+  ]
+}

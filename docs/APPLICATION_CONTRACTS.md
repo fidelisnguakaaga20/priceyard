@@ -80,7 +80,8 @@ Existing field/storage rules and stored long records remain; no new per-field
 editorial character policy or truncation is inferred from these technical bounds.
 
 Owner-approved Admin paging is recorded in [the exact scope](ADMIN_LIST_PAGING_APPROVAL.md).
-Users, Payments, Commodities and Markets have100-record pages, Previous/Next, complete totals,
+Users, Payments, Commodities, Markets, FAQs, Audit logs and both signal lists have
+100-record pages, Previous/Next, complete totals,
 preserved refresh/back/edit behavior and unchanged forms/columns/styles. New
 `/users/page`, `/payments/page`, `/commodities/admin/page` and `/markets/admin/page`
 are Admin only. Counts and rows share one DB
@@ -88,15 +89,18 @@ statement/snapshot. Existing `/users` and `/payments` still return complete sche
 checked JSON arrays using100-record cursor batches, with guaranteed close on
 completion/disconnect/cancellation. Full catalog APIs also stream; public paths
 keep active-only complete results and public cache eligibility. Completing a
-save after changing pages refreshes the current page. Other Admin lists/public history remain PY-20
+save after changing pages refreshes the current page. Paged signal editors use
+existing authorized ID endpoints for off-page saved values; stale or mismatched
+responses cannot replace a newer selection. Other Admin lists/public history remain PY-20
 work; never silently truncate an old API or chart to mark paging complete.
 
 ## Honest completion boundaries
 
 Completion means the finite identified application requirement and its evidence
 are satisfied. Do not keep reopening completed items for hypothetical work, or
-mark pending owner policies as implemented. Dates/day-filter display semantics,
-movement/confidence rules and remaining list bounds,
+mark pending owner policies as implemented. Nigeria WAT price entry/display/day
+filters are approved and complete69; stored UTC instants and paid-expiry rules
+remain intact. Movement/confidence rules and remaining list bounds,
 session-storage policy retain their tracker statuses. Current catalog/filter/link
 identity safeguards are complete in PY-29; legacy repairs remain separate.
 

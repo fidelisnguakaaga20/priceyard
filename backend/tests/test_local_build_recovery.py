@@ -42,6 +42,15 @@ class LocalBuildRecoveryTests(unittest.TestCase):
             write.assert_not_called()
             move.assert_not_called()
 
+    def test_paging_fixture_port_blocks_reuse_before_marker_or_file_access(self):
+        with ExitStack() as stack:
+            read, copy, write, move, run = self.controls(stack)
+            with patch.object(self.tool.socket, "socket") as probe:
+                probe.return_value.__enter__.return_value.connect_ex.side_effect = lambda endpoint: 0 if endpoint == ("127.0.0.1",55449) else 1
+                with self.assertRaisesRegex(RuntimeError,"Stop local preview/PostgreSQL"):
+                    self.tool.main()
+            read.assert_not_called();copy.assert_not_called();write.assert_not_called();move.assert_not_called();run.assert_not_called()
+
     def test_successful_resume_restores_ready_only_after_both_build_steps(self):
         with ExitStack() as stack:
             _, _, write, move, run = self.controls(stack)

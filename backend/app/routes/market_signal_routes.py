@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.services.audit_service import save_audited_resource, snapshot_model
+from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, stream_admin_records
 from app.models.market_signal import MarketSignal
 from app.models.user import User
 from app.schemas.market_signal_schema import MarketSignalCreate, MarketSignalResponse, MarketSignalUpdate
@@ -12,7 +13,6 @@ from app.services.market_signal_service import (
     create_market_signal,
     delete_market_signal,
     get_market_signal,
-    list_market_signals,
     update_market_signal,
 )
 from app.utils.permissions import get_current_user, require_roles
@@ -25,8 +25,20 @@ def get_signals(
     db: Session = Depends(get_db),
     _: User = Depends(get_current_user),
     commodity_id: Annotated[int | None, Query(gt=0)] = None,
-) -> list[MarketSignal]:
-    return list_market_signals(db, commodity_id=commodity_id)
+) -> Response:
+    conditions = (MarketSignal.commodity_id == commodity_id,) if commodity_id is not None else ()
+    return AdminJSONResponse(stream_admin_records(db.get_bind(), MarketSignal, MarketSignalResponse,
+        order=(("created_at", True), ("id", True)), where=conditions))
+
+
+@router.get("/admin/page", response_model=AdminRecordPage[MarketSignalResponse])
+def get_admin_signals_page(
+    offset: int = Query(default=0, ge=0, le=2_147_483_647),
+    db: Session = Depends(get_db),
+    _: User = Depends(require_roles("admin")),
+) -> AdminRecordPage[MarketSignalResponse]:
+    return admin_record_page(db, MarketSignal, MarketSignalResponse, offset=offset,
+        order=(("created_at", True), ("id", True)))
 
 
 @router.get("/{signal_id}", response_model=MarketSignalResponse)

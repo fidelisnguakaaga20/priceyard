@@ -24,6 +24,14 @@ dotenv, including when testing a regressed guard.
 
 ## Post-restart resource limits (2026-10-17)
 
+2026-10-18: the recovery fixture reached80/80 retained schemas in batch70.
+Preserve it stopped, along with the older revocation fixture. New native batches
+use `verify_pg_security.py --paging-cluster` against the separately initialized
+`runtime/postgres-paging-20261018`, literal127.0.0.1:55449, pinned identifier
+7697910732590408300. Same role/database,80-schema cap, exclusive lock and resource
+limits below apply. Build reuse refuses this port too. Never raise an exhausted
+fixture's budget, delete preserved schemas or change a marker to select a server.
+
 Run heavy phases sequentially. Stop native PostgreSQL before backend/browser
 checks; launch one browser check at a time and close it before the next. Reuse a
 verified build only after comparing current source hashes. Do not retry full

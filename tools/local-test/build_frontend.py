@@ -19,7 +19,7 @@ def main():
     options = parser.parse_args()
     if options.reuse:
         # Never update a snapshot being served, or build during native testing.
-        for port in (55446, 55448):
+        for port in (55446, 55448, 55449):
             with socket.socket() as probe:
                 probe.settimeout(1)
                 if probe.connect_ex(("127.0.0.1", port)) == 0:

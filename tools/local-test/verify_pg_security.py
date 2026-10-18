@@ -11,7 +11,9 @@ LAB = Path(__file__).resolve().parent
 ROOT = LAB.parents[1]
 sys.path.insert(0, str(LAB))
 parser = argparse.ArgumentParser()
-parser.add_argument("--recovery-cluster", action="store_true")
+profiles = parser.add_mutually_exclusive_group()
+profiles.add_argument("--recovery-cluster", action="store_true")
+profiles.add_argument("--paging-cluster", action="store_true")
 parser.add_argument("--test", action="append", default=[], help="Existing case name; repeat to run only relevant native regressions")
 options = parser.parse_args()
 # Acquire before importing application/database code. Two native suites must never
@@ -26,9 +28,11 @@ try:
 except OSError as error:
     raise RuntimeError("Another local PostgreSQL verification is already running") from error
 
-# Both profiles have literal directory/port/system-identifier pins. Selecting the
-# small recovery fixture cannot authorize an arbitrary marker or server.
+# Every profile has literal directory/port/system-identifier pins. A marker alone
+# cannot authorize an arbitrary server or override an exhausted fixture's budget.
 cluster_name, marker_name, expected_identifier, expected_port = (
+    ("postgres-paging-20261018", "postgres-paging-marker.json", "7697910732590408300", 55449)
+    if options.paging_cluster else
     ("postgres-recovery-20261017", "postgres-recovery-marker.json", "7697651361316763724", 55448)
     if options.recovery_cluster else
     ("postgres-revocation", "postgres-marker.json", "7697280512362447984", 55447)
@@ -148,6 +152,12 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_signal_pages_keep_complete_scopes_and_saved_observations(self):
+        spec = importlib.util.spec_from_file_location("local_signal_paging", ROOT / "backend/tests/test_signal_paging.py")
+        cases = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cases)
+        cases.verify_signal_pages(self, self.engine)
+
     def test_faq_audit_pages_preserve_publication_groups_and_private_history(self):
         spec = importlib.util.spec_from_file_location("local_faq_audit_paging", ROOT / "backend/tests/test_faq_audit_paging.py")
         cases = importlib.util.module_from_spec(spec)

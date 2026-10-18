@@ -1,16 +1,18 @@
+import { AdminPagination, useAdminPagedList } from "./adminPaging";
 import { FormEvent, useState } from "react";
 import { useAdminEditForm } from "./useAdminEditForm";
 import { apiFetch } from "../../services/api";
 import { StaleBadge } from "../../components/StaleBadge";
 import type { MarketSignal, QualitySignal } from "../../types/api";
-import { AdminActionButton, AdminLoading, AdminStatus, errorText, optionalNumber, useAdminList } from "./adminUtils";
+import { AdminActionButton, AdminLoading, AdminStatus, errorText, optionalNumber } from "./adminUtils";
 const actions = ["", "Watch", "Investigate", "Buy Carefully", "Hold", "Sell Carefully"];
 export function AdminMarketSignalsPage() {
-    const { data, loading, error: loadError, reload, token } = useAdminList<MarketSignal>("/market-signals");
+    const page = useAdminPagedList<MarketSignal>("/market-signals/admin/page");
+    const { data, loading, error: loadError, reload, token } = page;
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const [busy, setBusy] = useState(false);
-    const editor = useAdminEditForm(data, loading, setError);
+    const editor = useAdminEditForm(data, loading, setError, { path: "/market-signals", token });
     async function submit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
         if (!token || busy || !editor.canSubmit())
@@ -115,14 +117,16 @@ export function AdminMarketSignalsPage() {
             </div>
             </article>)}
         </div>}
+    <AdminPagination page={page} label="Market signals" />
     </div>;
 }
 export function AdminQualitySignalsPage() {
-    const { data, loading, error: loadError, reload, token } = useAdminList<QualitySignal>("/quality-signals");
+    const page = useAdminPagedList<QualitySignal>("/quality-signals/admin/page");
+    const { data, loading, error: loadError, reload, token } = page;
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const [busy, setBusy] = useState(false);
-    const editor = useAdminEditForm(data, loading, setError);
+    const editor = useAdminEditForm(data, loading, setError, { path: "/quality-signals", token });
     async function submit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
         if (!token || busy || !editor.canSubmit())
@@ -225,5 +229,6 @@ export function AdminQualitySignalsPage() {
             </div>
             </article>)}
         </div>}
+    <AdminPagination page={page} label="Quality signals" />
     </div>;
 }

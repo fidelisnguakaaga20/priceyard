@@ -45,8 +45,11 @@ before changing callers.
 
 Decision: APPROVED by owner2026-10-18; implement/test/commit locally in small batches.
 
-Verified through batch70:6/16 lists (Users/Payments67, Commodities/Markets68,
-FAQs/Audit70). FAQ pages keep the original visible published-first/hidden-second
+Verified through batch71:8/16 lists (Users/Payments67, Commodities/Markets68,
+FAQs/Audit70, Market/Quality signals71). Signal editors preserve off-page ID
+loading through existing detail endpoints, cancel obsolete requests and reject
+mismatched IDs; old full/scoped streams and access rules stay intact.
+FAQ pages keep the original visible published-first/hidden-second
 group ordering, then category/ID within groups; legacy full FAQ arrays retain
 their original category/ID order. Known-ID editing/publication works beyond the
 current page. Public FAQ arrays remain complete and published-only. Audit pages
