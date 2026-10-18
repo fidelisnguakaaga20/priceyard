@@ -1,0 +1,10 @@
+{
+  "original_export_screen_and_download": true,
+  "original_headers_and_numeric_prices_preserved": true,
+  "private_sources_absent": true,
+  "access": {
+    "guest": 401,
+    "trial": 403
+  },
+  "production_connections": 0
+}

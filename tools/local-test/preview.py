@@ -390,6 +390,33 @@ async def catalog_paging_fixture(request):
     return JSONResponse({"commodities":205,"markets":205,"synthetic_only":True})
 
 
+async def history_stream_fixture(request):
+    """Fixed small history sample; original catalog/measurements/current rows stay."""
+    from sqlalchemy import select
+    with Session(engine) as db:
+        owner = db.scalar(select(User).where(User.email == 'admin@example.com'))
+        commodity = db.scalar(select(Commodity).where(Commodity.name == 'Egusi'))
+        market = db.scalar(select(Market).where(Market.name == 'Kwali Market'))
+        if owner is None or commodity is None or market is None:
+            raise RuntimeError('Original synthetic fixture is required')
+        existing = db.scalar(select(PriceUpdate.id).where(PriceUpdate.notes == 'LOCAL-HISTORY-STREAM-SAMPLE'))
+        if request.method == 'POST' and existing is None:
+            for index in range(249):
+                db.add(PriceUpdate(commodity_id=commodity.id,market_id=market.id,
+                    price_low=210000+index,price_high=220000+index,unit='1 bag',bag_size=None,
+                    commodity_type=None,movement='unknown',confidence_level='Low confidence',
+                    time_of_day='morning' if index%2 else 'evening',status='approved',created_by=owner.id,
+                    update_date_time=now-timedelta(days=2)+timedelta(minutes=index),
+                    notes='LOCAL-HISTORY-STREAM-SAMPLE',source_1='LOCAL-PRIVATE-SOURCE'))
+            db.commit()
+        rows = db.scalars(select(PriceUpdate).where(PriceUpdate.commodity_id == commodity.id,
+            PriceUpdate.market_id == market.id,PriceUpdate.status == 'approved')
+            .order_by(PriceUpdate.update_date_time,PriceUpdate.id)).all()
+        return JSONResponse({'synthetic_only':True,'ids':[row.id for row in rows],
+            'morning_ids':[row.id for row in rows if row.time_of_day == 'morning'],
+            'commodity_id':commodity.id,'market_id':market.id})
+
+
 async def price_flag_paging_fixture(request):
     if request.method == "GET":
         return HTMLResponse('''<!doctype html><html><head><title>Local Price/Flag paging sample</title></head><body style="font:18px system-ui;max-width:760px;margin:32px auto;padding:16px"><h1>Local Price/Flag paging sample</h1><p>Load205 fabricated prices with flags in memory only. Original synthetic Egusi records stay unchanged; added Palm oil observations use existing unknown measurements, with no grades. Restarting the preview clears this sample.</p><button onclick="seed()">Load synthetic price and flag sample</button><p id="result" role="status"></p><p><a href="/admin/prices">Prices</a> / <a href="/admin/flagged">Flagged prices</a></p><script>async function seed(){const r=await fetch('/__test__/price-flag-paging',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({seed:true})});const d=await r.json();document.querySelector('#result').textContent=r.ok?'205 synthetic prices and flagged groups ready.':d.detail;}</script></body></html>''')
@@ -649,7 +676,7 @@ class LocalOnly:
         else:
             await self.app(scope, receive, secured)
 
-preview = LocalOnly(Starlette(routes=[Route("/__test__/price-flag-paging", price_flag_paging_fixture, methods=["GET", "POST"]), Route("/__test__/subscription-paging", subscription_paging_fixture, methods=["GET", "POST"]), Route("/__test__/feedback-paging", feedback_paging_fixture, methods=["GET", "POST"]), Route("/__test__/storage-cost-paging", storage_cost_paging_fixture, methods=["GET", "POST"]), Route("/__test__/trade-window-paging", trade_window_paging_fixture, methods=["GET", "POST"]), Route("/__test__/signal-paging", signal_paging_fixture, methods=["GET", "POST"]), Route("/__test__/faq-audit-paging", faq_audit_paging_fixture, methods=["GET", "POST"]), Route("/__test__/catalog-paging", catalog_paging_fixture, methods=["GET", "POST"]), Route("/__test__/admin-paging", admin_paging_fixture, methods=["GET", "POST"]), Route("/__test__/status", status), Route("/__test__/reconciliation", reconciliation_control, methods=["POST"]), Route("/__test__/offline-prices", offline_price_controls, methods=["GET", "POST"]), Route("/__test__/google-mode", set_google_mode, methods=["POST"]), Route("/__test__/alerts", notification_controls, methods=["GET", "POST"]), Route("/__test__/inbox", inbox), Route("/__test__/controls", controls), Route("/__test__/push", push_controls), Route("/__test__/payments", payment_controls), Route("/__test__/manual-review", manual_review_controls), Route("/__test__/purchase-value", purchase_value_controls), Route("/__test__/verification", verification_controls), Route("/__test__/verification-mode", set_verification_mode, methods=["POST"]), Route("/__test__/checkout", checkout_controls), Route("/__test__/checkout-mode", set_checkout_mode, methods=["POST"]), Route("/__test__/payment-event", payment_event, methods=["POST"]), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
+preview = LocalOnly(Starlette(routes=[Route("/__test__/history-stream", history_stream_fixture, methods=["GET", "POST"]), Route("/__test__/price-flag-paging", price_flag_paging_fixture, methods=["GET", "POST"]), Route("/__test__/subscription-paging", subscription_paging_fixture, methods=["GET", "POST"]), Route("/__test__/feedback-paging", feedback_paging_fixture, methods=["GET", "POST"]), Route("/__test__/storage-cost-paging", storage_cost_paging_fixture, methods=["GET", "POST"]), Route("/__test__/trade-window-paging", trade_window_paging_fixture, methods=["GET", "POST"]), Route("/__test__/signal-paging", signal_paging_fixture, methods=["GET", "POST"]), Route("/__test__/faq-audit-paging", faq_audit_paging_fixture, methods=["GET", "POST"]), Route("/__test__/catalog-paging", catalog_paging_fixture, methods=["GET", "POST"]), Route("/__test__/admin-paging", admin_paging_fixture, methods=["GET", "POST"]), Route("/__test__/status", status), Route("/__test__/reconciliation", reconciliation_control, methods=["POST"]), Route("/__test__/offline-prices", offline_price_controls, methods=["GET", "POST"]), Route("/__test__/google-mode", set_google_mode, methods=["POST"]), Route("/__test__/alerts", notification_controls, methods=["GET", "POST"]), Route("/__test__/inbox", inbox), Route("/__test__/controls", controls), Route("/__test__/push", push_controls), Route("/__test__/payments", payment_controls), Route("/__test__/manual-review", manual_review_controls), Route("/__test__/purchase-value", purchase_value_controls), Route("/__test__/verification", verification_controls), Route("/__test__/verification-mode", set_verification_mode, methods=["POST"]), Route("/__test__/checkout", checkout_controls), Route("/__test__/checkout-mode", set_checkout_mode, methods=["POST"]), Route("/__test__/payment-event", payment_event, methods=["POST"]), Route("/__test__/outage", control, methods=["POST"]), Mount("/api", app=api), Mount("/", app=PreviewFiles(directory=str(snapshot / "dist")))]))
 
 if __name__ == "__main__":
     import uvicorn

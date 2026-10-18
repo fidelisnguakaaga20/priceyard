@@ -33,7 +33,7 @@ from app.services.price_update_service import (
     get_submission_stats,
     list_latest_approved_price_updates,
     list_market_comparison,
-    list_price_history,
+    stream_price_history,
     list_price_history_pairs,
     mark_price_update_outdated,
     reject_price_update,
@@ -116,16 +116,16 @@ def get_price_history(
     time_of_day: TimeOfDay | None = Query(default=None),
     db: Session = Depends(get_db),
     _current_user: User = Depends(require_full_access),
-) -> list[PriceUpdate]:
-    return list_price_history(
-        db,
+) -> Response:
+    return AdminJSONResponse(stream_price_history(
+        db.get_bind(),
         commodity_search=commodity,
         market_search=market,
         commodity_id=commodity_id, market_id=market_id,
         selected_date=selected_date,
         movement=movement,
         time_of_day=time_of_day,
-    )
+    ))
 
 
 @router.get("/history/pairs", response_model=list[PriceHistoryPair])

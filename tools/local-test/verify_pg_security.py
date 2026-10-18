@@ -152,6 +152,12 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_full_price_history_stream_bounds_filters_privacy_and_preserved_rows(self):
+        spec = importlib.util.spec_from_file_location('local_history_streaming', ROOT / 'backend/tests/test_price_history_streaming.py')
+        cases = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cases)
+        cases.verify_history_stream(self, self.engine)
+
     def test_browser_cookie_revocation_reset_and_legacy_transport(self):
         spec = importlib.util.spec_from_file_location('local_browser_sessions', ROOT / 'backend/tests/test_browser_sessions.py')
         cases = importlib.util.module_from_spec(spec)

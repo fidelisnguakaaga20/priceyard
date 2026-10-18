@@ -4,7 +4,7 @@ from decimal import Decimal
 from fastapi import HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session, selectinload
+from sqlalchemy.orm import Session, contains_eager, selectinload
 
 from app.models.commodity import Commodity
 from app.models.market import Market
@@ -14,6 +14,8 @@ from app.schemas.price_update_schema import Movement, PriceUpdateCreate, PriceUp
 from app.services.price_scope_service import lock_price_scope, validate_price_scope_change
 from app.services.price_time_service import price_day_bounds
 from app.services.price_claim_service import CONFIDENCE_INPUTS, MOVEMENT_INPUTS, model_claim_values, validate_price_claims
+from app.services.admin_list_service import stream_schema_records
+from app.schemas.price_update_schema import PriceUpdatePublicResponse
 
 
 PRICE_UPDATE_LOAD_OPTIONS = (
@@ -78,12 +80,13 @@ def _approved_price_statement(
     time_of_day: TimeOfDay | None = None,
     include_outdated: bool = True,
     active_only: bool = True,
+    load_options=None,
 ):
     statement = (
         select(PriceUpdate)
         .join(Commodity, PriceUpdate.commodity_id == Commodity.id)
         .join(Market, PriceUpdate.market_id == Market.id)
-        .options(*PRICE_UPDATE_LOAD_OPTIONS)
+        .options(*(PRICE_UPDATE_LOAD_OPTIONS if load_options is None else load_options))
         .where(PriceUpdate.status == "approved")
     )
 
@@ -269,6 +272,15 @@ def list_price_history(
         include_outdated=True,
     ).order_by(PriceUpdate.update_date_time.asc(), PriceUpdate.id.asc())
     return list(db.scalars(statement).all())
+
+
+def stream_price_history(engine, **filters):
+    # Reuse every existing history filter/publication rule. Scalar eager joins
+    # avoid per-record catalog queries and keep one complete cursor snapshot.
+    statement = _approved_price_statement(**filters, include_outdated=True,
+        load_options=(contains_eager(PriceUpdate.commodity), contains_eager(PriceUpdate.market)))
+    statement = statement.order_by(PriceUpdate.update_date_time.asc(), PriceUpdate.id.asc())
+    return stream_schema_records(engine, statement, PriceUpdatePublicResponse)
 
 
 def list_price_history_pairs(db: Session) -> list[dict[str, dict[str, str]]]:

@@ -41,6 +41,12 @@ def admin_record_page(db: Session, model, schema: type[T], *, offset: int, order
 
 def stream_admin_records(engine: Engine, model, schema: type[T], *, order, where=(), related=()) -> Iterator[str]:
     statement = select(model).where(*where).options(*(joinedload(getattr(model, name)) for name in related)).order_by(*_ordering(model, order)).execution_options(yield_per=100)
+    return stream_schema_records(engine, statement, schema)
+
+
+def stream_schema_records(engine: Engine, statement, schema: type[T]) -> Iterator[str]:
+    """Complete schema-allowlisted JSON; own cursor/session, bounded ORM batches."""
+    statement = statement.execution_options(yield_per=PAGE_SIZE)
 
     def content():
         with Session(engine) as db:
