@@ -25,6 +25,11 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest preparation:batch89 records owner-confirmed Supabase priceyard,
+lrvpjfbtmftjkzaxbunk, Free/no managed backups. docs/PY35_MANUAL_BACKUP.md and
+docs/sql/PY35_READ_ONLY_PREFLIGHT.sql prepare a metadata-only owner-operated
+first step. No production SQL, export, restore or migration has run. Stop before
+operator access until secure connection/storage/isolated restore target established.
 Latest planning update:batch88 records owner-confirmed Render service IDs,
 repository/master links and deployed labels. Backend Auto-Deploy On Commit and
 build-time `alembic upgrade head` are explicit release blockers. Do not push/merge,
@@ -3441,3 +3446,28 @@ Documentation-only batch; diff/link/reference checks, no redundant application
 tests or build. Previous307 backend/five native/browser evidence retained;35/36
 complete, PY-35 partial and all nine live gates still unrun. No cloud project,
 production access, migration, settings changes, push, merge or deployment.
+
+### Batch 89 - manual backup preparation; stopped before production access
+
+Owner confirmed project priceyard/lrvpjfbtmftjkzaxbunk, Free, no managed backups;
+requested read-only compatibility review, encrypted manual backup and verified
+isolated local restoration, with explicit stop before production access if access
+or approval is needed. No authenticated production connection is available.
+Prepared docs/sql/PY35_READ_ONLY_PREFLIGHT.sql:whole read-only transaction,
+5s statement/1s lock timeouts, server/size/Alembic/catalog/extension/role metadata,
+rollback, no customer row/password/default/function-body reads or writes. Not run.
+
+docs/PY35_MANUAL_BACKUP.md records existing native PG18 tool preference over new
+CLI/Docker, version/TLS/source checks, secure operator credential entry, encrypted
+storage outside Git and independently retrievable copy, role/grant/snapshot
+coverage, actual empty private restore target and bounded single-worker verification.
+Real records must never enter the synthetic-only cluster/harness. Same-snapshot
+digests/records/permissions/integrity, migration rehearsal and compatible rollback
+acceptance required. Local migration rehearsal remains separately approval-gated.
+Official Supabase/PostgreSQL guidance reviewed; file bytes, external service/key/
+extension/role-password coverage and later payment writes explicitly excluded or
+require separate recovery. Missing encryption/access/setup is not successful backup.
+
+Documentation/SQL preparation only; no database connection, secret/.env read,
+tool installation, dump, restore, migration, production change, push/merge/deploy.
+No redundant regression tests.35/36 complete, PY-35 partial, live gates unrun.
