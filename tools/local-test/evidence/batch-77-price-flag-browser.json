@@ -1,0 +1,16 @@
+{
+  "checks": {
+    "all_price_statuses_ids_full_totals_and_original_records": true,
+    "price_correction_retains_page_status_sources_measurements_and_values": true,
+    "prefill_reads_latest_matching_pair_beyond_page_and_preserves_unknown_measurements": true,
+    "delayed_prefill_cannot_overwrite_new_form_values": true,
+    "all_flagged_ids_group_totals_and_counts_reachable": true,
+    "review_flags_preserves_prices_and_recovers_empty_tail": true,
+    "original_fields_and_mobile_layout": true
+  },
+  "records_per_list": 205,
+  "page_size": 100,
+  "external_requests": 0,
+  "production_connections": 0,
+  "reseed_preview_after_check": true
+}

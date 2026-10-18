@@ -3,9 +3,10 @@ import { apiFetch } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import { useCommodityMarketPairs } from "../../hooks/useCommodityMarketPairs";
 import type { Commodity, Market, PriceUpdateAdmin } from "../../types/api";
-import { AdminActionButton, AdminLoading, AdminStatus, errorText, useAdminList } from "./adminUtils";
+import { AdminActionButton, AdminLoading, AdminStatus, errorText } from "./adminUtils";
+import { AdminPagination, useAdminPagedList } from "./adminPaging";
 
-import { PRICE_TIME_LABEL, priceCalendarDate, priceEpoch, priceInputToUtc } from "../../utils/priceTime";
+import { PRICE_TIME_LABEL, priceCalendarDate, priceInputToUtc } from "../../utils/priceTime";
 
 const actions = ["Watch", "Investigate", "Buy Carefully", "Hold", "Sell Carefully"];
 const movements = ["up", "down", "stable", "unknown"];
@@ -15,7 +16,10 @@ const timesOfDay = ["morning", "afternoon", "evening", "closing"];
 
 export function AdminPriceUpdatesPage() {
   const { token } = useAuth();
-  const { data: history, setData: setHistory, loading, error: loadError, reload } = useAdminList<PriceUpdateAdmin>("/price-updates/admin/history");
+  const page = useAdminPagedList<PriceUpdateAdmin>("/price-updates/admin/history/page");
+  const { data: history, loading, error: loadError, reload } = page;
+  const activeToken = useRef(token);
+  activeToken.current = token;
   const [commodities, setCommodities] = useState<Commodity[]>([]); const [markets, setMarkets] = useState<Market[]>([]);
   const [error, setError] = useState(""); const [message, setMessage] = useState(""); const [targetId, setTargetId] = useState("");
   const [busy, setBusy] = useState(false); const [optionsLoading, setOptionsLoading] = useState(true);
@@ -32,35 +36,39 @@ export function AdminPriceUpdatesPage() {
   async function create(e: FormEvent<HTMLFormElement>) { e.preventDefault(); if (!token || busy) return; const f = new FormData(e.currentTarget); const payload = {
     commodity_id: Number(f.get("commodity_id")), market_id: Number(f.get("market_id")), price_low: Number(f.get("price_low")), price_high: Number(f.get("price_high")), average_price: Number(f.get("average_price")), previous_price_low: String(f.get("previous_price_low") || "") ? Number(f.get("previous_price_low")) : null, previous_price_high: String(f.get("previous_price_high") || "") ? Number(f.get("previous_price_high")) : null,
     unit: String(f.get("unit")), bag_size: String(f.get("bag_size") || "") || null, commodity_type: String(f.get("commodity_type") || "") || null, market_day: String(f.get("market_day") || "") || null, time_of_day: String(f.get("time_of_day") || "") || null, movement: String(f.get("movement")), confidence_level: String(f.get("confidence_level")), source_type: String(f.get("source_type") || "") || null, source_1: String(f.get("source_1") || "") || null, source_2: String(f.get("source_2") || "") || null, update_date_time: priceInputToUtc(String(f.get("update_date_time"))), is_outdated: false, possible_meaning: String(f.get("possible_meaning") || "") || null, suggested_action: String(f.get("suggested_action")), notes: String(f.get("notes") || "") || null,
-  }; setBusy(true); try { const item = await apiFetch<PriceUpdateAdmin>("/price-updates", { method: "POST", body: JSON.stringify(payload) }, token); setHistory((items) => [item, ...items.filter((existing) => existing.id !== item.id)]); setTargetId(String(item.id)); setMessage(`Price update #${item.id} created pending approval.`); setError(""); } catch (err) { setError(errorText(err)); setMessage(""); } finally { setBusy(false); } }
+  }; setBusy(true); try { const item = await apiFetch<PriceUpdateAdmin>("/price-updates", { method: "POST", body: JSON.stringify(payload) }, token); await reload(); setTargetId(String(item.id)); setMessage(`Price update #${item.id} created pending approval.`); setError(""); } catch (err) { setError(errorText(err)); setMessage(""); } finally { setBusy(false); } }
 
-  function prefillFromLast() {
+  async function prefillFromLast() {
     const form = createFormRef.current;
-    if (!form) return;
+    if (!form || !token || busy) return;
     const marketId = (form.elements.namedItem("market_id") as HTMLSelectElement | null)?.value;
     if (!newCommodityId || !marketId) { setError("Choose a commodity and market first, then prefill."); return; }
-    const last = [...history]
-      .filter((r) => String(r.commodity_id) === newCommodityId && String(r.market_id) === marketId)
-      .sort((a, b) => priceEpoch(b.update_date_time) - priceEpoch(a.update_date_time))[0];
-    if (!last) { setError(`No previous record found for this commodity/market pair to prefill from.`); return; }
-    const setField = (name: string, value: string) => { const el = form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null; if (el) el.value = value; };
-    setField("unit", last.unit);
-    setField("bag_size", last.bag_size || "");
-    setField("commodity_type", last.commodity_type || "");
-    setField("market_day", last.market_day || "");
-    setField("time_of_day", last.time_of_day || "");
-    setField("movement", last.movement);
-    setField("confidence_level", last.confidence_level);
-    setField("source_type", last.source_type || "");
-    setField("source_1", last.source_1 || "");
-    setField("source_2", last.source_2 || "");
-    setField("suggested_action", last.suggested_action || "Watch");
-    setField("possible_meaning", last.possible_meaning || "");
-    setField("notes", last.notes || "");
-    setField("previous_price_low", String(last.price_low));
-    setField("previous_price_high", String(last.price_high));
-    setError("");
-    setMessage(`Prefilled from record #${last.id} (${priceCalendarDate(last.update_date_time)}). Enter the new price and date, then create.`);
+    const unchanged = JSON.stringify([...new FormData(form).entries()]);
+    setBusy(true);
+    try {
+      const last = await apiFetch<PriceUpdateAdmin | null>(`/price-updates/admin/latest?commodity_id=${newCommodityId}&market_id=${marketId}`, {}, token);
+      if (createFormRef.current !== form || activeToken.current !== token || JSON.stringify([...new FormData(form).entries()]) !== unchanged) return;
+      if (!last) { setError(`No previous record found for this commodity/market pair to prefill from.`); return; }
+      const setField = (name: string, value: string) => { const el = form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null; if (el) el.value = value; };
+      setField("unit", last.unit);
+      setField("bag_size", last.bag_size || "");
+      setField("commodity_type", last.commodity_type || "");
+      setField("market_day", last.market_day || "");
+      setField("time_of_day", last.time_of_day || "");
+      setField("movement", last.movement);
+      setField("confidence_level", last.confidence_level);
+      setField("source_type", last.source_type || "");
+      setField("source_1", last.source_1 || "");
+      setField("source_2", last.source_2 || "");
+      setField("suggested_action", last.suggested_action || "Watch");
+      setField("possible_meaning", last.possible_meaning || "");
+      setField("notes", last.notes || "");
+      setField("previous_price_low", String(last.price_low));
+      setField("previous_price_high", String(last.price_high));
+      setError("");
+      setMessage(`Prefilled from record #${last.id} (${priceCalendarDate(last.update_date_time)}). Enter the new price and date, then create.`);
+    } catch (err) { if (createFormRef.current === form && activeToken.current === token) setError(errorText(err)); }
+    finally { if (createFormRef.current === form) setBusy(false); }
   }
 
   async function act(action: "approve"|"reject"|"mark-outdated"|"delete") { if (!token || !targetId || busy) return; setBusy(true); try { if (action === "delete") await apiFetch(`/price-updates/${targetId}`, { method: "DELETE" }, token); else await apiFetch(`/price-updates/${targetId}/${action}`, { method: "PATCH" }, token); setMessage(`Price update #${targetId}: ${action} completed.`); setError(""); await reload(); } catch (err) { setError(errorText(err)); } finally { setBusy(false); } }
@@ -138,5 +146,6 @@ export function AdminPriceUpdatesPage() {
     </form>
 
     {loading || optionsLoading ? <AdminLoading label="Loading price-update data…" /> : <div className="table-wrap"><table className="admin-table"><thead><tr><th>ID</th><th>Commodity / market</th><th>Range</th><th>Status</th><th>Meaning / action</th></tr></thead><tbody>{rows.map((item) => <tr key={item.id} tabIndex={0} aria-label={`Select price update #${item.id}`} onClick={() => setTargetId(String(item.id))} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setTargetId(String(item.id)); } }}><td>{item.id}</td><td>{item.commodity?.name || item.commodity_id}<small>{item.market?.name || item.market_id}</small></td><td>{item.price_low} – {item.price_high}</td><td>{item.status}{item.is_outdated ? " · outdated" : ""}</td><td>{item.possible_meaning}<small>{item.suggested_action}</small></td></tr>)}</tbody></table></div>}
+    <AdminPagination page={page} label="Price updates" />
   </div>;
 }

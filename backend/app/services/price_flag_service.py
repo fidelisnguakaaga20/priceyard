@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, true
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -10,6 +10,7 @@ from app.models.commodity import Commodity
 from app.models.market import Market
 from app.models.user import User
 from app.schemas.price_flag_schema import FlaggedPriceSummary
+from app.services.admin_list_service import AdminRecordPage, PAGE_SIZE
 
 
 def flag_price_update(db: Session, user: User, price_update: PriceUpdate, reason: str | None) -> bool:
@@ -26,8 +27,8 @@ def flag_price_update(db: Session, user: User, price_update: PriceUpdate, reason
     return True
 
 
-def list_flagged_price_updates(db: Session) -> list[FlaggedPriceSummary]:
-    statement = (
+def _flagged_statement():
+    return (
         select(
             PriceFlag.price_update_id,
             Commodity.name.label("commodity_name"),
@@ -42,7 +43,36 @@ def list_flagged_price_updates(db: Session) -> list[FlaggedPriceSummary]:
         .group_by(PriceFlag.price_update_id, Commodity.name, Market.name)
         .order_by(func.max(PriceFlag.created_at).desc(), PriceFlag.price_update_id.desc())
     )
-    return [FlaggedPriceSummary(**row._mapping) for row in db.execute(statement)]
+
+
+def list_flagged_price_updates(db: Session) -> list[FlaggedPriceSummary]:
+    return [FlaggedPriceSummary(**row._mapping) for row in db.execute(_flagged_statement())]
+
+
+def flagged_price_page(db: Session, *, offset: int) -> AdminRecordPage[FlaggedPriceSummary]:
+    grouped = _flagged_statement().order_by(None).cte("flagged_groups")
+    total = select(func.count().label("total")).select_from(grouped).cte("flagged_total")
+    page = select(grouped).order_by(grouped.c.latest_flag_at.desc(), grouped.c.price_update_id.desc()).offset(offset).limit(PAGE_SIZE).cte("flagged_page")
+    rows = db.execute(select(page, total.c.total).select_from(total).outerjoin(page, true())
+        .order_by(page.c.latest_flag_at.desc(), page.c.price_update_id.desc())).mappings().all()
+    return AdminRecordPage(items=[FlaggedPriceSummary(**row) for row in rows if row['price_update_id'] is not None],
+                           total=rows[0]['total'], offset=offset)
+
+
+def stream_flagged_prices(engine):
+    def content():
+        with Session(engine) as db:
+            rows = db.execute(_flagged_statement().execution_options(yield_per=100))
+            try:
+                yield "["
+                first = True
+                for row in rows:
+                    yield ("" if first else ",") + FlaggedPriceSummary(**row._mapping).model_dump_json()
+                    first = False
+                yield "]"
+            finally:
+                rows.close()
+    return content()
 
 
 def resolve_flags(db: Session, price_update_id: int, *, commit: bool = True) -> int:

@@ -25,7 +25,7 @@ try{
   assert.equal(await form.getByLabel('Notes',{exact:true}).getAttribute('aria-describedby'),description);
  }
  const create=page.locator('form.admin-form').first();await create.locator('[name=commodity_id]').selectOption({label:'Egusi'});await create.locator('[name=market_id]').selectOption({label:'Kwali Market'});
- await create.getByRole('button',{name:'Prefill from last entry',exact:true}).click();assert.equal(await create.getByLabel('Source 1 (private)',{exact:true}).inputValue(),'LOCAL-PRIVATE-SOURCE');
+ await create.getByRole('button',{name:'Prefill from last entry',exact:true}).click();await page.waitForFunction(()=>document.querySelector('form.admin-form [name=source_1]').value==='LOCAL-PRIVATE-SOURCE');assert.equal(await create.getByLabel('Source 1 (private)',{exact:true}).inputValue(),'LOCAL-PRIVATE-SOURCE');
  assert.equal(await page.getByLabel(/grade/i).count(),0);
  await page.setViewportSize({width:375,height:812});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
  assert.deepEqual(await api('/price-updates/admin/history'),before);assert.deepEqual(await api('/price-updates'),current);assert.deepEqual(await api('/audit-logs'),audits);

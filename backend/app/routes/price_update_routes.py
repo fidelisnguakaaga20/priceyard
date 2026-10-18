@@ -20,7 +20,10 @@ from app.schemas.price_update_schema import (
     TimeOfDay,
 )
 from app.services.audit_service import create_audit_log, snapshot_model
-from app.services.price_flag_service import flag_price_update, list_flagged_price_updates, resolve_flags
+from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, stream_admin_records
+from app.services.price_flag_service import flag_price_update, flagged_price_page, stream_flagged_prices, resolve_flags
+from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 from app.services.price_update_service import (
     approve_price_update,
     create_price_update,
@@ -29,7 +32,6 @@ from app.services.price_update_service import (
     get_price_update_for_admin,
     get_submission_stats,
     list_latest_approved_price_updates,
-    list_admin_price_updates,
     list_market_comparison,
     list_price_history,
     list_price_history_pairs,
@@ -155,16 +157,49 @@ def get_market_comparison(
 def get_admin_price_history(
     db: Session = Depends(get_db),
     _admin: User = Depends(require_roles("admin")),
-) -> list[PriceUpdate]:
-    return list_admin_price_updates(db)
+) -> Response:
+    return AdminJSONResponse(stream_admin_records(db.get_bind(), PriceUpdate, PriceUpdateAdminResponse,
+        order=(("update_date_time", True), ("id", True)), related=("commodity", "market")))
+
+
+@router.get("/admin/history/page", response_model=AdminRecordPage[PriceUpdateAdminResponse])
+def get_admin_price_page(
+    offset: int = Query(default=0, ge=0, le=2_147_483_647),
+    db: Session = Depends(get_db),
+    _admin: User = Depends(require_roles("admin")),
+) -> AdminRecordPage[PriceUpdateAdminResponse]:
+    return admin_record_page(db, PriceUpdate, PriceUpdateAdminResponse, offset=offset,
+        order=(("update_date_time", True), ("id", True)), related=("commodity", "market"))
+
+
+@router.get("/admin/latest", response_model=PriceUpdateAdminResponse | None)
+def get_admin_latest_pair(
+    commodity_id: int = Query(gt=0),
+    market_id: int = Query(gt=0),
+    db: Session = Depends(get_db),
+    _admin: User = Depends(require_roles("admin")),
+) -> PriceUpdate | None:
+    # Match the original all-history prefill, including pending/rejected records.
+    return db.scalar(select(PriceUpdate).where(PriceUpdate.commodity_id == commodity_id,
+        PriceUpdate.market_id == market_id).options(joinedload(PriceUpdate.commodity), joinedload(PriceUpdate.market))
+        .order_by(PriceUpdate.update_date_time.desc(), PriceUpdate.id.desc()).limit(1))
 
 
 @router.get("/admin/flagged", response_model=list[FlaggedPriceSummary])
 def get_flagged_price_updates(
     db: Session = Depends(get_db),
     _admin: User = Depends(require_roles("admin")),
-) -> list[FlaggedPriceSummary]:
-    return list_flagged_price_updates(db)
+) -> Response:
+    return AdminJSONResponse(stream_flagged_prices(db.get_bind()))
+
+
+@router.get("/admin/flagged/page", response_model=AdminRecordPage[FlaggedPriceSummary])
+def get_flagged_page(
+    offset: int = Query(default=0, ge=0, le=2_147_483_647),
+    db: Session = Depends(get_db),
+    _admin: User = Depends(require_roles("admin")),
+) -> AdminRecordPage[FlaggedPriceSummary]:
+    return flagged_price_page(db, offset=offset)
 
 
 @router.get("/my-stats", response_model=SubmissionStats)

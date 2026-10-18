@@ -45,9 +45,14 @@ before changing callers.
 
 Decision: APPROVED by owner2026-10-18; implement/test/commit locally in small batches.
 
-Verified through batch76:14/16 lists (Users/Payments67, Commodities/Markets68,
+Verified through batch77:16/16 lists (Users/Payments67, Commodities/Markets68,
 FAQs/Audit70, Market/Quality signals71, Buying zones/Sell-watch73, Storage/Cost74,
-Feedback75, Subscriptions76). Feedback keeps its original rating filter and global count/average;
+Feedback75, Subscriptions76, Prices/Flagged prices77). All approved Admin lists
+are now paged. Prices retain all statuses and nested commodity/market data;
+prefill reads the latest matching pair across all pages, including pending/rejected
+records. Delayed prefill does not overwrite newer input. Flags keep full aggregate
+counts before paging groups; reviewing an empty tail returns to an existing page.
+Feedback keeps its original rating filter and global count/average;
 changing the filter resets the page, and reload/back retain the selected filter.
 Filtered count/rows share one snapshot. Private screenshots and testimonial
 publish/hide/delete actions remain; public testimonial fields stay restricted.

@@ -6,7 +6,7 @@ import anyio
 from pydantic import BaseModel
 from sqlalchemy import func, select, true
 from sqlalchemy.engine import Engine
-from sqlalchemy.orm import Session, aliased
+from sqlalchemy.orm import Session, aliased, joinedload
 from starlette.concurrency import run_in_threadpool
 from starlette.responses import StreamingResponse
 
@@ -26,20 +26,21 @@ def _ordering(entity, order):
             for name, descending in order]
 
 
-def admin_record_page(db: Session, model, schema: type[T], *, offset: int, order, where=()) -> AdminRecordPage[T]:
+def admin_record_page(db: Session, model, schema: type[T], *, offset: int, order, where=(), related=()) -> AdminRecordPage[T]:
     # One statement gives count and rows the same DB snapshot, including an
     # empty/out-of-range page. Count never hydrates the rest of the catalog.
     total = select(func.count().label("total")).select_from(model).where(*where).cte("matched_total")
     page = select(model).where(*where).order_by(*_ordering(model, order)).offset(offset).limit(PAGE_SIZE).cte("page_rows")
     entity = aliased(model, page)
     rows = db.execute(select(entity, total.c.total).select_from(total).outerjoin(entity, true())
+                      .options(*(joinedload(getattr(entity, name)) for name in related))
                       .order_by(*_ordering(entity, order))).all()
     return AdminRecordPage(items=[schema.model_validate(item) for item, _ in rows if item is not None],
                            total=rows[0][1], offset=offset)
 
 
-def stream_admin_records(engine: Engine, model, schema: type[T], *, order, where=()) -> Iterator[str]:
-    statement = select(model).where(*where).order_by(*_ordering(model, order)).execution_options(yield_per=100)
+def stream_admin_records(engine: Engine, model, schema: type[T], *, order, where=(), related=()) -> Iterator[str]:
+    statement = select(model).where(*where).options(*(joinedload(getattr(model, name)) for name in related)).order_by(*_ordering(model, order)).execution_options(yield_per=100)
 
     def content():
         with Session(engine) as db:

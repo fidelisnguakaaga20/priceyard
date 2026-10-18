@@ -43,13 +43,13 @@ try {
   assert.equal(await row().locator('td').nth(3).innerText(),'pending');
   async function act(label,action) {
     const completion=page.waitForResponse(r=>r.url()===origin+`/api/price-updates/${created.id}/${action}`&&r.request().method()==='PATCH');
-    const reload=page.waitForResponse(r=>r.url()===origin+'/api/price-updates/admin/history');
+    const reload=page.waitForResponse(r=>r.url()===origin+'/api/price-updates/admin/history/page?offset=0');
     await page.getByRole('button',{name:label,exact:true}).click();
     assert.equal((await completion).status(),200);
     const data=await (await reload).json();
     await page.locator('.loading-spinner').waitFor({state:'hidden'}).catch(()=>{});
     await row().waitFor();
-    return data.find(x=>x.id===created.id);
+    return data.items.find(x=>x.id===created.id);
   }
   const saved=await act('Approve','approve');
   assert.equal(saved.status,'approved');

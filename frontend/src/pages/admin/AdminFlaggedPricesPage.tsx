@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { apiFetch } from "../../services/api";
 import { relativeTime } from "../../utils";
-import { AdminActionButton, AdminLoading, AdminStatus, errorText, useAdminList } from "./adminUtils";
+import { AdminActionButton, AdminLoading, AdminStatus, errorText } from "./adminUtils";
+import { AdminPagination, useAdminPagedList } from "./adminPaging";
 
 type FlaggedPrice = {
   price_update_id: number;
@@ -12,7 +13,8 @@ type FlaggedPrice = {
 };
 
 export function AdminFlaggedPricesPage() {
-  const { data, loading, error: loadError, reload, token } = useAdminList<FlaggedPrice>("/price-updates/admin/flagged");
+  const page = useAdminPagedList<FlaggedPrice>("/price-updates/admin/flagged/page");
+  const { data, loading, error: loadError, reload, token } = page;
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
@@ -49,5 +51,6 @@ export function AdminFlaggedPricesPage() {
         ))}
       </div>
     )}
+    <AdminPagination page={page} label="Flagged prices" />
   </div>;
 }

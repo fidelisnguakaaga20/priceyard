@@ -25,7 +25,7 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
-Latest verified: batch76,31 complete /5 partial or pending:
+Latest verified: batch77,31 complete /5 partial or pending:
 05,07,14,20,35. PY-02 approved source-publication scope is complete locally:
 both original Admin Notes controls explain their public visibility; private
 source fields/access and historical evidence stay intact. Six-role backend,
@@ -37,31 +37,31 @@ WAT input/display/day filters, explicit UTC instants, unchanged stored history,
 existing history access and billing/paid-expiry rules. Owner's2026-10-18 reply
 "do the best for app that is going to be mostly user friendly" authorizes the
 recommended WAT scope in docs/NIGERIAN_PRICE_TIME_APPROVAL.md. No production scope.
-Batch71 adds approved Market/Quality signal paging:100 rows and full totals;
-old complete/scoped streams retain original access. Existing ID editors look up
-off-page records through existing detail endpoints, cancel obsolete requests and
-reject mismatched IDs. No new fields/forms/visibility rules. Full268 backend
-tests, one focused native signal case, all six original editing forms,205-record
-paging/off-page edit/late-response/wrong-ID/delete/mobile, seven baseline and all14
-dashboard browser checks pass. TypeScript/Vite passed;
-87 source hashes match reused build; original CSS identical. WAT evidence69 kept.
-No new fields, measurements, policies, dependencies or data repair.
+All16 approved Admin lists now have100-record pages/full snapshot totals and
+complete legacy streaming arrays. Original forms/actions/fields and access remain.
+Batch77 finishes Prices/Flagged prices, joined commodity/market loads, all-status
+latest-pair prefill beyond a page, and protection against delayed prefill overwriting
+new form edits. Full277 backend tests, focused native case,205-record browser
+checks, original price/source workflows, seven baseline views and all14 dashboard
+cards pass.87 build source hashes match; original CSS byte-identical. No data repair.
 Old recovery fixture80/80 remains stopped/intact. Fresh small native fixture
 postgres-paging-20261018 at127.0.0.1:55449, identifier7697910732590408300,
-uses --paging-cluster:8/80 schemas, stopped. Same12 connections/32MB buffers,
+uses --paging-cluster:9/80 schemas, stopped. Same12 connections/32MB buffers,
 fsync enabled/exclusive lock and identity guards. Build refuses its active port.
 Review controls: /__test__/admin-paging, /__test__/catalog-paging and
 /__test__/faq-audit-paging and /__test__/signal-paging on http://127.0.0.1:55446;
 disposable samples only.
 Owner approved docs/ADMIN_LIST_PAGING_APPROVAL.md on2026-10-18:100-record Admin
 pages with Previous/Next, complete totals/records, original forms/styles/cards.
-Next:2 remaining approved Admin lists in small PY-20 batches;14/16 already paged
-(Users/Payments67, Commodities/Markets68, FAQs/Audit70, all six intelligence71/73/74, Feedback75, Subscriptions76), full snapshot totals/
-legacy arrays retained. Public history/charts must remain complete. PY-29 complete65.
-Policy gates remain for referral qualification/caps05,
-session/storage choices07 and movement/confidence14. Live operational work35
-remains unauthorized. PY-02 approved hint/source safeguards are verified72;
-no change to public notes, generic source categories or premium access.
+Approved Admin paging16/16 complete77 (Users/Payments67, catalogs68, FAQs/Audit70,
+Market/Quality signals71, Buying/Sell-watch73, Storage/Cost74, Feedback75,
+Subscriptions76, Prices/flags77). PY-20 still partial for public full-history/query
+materialization; never truncate charts or historical records to claim completion.
+Owner answered "do the best option" to the explicit three-bonus rolling30-day
+PY-05 proposal in docs/REFERRAL_ABUSE_DECISION.md. Implement that local scope next;
+seven-day rewards, existing days and eligibility stay. Not implemented yet.
+Session/storage choices07 and movement/confidence14 retain owner-policy gates.
+Live operational work35 remains unauthorized. PY-02 approved safeguards complete72.
 Owner policy and production gates stay explicit. Testing foundation PY-30 stays
 complete; new regression tests belong with their respective improvements.
 Do not reopen completed scope or mistake earlier historical counts for current.
@@ -416,7 +416,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-17 | Correct market-detail loading | Complete for identified loading races/combined-failure defect in batch 16; obsolete commodity/account responses ignored and independent successful sections retained |
 | PY-18 | Accurate account/payment/access messages | Complete for identified account/expiry/callback defects in batches 4/11/19; verified return refreshes access, unconfirmed return never claims payment received in title |
 | PY-19 | Existing FAQ draft/hide/publish management | Complete in batch 12; hidden drafts remain available to Admin across reload, public publication boundary verified |
-| PY-20 | Bounded queries with accessible historical records | Partial: current ranking23, dashboard29, history metadata32, commodity scoping47-49, CSV streaming60; approved100-record Admin pages67-76 now cover14/16 lists (Users,Subscriptions,Payments,Commodities,Markets,FAQs,Audit,Feedback,all six intelligence). Full snapshot counts, complete legacy/scoped streams, original access/publication/redaction and off-page ID edits retained. Late/wrong-ID lookup protection71 verified. Two Admin lists/public history remain; no chart/history truncation. Scope: docs/ADMIN_LIST_PAGING_APPROVAL.md |
+| PY-20 | Bounded queries with accessible historical records | Partial: approved Admin pagination complete77 for16/16 lists, full snapshot counts, complete streaming legacy arrays, original access/sources/filters/actions, all-account expiry under renewal-safe locks and global latest-pair price prefill retained. Current ranking/dashboard/history metadata/commodity scopes/CSV earlier verified. Public full-history/query materialization remains; never truncate chart/history. Scope: docs/ADMIN_LIST_PAGING_APPROVAL.md |
 | PY-21 | Reliable independent alerts | Application-side identified channel dependency complete in batch 24: failed email no longer skips push/WhatsApp; per-user/channel failures isolated; existing deduplication/count semantics retained. Delivery/retry operations remain PY-35 |
 | PY-22 | Efficient loading and accurate dashboard totals | Complete for identified dashboard scope in batch 29: all 14 original metrics preserved; one Admin-only aggregate API/DB snapshot, zero entity hydration; backend/PG/browser totals and outage recovery verified |
 | PY-23 | Preserve layout while fixing mobile overflow | Complete for identified original critical-layout/price-card overflow scope in batches 42/43: 78 normal and twelve long-name viewport checks, 320–1366px, Easy reading both modes; ordinary card/badge geometry and all fourteen Admin cards preserved |
@@ -2923,3 +2923,47 @@ Evidence: tools/local-test/evidence/batch-76-*.json.31 complete /5 partial-pendi
 latest-pair prefill across all price pages and full flag counts when finishing.
 Public history must remain complete; owner referral/session/movement decisions
 and production readiness retain their gates. No production, push/merge/deploy.
+
+
+### Batch 77 - approved PY-20 Prices/Flagged prices paging (2026-10-18)
+
+Continued586b621. Final two Admin lists use100-record pages/full snapshot totals.
+Price pages join existing commodity/market relationships within the single count/
+page statement; complete legacy Admin arrays stream100-row batches. Every price
+status remains reachable. Flag pages count all unresolved reports per price before
+paging grouped prices, keeping newest flag/ID ordering and original review action.
+Full flag arrays stream; no flags, prices, catalog records or audit evidence removed.
+
+Original price prefill now queries the latest matching commodity/market globally,
+including pending/rejected records as before, sorted by date/ID. It retains private
+Admin source fields/unknown measurements. Delayed prefill cannot overwrite form
+values changed since its request or a different account/form. Creating a pending
+record reloads the current page rather than adding an unbounded optimistic row;
+existing Record ID actions/corrections still work beyond the displayed page.
+
+Verification:
+- Focused backend case passed0.435s. Full277 backend tests passed31.796s with no
+  failures/errors/skips.205 prices/grouped flags, all statuses/ties/pages/empty
+  tails, one-query snapshot/related loads, full streams, exact aggregate counts,
+  original permissions/private sources/global latest-pair lookup and raw records
+  pass. No invented grades, weights, markets or additional product fields.
+- Focused native case passed1.742s; pinned55449 schemas8->9/80, stopped before
+  build. TypeScript/Vite passed106 modules1.16s.87 whitelisted hashes match reused
+  snapshot; CSS byte-identical; no installs/copies. API source reference123 ops.
+- Seven205-row browser checks pass: complete prices/statuses/flag groups; original
+  correction retains page/status/sources/measurements; off-page latest-pair prefill;
+  delayed response preserves newer form input; flag review empties last page and
+  moves back without altering prices; original mobile layout/no grades. Test-only
+  expectation corrected to original flag review204 response; rerun on fresh fixture.
+- Original source/Notes checks and create/approve/correct/outdated/reject/reload
+  price workflows pass. Their request assertions now follow the paged reload and
+  await the existing prefill's async result. Seven baseline views and all14 dashboard
+  labels/full totals/outage recovery pass; zero external/production contacts.
+
+Evidence: tools/local-test/evidence/batch-77-*.json.31 complete /5 partial-pending:
+05,07,14,20,35. Admin paging16/16 complete. PY-20 public-history materialization
+remains explicitly separate. Owner's "do the best option" reply approves the
+recommended local three-bonus/rolling30-day PY-05 scope; documented exact decision
+in docs/REFERRAL_ABUSE_DECISION.md, not yet implemented. Next batch implements and
+tests it without reducing historical bonuses, purchased days or signup access.
+Other policy/production gates remain. No production, push, merge or deployment.

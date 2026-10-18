@@ -152,6 +152,12 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_price_flag_pages_preserve_all_statuses_sources_counts_and_latest_pair(self):
+        spec = importlib.util.spec_from_file_location("local_price_admin_paging", ROOT / "backend/tests/test_price_admin_paging.py")
+        cases = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cases)
+        cases.verify_price_admin_pages(self, self.engine)
+
     def test_subscription_pages_preserve_whole_account_expiry_and_purchased_value(self):
         spec = importlib.util.spec_from_file_location("local_subscription_paging", ROOT / "backend/tests/test_subscription_paging.py")
         cases = importlib.util.module_from_spec(spec)

@@ -84,8 +84,7 @@ Existing field/storage rules and stored long records remain; no new per-field
 editorial character policy or truncation is inferred from these technical bounds.
 
 Owner-approved Admin paging is recorded in [the exact scope](ADMIN_LIST_PAGING_APPROVAL.md).
-Users, Subscriptions, Payments, Commodities, Markets, FAQs, Audit logs, Feedback and all six
-intelligence lists have
+All16 approved Admin lists, including Prices and Flagged prices, have
 100-record pages, Previous/Next, complete totals,
 preserved refresh/back/edit behavior and unchanged forms/columns/styles. New
 `/users/page`, `/payments/page`, `/commodities/admin/page` and `/markets/admin/page`
@@ -96,8 +95,11 @@ completion/disconnect/cancellation. Full catalog APIs also stream; public paths
 keep active-only complete results and public cache eligibility. Completing a
 save after changing pages refreshes the current page. Paged intelligence editors use
 existing authorized ID endpoints for off-page saved values; stale or mismatched
-responses cannot replace a newer selection. Other Admin lists/public history remain PY-20
-work; never silently truncate an old API or chart to mark paging complete.
+responses cannot replace a newer selection. Price prefill uses the latest matching
+commodity/market across all pages and statuses; delayed responses cannot overwrite
+newer input. Flag groups count all matching unresolved reports before paging.
+Public full-history materialization remains PY-20 work; never silently truncate
+an old API or chart to mark paging complete.
 Feedback pages keep the original rating filter, private screenshots and existing
 testimonial actions. Their page totals count only the selected rating, while the
 original summary cards keep the count/average across all feedback. Filter changes
