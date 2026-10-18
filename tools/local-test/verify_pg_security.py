@@ -148,6 +148,12 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_request_bounds_reject_before_database_and_preserve_prices(self):
+        spec = importlib.util.spec_from_file_location("local_request_bounds", ROOT / "backend/tests/test_request_bounds.py")
+        cases = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cases)
+        cases.verify_database_rejection(self, self.engine)
+
     def test_exact_price_identity_filters_preserve_history_through_rename(self):
         spec = importlib.util.spec_from_file_location("local_price_identity_filters", ROOT / "backend/tests/test_price_identity_filters.py")
         cases = importlib.util.module_from_spec(spec)

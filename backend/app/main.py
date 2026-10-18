@@ -5,6 +5,7 @@ from slowapi.errors import RateLimitExceeded
 
 from app.config import get_settings
 from app.rate_limit import limiter
+from app.request_bounds import RequestBoundsMiddleware
 from app.routes.activity_routes import router as activity_router
 from app.routes.admin_summary_routes import router as admin_summary_router
 from app.routes.audit_log_routes import router as audit_log_router
@@ -38,6 +39,7 @@ app = FastAPI(
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(RequestBoundsMiddleware)
 
 allowed_origins = [
     origin.strip().rstrip("/")

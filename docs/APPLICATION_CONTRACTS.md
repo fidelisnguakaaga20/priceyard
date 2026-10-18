@@ -72,12 +72,19 @@ Offline copies visibly identify themselves as saved, not live, with device save
 time. Only approved public resources are cached. Private/history/authenticated
 resources must not enter the public offline cache.
 
+HTTP input is bounded before parsing, database writes or provider calls:4MiB
+body,8KiB encoded request target and64KiB headers. Declared lengths and actual
+chunks are checked; malformed lengths/disconnects cannot cause partial writes.
+The original decoded2MiB screenshot allowance fits the encoded-body budget.
+Existing field/storage rules and stored long records remain; no new per-field
+editorial character policy or truncation is inferred from these technical bounds.
+
 ## Honest completion boundaries
 
 Completion means the finite identified application requirement and its evidence
 are satisfied. Do not keep reopening completed items for hypothetical work, or
 mark pending owner policies as implemented. Dates/day-filter display semantics,
-movement/confidence rules, broader text/body limits, remaining list bounds,
+movement/confidence rules and remaining list bounds,
 session-storage policy retain their tracker statuses. Current catalog/filter/link
 identity safeguards are complete in PY-29; legacy repairs remain separate.
 

@@ -96,7 +96,7 @@ from declarations for traceability; follow the linked handler for all checks.
 | GET | `/feedback/{feedback_id}` | `require_roles('admin')` | [get_feedback_item](../backend/app/routes/feedback_routes.py#L79) |
 | PATCH | `/feedback/{feedback_id}/testimonial/hide` | `require_roles('admin')` | [hide_testimonial](../backend/app/routes/feedback_routes.py#L102) |
 | PATCH | `/feedback/{feedback_id}/testimonial/publish` | `require_roles('admin')` | [publish_testimonial](../backend/app/routes/feedback_routes.py#L88) |
-| GET | `/health` | `—` | [health_check](../backend/app/main.py#L82) |
+| GET | `/health` | `—` | [health_check](../backend/app/main.py#L84) |
 | GET | `/market-signals` | `get_current_user` | [get_signals](../backend/app/routes/market_signal_routes.py#L24) |
 | POST | `/market-signals` | `require_roles('admin')` | [add_signal](../backend/app/routes/market_signal_routes.py#L42) |
 | DELETE | `/market-signals/{signal_id}` | `require_roles('admin')` | [remove_signal](../backend/app/routes/market_signal_routes.py#L67) |

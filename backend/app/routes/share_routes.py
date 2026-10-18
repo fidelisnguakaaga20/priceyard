@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from html import escape as html_escape
 from urllib.parse import quote
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from fastapi.responses import HTMLResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -47,7 +47,7 @@ def _relative_age(moment: datetime) -> str:
 
 @router.get("/commodities/{commodity_name}", response_class=HTMLResponse)
 def share_commodity_card(
-    commodity_name: str,
+    commodity_name: str = Path(min_length=1, max_length=100),
     pu: int | None = Query(default=None, gt=0, le=2_147_483_647),
     commodity_id: int | None = Query(default=None, gt=0, le=2_147_483_647),
     db: Session = Depends(get_db),

@@ -1,0 +1,13 @@
+{
+  "checks": {
+    "oversized_payment_body_rejected_before_provider": true,
+    "saved_prices_audits_payments_preserved": true,
+    "existing_two_mib_screenshot_accepted_unchanged": true,
+    "original_current_prices_screen": true
+  },
+  "maximum_single_body_test_bytes": 4194305,
+  "files_created_for_payloads": 0,
+  "synthetic_preview_reseed_required": true,
+  "external_requests": 0,
+  "production_connections": 0
+}

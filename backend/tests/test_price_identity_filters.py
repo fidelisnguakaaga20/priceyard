@@ -152,3 +152,9 @@ class PriceIdentityFilterTests(unittest.TestCase):
                 self.assertEqual(client.get("/share/commodities/Egusi?" + query).status_code, 404)
             for value in ("0", "2147483648", "not-an-id"):
                 self.assertEqual(client.get("/share/commodities/Egusi?pu=" + value).status_code, 422)
+
+    def test_share_name_boundary_matches_existing_catalog_storage(self):
+        client, _, _, _ = self.prepare_client()
+        with client:
+            self.assertEqual(client.get("/share/commodities/" + "n"*100).status_code, 200)
+            self.assertEqual(client.get("/share/commodities/" + "n"*101).status_code, 422)

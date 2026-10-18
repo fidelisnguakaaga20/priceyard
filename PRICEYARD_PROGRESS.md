@@ -25,17 +25,20 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
-Latest verified: batch65,28 complete /8 partial or pending:
-02,05,07,08,13,14,20,35. PY-29 application-side identity/link scope is complete:
-unchanged dropdown labels use existing IDs; commodity/detail/share links survive
-renames; prefix names and same-named markets no longer mix selected records.
-Legacy text-search API semantics remain; ambiguous name-only links never guess
-between duplicate identities. No aliases, merges or historical rewrites.
-Full242 backend tests, one focused native identity case,34 worker checks and
-identity/baseline/filter/navigation/detail/all14 dashboard browser checks pass.
-TypeScript/Vite passed;85 frontend source/config hashes match the reused build;
-original CSS byte-identical. Small native fixture75/80 schemas, stopped.
-Next: remaining PY-08 request/input bounds and PY-20 full JSON lists;
+Latest verified: batch66,29 complete /7 partial or pending:
+02,05,07,13,14,20,35. PY-08 finite application input-bound scope is complete:
+HTTP bodies capped4MiB before parsing/DB/providers, URL8KiB and headers64KiB;
+existing decoded2MiB screenshots still save unchanged. Original field/storage
+limits stay; all submitted text is within the global byte budget. No truncation
+or historical rewrites. Malformed lengths/chunked overflow fail before writes.
+Full252 backend tests pass; one focused native case proves zero DB/provider
+work on rejection. Browser request/screenshot, original baseline/feedback/
+checkout/all14 dashboard checks pass.85 frontend source hashes unchanged since
+verified65 build; original CSS identical. Small native fixture76/80, stopped.
+Owner approved docs/ADMIN_LIST_PAGING_APPROVAL.md on2026-10-18:100-record Admin
+pages with Previous/Next, complete totals/records, original forms/styles/cards.
+Next: implement that PY-20 scope in small list batches; public history/charts
+remain separate and unchanged. PY-29 complete65; no repeated identity work.
 owner-policy/production gates stay explicit. Testing foundation PY-30 stays
 complete; new regression tests belong with their respective improvements.
 Do not reopen completed scope or mistake earlier historical counts for current.
@@ -378,7 +381,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-05 | Referral abuse protection | Partial: atomic registration/reward/audit, duplicate-registration safety and concurrent seven-day reward preservation verified in batch 20; qualification/abuse-cap changes require approval and remain unchanged |
 | PY-06 | Safe push notification destinations | Application-side complete in batch 13; known-provider/key validation, bounded TLS transport, no redirects; live provider compatibility remains operational verification |
 | PY-07 | Shared-device/session safety | Partial: server revocation, stale UI protection, possession-based push ownership/concurrent registration and bounded current-device logout cleanup verified; JS token storage/offline cleanup limits remain |
-| PY-08 | Input/upload/request abuse bounds | Partial: push endpoint/key/query bounds, feedback pre-decode 2MB screenshot bound, watchlist numeric limits (batch53), Cost calculated totals and required values across all six intelligence resources (batches54–57) verified; broader request/text/body limits remain pending |
+| PY-08 | Input/upload/request abuse bounds | Identified application-side bounds complete66: existing push/query/numeric/required-value/storage rules plus4MiB aggregate HTTP body,8KiB URL,64KiB headers before parsing/DB/provider work; declared/chunked/malformed lengths, disconnects and bounded fragment buffering tested. Global body budget bounds all submitted text; existing2MiB screenshot limit and valid fields unchanged. Share path matches existing100-character catalog storage. No historical rewrite or arbitrary new editorial character limits; production proxy/timeouts/distributed throttling remain PY-35 |
 | PY-09 | Concurrent security-action safety | Complete for identified reset/logout/last-Admin cases in batches 5/6; six PostgreSQL cases passed |
 | PY-10 | Spreadsheet export safety | Complete in batch 3; text/numeric regressions and original browser download/access checks passed |
 | PY-11 | Correct saved administrator price state | Complete in batch 10; actual create/approve/correct/outdated/reject/reload browser regression passed |
@@ -390,7 +393,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-17 | Correct market-detail loading | Complete for identified loading races/combined-failure defect in batch 16; obsolete commodity/account responses ignored and independent successful sections retained |
 | PY-18 | Accurate account/payment/access messages | Complete for identified account/expiry/callback defects in batches 4/11/19; verified return refreshes access, unconfirmed return never claims payment received in title |
 | PY-19 | Existing FAQ draft/hide/publish management | Complete in batch 12; hidden drafts remain available to Admin across reload, public publication boundary verified |
-| PY-20 | Bounded queries with accessible historical records | Partial: current-price DB ranking (batch23), single-query dashboard summary (batch29), protected DISTINCT history metadata (batch32), SQL commodity scoping for all six intelligence detail requests (batches47–49), streamed complete CSV export with bounded ORM batches and disconnect cleanup (batch60); complete default Admin lists preserved; full JSON history and other unbounded lists remain pending |
+| PY-20 | Bounded queries with accessible historical records | Partial: current-price DB ranking23, single-query dashboard29, protected DISTINCT history metadata32, SQL commodity scoping47–49, streamed complete CSV60; full JSON history/other lists still pending. Owner approved100-record Admin pages/Previous-Next on2026-10-18 in docs/ADMIN_LIST_PAGING_APPROVAL.md; implement in small batches with full totals/records and compatible APIs, preserving charts/public history |
 | PY-21 | Reliable independent alerts | Application-side identified channel dependency complete in batch 24: failed email no longer skips push/WhatsApp; per-user/channel failures isolated; existing deduplication/count semantics retained. Delivery/retry operations remain PY-35 |
 | PY-22 | Efficient loading and accurate dashboard totals | Complete for identified dashboard scope in batch 29: all 14 original metrics preserved; one Admin-only aggregate API/DB snapshot, zero entity hydration; backend/PG/browser totals and outage recovery verified |
 | PY-23 | Preserve layout while fixing mobile overflow | Complete for identified original critical-layout/price-card overflow scope in batches 42/43: 78 normal and twelve long-name viewport checks, 320–1366px, Easy reading both modes; ordinary card/badge geometry and all fourteen Admin cards preserved |
@@ -400,7 +403,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-27 | Consistent existing editing/password inputs | Complete for identified scope: feedback selection in batch26, existing Unicode/72-byte password rules and reset validation in batch46, owner-approved six Admin edit forms in batches50–52. Saved values/costs, one-field edits, reload, explicit clearing, switching/unknown/blank IDs and creation verified in61 actual browser checks |
 | PY-28 | Historical record preservation | Current application-side scope complete in batch59: read-only legacy/unversioned preflight before migration steps, empty/reviewed0021-to0022 paths, unchanged raw history/catalog IDs/active flags/cost links/sources/audits, preserved paid/payment records and0022 downgrade refusal verified. No guesses to repair already-changed historical data; production backup/restore/rollout and any repairs require owner approval under PY-35 |
 | PY-29 | Stable identities and dependent records | Application-side identified scope complete65: catalog IDs/referenced deletion/atomic audits34; duplicate/rename/rollback races62; locked parent-price and same-commodity/market observation links64; exact existing-ID current/history filters and rename-safe detail/share links65. Current shares never publish historical amounts. Original labels, measurements and all records preserved; no automatic merge, legacy alias guesses, rewrites or invented cost units. Historical repairs require separate PY-35 approval |
-| PY-30 | Isolated automated/browser verification | Identified local testing-foundation/coverage scope complete63: criteria/workflow map/evidence retained; full242 backend tests65, full40 native baseline47 plus later focused cases (scope race64, exact identity65), six isolation probes63; original baseline/filter/navigation/detail/14-card browser65. Native75/80 schemas stopped, phases serialized,85 source hashes match reused build; original CSS unchanged, no dependency copies. Not100% coverage or production/provider certification; future tests stay with remaining items, operational checks remain PY-35 |
+| PY-30 | Isolated automated/browser verification | Identified local testing-foundation/coverage scope complete63: criteria/workflow map/evidence retained; full252 backend tests66, full40 native baseline47 plus later focused cases (scope race64, exact identity65, request boundary66), six isolation probes63; original baseline/filter/navigation/detail/14-card browser65. Native76/80 schemas stopped, phases serialized,85 source hashes match reused build; original CSS unchanged, no dependency copies. Not100% coverage or production/provider certification; future tests stay with remaining items, operational checks remain PY-35 |
 | PY-31 | Confirmed payment activation and recovery | Application-side approved scope complete in batch58: atomic confirmation, owner callback and explicit bounded/resumable reconciliation for missed webhook/return; dry-run default, strict existing evidence/activation, single PG worker, error isolation, replay safety and purchased-time/manual-grant preservation verified. Live scheduling/checkpoints/monitoring and ambiguous legacy repairs require owner approval under PY-35 |
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches 14/21: carry forward dated paid/trial time; preserve indefinite grants, block new checkout and hold/recover old purchases without consuming days |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
@@ -2414,3 +2417,44 @@ No expansion of completed null-guard/account/UI scopes is needed.
   historical repair decisions and production/provider verification remain PY-35;
   no automatic repair or production readiness claim. Next: PY-08/PY-20 unfinished
   technical bounds, preserving original full results and approved policies.
+
+
+### Batch 66 ? PY-08 aggregate HTTP input bounds (2026-10-18)
+
+- Started from verified5b60e52. Added pure ASGI input bounds before JSON parsing,
+  database dependencies, payment verification or writes:4MiB actual body bytes,
+ 8KiB encoded URL/query and64KiB headers. These are technical resource budgets,
+  not new form fields, plans, measurements or per-field editorial length rules.
+- Declared oversize rejects without reading input. Actual chunks are checked
+  independently of Content-Length; malformed/conflicting/mismatched lengths,
+  early disconnects and overflow never enter application handlers. Buffering
+  uses bounded bytearray storage rather than retaining an unbounded chunk list.
+  Signed bytes are replayed exactly. Non-HTTP lifecycle and CORS remain intact.
+- Existing2MiB decoded screenshot policy remains. Browser saved a fabricated
+  maximum-size data URI unchanged. One4MiB+1 request rejected before payment
+  verification, with prices/payment/audit rows unchanged. Payloads only in
+  memory; no large disk fixture, new snapshot or overlapping heavy processes.
+- Shared commodity path validation now uses the existing100-character catalog
+  storage boundary, preventing arbitrary long unknown paths reaching activity
+  writes. Valid100-character paths remain supported;101 returns422. This final
+  source change justified one final full backend rerun, not extra native schemas.
+- Nine focused request tests passed0.462s. Final full252 backend tests passed,
+  zero failures/errors/skips,28.516s. Native selected rejection/preservation case
+  passed3.179s: zero DB queries or provider verification on oversized input;
+  original Admin history readable afterward and raw price rows unchanged.
+  Pinned small fixture76/80 schemas retained and stopped in finally.
+- Browser boundary/max-screenshot checks, seven original baseline workflows,
+  four feedback-selection/save cases, both fake-provider checkout rejection/
+  success navigation and all14 dashboard totals/one-query/outage checks pass.
+  External/provider/production connections zero. Large synthetic screenshot
+  fixture reseeded immediately after its check.85 frontend source/config hashes
+  match65 build, no frontend/CSS changes or rebuild/dependency copies.
+- PY-08 identified local application-bound scope complete. Operational request
+  timeouts/proxy limits/distributed throttling remain PY-35. Old stored text,
+  image policy, original valid field values and all customer data untouched.
+- Owner separately approved docs/ADMIN_LIST_PAGING_APPROVAL.md on2026-10-18.
+  This authorizes100-record Admin pages with Previous/Next, original forms/styles,
+  full totals/all14 dashboard cards and compatible complete API results. No
+  paging code included in66. Start with Users/Payments; public history/charts
+  remain separate. Evidence: tools/local-test/evidence/batch-66-*.json.
+- Count:29 complete /7 partial or pending:02,05,07,13,14,20,35.
