@@ -1,3 +1,4 @@
+import { relativePriceTime, priceAgingClass } from "../utils/priceTime";
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { CommodityImage } from "../components/CommodityImage";
@@ -13,7 +14,7 @@ import { useAuth } from "../context/AuthContext";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { apiFetch, apiFetchWithProvenance } from "../services/api";
 import type { BuyingZone, CostBreakdown, Market, MarketSignal, PriceUpdate, QualitySignal, SellWatchWindow, StorageSuitability } from "../types/api";
-import { agingClass, commodityTitleColor, confidenceClass, isWithinSeasonalMonths, money, movementIcon, priceShareContent, relativeTime, shortDate, whatsAppShareUrl } from "../utils";
+import { commodityTitleColor, confidenceClass, isWithinSeasonalMonths, money, movementIcon, priceShareContent, shortDate, whatsAppShareUrl } from "../utils";
 
 export function CommodityDetailPage() {
   const { commodityName = "" } = useParams();
@@ -109,7 +110,7 @@ export function CommodityDetailPage() {
     {!loading && prices.length > 0 && <SavedPriceNotice savedAt={priceResult.savedAt} />}
     {loading ? <LoadingSpinner label={`Loading ${name} prices…`} /> : prices.length ? <div className="detail-grid">{prices.map((item) => <article key={item.id} className="card detail-card">
       <div className="card-row"><div><span className="eyebrow">{item.market.name}</span><h2>{money(item.price_low)} – {money(item.price_high)}</h2></div><span className={`movement movement-${item.movement}`}>{movementIcon(item.movement)} {item.movement}</span></div>
-      <dl className="data-list"><div><dt>Previous range</dt><dd>{item.previous_price_low !== null ? `${money(item.previous_price_low)} – ${money(item.previous_price_high)}` : "Not confirmed"}</dd></div><div><dt>Average</dt><dd>{money(item.average_price)}</dd></div><div><dt>Unit / bag</dt><dd>{item.unit}{item.bag_size ? ` / ${item.bag_size}` : ""}{item.commodity_type ? ` ? ${item.commodity_type}` : ""}</dd></div><div><dt>Market day / time</dt><dd>{item.market_day || item.market.market_day || "—"}{item.time_of_day ? ` · ${item.time_of_day}` : ""}</dd></div><div><dt>Status</dt><dd><span className={`confidence-badge ${confidenceClass(item.confidence_level)}`}>{item.confidence_level}</span><ConfidenceInfo /></dd></div><div><dt>Last updated</dt><dd className={agingClass(item.update_date_time)}>{relativeTime(item.update_date_time)}</dd></div></dl>
+      <dl className="data-list"><div><dt>Previous range</dt><dd>{item.previous_price_low !== null ? `${money(item.previous_price_low)} – ${money(item.previous_price_high)}` : "Not confirmed"}</dd></div><div><dt>Average</dt><dd>{money(item.average_price)}</dd></div><div><dt>Unit / bag</dt><dd>{item.unit}{item.bag_size ? ` / ${item.bag_size}` : ""}{item.commodity_type ? ` ? ${item.commodity_type}` : ""}</dd></div><div><dt>Market day / time</dt><dd>{item.market_day || item.market.market_day || "—"}{item.time_of_day ? ` · ${item.time_of_day}` : ""}</dd></div><div><dt>Status</dt><dd><span className={`confidence-badge ${confidenceClass(item.confidence_level)}`}>{item.confidence_level}</span><ConfidenceInfo /></dd></div><div><dt>Last updated</dt><dd className={priceAgingClass(item.update_date_time)}>{relativePriceTime(item.update_date_time)}</dd></div></dl>
       <div className="guidance"><div><span>Possible Meaning</span><p>{item.possible_meaning || "No observation supplied."}</p></div><div><span>Suggested Action</span><strong>{item.suggested_action || "Watch"}</strong><small>Observation, not guaranteed trading instruction.</small></div></div>
       {item.notes && <p className="price-card-note"><strong>Note from PriceYard:</strong> {item.notes}</p>}
       <div className="card-actions top-gap"><a className="text-link" href={whatsAppShareUrl(item)} target="_blank" rel="noopener noreferrer">Share on WhatsApp</a><NativeShareButton content={priceShareContent(item)} /><FlagPriceButton priceUpdateId={item.id} /></div>

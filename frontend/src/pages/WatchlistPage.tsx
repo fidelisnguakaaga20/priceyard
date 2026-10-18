@@ -1,3 +1,4 @@
+import { relativePriceTime, priceAgingClass } from "../utils/priceTime";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ButtonSpinner, LoadingSpinner } from "../components/LoadingSpinner";
@@ -8,7 +9,7 @@ import { useCommodityMarketPairs } from "../hooks/useCommodityMarketPairs";
 import { useToast } from "../context/ToastContext";
 import { apiFetch, apiFetchWithProvenance } from "../services/api";
 import type { Commodity, Market, PriceUpdate, TargetDirection, WatchlistItem } from "../types/api";
-import { agingClass, money, movementIcon, relativeTime } from "../utils";
+import { money, movementIcon } from "../utils";
 
 const FEEDBACK_PROMPT_KEY = "priceyard_feedback_prompted";
 
@@ -184,7 +185,7 @@ export function WatchlistPage() {
               <p className="price-range">{money(match.price_low)} – {money(match.price_high)}</p>
               <div className="mini-grid">
                 <span><strong>Movement</strong><span className={`movement movement-${match.movement}`}>{movementIcon(match.movement)} {match.movement}</span></span>
-                <span><strong>Updated</strong><span className={agingClass(match.update_date_time)}>{relativeTime(match.update_date_time)}</span></span>
+                <span><strong>Updated</strong><span className={priceAgingClass(match.update_date_time)}>{relativePriceTime(match.update_date_time)}</span></span>
               </div>
             </>
           ) : (

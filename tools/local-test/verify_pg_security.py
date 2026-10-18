@@ -148,6 +148,12 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_nigerian_price_days_preserve_timestamptz_history_and_export(self):
+        spec = importlib.util.spec_from_file_location("local_nigeria_price_time", ROOT / "backend/tests/test_nigeria_price_time.py")
+        cases = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cases)
+        cases.verify_price_day(self, self.engine)
+
     def test_catalog_pages_and_public_streams_keep_active_flags_and_catalog_records(self):
         spec = importlib.util.spec_from_file_location("local_catalog_paging", ROOT / "backend/tests/test_catalog_paging.py")
         cases = importlib.util.module_from_spec(spec)
@@ -923,7 +929,8 @@ class PostgreSQLSecurityTests(unittest.TestCase):
             self.assertEqual(records[0].unit, "1 bag"); self.assertIsNone(records[0].bag_size)
             self.assertEqual(list_latest_approved_price_updates(db, movement="down"), [])
             # Native PostgreSQL returns timestamptz in its session timezone.
-            self.assertEqual(list_latest_approved_price_updates(db, selected_date=now.date()-timedelta(days=1))[0].update_date_time.astimezone(timezone.utc).hour, 23)
+            # The final hourly observation before Nigerian midnight is22:00 UTC.
+            self.assertEqual(list_latest_approved_price_updates(db, selected_date=now.date()-timedelta(days=1))[0].update_date_time.astimezone(timezone.utc).hour, 22)
             records[0].is_outdated = True; db.commit()
             self.assertEqual(list_latest_approved_price_updates(db), [])
             self.assertEqual(len(list_price_history(db)), 151)

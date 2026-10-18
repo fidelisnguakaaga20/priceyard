@@ -1,3 +1,4 @@
+import { relativePriceTime, priceAgingClass } from "../utils/priceTime";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { CommodityImage } from "./CommodityImage";
@@ -9,7 +10,7 @@ import { useToast } from "../context/ToastContext";
 import { apiFetch, ApiError } from "../services/api";
 import { commodityLink } from "../services/priceIdentity";
 import type { PriceUpdate } from "../types/api";
-import { agingClass, commodityTitleColor, confidenceClass, money, movementIcon, priceShareContent, relativeTime, whatsAppShareUrl } from "../utils";
+import { commodityTitleColor, confidenceClass, money, movementIcon, priceShareContent, whatsAppShareUrl } from "../utils";
 
 export function PriceCard({ item }: { item: PriceUpdate }) {
   const { token } = useAuth();
@@ -53,7 +54,7 @@ export function PriceCard({ item }: { item: PriceUpdate }) {
       <p className="muted">{item.unit}{item.bag_size ? ` · ${item.bag_size}` : ""}{item.commodity_type ? ` · ${item.commodity_type}` : ""}</p>
       <div className="mini-grid">
         <span><strong>Status</strong><span className={`confidence-badge ${confidenceClass(item.confidence_level)}`}>{item.confidence_level}</span><ConfidenceInfo /></span>
-        <span><strong>Updated</strong><span className={agingClass(item.update_date_time)}>{relativeTime(item.update_date_time)}</span></span>
+        <span><strong>Updated</strong><span className={priceAgingClass(item.update_date_time)}>{relativePriceTime(item.update_date_time)}</span></span>
       </div>
       {item.notes && <p className="price-card-note"><strong>Note from PriceYard:</strong> {item.notes}</p>}
       <div className="card-actions">

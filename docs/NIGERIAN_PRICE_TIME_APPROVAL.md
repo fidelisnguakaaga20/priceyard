@@ -1,10 +1,13 @@
-# PY-13 — proposed Nigeria price-time rule; awaiting approval
+# PY-13 — approved Nigeria price-time rule
 
 Your instructions require specific approval for business rules and visible
 changes. This proposal changes the meaning of a price's selected calendar day
-and adds a time-zone label. No implementation is authorized by this document.
+and adds a time-zone label. On2026-10-18 the owner replied "do the best for app
+that is going to be mostly user friendly" to the explicit WAT scope. The
+recommended local-only WAT rule is selected under that discretion approval.
+Production changes remain unauthorized.
 
-Current behavior: price displays use the viewer's device time zone, and dated
+Behavior before approval: price displays used the viewer's device time zone, and dated
 price queries use UTC midnight boundaries. Existing Admin/Reporter inputs
 correctly convert the device's local time to stored UTC. These can describe
 different calendar days around midnight or for someone outside Nigeria.
@@ -33,4 +36,16 @@ leaving the PY-13 business-time decision pending. The recommended rule is more
 consistent for a Nigerian market-information service and changes times shown
 to users outside Nigeria; it is a business choice, not merely a code cleanup.
 
-Decision: APPROVE / MODIFY / REJECT: __________________
+Decision: recommended WAT rule selected under the owner's2026-10-18 approval.
+Relative elapsed-time wording remains; absolute price timestamps carry WAT.
+Offset-free legacy values remain literal, without guessed ages/chart coordinates.
+CSV filters use Nigerian days; exported timestamp values/headers stay unchanged.
+
+Verification69:263 backend tests; one identity-pinned native PostgreSQL case;
+Admin create/correction and Reporter default/submission tested in Lagos and UTC;
+WAT midnight display in original cards/history on desktop/mobile; legacy values
+not guessed; original moderation/charts/baseline/all14 dashboard cards pass.
+The disposable SQLite preview restores offsets only for its known synthetic UTC
+price instants to match native TIMESTAMPTZ. Application serializers, actual
+historical rows and production configuration are unchanged. Real ambiguous legacy
+timestamps, if found in separately authorized production review, remain PY-35.

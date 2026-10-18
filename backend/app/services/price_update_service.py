@@ -1,4 +1,4 @@
-from datetime import date, datetime, time, timedelta, timezone
+from datetime import date
 from decimal import Decimal
 
 from fastapi import HTTPException, status
@@ -12,6 +12,7 @@ from app.models.price_update import PriceUpdate
 from app.models.user import User
 from app.schemas.price_update_schema import Movement, PriceUpdateCreate, PriceUpdateUpdate, TimeOfDay
 from app.services.price_scope_service import lock_price_scope, validate_price_scope_change
+from app.services.price_time_service import price_day_bounds
 
 
 PRICE_UPDATE_LOAD_OPTIONS = (
@@ -103,8 +104,7 @@ def _approved_price_statement(
         statement = statement.where(Market.name.ilike(f"%{market_search}%"))
 
     if selected_date is not None:
-        start = datetime.combine(selected_date, time.min, tzinfo=timezone.utc)
-        end = start + timedelta(days=1)
+        start, end = price_day_bounds(selected_date)
         statement = statement.where(
             PriceUpdate.update_date_time >= start,
             PriceUpdate.update_date_time < end,

@@ -9,7 +9,9 @@ import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { apiFetch } from "../services/api";
 import { addIdentityFilter, identityLabel, identityValue, nameSelection, selectedIdentity } from "../services/priceIdentity";
 import type { Commodity, Market, PriceUpdate } from "../types/api";
-import { confidenceClass, money, movementIcon, shortDate } from "../utils";
+import { confidenceClass, money, movementIcon } from "../utils";
+
+import { PRICE_TIME_LABEL, shortPriceDate } from "../utils/priceTime";
 
 export function PriceHistoryPage() {
   useDocumentTitle("Price History");
@@ -98,6 +100,7 @@ export function PriceHistoryPage() {
       <span className="eyebrow">All price records</span>
       <h1>Price history</h1>
       <p>Review approved historical ranges, movement and same-day market timing.</p>
+      <p className="muted">{PRICE_TIME_LABEL}</p>
     </div>
 
     {authLoading ? <LoadingSpinner label="Checking price-history access…" /> : !hasFullAccess ? <PremiumGate><></></PremiumGate> : <>
@@ -114,7 +117,7 @@ export function PriceHistoryPage() {
           <table>
             <thead><tr><th>Date/time</th><th>Commodity</th><th>Market</th><th>Range</th><th>Previous</th><th>Movement</th><th>Status</th><th>Meaning / action</th></tr></thead>
             <tbody>{items.map((item) => <tr key={item.id}>
-              <td>{shortDate(item.update_date_time)}<small>{item.time_of_day || ""}</small></td>
+              <td>{shortPriceDate(item.update_date_time)}<small>{item.time_of_day || ""}</small></td>
               <td>{item.commodity.name}</td>
               <td>{item.market.name}</td>
               <td>{money(item.price_low)} – {money(item.price_high)}</td>
@@ -132,7 +135,7 @@ export function PriceHistoryPage() {
             <p className="muted">Previous: {item.previous_price_low !== null ? `${money(item.previous_price_low)} – ${money(item.previous_price_high)}` : "Not confirmed"}</p>
             <div className="mini-grid">
               <span><strong>Status</strong><span className={`confidence-badge ${confidenceClass(item.confidence_level)}`}>{item.confidence_level}</span></span>
-              <span><strong>Date/time</strong>{shortDate(item.update_date_time)}{item.time_of_day ? ` · ${item.time_of_day}` : ""}</span>
+              <span><strong>Date/time</strong>{shortPriceDate(item.update_date_time)}{item.time_of_day ? ` · ${item.time_of_day}` : ""}</span>
             </div>
             <div className="guidance"><div><span>Possible Meaning</span><p>{item.possible_meaning || "No observation supplied."}</p></div><div><span>Suggested Action</span><strong>{item.suggested_action || "Watch"}</strong></div></div>
           </article>)}

@@ -47,12 +47,12 @@ export function isWithinSeasonalMonths(startPeriod: string, endPeriod: string | 
   return current >= start || current <= end;
 }
 
-export function relativeTime(value: string | null | undefined): string {
+export function relativeTime(value: string | null | undefined, formatDate = shortDate): string {
   if (!value) return "—";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   const seconds = Math.round((Date.now() - date.getTime()) / 1000);
-  if (seconds < 0) return shortDate(value);
+  if (seconds < 0) return formatDate(value);
   if (seconds < 60) return "Just now";
   const minutes = Math.round(seconds / 60);
   if (minutes < 60) return `${minutes} min${minutes === 1 ? "" : "s"} ago`;
@@ -60,7 +60,7 @@ export function relativeTime(value: string | null | undefined): string {
   if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
   const days = Math.round(hours / 24);
   if (days < 7) return `${days} day${days === 1 ? "" : "s"} ago`;
-  return shortDate(value);
+  return formatDate(value);
 }
 
 export function movementIcon(movement: string): string {

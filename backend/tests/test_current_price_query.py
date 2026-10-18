@@ -84,7 +84,8 @@ class CurrentPriceQueryTests(unittest.TestCase):
             records = list_latest_approved_price_updates(db, selected_date=day)
             self.assertEqual(len(records), 1)
             self.assertEqual(records[0].update_date_time.date(), day)
-            self.assertEqual(records[0].update_date_time.hour, 23)
+            # 23:00 UTC is the next Nigerian day; the last hourly row is 22:00.
+            self.assertEqual(records[0].update_date_time.hour, 22)
             self.assertEqual(list_latest_approved_price_updates(db, selected_date=day, movement="up"), [])
 
     def test_existing_search_active_catalog_and_unknown_quantity_are_preserved(self):

@@ -6,16 +6,12 @@ import { ApiError, apiFetch } from "../services/api";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import type { Commodity, Market } from "../types/api";
 
+import { PRICE_TIME_LABEL, priceInputNow, priceInputToUtc } from "../utils/priceTime";
+
 const movements = ["up", "down", "stable", "unknown"];
 
 function errorText(err: unknown): string {
   return err instanceof ApiError ? err.detail : err instanceof Error ? err.message : "Request failed.";
-}
-
-function nowForInput(): string {
-  const now = new Date();
-  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-  return now.toISOString().slice(0, 16);
 }
 
 export function ReportPricePage() {
@@ -54,7 +50,7 @@ export function ReportPricePage() {
       bag_size: String(f.get("bag_size")),
       movement: String(f.get("movement")),
       confidence_level: "Reporter submitted",
-      update_date_time: new Date(String(f.get("update_date_time"))).toISOString(),
+      update_date_time: priceInputToUtc(String(f.get("update_date_time"))),
       is_outdated: false,
       suggested_action: "Watch",
     };
@@ -101,13 +97,14 @@ export function ReportPricePage() {
           {markets.map((item) => <option value={item.id} key={item.id}>{item.name}</option>)}
         </select>
       </label>
+      <p className="muted">{PRICE_TIME_LABEL}</p>
       <div className="form-grid">
         <label>Price low<input name="price_low" type="number" min="0" step="0.01" required /></label>
         <label>Price high<input name="price_high" type="number" min="0" step="0.01" required /></label>
         <label>Number of bags<input name="unit" defaultValue="1 bag" placeholder="e.g. 1 bag" required /></label>
         <label>Bag size (kg)<input name="bag_size" placeholder="e.g. 50kg" required /></label>
         <label>Movement<select name="movement" defaultValue="unknown">{movements.map((item) => <option key={item}>{item}</option>)}</select></label>
-        <label>Date/time seen<input name="update_date_time" type="datetime-local" defaultValue={nowForInput()} required /></label>
+        <label>Date/time seen<input name="update_date_time" type="datetime-local" defaultValue={priceInputNow()} required /></label>
       </div>
       {message && <div className="status-box success">{message}</div>}
       {error && <div className="status-box error">{error}</div>}

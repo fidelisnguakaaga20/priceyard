@@ -1,5 +1,5 @@
 import type { PriceUpdate } from "../types/api";
-import { shortDate } from "../utils";
+import { priceEpoch, shortPriceDate } from "../utils/priceTime";
 import { comparablePriceGroups } from "../utils/priceComparability";
 
 const WIDTH = 640;
@@ -24,7 +24,7 @@ function ComparableTrendChart({ items }: { items: PriceUpdate[] }) {
     const low = Number(item.price_low);
     const high = Number(item.price_high);
     const average = item.average_price !== null && item.average_price !== undefined ? Number(item.average_price) : (low + high) / 2;
-    return { x: new Date(item.update_date_time).getTime(), y: average, low, high, date: item.update_date_time };
+    return { x: priceEpoch(item.update_date_time), y: average, low, high, date: item.update_date_time };
   });
 
   let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
@@ -53,9 +53,9 @@ function ComparableTrendChart({ items }: { items: PriceUpdate[] }) {
         {points.map((p, i) => <circle key={i} className="trend-dot" cx={scaleX(p.x)} cy={scaleY(p.y)} r={3} />)}
       </svg>
       <div className="trend-chart-labels">
-        <span>{shortDate(first.date)}</span>
+        <span>{shortPriceDate(first.date)}</span>
         <span className="muted">Shaded band shows the daily low–high range; the line tracks the average.</span>
-        <span>{shortDate(last.date)}</span>
+        <span>{shortPriceDate(last.date)}</span>
       </div>
     </div>
   );

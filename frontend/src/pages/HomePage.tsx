@@ -1,3 +1,4 @@
+import { relativePriceTime } from "../utils/priceTime";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { CommodityImage } from "../components/CommodityImage";
@@ -10,7 +11,7 @@ import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { usePreferences } from "../context/PreferencesContext";
 import { apiFetch, apiFetchWithProvenance } from "../services/api";
 import type { Commodity, Market, PriceUpdate, Testimonial } from "../types/api";
-import { comingSoonShareContent, comingSoonShareUrl, dateOnly, money, priceShareContent, relativeTime, whatsAppShareUrl, WHATSAPP_COMMUNITY_URL } from "../utils";
+import { comingSoonShareContent, comingSoonShareUrl, dateOnly, money, priceShareContent, whatsAppShareUrl, WHATSAPP_COMMUNITY_URL } from "../utils";
 
 const AUTO_REFRESH_MS = 60_000;
 
@@ -74,7 +75,7 @@ export function HomePage() {
               {!savedAt && <span className="eyebrow">Live now</span>}
               <SavedPriceNotice savedAt={savedAt} />
               <p className="price-range">{prices[0].commodity.name}: {money(prices[0].price_low)} – {money(prices[0].price_high)}</p>
-              <span className="muted">{prices[0].market.name} · updated {relativeTime(prices[0].update_date_time)}</span>
+              <span className="muted">{prices[0].market.name} · updated {relativePriceTime(prices[0].update_date_time)}</span>
               <a className="text-link" href={whatsAppShareUrl(prices[0])} target="_blank" rel="noopener noreferrer">Share on WhatsApp →</a>
               <NativeShareButton content={priceShareContent(prices[0])} />
             </div>

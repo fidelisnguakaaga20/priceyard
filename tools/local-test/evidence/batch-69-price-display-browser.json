@@ -1,0 +1,21 @@
+{
+  "cases": [
+    {
+      "timezone": "Africa/Lagos",
+      "wat_midnight_display": true,
+      "mobile_history_and_cards": true,
+      "ambiguous_legacy_value_not_guessed": true,
+      "stored_timestamps_unchanged": true
+    },
+    {
+      "timezone": "UTC",
+      "wat_midnight_display": true,
+      "mobile_history_and_cards": true,
+      "ambiguous_legacy_value_not_guessed": true,
+      "stored_timestamps_unchanged": true
+    }
+  ],
+  "external_requests": 0,
+  "production_connections": 0,
+  "aware_timestamps_response_mock_only": true
+}

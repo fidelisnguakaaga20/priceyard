@@ -41,6 +41,28 @@ from app.utils.password import hash_password
 from app.main import app as api
 from app.services import password_reset_service
 
+
+# SQLite discards timezone offsets; native PriceUpdate uses TIMESTAMPTZ. Restore
+# only this disposable fixture's known UTC instants so the original UI receives
+# the same explicit timestamps as PostgreSQL. Never use this adapter on real data.
+from sqlalchemy.types import DateTime, TypeDecorator
+
+
+class SyntheticPriceInstant(TypeDecorator):
+    impl = DateTime
+    cache_ok = True
+
+    def process_bind_param(self, value, dialect):
+        if value is not None and value.utcoffset() is None:
+            raise RuntimeError("Synthetic price fixture requires explicit instants")
+        return value.astimezone(timezone.utc) if value is not None else None
+
+    def process_result_value(self, value, dialect):
+        return value.replace(tzinfo=timezone.utc) if value is not None else None
+
+
+PriceUpdate.__table__.c.update_date_time.type = SyntheticPriceInstant(timezone=True)
+
 local_reset_inbox = []
 
 def capture_reset_message(*, recipient, reset_url):

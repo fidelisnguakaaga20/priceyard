@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import csv
 from collections.abc import Iterable, Iterator
-from datetime import date, datetime, time, timedelta, timezone
+from datetime import date
 from io import StringIO
 
 from fastapi import HTTPException, status
@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session, selectinload
 from app.models.commodity import Commodity
 from app.models.market import Market
 from app.models.price_update import PriceUpdate
+from app.services.price_time_service import price_day_bounds
 
 
 CSV_HEADERS = [
@@ -95,11 +96,11 @@ def _export_statement(
         )
 
     if date_from is not None:
-        start = datetime.combine(date_from, time.min, tzinfo=timezone.utc)
+        start, _ = price_day_bounds(date_from)
         statement = statement.where(PriceUpdate.update_date_time >= start)
 
     if date_to is not None:
-        end = datetime.combine(date_to, time.min, tzinfo=timezone.utc) + timedelta(days=1)
+        _, end = price_day_bounds(date_to)
         statement = statement.where(PriceUpdate.update_date_time < end)
 
     return statement.order_by(PriceUpdate.update_date_time.asc(), PriceUpdate.id.asc())

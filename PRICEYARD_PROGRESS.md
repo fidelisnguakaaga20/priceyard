@@ -25,24 +25,28 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
-Latest verified: batch68,29 complete /7 partial or pending:
-02,05,07,13,14,20,35. PY-29 complete65; PY-08 complete66. Approved PY-20 paging
-covers4 of16 Admin lists: Users, Payments, Commodities, Markets.100/page, full
-snapshot totals, original forms/styles, complete legacy arrays via cursor
-streams. Public catalogs still return every active record and remain eligible
-for public-only caching. No silent truncation, added measurements or real data.
-Reproduced/fixed a pending-save navigation race: completion refreshes the current
-page instead of the old page; old responses/errors still ignored.
-Full260 backend tests, one focused native catalog case, catalog/edit/delete/
-save-race/original access/baseline/all14 dashboard browser checks pass. TypeScript/
-Vite passed;86 source hashes match reused build; original CSS identical.
-Small native fixture78/80, stopped. Review controls: /__test__/admin-paging and
+Latest verified: batch69,30 complete /6 partial or pending:
+02,05,07,14,20,35. PY-13 approved Nigerian price time is complete locally:
+WAT input/display/day filters, explicit UTC instants, unchanged stored history,
+existing history access and billing/paid-expiry rules. Owner's2026-10-18 reply
+"do the best for app that is going to be mostly user friendly" authorizes the
+recommended WAT scope in docs/NIGERIAN_PRICE_TIME_APPROVAL.md. No production scope.
+Full263 backend tests, one focused native midnight/history/CSV case, original
+Admin/Reporter forms in Lagos/UTC, WAT desktop/mobile displays, legacy ambiguity,
+price moderation, comparison charts, seven baseline and all14 dashboard browser
+checks pass. TypeScript/Vite passed;87 source hashes match reused build; original
+CSS identical. No new fields, measurements, policies, dependencies or data repair.
+Small native fixture79/80, stopped. Review controls: /__test__/admin-paging and
 /__test__/catalog-paging on http://127.0.0.1:55446; load disposable samples only.
 Owner approved docs/ADMIN_LIST_PAGING_APPROVAL.md on2026-10-18:100-record Admin
 pages with Previous/Next, complete totals/records, original forms/styles/cards.
-Next:12 remaining approved Admin lists in small PY-20 batches; public history/charts
-remain separate and unchanged. PY-13 Nigeria-time proposal awaits approval;
-no time-rule or input-label changes implemented. PY-29 complete65.
+Next:12 remaining approved Admin lists in small PY-20 batches;4/16 already paged
+(Users/Payments67, Commodities/Markets68), complete snapshot totals/legacy arrays
+retained. Public history/charts must remain complete. PY-29 complete65.
+Policy gates remain for source disclosure02, referral qualification/caps05,
+session/storage choices07 and movement/confidence14. Live operational work35
+remains unauthorized. Before a new native case, check the80-schema budget;
+only one case remains in the current pinned fixture. Preserve its evidence.
 Owner policy and production gates stay explicit. Testing foundation PY-30 stays
 complete; new regression tests belong with their respective improvements.
 Do not reopen completed scope or mistake earlier historical counts for current.
@@ -390,7 +394,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-10 | Spreadsheet export safety | Complete in batch 3; text/numeric regressions and original browser download/access checks passed |
 | PY-11 | Correct saved administrator price state | Complete in batch 10; actual create/approve/correct/outdated/reject/reload browser regression passed |
 | PY-12 | Accurate existing quantity/type/market comparisons | Complete for owner-approved current-record/history-chart safeguards in batch 37: separate recorded specifications, matching commodity/market/unit/size/type only, no inferred missing measurements; all historical rows preserved. Cost-reference quantity linkage remains separate PY-29 work |
-| PY-13 | Consistent Nigerian dates/times | Partial: legacy naive trial timestamps treated as UTC; original Admin create/correction inputs convert local time to UTC like Reporter, Lagos/UTC browser/PG verified. Display/day-filter/input market-time standard requires owner approval: docs/NIGERIAN_PRICE_TIME_APPROVAL.md proposed2026-10-18; not implemented. Original paid UTC policy unchanged |
+| PY-13 | Consistent Nigerian dates/times | Complete for approved local scope69: Nigerian WAT price displays, Admin/Reporter entry/correction and current/history/comparison/CSV day filters. Inclusive WAT midnight/exclusive next midnight, exact UTC instants and unchanged raw history verified backend/PG; Lagos/UTC forms and desktop/mobile displays pass. No guessed zone for ambiguous legacy values; actual historical review remains35. Earlier UTC trial parsing31 and paid UTC expiry unchanged. Approval: docs/NIGERIAN_PRICE_TIME_APPROVAL.md, owner discretion2026-10-18 |
 | PY-14 | Evidence-based movement/confidence | Pending; wording/policy changes require approval |
 | PY-15 | Prices recover after failed loading | Complete in batch 1; before/after browser regression passed |
 | PY-16 | Correct filters and response ordering | Complete for identified current/history/navigation scope in batches 22/28: applied filters, overlap, URL navigation, stale history/error/metadata and access-role browser regressions verified |
@@ -407,7 +411,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-27 | Consistent existing editing/password inputs | Complete for identified scope: feedback selection in batch26, existing Unicode/72-byte password rules and reset validation in batch46, owner-approved six Admin edit forms in batches50–52. Saved values/costs, one-field edits, reload, explicit clearing, switching/unknown/blank IDs and creation verified in61 actual browser checks |
 | PY-28 | Historical record preservation | Current application-side scope complete in batch59: read-only legacy/unversioned preflight before migration steps, empty/reviewed0021-to0022 paths, unchanged raw history/catalog IDs/active flags/cost links/sources/audits, preserved paid/payment records and0022 downgrade refusal verified. No guesses to repair already-changed historical data; production backup/restore/rollout and any repairs require owner approval under PY-35 |
 | PY-29 | Stable identities and dependent records | Application-side identified scope complete65: catalog IDs/referenced deletion/atomic audits34; duplicate/rename/rollback races62; locked parent-price and same-commodity/market observation links64; exact existing-ID current/history filters and rename-safe detail/share links65. Current shares never publish historical amounts. Original labels, measurements and all records preserved; no automatic merge, legacy alias guesses, rewrites or invented cost units. Historical repairs require separate PY-35 approval |
-| PY-30 | Isolated automated/browser verification | Identified local testing-foundation/coverage scope complete63: criteria/workflow map/evidence retained; full260 backend tests68, full40 native baseline47 plus focused scope/identity/request/paging/catalog cases, six isolation probes63; original baseline/access/catalog/14-card browser68,205-row paging and before/after save-race proof. Native78/80 schemas stopped, phases serialized,86 source hashes match reused build; original CSS unchanged, no dependency copies. Not100% coverage or production/provider certification; future tests stay with remaining items, operational checks remain PY-35 |
+| PY-30 | Isolated automated/browser verification | Identified local testing-foundation/coverage scope complete63: criteria/workflow map/evidence retained; full263 backend tests69, full40 native baseline47 plus focused cases including WAT midnight/history/CSV69, six isolation probes63. Original baseline/14-card/time/price/chart browser69 and earlier access/catalog/paging/save-race proof retained. Native79/80 schemas stopped, phases serialized,87 source hashes match reused build; original CSS unchanged, no dependency copies. Synthetic-only SQLite adapter restores known UTC price instants to match native TIMESTAMPTZ; never used on real/ambiguous data. Not100% coverage or production/provider certification; future tests stay with remaining items, operational checks remain PY-35 |
 | PY-31 | Confirmed payment activation and recovery | Application-side approved scope complete in batch58: atomic confirmation, owner callback and explicit bounded/resumable reconciliation for missed webhook/return; dry-run default, strict existing evidence/activation, single PG worker, error isolation, replay safety and purchased-time/manual-grant preservation verified. Live scheduling/checkpoints/monitoring and ambiguous legacy repairs require owner approval under PY-35 |
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches 14/21: carry forward dated paid/trial time; preserve indefinite grants, block new checkout and hold/recover old purchases without consuming days |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
@@ -2565,3 +2569,52 @@ No expansion of completed null-guard/account/UI scopes is needed.
   Native budget has two schemas left; preserve existing fixture/evidence and
   prepare a separately pinned small fixture when needed, without destructive
   cleanup or repeated full native suites. No production/push/merge/deployment.
+
+
+### Batch 69 - approved PY-13 Nigerian price time (2026-10-18)
+
+Owner delegated the explicit Nigeria WAT choice: "do the best for app that is
+ going to be mostly user friendly". Applied only the recommended local price-time
+scope in docs/NIGERIAN_PRICE_TIME_APPROVAL.md. No billing/access-policy change.
+
+- Price-entry and correction fields now mean WAT on every device; Reporter default
+  is current WAT. Existing labels/fields/grid arrangement stay, with a separate
+  Nigeria time (WAT) caption. New submissions still send explicit UTC instants.
+- Original price cards, history, detail, watchlist and chart labels use WAT for
+  explicit instants; elapsed age wording remains. Unzoned legacy values stay
+  literal; no guessed ages/chart coordinates or rewritten history.
+- Shared Nigerian-day bounds feed current/history/comparison and CSV date filters:
+  inclusive 23:00 UTC the prior day, exclusive 23:00 UTC the selected day. Original
+  ranking, specifications, history permissions, CSV columns/raw instants remain.
+- The synthetic SQLite preview alone adapts known UTC price timestamps to native
+  TIMESTAMPTZ-shaped responses. It rejects unzoned synthetic writes; no application
+  serializer, real database type, schema, migration or production data changed.
+
+Verification (one heavy phase at a time; native fixture stopped before build):
+- Full263 backend tests passed in87.180s; focused native boundary/history/export
+  case passed in2.960s. Raw price rows unchanged, private sources excluded and
+  current/history access retained. Native fixture78->79 of80 schemas, stopped.
+- Corrected two new test assumptions: a free fixture needed its existing free
+  subscription; the framework accepts midnight datetime strings as dates, so the
+  invalid-input case now uses an actually invalid date. Final suite has no
+  failures/errors/skips. No product behavior changed to satisfy these assertions.
+- Original Admin create/correct and Reporter default/submit/reload verified in
+  Lagos and UTC; 00:30 WAT sends23:30 UTC on the preceding day in both contexts.
+- Original cards/history show1 January2001 at00:30 WAT for31 December2000 at
+  23:30 UTC on both devices, desktop and375px; raw legacy ambiguity not guessed.
+  The display case changes response timestamps only; stored originals unchanged.
+- Original moderation/audits, separate comparable charts, all seven baseline
+  workflows and all14 dashboard labels/totals/outage recovery passed. No external
+  or production contacts. Build TypeScript/Vite106 modules4.09s;87 whitelisted
+  source/public/config hashes match snapshot, original CSS byte-identical.
+- Restricted CIM process inspection was denied; stopped that attempt and used
+  the same identity-checking preview helper through approved escalation. No
+  weakened checks or unrelated process termination. Dependencies not installed.
+
+Evidence: tools/local-test/evidence/batch-69-*.json; reusable time browser cases
+and native case are tracked. Current count:30 complete,6 partial/pending:
+02,05,07,14,20,35. Continue approved PY-20 lists in small batches; preserve original
+public-history/chart completeness. Source/referral/session/movement policy gates
+and all live operations remain explicit. One native schema slot remains; preserve
+this fixture and its evidence when preparing any separately pinned replacement.
+No production access, push, merge or deployment.

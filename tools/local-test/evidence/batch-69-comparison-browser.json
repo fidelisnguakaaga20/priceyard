@@ -1,0 +1,11 @@
+{
+  "old_mixed_measurement_trend_reproduced": false,
+  "current_distinct_recorded_sizes_preserved": true,
+  "separate_matching_two_point_charts": true,
+  "unknown_measurements_not_joined": true,
+  "all_history_rows_retained": true,
+  "original_history_restored_after_synthetic_checks": true,
+  "no_real_or_guessed_weights": true,
+  "external_page_requests": 0,
+  "production_connections": 0
+}
