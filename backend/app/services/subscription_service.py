@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 
 from fastapi import HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import and_, func, or_, select
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
@@ -111,19 +111,49 @@ def find_subscription_for_user(db: Session, user_id: int) -> Subscription | None
     return expire_trial_if_needed(db, subscription)
 
 
-def list_subscriptions(db: Session) -> list[Subscription]:
-    subscriptions = list(db.scalars(select(Subscription).order_by(Subscription.id)).all())
+def expire_subscriptions_for_listing(db: Session) -> None:
+    """Keep the original whole-list expiry sweep without loading every account.
+
+    Candidates are bounded, then rechecked under the same User -> Subscription
+    locks as payments. A renewal completed while waiting must not be overwritten.
+    The sweep commits atomically before any paged/streamed response is produced.
+    """
     now = utc_now()
-    changed = False
-    for item in subscriptions:
-        trial_changed = apply_trial_expiry(item, now=now)
-        paid_changed = apply_paid_expiry(item, now=now)
-        changed = trial_changed or paid_changed or changed
-    if changed:
+    due = or_(and_(Subscription.status == "trial", Subscription.trial_ends_at <= now),
+              and_(Subscription.status == "active", Subscription.end_date < now.date()))
+    try:
+        ceiling = db.scalar(select(func.max(Subscription.user_id))) or 0
+        cursor = 0
+        while True:
+            users = db.scalars(select(Subscription.user_id).where(
+                due, Subscription.user_id > cursor, Subscription.user_id <= ceiling
+            ).order_by(Subscription.user_id).limit(100)).all()
+            if not users:
+                break
+            for user_id in users:
+                try:
+                    _, item = lock_subscription_state(db, user_id)
+                except HTTPException as error:
+                    if error.status_code == 404:
+                        continue  # An account removed after candidate selection.
+                    raise
+                if item is not None:
+                    trial_changed = apply_trial_expiry(item, now=now)
+                    paid_changed = apply_paid_expiry(item, now=now)
+                    if trial_changed or paid_changed:
+                        db.flush()
+            cursor = users[-1]
+        # Release candidate locks even when a concurrent renewal made them valid.
         db.commit()
-        for item in subscriptions:
-            db.refresh(item)
-    return subscriptions
+    except Exception:
+        db.rollback()
+        raise
+
+
+def list_subscriptions(db: Session) -> list[Subscription]:
+    # Internal compatibility; HTTP callers use the bounded page/stream paths.
+    expire_subscriptions_for_listing(db)
+    return list(db.scalars(select(Subscription).order_by(Subscription.id)).all())
 
 
 def update_subscription_status(db: Session, subscription: Subscription, new_status: str, *, commit: bool = True) -> Subscription:

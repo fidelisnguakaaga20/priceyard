@@ -152,6 +152,55 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_subscription_pages_preserve_whole_account_expiry_and_purchased_value(self):
+        spec = importlib.util.spec_from_file_location("local_subscription_paging", ROOT / "backend/tests/test_subscription_paging.py")
+        cases = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cases)
+        cases.verify_subscription_pages(self, self.engine)
+
+    def test_listing_expiry_rechecks_a_renewal_completed_after_candidate_selection(self):
+        from app.services import subscription_service
+        Base.metadata.create_all(self.engine)
+        now = datetime.now(timezone.utc)
+        with Session(self.engine) as db:
+            user = User(full_name="Synthetic renewal race", email="expiry-renewal@example.com",
+                        password_hash="unused", role="paid_user", referral_code="EXPRENEW")
+            user.subscription = Subscription(status="active", plan_name="paid_monthly",
+                start_date=(now-timedelta(days=31)).date(), end_date=(now-timedelta(days=1)).date())
+            db.add(user); db.flush(); user_id = user.id
+            db.add(Payment(user_id=user_id, reference="py_expiry_renewal", plan="monthly", amount=2500,
+                           currency="NGN", status="pending")); db.commit()
+        selected, release = threading.Event(), threading.Event()
+        outcomes = []
+        original = subscription_service.lock_subscription_state
+        def delayed_lock(db, candidate):
+            self.assertEqual(candidate, user_id)
+            selected.set()
+            if not release.wait(10): raise RuntimeError("Synthetic expiry coordination timed out")
+            return original(db, candidate)
+        def expire():
+            with Session(self.engine) as db:
+                try: subscription_service.expire_subscriptions_for_listing(db); outcomes.append("complete")
+                except BaseException as error: outcomes.append(type(error).__name__)
+        with patch.object(subscription_service, "lock_subscription_state", side_effect=delayed_lock), patch.object(subscription_service, "utc_now", return_value=now), patch.object(payment_service, "notify_admins", return_value=None):
+            worker = threading.Thread(target=expire)
+            worker.start()
+            try:
+                self.assertTrue(selected.wait(10))
+                with Session(self.engine) as db:
+                    payment_service.handle_webhook_event(db, {"event":"charge.success", "data":{
+                        "reference":"py_expiry_renewal", "id":767676, "amount":250000, "currency":"NGN", "status":"success"}})
+            finally:
+                release.set(); worker.join(15)
+        self.assertFalse(worker.is_alive()); self.assertEqual(outcomes, ["complete"])
+        with Session(self.engine) as db:
+            item = db.scalar(select(Subscription).where(Subscription.user_id == user_id))
+            self.assertEqual((item.status, item.end_date, item.payment_reference),
+                             ("active", (now+timedelta(days=30)).date(), "py_expiry_renewal"))
+            self.assertEqual(db.get(User, user_id).role, "paid_user")
+            self.assertEqual(db.scalar(select(Payment.status).where(Payment.user_id == user_id)), "success")
+            self.assertEqual(len(db.scalars(select(AuditLog).where(AuditLog.action == "payment.success")).all()), 1)
+
     def test_feedback_pages_keep_filtered_totals_global_summary_and_privacy(self):
         spec = importlib.util.spec_from_file_location("local_feedback_paging", ROOT / "backend/tests/test_feedback_paging.py")
         cases = importlib.util.module_from_spec(spec)

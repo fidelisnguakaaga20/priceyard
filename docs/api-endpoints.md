@@ -158,11 +158,12 @@ from declarations for traceability; follow the linked handler for all checks.
 | GET | `/storage-suitability/admin/page` | `require_roles('admin')` | [get_admin_storage_page](../backend/app/routes/storage_suitability_routes.py#L38) |
 | GET | `/storage-suitability/{item_id}` | `require_full_access` | [get_item](../backend/app/routes/storage_suitability_routes.py#L48) |
 | PATCH | `/storage-suitability/{item_id}` | `require_roles('admin')` | [edit_item](../backend/app/routes/storage_suitability_routes.py#L68) |
-| GET | `/subscriptions` | `require_roles('admin')` | [get_subscriptions](../backend/app/routes/subscription_routes.py#L31) |
-| POST | `/subscriptions/cron/send-trial-reminders` | `verify_cron_secret` | [cron_trigger_trial_reminders](../backend/app/routes/subscription_routes.py#L62) |
-| POST | `/subscriptions/send-trial-reminders` | `require_roles('admin')` | [trigger_trial_reminders](../backend/app/routes/subscription_routes.py#L53) |
-| GET | `/subscriptions/{user_id}` | `get_current_user` | [get_user_subscription](../backend/app/routes/subscription_routes.py#L39) |
-| PATCH | `/subscriptions/{user_id}/status` | `require_roles('admin')` | [set_subscription_status](../backend/app/routes/subscription_routes.py#L74) |
+| GET | `/subscriptions` | `require_roles('admin')` | [get_subscriptions](../backend/app/routes/subscription_routes.py#L32) |
+| GET | `/subscriptions/admin/page` | `require_roles('admin')` | [get_subscriptions_page](../backend/app/routes/subscription_routes.py#L42) |
+| POST | `/subscriptions/cron/send-trial-reminders` | `verify_cron_secret` | [cron_trigger_trial_reminders](../backend/app/routes/subscription_routes.py#L75) |
+| POST | `/subscriptions/send-trial-reminders` | `require_roles('admin')` | [trigger_trial_reminders](../backend/app/routes/subscription_routes.py#L66) |
+| GET | `/subscriptions/{user_id}` | `get_current_user` | [get_user_subscription](../backend/app/routes/subscription_routes.py#L52) |
+| PATCH | `/subscriptions/{user_id}/status` | `require_roles('admin')` | [set_subscription_status](../backend/app/routes/subscription_routes.py#L87) |
 | GET | `/testimonials` | `—` | [get_public_testimonials](../backend/app/routes/feedback_routes.py#L48) |
 | GET | `/users` | `require_roles('admin')` | [get_users](../backend/app/routes/user_routes.py#L17) |
 | GET | `/users/page` | `require_roles('admin')` | [get_users_page](../backend/app/routes/user_routes.py#L25) |

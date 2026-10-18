@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Header, HTTPException, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
@@ -7,12 +7,13 @@ from app.models.subscription import Subscription
 from app.models.user import User
 from app.schemas.subscription_schema import SubscriptionResponse, SubscriptionStatusUpdate
 from app.services.audit_service import create_audit_log, snapshot_model
+from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, stream_admin_records
 from app.services.subscription_service import (
     get_subscription_for_user,
     lock_subscription_state,
     apply_paid_expiry,
     apply_trial_expiry,
-    list_subscriptions,
+    expire_subscriptions_for_listing,
     send_trial_expiry_reminders,
     update_subscription_status,
 )
@@ -31,8 +32,20 @@ def verify_cron_secret(x_cron_secret: str | None = Header(default=None)) -> None
 def get_subscriptions(
     db: Session = Depends(get_db),
     _: User = Depends(require_roles("admin")),
-) -> list[Subscription]:
-    return list_subscriptions(db)
+) -> Response:
+    expire_subscriptions_for_listing(db)
+    return AdminJSONResponse(stream_admin_records(db.get_bind(), Subscription, SubscriptionResponse,
+        order=(("id", False),)))
+
+
+@router.get("/admin/page", response_model=AdminRecordPage[SubscriptionResponse])
+def get_subscriptions_page(
+    offset: int = Query(default=0, ge=0, le=2_147_483_647),
+    db: Session = Depends(get_db),
+    _: User = Depends(require_roles("admin")),
+) -> AdminRecordPage[SubscriptionResponse]:
+    expire_subscriptions_for_listing(db)
+    return admin_record_page(db, Subscription, SubscriptionResponse, offset=offset, order=(("id", False),))
 
 
 @router.get("/{user_id}", response_model=SubscriptionResponse)

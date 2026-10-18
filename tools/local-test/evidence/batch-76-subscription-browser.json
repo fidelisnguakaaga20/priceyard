@@ -1,0 +1,14 @@
+{
+  "checks": {
+    "all_ids_ascending_order_full_totals_and_page_bounds": true,
+    "reload_previous_and_browser_back": true,
+    "original_status_action_retains_page_14_day_trial_and_other_records": true,
+    "original_columns_controls_and_mobile_layout": true
+  },
+  "records": 205,
+  "page_size": 100,
+  "existing_price_records_unchanged": true,
+  "external_requests": 0,
+  "production_connections": 0,
+  "reseed_preview_after_check": true
+}

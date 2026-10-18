@@ -45,9 +45,9 @@ before changing callers.
 
 Decision: APPROVED by owner2026-10-18; implement/test/commit locally in small batches.
 
-Verified through batch75:13/16 lists (Users/Payments67, Commodities/Markets68,
+Verified through batch76:14/16 lists (Users/Payments67, Commodities/Markets68,
 FAQs/Audit70, Market/Quality signals71, Buying zones/Sell-watch73, Storage/Cost74,
-Feedback75). Feedback keeps its original rating filter and global count/average;
+Feedback75, Subscriptions76). Feedback keeps its original rating filter and global count/average;
 changing the filter resets the page, and reload/back retain the selected filter.
 Filtered count/rows share one snapshot. Private screenshots and testimonial
 publish/hide/delete actions remain; public testimonial fields stay restricted.
@@ -59,4 +59,7 @@ group ordering, then category/ID within groups; legacy full FAQ arrays retain
 their original category/ID order. Known-ID editing/publication works beyond the
 current page. Public FAQ arrays remain complete and published-only. Audit pages
 and full streams apply the existing response-time redaction, retaining raw
-historical evidence. No subscription expiry or other listing rules changed.
+historical evidence. Subscription paging preserves the original whole-account
+expiry sweep using bounded candidate batches, User->Subscription locks and a
+single atomic commit/rollback. Recheck after locking protects concurrent renewal;
+original UTC boundaries, manual grants, staff authority and saved dates remain.
