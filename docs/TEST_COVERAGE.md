@@ -10,11 +10,12 @@ fixes remain mandatory within their respective items.
 
 1. Automated backend service/API tests exercise the existing critical account,
    access, payment, data-preservation and notification workflows with synthetic
-   data. Latest full suite:286 tests, zero failures/errors/skips in batch81.
+   data. Latest full suite:307 tests, zero failures/errors/skips in batch87.
 2. PostgreSQL tests exercise material lock/transaction behavior rather than
    substituting SQLite for concurrency. Last full40-case native baseline is
    batch47. Later recovery/migration/export/catalog changes have focused native
-   evidence; there is no claim of a newly executed full native suite.
+   evidence; batch87 adds five native cases, including twelve single-account
+   expiry/payment interleavings. No newly executed full native suite is claimed.
 3. Real browser checks use the original compiled application and real local
    handlers with fake providers. Original forms, purchased-value/access flows,
    price screens and all14 Admin dashboard metrics have regression checks.

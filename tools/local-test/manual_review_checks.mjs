@@ -20,7 +20,8 @@ try {
  const customer=await fixture('manual-paid');
  async function snapshot() {
   return customer.page.evaluate(async()=>{
-   const token=localStorage.getItem('priceyard_access_token')||sessionStorage.getItem('priceyard_access_token'),headers={Authorization:'Bearer '+token};
+   const session=await fetch('/api/auth/browser/session').then(r=>r.json());
+   const headers={'X-PriceYard-CSRF':session.csrf_token,'X-PriceYard-Session':session.session_id};
    const user=await fetch('/api/auth/me',{headers}).then(r=>r.json());
    const subscription=await fetch('/api/subscriptions/'+user.id,{headers}).then(r=>r.json());
    const history=(await fetch('/api/price-updates/history',{headers})).status;
@@ -35,8 +36,7 @@ try {
  assert.deepEqual(await send(),held);assert.deepEqual(await snapshot(),before);
  const admin=await fixture('admin');
  async function audits(){return admin.page.evaluate(async()=>{
-  const token=localStorage.getItem('priceyard_access_token')||sessionStorage.getItem('priceyard_access_token');
-  const rows=await fetch('/api/audit-logs',{headers:{Authorization:'Bearer '+token}}).then(r=>r.json());
+  const rows=await fetch('/api/audit-logs').then(r=>r.json());
   return rows.filter(row=>row.action==='payment.review_required');
  });}
  const review=await audits();assert.equal(review.length,1);assert.equal(review[0].new_value.paystack_transaction_id,'700005');

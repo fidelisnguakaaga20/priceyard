@@ -1,0 +1,28 @@
+{
+  "checks": [
+    {
+      "account": "value-paid",
+      "previous_paid_end": "2026-11-17",
+      "original_trial_end": null,
+      "purchased_days": 30,
+      "expected_end": "2026-12-17",
+      "saved_end": "2026-12-17",
+      "replay_unchanged": true,
+      "original_dashboard": true,
+      "live_initiation": 503
+    },
+    {
+      "account": "value-trial",
+      "previous_paid_end": null,
+      "original_trial_end": "2026-11-01T22:05:55.927417",
+      "purchased_days": 90,
+      "expected_end": "2027-01-30",
+      "saved_end": "2027-01-30",
+      "replay_unchanged": true,
+      "original_dashboard": true,
+      "live_initiation": 503
+    }
+  ],
+  "external_page_requests": 0,
+  "production_connections": 0
+}

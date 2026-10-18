@@ -29,8 +29,8 @@ try {
     await page.getByRole('heading',{name:/Welcome, Test/}).waitFor();
     async function snapshot() {
       return page.evaluate(async()=>{
-        const token=localStorage.getItem('priceyard_access_token')||sessionStorage.getItem('priceyard_access_token');
-        const headers={Authorization:'Bearer '+token};
+        const session=await fetch('/api/auth/browser/session').then(r=>r.json());
+        const headers={'X-PriceYard-CSRF':session.csrf_token,'X-PriceYard-Session':session.session_id};
         const user=await fetch('/api/auth/me',{headers}).then(r=>r.json());
         const subscription=await fetch('/api/subscriptions/'+user.id,{headers}).then(r=>r.json());
         const history=(await fetch('/api/price-updates/history',{headers})).status;

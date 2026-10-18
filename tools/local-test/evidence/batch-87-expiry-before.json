@@ -1,0 +1,8 @@
+{
+  "committed_defect_reproduced": true,
+  "expected_failing_subcases": 6,
+  "source_file_modified_by_reproducer": false,
+  "working_fix_restored_after_memory_patch": true,
+  "database": "fresh synthetic in-memory SQLite",
+  "production_connections": 0
+}

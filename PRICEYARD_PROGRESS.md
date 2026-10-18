@@ -25,7 +25,12 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
-Latest verified: batch86,35 complete /1 partial or pending:35.
+Latest verified: batch87,35 complete /1 partial or pending:35.
+Resumed actual5bce117 and preserved both interrupted expiry files before editing.
+Confirmed/fixed single-account expiry GET overwriting a concurrent renewal;
+307 backend tests, five focused native PostgreSQL cases (twelve GET/payment
+interleavings), purchased-value/review/eight-role browser checks and14 Admin cards
+pass. Details/access blockers:docs/PY35_FINAL_REVIEW.md. No release authorization.
 Owner chose existing local isolation with no new cloud resources. Identified
 remaining local TLS/browser and simulated email transport gaps verified86; see
 docs/PY35_OFFLINE_READINESS.md. Public-host/provider/actual-record gates stay open.
@@ -65,7 +70,7 @@ checks, original price/source workflows, seven baseline views and all14 dashboar
 cards pass.87 build source hashes match; original CSS byte-identical. No data repair.
 Old recovery fixture80/80 remains stopped/intact. Fresh small native fixture
 postgres-paging-20261018 at127.0.0.1:55449, identifier7697910732590408300,
-uses --paging-cluster:21/80 schemas, stopped after84. Same12 connections/32MB buffers,
+uses --paging-cluster:26/80 schemas, stopped after87. Same12 connections/32MB buffers,
 fsync enabled/exclusive lock and identity guards. Build refuses its active port.
 Review controls: /__test__/admin-paging, /__test__/catalog-paging and
 /__test__/faq-audit-paging and /__test__/signal-paging on http://127.0.0.1:55446;
@@ -83,7 +88,9 @@ qualification, further signups/referral counts and14-day child trials preserved.
 Full281 backend tests, UTC-boundary/rollback/native last-slot concurrency and real
 registration/dashboard browser checks pass. No new identity verification claims.
 Session/storage07 and claim evidence14 explicitly approved2026-10-18; verified80/79 respectively.
-Live operational work35 remains unauthorized. PY-02 approved safeguards complete72.
+Live production work35 remains unauthorized; safe Phase1 staging testing was
+approved later, but its infrastructure/provider prerequisites remain unavailable.
+PY-02 approved safeguards complete72.
 Owner policy and production gates stay explicit. Testing foundation PY-30 stays
 complete; new regression tests belong with their respective improvements.
 Do not reopen completed scope or mistake earlier historical counts for current.
@@ -450,10 +457,10 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-29 | Stable identities and dependent records | Application-side identified scope complete65: catalog IDs/referenced deletion/atomic audits34; duplicate/rename/rollback races62; locked parent-price and same-commodity/market observation links64; exact existing-ID current/history filters and rename-safe detail/share links65. Current shares never publish historical amounts. Original labels, measurements and all records preserved; no automatic merge, legacy alias guesses, rewrites or invented cost units. Historical repairs require separate PY-35 approval |
 | PY-30 | Isolated automated/browser verification | Identified testing-foundation scope complete63; full268 backend tests71, earlier full40 native baseline47 plus focused cases through signal paging71; original baseline/14-card/all-six-editor/paging/race/mobile checks71 pass. Fresh pinned postgres-paging-20261018:55449 identifier7697910732590408300 uses1/80 schemas, stopped,12 connections/32MB buffers/fsync enabled. Exhausted recovery80/80 retained stopped. Exclusive native lock/negative connection probes and build port guard kept;87 source hashes match reused build, original CSS identical, no installs. Not production/provider certification; future regression tests stay with remaining items; live operations35 gated |
 | PY-31 | Confirmed payment activation and recovery | Application-side approved scope complete in batch58: atomic confirmation, owner callback and explicit bounded/resumable reconciliation for missed webhook/return; dry-run default, strict existing evidence/activation, single PG worker, error isolation, replay safety and purchased-time/manual-grant preservation verified. Live scheduling/checkpoints/monitoring and ambiguous legacy repairs require owner approval under PY-35 |
-| PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches 14/21: carry forward dated paid/trial time; preserve indefinite grants, block new checkout and hold/recover old purchases without consuming days |
+| PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches14/21; batch87 closes the confirmed stale single-account GET/renewal race under existing locks. Paid/trial value, indefinite grants/review and payment evidence preserved; full307 backend tests, actual PG blocking/twelve interleavings and value/review browser checks pass |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
-| PY-34 | Expiry without unintended staff-role loss | Complete in batch 2; 18 backend tests and two expired-Reporter browser cases passed |
-| PY-35 | Operational readiness and dependency evidence | Partial: approved dependency update82 and all currently authorized local operational preparation83 verified. Synthetic backup/restore, monitoring drill, release evidence gate, dependency inventory and runbooks pass. Nine unrun owner-approved live/provider/actual-backup/hosting/rollout gates remain; local success is not production certification. No live monitor, scheduler or data repair enabled |
+| PY-34 | Expiry without unintended staff-role loss | Complete in batch2; batch87 additionally verifies locked single-account expiry versus payment for ordinary/Reporter/Admin users, genuine expiry/history/rollback and eight-role browser access |
+| PY-35 | Operational readiness and dependency evidence | Partial: local preparation through87 verified, including dependency82, synthetic backup83, URL85, offline TLS86 and final expiry/payment regression87. Full307 backend tests/five native cases/affected browsers pass; all nine external/actual-backup/hosting/rollout gates remain unrun. docs/PY35_FINAL_REVIEW.md identifies access and compatibility blockers. No production, live jobs or release authorized |
 | PY-36 | Accurate progress/documentation/maintainability | Current application documentation/identified six-form readability scope complete in61: exact106-operation API index, approved contracts, safe local recovery/resumption guide and README links; six original intelligence forms expanded for maintenance with identical emitted syntax and byte-identical compiled JS/CSS. Progress/approvals/evidence current; future maintenance does not reopen this scope. Production rollout/provider documentation verification remains PY-35 |
 
 ## Verified results and batch history
@@ -3348,3 +3355,55 @@ local gaps now covered;35/36 complete,PY-35 partial. Evidence86 retained; no fai
 new check, heavy load, virtualization or repeated prior full suite. No production,
 customer records, actual charges/messages, purchase, cloud creation, push, merge,
 deployment or jobs enabled. Stop after reporting; no credentials requested.
+
+### Batch 87 - final review and single-account expiry/renewal race (2026-10-18)
+
+Resumed actual5bce117 on the existing branch, preserving interrupted modified
+subscription_service.py and untracked test_subscription_expiry_race.py byte-for-byte
+under ignored runtime/batch-87-interrupted-work. Initial SHA256 respectively:
+F4CC326F9CE8352FBD45755E7BC915AEE11C54B99EE345BC87AE42C85A901675 and
+A35434D68004E99BFB8880B6B5F4273AD217F2D241521FD44D1C7B628E8FDC85.
+No branch reset, discarded work or backup/master changes. Existing uncommitted
+service fix retained; strengthened its native regression evidence independently.
+
+Confirmed old committed helper overwrote concurrent renewed access/ordinary paid
+role after reading expired trial/paid state. Reproduced six expected failing
+subcases by compiling only the old function in memory; source never reverted.
+Fixed helper reloads under existing User->Subscription locks before mutation,
+releases locks even after renewed candidate, rolls back failures. Valid/indefinite
+reads avoid expiry writes/locks. Same approved pricing/trial/value/staff/history.
+
+Fresh full backend307 pass117.546s, zero failures/errors/skips. Focused expiry6
+pass0.249s. Five native PostgreSQL cases pass9.689s:two new cases cover twelve
+actual webhook/GET interleavings across trial/paid and ordinary/Reporter/Admin;
+pg_blocking_pids proves payment waits when expiry holds the lock. Listing expiry,
+verification/webhook replay and distinct concurrent purchase durations also pass.
+Actual payment.success audit/receipt once and preserved access/authority checked.
+Pinned small cluster stopped normally,21->26/80 schemas,12 connections/32MB
+buffers/fsync; preview stopped during heavy phases. No overlapping heavy suites.
+
+Browser paid renewal/trial purchase/replay, indefinite grant held/resolved/credited
+once, eight access scenarios and all14 exact Admin metrics/outage recovery pass.
+Two older value/review harnesses updated from Bearer-null to approved cookie/CSRF
+session. No frontend source/CSS change or redundant build. Read-only local release
+checker now requires87 evidence;89 source/build files match, original Git refs
+preserved and all nine live gates remain unrun/release refused. Evidence87 saved.
+
+Retained launcher issues, not application failures:PowerShell stderr redirection
+treated existing Starlette/httpx warning as terminating error before discovery;
+Start-Process direct log redirection then completed the suite. Initial browser
+launch lacked existing isolated browser path; explicit path fixed it without
+installing/downloading anything. No auto-review rejection/bypass occurred this
+batch. Full backend used bounded sequential execution; PostgreSQL test waits are
+bounded, no high-load loop or broad new database tree.
+
+Scoped current auth/session/reset/Google, payment/expiry and migration-safety
+review completed against existing readiness requirements. Separate unseen other
+conversation audit findings are not claimed reviewed. No new confirmed critical
+issue beyond the verified fix; no promise of exhaustive vulnerability discovery.
+docs/PY35_FINAL_REVIEW.md distinguishes proved local fixes from unverified actual
+Render/Supabase/provider/backup compatibility and lists exact secure access needs.
+GitHub connector available but repo permissions/publication unverified; no remote
+fetch, service access, credentials/production data, migration, push, merge or deploy.
+35/36 complete, PY-35 partial; mandatory external release checks have NOT passed.
+Stop before deployment until approved evidence/backup/rollback prerequisites close.

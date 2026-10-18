@@ -71,11 +71,33 @@ def apply_paid_expiry(subscription: Subscription, *, now: datetime | None = None
 
 
 def expire_trial_if_needed(db: Session, subscription: Subscription, *, now: datetime | None = None) -> Subscription:
-    trial_changed = apply_trial_expiry(subscription, now=now)
-    paid_changed = apply_paid_expiry(subscription, now=now)
-    if trial_changed or paid_changed:
+    current_time = now or utc_now()
+    trial_end = subscription.trial_ends_at
+    if trial_end is not None and trial_end.tzinfo is None:
+        trial_end = trial_end.replace(tzinfo=timezone.utc)
+    due = (subscription.status == "trial" and trial_end is not None and current_time >= trial_end
+           or subscription.status == "active" and subscription.end_date is not None
+           and current_time.date() > subscription.end_date)
+    if not due:
+        return subscription
+
+    # A GET may have read the old expiry just before payment renewed access.
+    # Reload under the same User -> Subscription locks as payment/admin writers
+    # before changing either row. Do not dirty the stale instance beforehand.
+    try:
+        with db.no_autoflush:
+            _, current = lock_subscription_state(db, subscription.user_id)
+        if current is None:
+            raise HTTPException(status_code=404, detail="Subscription not found")
+        subscription = current
+        apply_trial_expiry(subscription, now=current_time)
+        apply_paid_expiry(subscription, now=current_time)
+        # Release the locks even when a concurrent renewal removed the expiry.
         db.commit()
         db.refresh(subscription)
+    except Exception:
+        db.rollback()
+        raise
     return subscription
 
 

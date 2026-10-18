@@ -2,6 +2,10 @@
 
 Current checklist:35 of36 complete. PY-35 remains partial until the owner-approved
 live gates below pass. A local check returning success never authorizes release.
+Latest scoped final review: [PY35_FINAL_REVIEW.md](PY35_FINAL_REVIEW.md).
+Batch87 fixes the confirmed single-account expiry/renewal race:307 backend tests,
+five native PostgreSQL cases and affected browser workflows pass. All nine live
+gates remain unrun; deployment is blocked pending their evidence and approval.
 Phase 1 staging verification was authorized subsequently on2026-10-18. See
 [Phase 1 results](PY35_PHASE1_REPORT.md):separate local package and synthetic checks
 pass; hosted/provider checks are blocked by missing staging/credentials. Original
@@ -16,7 +20,7 @@ accessed. No migration, live job, push, merge or deployment was performed.
 
 | Work | Evidence and limits |
 | --- | --- |
-| Original app and critical workflows | Full286 backend tests and focused native history81; baseline, full251-row history,14 accurate Admin cards and original forms. Later dependency-only checks reuse unchanged backend evidence |
+| Original app and critical workflows | Full307 backend tests87; five focused PostgreSQL cases87, including twelve expiry/payment interleavings; purchased-value/review/eight-role browser checks and14 accurate Admin cards87. Earlier baseline/full251-row history checks retained |
 | Approved security dependencies | Vite6.4.4/router6.30.6, reviewed integrity-bearing lockfile, official-registry-only isolated install with lifecycle scripts disabled. Old tools retained. TypeScript/build, computed original styles, sessions/payment/CSV/Google/history/baseline/14 cards pass82. See DEPENDENCY_READINESS.md; not a complete CVE-free certificate |
 | Synthetic backup/recovery | Native PostgreSQL18 pg_dump/pg_restore into one new marked empty local database.21 application tables/14 fabricated business rows; data digests, types/defaults/precision, indexes/sequences and constraint semantics match. Source unchanged. Failed raw-text comparison retained: PostgreSQL rewrote equivalent varchar-array casts; its planned expressions/validation flags match. No second restore was needed |
 | Recovery isolation | Fixed literal55449, directory/system ID before mutation, no arbitrary database/URL input, marked new target, no clean/drop/overwrite, single transaction/worker,2MiB archive budget, source and failed evidence retained. Four negative guard tests; no native connection in those unit tests |

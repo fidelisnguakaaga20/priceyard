@@ -152,6 +152,18 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_single_subscription_get_rechecks_committed_paid_and_trial_renewals(self):
+        spec = importlib.util.spec_from_file_location('local_single_expiry_race', ROOT / 'backend/tests/test_subscription_expiry_race.py')
+        cases = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cases)
+        cases.verify_subscription_get_renewal_races(self, self.engine)
+
+    def test_single_subscription_expiry_holds_lock_until_payment_can_credit_once(self):
+        spec = importlib.util.spec_from_file_location('local_locked_expiry_race', ROOT / 'backend/tests/test_subscription_expiry_race.py')
+        cases = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cases)
+        cases.verify_expiry_first_blocks_payment_then_preserves_renewal(self, self.engine)
+
     def test_prepare_tiny_synthetic_backup_fixture(self):
         if not options.paging_cluster:
             raise RuntimeError('Recovery fixture requires the current pinned small profile')
