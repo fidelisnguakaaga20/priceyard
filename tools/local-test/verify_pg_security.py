@@ -152,6 +152,13 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_prepare_tiny_synthetic_backup_fixture(self):
+        if not options.paging_cluster:
+            raise RuntimeError('Recovery fixture requires the current pinned small profile')
+        sys.path.insert(0,str(LAB))
+        from synthetic_backup_fixture import prepare_backup_fixture
+        prepare_backup_fixture(self,self.engine,self.schema,LAB)
+
     def test_full_price_history_stream_bounds_filters_privacy_and_preserved_rows(self):
         spec = importlib.util.spec_from_file_location('local_history_streaming', ROOT / 'backend/tests/test_price_history_streaming.py')
         cases = importlib.util.module_from_spec(spec)

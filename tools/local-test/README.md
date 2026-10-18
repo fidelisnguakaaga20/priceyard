@@ -70,3 +70,19 @@ configuration/credentials are never copied. No additional dependency installatio
 After restart, stale PID metadata may refer to an unrelated Windows process. Keep
 the launcher's refusal intact. Verify that the record predates the reboot and
 the test port is free, then archive the stale metadata; never kill a reused PID.
+
+## Completed one-time synthetic recovery rehearsal
+
+Batch83 already ran `run_recovery_drill.ps1` against the pinned small55449 fixture.
+It retains one new schema, the marked `priceyard_synthetic_restore_20261018`
+database, ignored synthetic archive/state and diagnostic evidence. The runner
+refuses existing artifacts rather than reseeding/overwriting. Do not rerun it on
+resumption. Read `docs/BACKUP_RECOVERY.md` and the latest progress entry first.
+`pg_recovery_control.py` has only fixed preparation/empty-target/diagnosis/read-only
+verification phases; no arbitrary target or drop/clean option. Native tools are
+single-worker and archive-limited. Production backups/restorations are unauthorized.
+
+The approved dependency exception is documented in `docs/DEPENDENCY_READINESS.md`;
+the new marked snapshot retains old trees. It does not authorize other installs.
+`check_local_release.py --require-clean` performs read-only local evidence/source/
+lock/Git checks and inventories versions; it cannot grant deployment permission.

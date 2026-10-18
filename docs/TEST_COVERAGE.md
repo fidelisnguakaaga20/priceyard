@@ -10,7 +10,7 @@ fixes remain mandatory within their respective items.
 
 1. Automated backend service/API tests exercise the existing critical account,
    access, payment, data-preservation and notification workflows with synthetic
-   data. Latest full suite:283 tests, zero failures/errors/skips in batch80.
+   data. Latest full suite:286 tests, zero failures/errors/skips in batch81.
 2. PostgreSQL tests exercise material lock/transaction behavior rather than
    substituting SQLite for concurrency. Last full40-case native baseline is
    batch47. Later recovery/migration/export/catalog changes have focused native
@@ -51,7 +51,18 @@ The full backend discovery command includes additional tests beside these files.
 
 ## Evidence and limits
 
-- [Latest full backend suite](../tools/local-test/evidence/batch-62-backend.json).
+- [Latest full backend suite](../tools/local-test/evidence/batch-81-backend.json).
+- [Focused native history check](../tools/local-test/evidence/batch-81-postgres.json).
+- Current dependency-update browser/build evidence:batch82. Source/build hashes
+  match89 files; original appearance checked at desktop/mobile widths. See
+  [dependency readiness](DEPENDENCY_READINESS.md).
+- [Synthetic native backup/restore](../tools/local-test/evidence/batch-83-recovery.json),
+  [four recovery guard tests](../tools/local-test/evidence/batch-83-recovery-guards.json),
+  [three release-gate tests](../tools/local-test/evidence/batch-83-release-gate-tests.json)
+  and [monitoring browser drill](../tools/local-test/evidence/batch-83-monitoring-browser.json).
+  Reuses unchanged286-test backend evidence; no redundant full-suite run.
+- The following batch47/61/62/63 links are historical focused evidence, not current
+  fixture usage or latest build/suite counts.
 - [Last full native baseline](../tools/local-test/evidence/batch-47-postgres.json).
 - Catalog commit races passed in the [initial focused run](../tools/local-test/evidence/batch-62-postgres-initial.json);
   that same run contains a second-case connection setup error. Only that case was
@@ -71,7 +82,7 @@ Google, email/push delivery, production TLS or backup restoration. PY-35 retains
 these operational approvals/checks. No live service or CI deployment was run.
 
 Untested future policy changes must not be presented as completed safeguards.
-Remaining PY-20/35 work retains its own decisions and tests.
+PY-20 is complete locally (batch81); PY-35 retains explicit live approval gates.
 Cookie/CSRF/race evidence:batch80; new price-claim evidence:batch79.
 Earlier evidence links remain historical, not the newest completion counts.
 Use [the progress tracker](../PRICEYARD_PROGRESS.md) for exact current counts and

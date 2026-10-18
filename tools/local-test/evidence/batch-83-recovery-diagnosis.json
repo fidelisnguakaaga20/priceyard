@@ -1,0 +1,88 @@
+{
+  "synthetic_only": true,
+  "source_rows_match_baseline": true,
+  "restored_rows_match_baseline": true,
+  "different_table_names": [],
+  "schema_parts_differ": [
+    "constraints"
+  ],
+  "structural_differences": {
+    "constraints": {
+      "only_source": [
+        [
+          "payments",
+          "ck_payments_plan",
+          "CHECK (((plan)::text = ANY ((ARRAY['monthly'::character varying, 'seasonal'::character varying])::text[])))"
+        ],
+        [
+          "payments",
+          "ck_payments_status",
+          "CHECK (((status)::text = ANY ((ARRAY['pending'::character varying, 'success'::character varying, 'failed'::character varying])::text[])))"
+        ],
+        [
+          "price_updates",
+          "ck_price_updates_movement",
+          "CHECK (((movement)::text = ANY ((ARRAY['up'::character varying, 'down'::character varying, 'stable'::character varying, 'unknown'::character varying])::text[])))"
+        ],
+        [
+          "price_updates",
+          "ck_price_updates_status",
+          "CHECK (((status)::text = ANY ((ARRAY['pending'::character varying, 'approved'::character varying, 'rejected'::character varying])::text[])))"
+        ],
+        [
+          "storage_suitability",
+          "ck_storage_suitability_status",
+          "CHECK (((suitability_status)::text = ANY ((ARRAY['good'::character varying, 'watch'::character varying, 'risky'::character varying, 'not_recommended'::character varying])::text[])))"
+        ],
+        [
+          "subscriptions",
+          "ck_subscriptions_status",
+          "CHECK (((status)::text = ANY ((ARRAY['free'::character varying, 'trial'::character varying, 'active'::character varying, 'expired'::character varying, 'cancelled'::character varying])::text[])))"
+        ],
+        [
+          "watchlists",
+          "ck_watchlists_target_direction_valid",
+          "CHECK (((target_direction IS NULL) OR ((target_direction)::text = ANY ((ARRAY['at_or_below'::character varying, 'at_or_above'::character varying])::text[]))))"
+        ]
+      ],
+      "only_restored": [
+        [
+          "payments",
+          "ck_payments_plan",
+          "CHECK (((plan)::text = ANY (ARRAY[('monthly'::character varying)::text, ('seasonal'::character varying)::text])))"
+        ],
+        [
+          "payments",
+          "ck_payments_status",
+          "CHECK (((status)::text = ANY (ARRAY[('pending'::character varying)::text, ('success'::character varying)::text, ('failed'::character varying)::text])))"
+        ],
+        [
+          "price_updates",
+          "ck_price_updates_movement",
+          "CHECK (((movement)::text = ANY (ARRAY[('up'::character varying)::text, ('down'::character varying)::text, ('stable'::character varying)::text, ('unknown'::character varying)::text])))"
+        ],
+        [
+          "price_updates",
+          "ck_price_updates_status",
+          "CHECK (((status)::text = ANY (ARRAY[('pending'::character varying)::text, ('approved'::character varying)::text, ('rejected'::character varying)::text])))"
+        ],
+        [
+          "storage_suitability",
+          "ck_storage_suitability_status",
+          "CHECK (((suitability_status)::text = ANY (ARRAY[('good'::character varying)::text, ('watch'::character varying)::text, ('risky'::character varying)::text, ('not_recommended'::character varying)::text])))"
+        ],
+        [
+          "subscriptions",
+          "ck_subscriptions_status",
+          "CHECK (((status)::text = ANY (ARRAY[('free'::character varying)::text, ('trial'::character varying)::text, ('active'::character varying)::text, ('expired'::character varying)::text, ('cancelled'::character varying)::text])))"
+        ],
+        [
+          "watchlists",
+          "ck_watchlists_target_direction_valid",
+          "CHECK (((target_direction IS NULL) OR ((target_direction)::text = ANY (ARRAY[('at_or_below'::character varying)::text, ('at_or_above'::character varying)::text]))))"
+        ]
+      ]
+    }
+  },
+  "production_contacts": 0
+}

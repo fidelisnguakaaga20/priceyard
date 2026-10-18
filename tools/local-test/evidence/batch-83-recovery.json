@@ -1,0 +1,15 @@
+{
+  "synthetic_only": true,
+  "full_application_tables": 21,
+  "business_rows": 14,
+  "rows_schema_constraints_indexes_sequences_match": true,
+  "source_unchanged": true,
+  "paid_trial_payment_private_source_audit_revocation_evidence_preserved": true,
+  "raw_check_cast_representation_changed": true,
+  "postgres_planned_constraint_expressions_and_validation_flags_match": true,
+  "archive_bytes": 124437,
+  "archive_sha256": "e855144d4866cfa31d2fa773b6fe4625946841fbc2ade2319a632e89a78e6c8b",
+  "production_contacts": 0,
+  "production_backup_restoration_verified": false,
+  "provider_managed_roles_rls_storage_verified": false
+}

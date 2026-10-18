@@ -1,0 +1,16 @@
+{
+  "scope": "local-only-priceyard-py35",
+  "release_authorized": false,
+  "production_checks_run": false,
+  "gates": [
+    {"id": "hosting_cookies_browsers", "status": "not_run", "owner_approval_required": true},
+    {"id": "actual_backup_restoration", "status": "not_run", "owner_approval_required": true},
+    {"id": "production_schema_rollout", "status": "not_run", "owner_approval_required": true},
+    {"id": "paystack_provider", "status": "not_run", "owner_approval_required": true},
+    {"id": "recovery_scheduler", "status": "not_run", "owner_approval_required": true},
+    {"id": "google_notification_delivery", "status": "not_run", "owner_approval_required": true},
+    {"id": "monitoring_load_clock", "status": "not_run", "owner_approval_required": true},
+    {"id": "hosted_dependencies_environment", "status": "not_run", "owner_approval_required": true},
+    {"id": "historical_review_cutover", "status": "not_run", "owner_approval_required": true}
+  ]
+}

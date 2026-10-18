@@ -1,5 +1,10 @@
 # Deployment Plan
 
+Current authority (2026-10-18): local development/testing only. Historical hosting
+directions below are retained as history; they do not authorize a push, migration,
+production connection or deployment. Current release remains blocked by the
+owner-approved gates in [OPERATIONAL_READINESS.md](OPERATIONAL_READINESS.md).
+
 Status: Stage 22 IN PROGRESS by owner-approved change control.
 
 Approved deployment direction as of 2026-08-25:

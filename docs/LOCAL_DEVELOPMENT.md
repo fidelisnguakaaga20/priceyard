@@ -119,3 +119,27 @@ Only the isolated55446 fixture permits non-Secure cookies. Production needs
 HTTPS/same-site cookie compatibility and supported cross-tab Web Locks; do not
 weaken this to make a hosted preview appear to work. Existing API bearer clients
 remain supported. Focused browser check:cookie_session_checks.mjs.
+
+## Current dependency and operational evidence
+
+The approved Vite6.4.4/router6.30.6 snapshot is
+`tools/local-test/runtime/frontend-security-20261018`; its marker and reviewed
+frontend lockfile identify the built version. Older dependency trees remain
+preserved. Use the isolated55446 preview; do not run the original root dev server
+with application configuration. Additional installs require scoped authorization.
+
+The one-time synthetic recovery drill has already run. Its source schema, marked
+restore database and ignored archive/state are retained. Do not reseed, overwrite,
+run another restore or delete them on resumption. See [backup/recovery](BACKUP_RECOVERY.md)
+and batch83 evidence. The small cluster is stopped,19/80 schemas retained.
+
+After a verified local commit, run the read-only candidate check:
+
+```powershell
+& '.\.git\priceyard-local-recovery-20261015\p00\runtime\venv\Scripts\python.exe' -I -B .\tools\local-test\check_local_release.py --require-clean
+```
+
+Its ignored runtime report inventories installed packages and checks evidence,
+build/source/lock identity and preserved Git references. It never connects to a
+database/provider, deploys or authorizes production. The [nine live release gates](OPERATIONAL_READINESS.md)
+remain separately approved work even when this local command passes.

@@ -25,7 +25,10 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
-Latest verified: batch82,35 complete /1 partial or pending:35.
+Latest verified: batch83,35 complete /1 partial or pending:35.
+All currently authorized local PY-35 preparation is verified; nine live approval
+gates remain explicit in docs/OPERATIONAL_READINESS.md and docs/RELEASE_GATES.json.
+Local success does not authorize production release or establish36/36 completion.
 PY-20 committed558f756eea2eb7db727708b9a72f81e5f40fd5a7 successfully before
 advancing this count. History uses one ordered query and100-row ORM batches,
 without truncation. Browser memory still scales with the selected full result;
@@ -53,7 +56,7 @@ checks, original price/source workflows, seven baseline views and all14 dashboar
 cards pass.87 build source hashes match; original CSS byte-identical. No data repair.
 Old recovery fixture80/80 remains stopped/intact. Fresh small native fixture
 postgres-paging-20261018 at127.0.0.1:55449, identifier7697910732590408300,
-uses --paging-cluster:18/80 schemas, stopped after81. Same12 connections/32MB buffers,
+uses --paging-cluster:19/80 schemas, stopped after83. Same12 connections/32MB buffers,
 fsync enabled/exclusive lock and identity guards. Build refuses its active port.
 Review controls: /__test__/admin-paging, /__test__/catalog-paging and
 /__test__/faq-audit-paging and /__test__/signal-paging on http://127.0.0.1:55446;
@@ -62,8 +65,8 @@ Owner approved docs/ADMIN_LIST_PAGING_APPROVAL.md on2026-10-18:100-record Admin
 pages with Previous/Next, complete totals/records, original forms/styles/cards.
 Approved Admin paging16/16 complete77 (Users/Payments67, catalogs68, FAQs/Audit70,
 Market/Quality signals71, Buying/Sell-watch73, Storage/Cost74, Feedback75,
-Subscriptions76, Prices/flags77). PY-20 still partial for public full-history/query
-materialization; never truncate charts or historical records to claim completion.
+Subscriptions76, Prices/flags77). Public history query materialization completed81;
+never truncate charts or historical records to claim completion.
 Owner answered "do the best option" to the explicit three-bonus rolling30-day
 PY-05 proposal in docs/REFERRAL_ABUSE_DECISION.md. Scope implemented/verified78:
 maximum3 new seven-day bonuses per rolling30 elapsed UTC days; existing days,
@@ -441,7 +444,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches 14/21: carry forward dated paid/trial time; preserve indefinite grants, block new checkout and hold/recover old purchases without consuming days |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
 | PY-34 | Expiry without unintended staff-role loss | Complete in batch 2; 18 backend tests and two expired-Reporter browser cases passed |
-| PY-35 | Operational readiness and dependency evidence | Pending; production/provider/backup-restore/rollout checks outside current scope. Reconciliation scheduling/checkpoint storage/monitoring and any ambiguous historical payment or migration-data repair require owner approval; no live job or scheduler enabled |
+| PY-35 | Operational readiness and dependency evidence | Partial: approved dependency update82 and all currently authorized local operational preparation83 verified. Synthetic backup/restore, monitoring drill, release evidence gate, dependency inventory and runbooks pass. Nine unrun owner-approved live/provider/actual-backup/hosting/rollout gates remain; local success is not production certification. No live monitor, scheduler or data repair enabled |
 | PY-36 | Accurate progress/documentation/maintainability | Current application documentation/identified six-form readability scope complete in61: exact106-operation API index, approved contracts, safe local recovery/resumption guide and README links; six original intelligence forms expanded for maintenance with identical emitted syntax and byte-identical compiled JS/CSS. Progress/approvals/evidence current; future maintenance does not reopen this scope. Production rollout/provider documentation verification remains PY-35 |
 
 ## Verified results and batch history
@@ -3169,3 +3172,45 @@ for remaining operational work. Do not claim all dependencies/CVEs or Linux/live
 hosting certified. Old root node_modules is retained; use marked55446 preview.
 Next tiny synthetic backup/restore, monitoring and release gate/runbooks. No
 production, push, merge or deployment.
+
+### Batch 83 - PY-35 local recovery, monitoring and release gates (2026-10-18)
+
+Continued449475e. All currently authorized local operational preparation verified;
+35/36 complete, PY-35 partial for nine explicitly unrun live approval gates.
+See docs/OPERATIONAL_READINESS.md and docs/RELEASE_GATES.json. No production or
+provider access, deployment, migration, live monitor or scheduler enabled.
+
+Tiny native fixture prepared0.738s,18->19/80 retained schemas,21 application
+tables/14 fabricated business rows. Actual pg_dump/pg_restore into one new marked
+empty database on the pinned55449 cluster preserved paid/trial/payment/private
+source/audit/revocation evidence.124437-byte archive and originals stay ignored
+and retained. No drop/clean/overwrite or repeat restoration. Source raw baseline
+unchanged. Initial verification found seven equivalent CHECK array-cast text
+rewrites; retained diagnosis and verified PostgreSQL's own planned expressions
+and validation flags, with all other columns/indexes/sequences/row digests equal.
+Separate first dump/restore times were not captured; this is not production RTO.
+Cluster stopped before browser checks. Four negative recovery guard tests pass
+0.005s with no native connections; three release-gate tests pass0.001s.
+
+Browser monitoring drill passes:process /health200 cannot conceal price503,
+original Current Prices error and existing Apply recovery work, Guest history
+remains401/private fields absent, external requests0. Harness initially expected
+a Retry control absent from the original app; corrected only the check to Apply.
+No application design/source behavior change. Fresh original synthetic preview
+remains http://127.0.0.1:55446, outage disabled.
+
+Read-only release checker validates required evidence, complete36-item tracker,
+89 current build/source hashes, approved lock and installed versions, exact local
+Python inventory, unchanged master/backup references and explicit release refusal.
+New backup/incident/monitoring/release procedures distinguish local evidence from
+actual customer-backup restoration, hosted security/browser/load checks, provider
+delivery/payment tests and approved rollout. No portable dependency/CVE-free or
+production readiness certificate claimed. Reused unchanged286-backend/native81
+and dependency/browser82 results; no unnecessary whole-suite rerun.
+
+Evidence:tools/local-test/evidence/batch-83-*.json. Precommit release inventory
+records parent449475e and expected dirty tree; final --require-clean result stays
+ignored in runtime/local-release-check.json to avoid rewriting committed evidence.
+Only verified source/docs/test evidence is committed; archives/dependency trees/
+runtime stay untracked. PY-35 remains partial until separately approved live gates
+pass. No push, merge or deployment.
