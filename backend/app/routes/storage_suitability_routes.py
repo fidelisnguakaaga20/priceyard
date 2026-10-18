@@ -1,10 +1,11 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.services.audit_service import save_audited_resource, snapshot_model
+from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, stream_admin_records
 from app.models.storage_suitability import StorageSuitability
 from app.models.user import User
 from app.schemas.storage_suitability_schema import (
@@ -15,7 +16,6 @@ from app.schemas.storage_suitability_schema import (
 from app.services.storage_suitability_service import (
     create_storage_suitability,
     get_storage_suitability,
-    list_storage_suitability,
     update_storage_suitability,
 )
 from app.utils.permissions import require_full_access, require_roles
@@ -28,8 +28,20 @@ def get_items(
     db: Session = Depends(get_db),
     _: User = Depends(require_full_access),
     commodity_id: Annotated[int | None, Query(gt=0)] = None,
-) -> list[StorageSuitability]:
-    return list_storage_suitability(db, commodity_id=commodity_id)
+) -> Response:
+    conditions = (StorageSuitability.commodity_id == commodity_id,) if commodity_id is not None else ()
+    return AdminJSONResponse(stream_admin_records(db.get_bind(), StorageSuitability, StorageSuitabilityResponse,
+        order=(("created_at", True), ("id", True)), where=conditions))
+
+
+@router.get("/admin/page", response_model=AdminRecordPage[StorageSuitabilityResponse])
+def get_admin_storage_page(
+    offset: int = Query(default=0, ge=0, le=2_147_483_647),
+    db: Session = Depends(get_db),
+    _: User = Depends(require_roles("admin")),
+) -> AdminRecordPage[StorageSuitabilityResponse]:
+    return admin_record_page(db, StorageSuitability, StorageSuitabilityResponse, offset=offset,
+        order=(("created_at", True), ("id", True)))
 
 
 @router.get("/{item_id}", response_model=StorageSuitabilityResponse)

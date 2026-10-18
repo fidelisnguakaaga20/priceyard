@@ -25,7 +25,7 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
-Latest verified: batch73,31 complete /5 partial or pending:
+Latest verified: batch74,31 complete /5 partial or pending:
 05,07,14,20,35. PY-02 approved source-publication scope is complete locally:
 both original Admin Notes controls explain their public visibility; private
 source fields/access and historical evidence stay intact. Six-role backend,
@@ -48,15 +48,15 @@ dashboard browser checks pass. TypeScript/Vite passed;
 No new fields, measurements, policies, dependencies or data repair.
 Old recovery fixture80/80 remains stopped/intact. Fresh small native fixture
 postgres-paging-20261018 at127.0.0.1:55449, identifier7697910732590408300,
-uses --paging-cluster:4/80 schemas, stopped. Same12 connections/32MB buffers,
+uses --paging-cluster:5/80 schemas, stopped. Same12 connections/32MB buffers,
 fsync enabled/exclusive lock and identity guards. Build refuses its active port.
 Review controls: /__test__/admin-paging, /__test__/catalog-paging and
 /__test__/faq-audit-paging and /__test__/signal-paging on http://127.0.0.1:55446;
 disposable samples only.
 Owner approved docs/ADMIN_LIST_PAGING_APPROVAL.md on2026-10-18:100-record Admin
 pages with Previous/Next, complete totals/records, original forms/styles/cards.
-Next:6 remaining approved Admin lists in small PY-20 batches;10/16 already paged
-(Users/Payments67, Commodities/Markets68, FAQs/Audit70, Signals71, Buying/Sell-watch73), full snapshot totals/
+Next:4 remaining approved Admin lists in small PY-20 batches;12/16 already paged
+(Users/Payments67, Commodities/Markets68, FAQs/Audit70, all six intelligence71/73/74), full snapshot totals/
 legacy arrays retained. Public history/charts must remain complete. PY-29 complete65.
 Policy gates remain for referral qualification/caps05,
 session/storage choices07 and movement/confidence14. Live operational work35
@@ -416,7 +416,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-17 | Correct market-detail loading | Complete for identified loading races/combined-failure defect in batch 16; obsolete commodity/account responses ignored and independent successful sections retained |
 | PY-18 | Accurate account/payment/access messages | Complete for identified account/expiry/callback defects in batches 4/11/19; verified return refreshes access, unconfirmed return never claims payment received in title |
 | PY-19 | Existing FAQ draft/hide/publish management | Complete in batch 12; hidden drafts remain available to Admin across reload, public publication boundary verified |
-| PY-20 | Bounded queries with accessible historical records | Partial: current ranking23, dashboard29, history metadata32, commodity scoping47-49, CSV streaming60; approved100-record Admin pages67-73 now cover10/16 lists (Users,Payments,Commodities,Markets,FAQs,Audit,Market/Quality signals,Buying zones,Sell-watch). Full snapshot counts, complete legacy/scoped streams, original access/publication/redaction and off-page ID edits retained. Late/wrong-ID lookup protection71 verified. Six Admin lists/public history remain; no chart/history truncation. Scope: docs/ADMIN_LIST_PAGING_APPROVAL.md |
+| PY-20 | Bounded queries with accessible historical records | Partial: current ranking23, dashboard29, history metadata32, commodity scoping47-49, CSV streaming60; approved100-record Admin pages67-74 now cover12/16 lists (Users,Payments,Commodities,Markets,FAQs,Audit,all six intelligence). Full snapshot counts, complete legacy/scoped streams, original access/publication/redaction and off-page ID edits retained. Late/wrong-ID lookup protection71 verified. Four Admin lists/public history remain; no chart/history truncation. Scope: docs/ADMIN_LIST_PAGING_APPROVAL.md |
 | PY-21 | Reliable independent alerts | Application-side identified channel dependency complete in batch 24: failed email no longer skips push/WhatsApp; per-user/channel failures isolated; existing deduplication/count semantics retained. Delivery/retry operations remain PY-35 |
 | PY-22 | Efficient loading and accurate dashboard totals | Complete for identified dashboard scope in batch 29: all 14 original metrics preserved; one Admin-only aggregate API/DB snapshot, zero entity hydration; backend/PG/browser totals and outage recovery verified |
 | PY-23 | Preserve layout while fixing mobile overflow | Complete for identified original critical-layout/price-card overflow scope in batches 42/43: 78 normal and twelve long-name viewport checks, 320–1366px, Easy reading both modes; ordinary card/badge geometry and all fourteen Admin cards preserved |
@@ -2795,3 +2795,44 @@ Evidence: tools/local-test/evidence/batch-73-*.json.31 complete /5 partial-pendi
 05,07,14,20,35. Approved Admin paging10/16; next small batch Storage/Cost lists,
 then Feedback/Subscriptions/Prices/flags. Public history remains complete/separate.
 No production, historical rewrite, policy/measurement change, push/merge/deploy.
+
+
+### Batch 74 - approved PY-20 Storage/Cost paging (2026-10-18)
+
+Continued c22f819 without reopening completed checklist items. Storage suitability
+and Cost breakdown now use approved100-record Admin pages/full snapshot counts.
+Original complete/scoped premium arrays stream100-row batches, original
+newest/ID ordering/access/disclaimers remain. Existing ID endpoints retain saved
+off-page values; original optional clearing and cost-delete capability remain.
+No unit, measurement, formula, form, pricing or historical-record changes.
+
+Verification:
+- New relevant backend contract case passed0.718s. Native same case passed1.814s
+  on pinned small55449; schemas4->5/80, stopped before build. Both205-row lists,
+  ties/pages/full counts/empty tails, single-statement snapshots, scoped complete
+  results, actual permissions, decimal costs/zero values and saved price links
+  pass; raw costs/storage/prices unchanged. Full271 baseline passed batch73;
+  this is a focused additional case, not a claim of another full suite.
+- TypeScript/Vite passed106 modules0.993s.87 source/public/config hashes match
+  reused snapshot; original CSS byte-identical; no installations/dependency copies.
+  Source-only API index now118 operations.
+- Eleven205-row browser checks pass: all IDs/totals, reload/Previous/Next/Back,
+  off-page edits retain links/other values and recalculate original cost totals,
+  delayed/unknown-ID safety, original cost tail deletion/page recovery and375px
+  layout. Storage still has no delete control; raw price history unchanged.
+- All six original form workflows pass73 checks. Existing calculator browser
+  test found a test-only assumption that POST decimal text ("120") equals a
+  persisted NUMERIC response ("120.00"). Test now verifies every amount and
+  compares the persisted record exactly before/after calculator use; passed.
+  Product serialization/calculations untouched; original honest unit label stays.
+- Fresh tiny-preview seven baseline workflows and all14 dashboard labels/full
+  totals/outage recovery pass. Sequential heavy phases, one browser at a time;
+  zero external requests/production contacts.
+
+Evidence: tools/local-test/evidence/batch-74-*.json.31 complete /5 partial-pending:
+05,07,14,20,35. Admin paging12/16; remaining Feedback/Subscriptions/Prices/flags.
+Subscription listing must still process every expired account, with staff and
+purchased-time preservation; do not page away those side effects. Full public
+history/chart materialization stays separate and must not be truncated.
+Referral/session/movement decisions and live operations retain their gates.
+No production, push, merge or deployment.

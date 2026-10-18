@@ -84,8 +84,8 @@ Existing field/storage rules and stored long records remain; no new per-field
 editorial character policy or truncation is inferred from these technical bounds.
 
 Owner-approved Admin paging is recorded in [the exact scope](ADMIN_LIST_PAGING_APPROVAL.md).
-Users, Payments, Commodities, Markets, FAQs, Audit logs, both signal lists,
-Buying zones and Sell-watch windows have
+Users, Payments, Commodities, Markets, FAQs, Audit logs and all six intelligence
+lists have
 100-record pages, Previous/Next, complete totals,
 preserved refresh/back/edit behavior and unchanged forms/columns/styles. New
 `/users/page`, `/payments/page`, `/commodities/admin/page` and `/markets/admin/page`

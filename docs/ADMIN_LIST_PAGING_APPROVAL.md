@@ -45,8 +45,9 @@ before changing callers.
 
 Decision: APPROVED by owner2026-10-18; implement/test/commit locally in small batches.
 
-Verified through batch73:10/16 lists (Users/Payments67, Commodities/Markets68,
-FAQs/Audit70, Market/Quality signals71, Buying zones/Sell-watch73). These editors preserve off-page ID
+Verified through batch74:12/16 lists (Users/Payments67, Commodities/Markets68,
+FAQs/Audit70, Market/Quality signals71, Buying zones/Sell-watch73, Storage/Cost74).
+All six intelligence editors preserve off-page ID
 loading through existing detail endpoints, cancel obsolete requests and reject
 mismatched IDs; old full/scoped streams and access rules stay intact.
 FAQ pages keep the original visible published-first/hidden-second

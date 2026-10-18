@@ -1,0 +1,9 @@
+{
+  "tests_run": 1,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "duration_seconds": 0.718,
+  "pattern": "test_storage_cost_paging.py",
+  "runtime": "in-process synthetic SQLite; TCP and DNS denied"
+}

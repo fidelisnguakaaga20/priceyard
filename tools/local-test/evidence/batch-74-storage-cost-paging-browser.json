@@ -1,0 +1,23 @@
+{
+  "checks": {
+    "storage-suitability_all_ids_and_full_totals_reachable": true,
+    "storage-suitability_reload_previous_next_browser_back": true,
+    "storage-suitability_off_page_edit_preserves_links_values_and_original_cost_totals": true,
+    "storage-suitability_late_lookup_cannot_overwrite_new_selection": true,
+    "storage-suitability_unknown_id_cannot_submit_wrong_record": true,
+    "cost-breakdowns_all_ids_and_full_totals_reachable": true,
+    "cost-breakdowns_reload_previous_next_browser_back": true,
+    "cost-breakdowns_off_page_edit_preserves_links_values_and_original_cost_totals": true,
+    "cost-breakdowns_late_lookup_cannot_overwrite_new_selection": true,
+    "cost-breakdowns_unknown_id_cannot_submit_wrong_record": true,
+    "cost_disposable_tail_delete_returns_to_existing_page": true
+  },
+  "records_per_resource": 205,
+  "page_size": 100,
+  "existing_price_records_unchanged": true,
+  "original_forms_and_mobile_layout": true,
+  "original_delete_capabilities_preserved": true,
+  "external_requests": 0,
+  "production_connections": 0,
+  "reseed_preview_after_check": true
+}

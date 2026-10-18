@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.services.audit_service import save_audited_resource, snapshot_model
+from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, stream_admin_records
 from app.models.cost_breakdown import CostBreakdown
 from app.models.user import User
 from app.schemas.cost_breakdown_schema import (
@@ -16,7 +17,6 @@ from app.services.cost_breakdown_service import (
     create_cost_breakdown,
     delete_cost_breakdown,
     get_cost_breakdown,
-    list_cost_breakdowns,
     update_cost_breakdown,
 )
 from app.utils.permissions import require_full_access, require_roles
@@ -29,8 +29,20 @@ def get_items(
     db: Session = Depends(get_db),
     _: User = Depends(require_full_access),
     commodity_id: Annotated[int | None, Query(gt=0)] = None,
-) -> list[CostBreakdown]:
-    return list_cost_breakdowns(db, commodity_id=commodity_id)
+) -> Response:
+    conditions = (CostBreakdown.commodity_id == commodity_id,) if commodity_id is not None else ()
+    return AdminJSONResponse(stream_admin_records(db.get_bind(), CostBreakdown, CostBreakdownResponse,
+        order=(("created_at", True), ("id", True)), where=conditions))
+
+
+@router.get("/admin/page", response_model=AdminRecordPage[CostBreakdownResponse])
+def get_admin_costs_page(
+    offset: int = Query(default=0, ge=0, le=2_147_483_647),
+    db: Session = Depends(get_db),
+    _: User = Depends(require_roles("admin")),
+) -> AdminRecordPage[CostBreakdownResponse]:
+    return admin_record_page(db, CostBreakdown, CostBreakdownResponse, offset=offset,
+        order=(("created_at", True), ("id", True)))
 
 
 @router.get("/{item_id}", response_model=CostBreakdownResponse)

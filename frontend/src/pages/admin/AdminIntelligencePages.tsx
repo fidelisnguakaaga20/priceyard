@@ -4,7 +4,7 @@ import { StaleBadge } from "../../components/StaleBadge";
 import type { BuyingZone, CostBreakdown, SellWatchWindow, StorageSuitability } from "../../types/api";
 import { useAdminEditForm } from "./useAdminEditForm";
 import { AdminPagination, useAdminPagedList } from "./adminPaging";
-import { AdminActionButton, AdminLoading, AdminStatus, errorText, optionalNumber, useAdminList } from "./adminUtils";
+import { AdminActionButton, AdminLoading, AdminStatus, errorText, optionalNumber } from "./adminUtils";
 export function AdminBuyingZonesPage() {
     const r = useAdminPagedList<BuyingZone>("/buying-zones/admin/page");
     const [error, setError] = useState("");
@@ -180,11 +180,11 @@ export function AdminSellWatchPage() {
     </div>;
 }
 export function AdminStoragePage() {
-    const r = useAdminList<StorageSuitability>("/storage-suitability");
+    const r = useAdminPagedList<StorageSuitability>("/storage-suitability/admin/page");
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const [busy, setBusy] = useState(false);
-    const editor = useAdminEditForm(r.data, r.loading, setError);
+    const editor = useAdminEditForm(r.data, r.loading, setError, { path: "/storage-suitability", token: r.token });
     async function save(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
         if (!r.token || busy || !editor.canSubmit())
@@ -277,14 +277,15 @@ export function AdminStoragePage() {
             <StaleBadge updatedAt={x.updated_at}/>
             </article>)}
         </div>}
+    <AdminPagination page={r} label="Storage suitability"/>
     </div>;
 }
 export function AdminCostBreakdownPage() {
-    const r = useAdminList<CostBreakdown>("/cost-breakdowns");
+    const r = useAdminPagedList<CostBreakdown>("/cost-breakdowns/admin/page");
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const [busy, setBusy] = useState(false);
-    const editor = useAdminEditForm(r.data, r.loading, setError);
+    const editor = useAdminEditForm(r.data, r.loading, setError, { path: "/cost-breakdowns", token: r.token });
     async function save(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
         if (!r.token || busy || !editor.canSubmit())
@@ -374,5 +375,6 @@ export function AdminCostBreakdownPage() {
             </div>
             </article>)}
         </div>}
+    <AdminPagination page={r} label="Cost breakdown"/>
     </div>;
 }
