@@ -1,5 +1,25 @@
 # Actual encrypted backup - owner-private execution, batch97
 
+## Current111: actual source preflight failed; no export started
+
+Protected diagnostics for run20261019T133223Z identify the exact rejected check:
+`pooler_to_database_ssl=false`. Login and authenticated metadata read succeeded;
+client TLS was active with `verify-full`. Database/role `postgres`, read-only `on`,
+version `170006` and revision `0021_feedback_screenshot` matched expectations.
+The server-side SSL value describes the pooler-to-database connection, separately
+from the successfully verified client-to-pooler TLS connection.
+
+Error: `Source preflight rejected: pooler_to_database_ssl; no dump created`.
+This run contains only EFS-encrypted error/metadata files and its trusted CA file;
+no dump, roles export or archive. No real success report or running export process.
+No credentials or private data are copied into this report. Application unchanged.
+
+STOP at this safety failure. No automatic retry, new credential prompt, reduced
+TLS requirements, production settings change, migration or deployment. A verified
+end-to-end TLS route is needed before another attempt; same-project direct
+connectivity is a candidate, not yet verified. Backup and restoration remain
+unverified; the release gate is blocked before export, not a failed restoration.
+
 ## Current110: visible hidden-entry window explicitly approved and opened
 
 Owner now explicitly approves a visible PowerShell window with hidden input for

@@ -25,6 +25,21 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest111: controlled attempt stopped at the retained upstream TLS safeguard.
+Private metadata from run20261019T133223Z confirms authenticated metadata read,
+client TLS in use with verify-full, database postgres, role postgres, read-only on,
+PostgreSQL170006 and installed revision0021_feedback_screenshot. The only failed
+source check is pooler_to_database_ssl=false. Exact error: Source preflight
+rejected: pooler_to_database_ssl; no dump created. This describes the pooler to
+database hop; client to pooler TLS passed. No password/parsing failure inferred.
+Only encrypted private error/metadata and trusted CA files exist in this run;
+no dump/archive, real success status or active export process. Backup/restoration
+remain unverified;35/36 unchanged. No retry/window, security-policy change,
+application edit, migration, push, merge or deploy. Next minimum decision: a
+verified end-to-end TLS connection path, such as same-project direct connectivity
+if available, before another approved attempt. Direct reachability is unverified;
+do not change live SSL settings or remove this guard automatically.
+
 Latest110:owner stops feature work and explicitly approves visible local console
 with hidden input for ONE controlled production backup and isolated restoration;
 this resolves the earlier review ambiguity/refusal. Initial Git clean atb788160;
