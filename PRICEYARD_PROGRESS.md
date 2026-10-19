@@ -32,9 +32,10 @@ read non-secret second-copy report:retrieval digest matches, privacy owner-confi
 Start-PriceYardEncryptedBackup.ps1/.py outside Git with pinned source, hidden
 owner prompts, verify-full TLS/public Windows CA roots, readonly source/snapshot,
 full custom dump/password-free roles, same-snapshot table digests, AES256/header
-archive and verified EFS-decrypted copy. Four NEW guard tests pass; actual helper
-NOT run:owner must enter existing DB password privately. No source connection or
-customer export by Codex. Launcher preparation path-variable error fixed before
+archive and verified EFS-decrypted copy. Four NEW guard tests pass; visible owner
+PowerShell launcher opened (process42268) for private prompts. Actual connection/
+export/results NOT observed or verified; owner must enter existing DB password
+privately. Launcher preparation path-variable error fixed before
 execution. Restore remains NOT RUN; managed-object/extension/isolation review must
 precede executing restored SQL. Details:docs/PY35_ACTUAL_BACKUP_RUN.md.35/36 stays.
 Latest96:owner reports recovery helper succeeded. Independently checked only

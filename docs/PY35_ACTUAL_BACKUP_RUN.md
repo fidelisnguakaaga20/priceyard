@@ -7,11 +7,13 @@ isolated restoration after confirming the second recovery copy. Its saved report
 confirms matching retrieved ciphertext and owner-confirmed restricted Drive
 sharing; remote permissions were not independently queried. No repeated setup
 tests, real source connection, customer export, upload, migration or deploy by
-Codex. Actual backup and database restoration remain NOT RUN.
+Codex. Visible owner PowerShell launcher opened (process42268) for private input;
+actual connection/export results are not yet observed. Database restoration NOT RUN.
 
 ## Owner action
 
-Open normal Windows PowerShell and run:
+Use the opened PowerShell window. If it did not appear, open normal Windows
+PowerShell and run (do not start another copy while the first is running):
 
 ```powershell
 & "C:\Users\HP\AppData\Local\PriceYardPrivateBackup\Start-PriceYardEncryptedBackup.ps1"
