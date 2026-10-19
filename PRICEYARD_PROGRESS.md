@@ -25,6 +25,18 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest100:second owner attempt fails with server FATAL password authentication
+failed, not TLS. Latest protected run20261019T074829Z has only encrypted CA/error
+log; no dump, roles, archive or saved success. No native backup process active.
+Source reached but login rejected; SQL permissions remain NOT CHECKED. Verified
+native PG17.11 versions, same major as reported17.6; failed login never reached
+them. Mocked test confirms password passed unchanged via keywords including
+special characters; cannot infer wrong entered password versus credential pairing.
+Preserved old helpers/diagnostics. Improved auth-first flow:archive passphrase
+only after login/identity/initial privileges; no automatic retries or resets.
+Three new mocked auth tests pass. No production retry or backup window reopened:
+valid existing DB credentials must be verified privately first; none retained.
+Details/hash:docs/PY35_ACTUAL_BACKUP_RUN.md. No migrations/push/deploy;35/36 stays.
 Latest99:owner reports BACKUP STOPPED. Private diagnostic identifies TLS
 certificate verification failure before authentication/SQL/dump; failed run
 supabase-backup-20261019T073609Z has only encrypted public-root PEM/error log,

@@ -1,5 +1,37 @@
 # Actual encrypted backup - owner-private execution, batch97
 
+## Current100: authentication rejected; do not blindly reopen
+
+Second owner attempt20261019T074829Z reports **password authentication failed**.
+The endpoint was reached; this is not a certificate or dump-version failure.
+Code passes the raw password as a driver keyword without shell/URL encoding,
+trimming or substitution. Tests confirm exact preservation of special characters.
+The log cannot distinguish a wrong entered password from a mismatched credential/
+account pair. No valid credential was retained. Do not reset credentials or
+change provider settings.
+
+| Check | Result |
+| --- | --- |
+| Connectivity/TLS | Prior TLS1.3 certificate/hostname check passed; latest attempt reached server authentication |
+| Authentication | FAILED:server rejected login |
+| Permissions/schema compatibility | NOT CHECKED:authentication blocked SQL |
+| Backup tools | Native dump/dumpall/restore17.11 verified; same major as reported17.6, not reached by failure |
+| Incomplete export | None:only encrypted CA/error log, no dump/roles/archive or success status |
+| Preservation | All failed runs and previous helper/launcher versions retained |
+
+Corrected prompt flow:one private DB password attempt; login, identity and initial
+read-privilege checks first; only then request the archive passphrase. No automatic
+retries or resets. Three new mocked tests pass:raw credential preservation, failed
+login skips archive prompts/exports, prompt order. No production retry or repeated
+setup tests. Previous helpers remain as `.before-auth-fix` copies outside Git.
+
+**Backup not reopened**, respecting the instruction to confirm the fix first.
+Essential next step:owner locates the existing database password privately in
+their password manager or existing backend connection configuration. This is not
+the Supabase website password or an API key. Never paste credentials, full URLs
+or logs into chat; do not read dotenv files or reset passwords. Successful private
+authentication is still required to check permissions and run the backup.
+
 ## Current99: TLS trust failure corrected; owner retry pending
 
 Owner's failed run20261019T073609Z stopped at certificate verification before
@@ -45,15 +77,17 @@ actual connection/export results are not yet observed. Database restoration NOT 
 
 ## Owner action
 
-Use the opened PowerShell window. If it did not appear, open normal Windows
-PowerShell and run (do not start another copy while the first is running):
+Current100:do not restart until the correct existing DB credentials are located
+privately. The command below remains the approved owner procedure for that step;
+no new window has been opened. Never run overlapping copies.
 
 ```powershell
 & "C:\Users\HP\AppData\Local\PriceYardPrivateBackup\Start-PriceYardEncryptedBackup.ps1"
 ```
 
-Enter the **existing Supabase database password** privately, then a **separate
-new archive passphrase** twice. Use at least24 printable English/ASCII characters
+Enter the **existing Supabase database password** privately. Only after successful
+login/identity/initial permission checks enter a **separate archive passphrase**
+twice. Use at least24 printable English/ASCII characters
 from your password manager (for portable 7-Zip recovery); keep it separately from
 the archive/Drive account. Type `BACKUP` when asked to start. Hidden prompts show
 no characters; this is normal. Never paste passwords or private logs into chat.
@@ -67,8 +101,8 @@ execution handoff for private credential entry, not another setup/approval reque
 The launcher and Python helper are outside Git in the private backup root, as are
 their four new guard-test results. The launcher pins the owning SID, private root
 ACL, existing EFS folder/key and the exact reviewed Python SHA256:
-`8d716edc9dcfc12571cc606a0a9d82c4c528c134735e8c9049c50212525b3c3c`.
-This supersedes the initial Windows-root-only helper hash recorded in batch97.
+`796d06803cfccc02be20839f1fd04f76234db49eb7a3423dc9a391b9fb31106d`.
+This supersedes the batch97 Windows-root-only and batch99 CA-fix helper hashes.
 
 - Reuses PG17.11/7-Zip26.04 and existing installed psycopg3.3.6; no installs or app
   imports/dotenv reads. The driver's existing libpq18 is only a connection client;

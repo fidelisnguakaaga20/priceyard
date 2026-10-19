@@ -6,6 +6,14 @@ No production services, credentials, customer data, migrations, provider sends,
 push, merge or deployment were used. Conditional deployment approval does not
 substitute for the required evidence.
 
+Current100:latest owner attempt FAILED authentication(server password rejection),
+not TLS. No dump/archive; diagnostics preserved. Native PG17.11 client versions
+confirmed, same major but never reached by failure. Permissions/actual schema
+compatibility remain unchecked. Auth-first prompt flow passes three new mocked
+tests; backup deliberately NOT reopened until valid credentials can be verified
+privately. No resets, production retry/SQL by Codex, migrations/push/deploy or
+new release-gate success. See[actual backup status](PY35_ACTUAL_BACKUP_RUN.md).
+
 Current99:actual owner backup attempt FAILED TLS certificate verification before
 SQL/dump, not data corruption. No dump/archive created; protected diagnostics
 preserved. Private CA trust corrected from official Supabase dashboard distribution,
