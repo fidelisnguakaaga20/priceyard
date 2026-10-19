@@ -25,6 +25,27 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest109:owner authorizes proactive local interface/security/maintainability
+enhancements without routine permission prompts; explicit refusal to open a
+credential window remains in force. Completed one dashboard reliability/privacy
+batch, preserving all prior work. Original browser reproduces two bugs:late
+checkout success redirects after navigation, late failure displays an obsolete
+global toast. Fix binds private reads/payment/clipboard completion to the active
+account/page, aborts obsolete requests, clears account data before paint, cleans
+copy timers and guards duplicate submissions. Current-account retry/redirect stay.
+Verified:TypeScript/Vite isolated build;8 targeted browser checks including
+cross-account stale error and read cancellation;14 Admin cards/totals/one-summary
+request/outage recovery; rendered Dashboard JSX exactly matches prior source.
+No external browser requests/page errors/real payments. One preview/browser phase
+at a time, existing dependency snapshot reused. Backend/schema unchanged, so no
+native PostgreSQL or backend suites rerun. Initial dummy success URL redirected
+through app fallback; harness corrected to existing local FAQ route before
+baseline reproduction. No guard bypass. Evidence:runtime/enhancement-109-summary
+and dashboard-race-before/after.json; docs/LOCAL_DASHBOARD_ENHANCEMENT_109.md.
+Preview synthetic-only127.0.0.1:55446.35/36 unchanged; PY35 real backup/restore/
+live release gates still pending. No credential window, production, migration,
+push/merge/deploy. Verified local commit authorized.
+
 Latest108:owner designates THIS conversation main session and resumes PY35 from
 actual latest Git state. Clean branch at0b9dab3285ee19a0a3d61e7fc13726a352c7c3bf;
 reported offline7b422e1 and latest0b9dab3 are confirmed ancestors, all changes

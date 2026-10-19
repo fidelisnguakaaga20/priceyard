@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ONBOARDING_TOUR_SEEN_EVENT, ONBOARDING_TOUR_SEEN_KEY } from "../components/OnboardingTour";
 import { useAuth } from "../context/AuthContext";
@@ -26,6 +26,12 @@ export function DashboardPage() {
   const [submissionStats, setSubmissionStats] = useState<SubmissionStats | null>(null);
   const [copied, setCopied] = useState(false);
   const [upgrading, setUpgrading] = useState<PaymentPlan | null>(null);
+  const accountKey = `${token ?? ""}:${user?.id ?? ""}:${user?.role ?? ""}`;
+  const activeAccount = useRef<string | null>(accountKey);
+  const pendingCheckout = useRef<AbortController | null>(null);
+  const checkoutBusy = useRef(false);
+  const copiedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  activeAccount.current = accountKey;
   const dismissOnboarding = () => {
     try { localStorage.setItem(ONBOARDING_KEY, "1"); } catch { /* ignore storage failures */ }
     setOnboardingDismissed(true);
@@ -36,31 +42,63 @@ export function DashboardPage() {
     window.addEventListener(ONBOARDING_TOUR_SEEN_EVENT, onSeen);
     return () => window.removeEventListener(ONBOARDING_TOUR_SEEN_EVENT, onSeen);
   }, [tourSeen]);
-  useEffect(() => {
-    if (!token || user?.role === "admin") return;
-    apiFetch<ReferralSummary>("/auth/referral-summary", {}, token).then(setReferral).catch(() => undefined);
-  }, [token, user?.role]);
-  useEffect(() => {
-    if (!token || user?.role !== "reporter") return;
-    apiFetch<SubmissionStats>("/price-updates/my-stats", {}, token).then(setSubmissionStats).catch(() => undefined);
-  }, [token, user?.role]);
+  useLayoutEffect(() => {
+    activeAccount.current = accountKey;
+    setReferral(null);
+    setSubmissionStats(null);
+    setCopied(false);
+    setUpgrading(null);
+    checkoutBusy.current = false;
+    const controller = new AbortController();
+    const current = () => !controller.signal.aborted && activeAccount.current === accountKey;
+    if (token && user && user.role !== "admin") {
+      void apiFetch<ReferralSummary>("/auth/referral-summary", { signal: controller.signal }, token)
+        .then((data) => { if (current()) setReferral(data); }).catch(() => undefined);
+      if (user.role === "reporter") {
+        void apiFetch<SubmissionStats>("/price-updates/my-stats", { signal: controller.signal }, token)
+          .then((data) => { if (current()) setSubmissionStats(data); }).catch(() => undefined);
+      }
+    }
+    return () => {
+      activeAccount.current = null;
+      controller.abort();
+      pendingCheckout.current?.abort();
+      pendingCheckout.current = null;
+      if (copiedTimer.current !== null) clearTimeout(copiedTimer.current);
+      copiedTimer.current = null;
+    };
+  }, [accountKey]);
   const copyReferralLink = async () => {
-    if (!referral) return;
+    if (!referral || activeAccount.current !== accountKey) return;
     try {
       await navigator.clipboard.writeText(referralLink(referral.referral_code));
+      if (activeAccount.current !== accountKey) return;
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      if (copiedTimer.current !== null) clearTimeout(copiedTimer.current);
+      copiedTimer.current = setTimeout(() => {
+        if (activeAccount.current === accountKey) setCopied(false);
+        copiedTimer.current = null;
+      }, 2000);
     } catch { /* clipboard unavailable */ }
   };
   const startUpgrade = async (plan: PaymentPlan) => {
-    if (!token || upgrading) return;
+    if (!token || upgrading || checkoutBusy.current || activeAccount.current !== accountKey) return;
+    checkoutBusy.current = true;
+    const controller = new AbortController();
+    pendingCheckout.current = controller;
+    const current = () => !controller.signal.aborted && activeAccount.current === accountKey && pendingCheckout.current === controller;
     setUpgrading(plan);
     try {
-      const result = await apiFetch<PaymentInitiateResponse>("/payments/initiate", { method: "POST", body: JSON.stringify({ plan }) }, token);
+      const result = await apiFetch<PaymentInitiateResponse>("/payments/initiate", { method: "POST", body: JSON.stringify({ plan }), signal: controller.signal }, token);
+      if (!current()) return;
       window.location.href = result.authorization_url;
     } catch (err) {
+      if (!current()) return;
       showToast((err as Error).message || "Could not start payment.", "error");
       setUpgrading(null);
+      checkoutBusy.current = false;
+    } finally {
+      if (pendingCheckout.current === controller) pendingCheckout.current = null;
     }
   };
   if (!user) return null;
