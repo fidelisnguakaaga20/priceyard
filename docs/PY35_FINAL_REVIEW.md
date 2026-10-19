@@ -24,6 +24,9 @@ Windows-local setup91 has an empty private folder outside Git with verified
 user/SYSTEM ACL; it is NOT encrypted. Bundled7za23.01/PG18 found, PG17 missing in
 standard installation, BitLocker status unverified. No customer export/restore or
 upload. Next:[PY35_WINDOWS_BACKUP_SETUP.md](PY35_WINDOWS_BACKUP_SETUP.md).
+Stage92 supersedes the missing standalone-encryption-tool status:7-Zip26.04
+verified with eight synthetic AES-256/filename/password/restore checks; artifacts
+outside Git, no real password. PG17/protected disk and actual backup remain pending.
 
 | Setting | Backend | Frontend |
 | --- | --- | --- |

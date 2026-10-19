@@ -23,15 +23,49 @@ the fixed folder with its private ACL at creation. Existing targets/redirected
 parents cause refusal; do not rerun/reset its permissions. Successful execution
 used the owner-authorized outside-workspace location. Evidence:batch-91-private-folder.json.
 
-## Next owner step
+## Stage 2 verified: archive encryption - 2026-10-19
+
+Owner installed standalone7-Zip26.04 x64. Executable/DLL version and hashes
+recorded privately; startup works. Authenticode reports NotSigned, so these hashes
+are local inventory, not independent publisher attestation. Official7-Zip site
+lists the same version; no execution policy or signature restriction changed.
+
+Eight sequential synthetic checks PASS with installed7z.exe:archive creation,
+missing/wrong password listing denied, missing/wrong extraction denied, correct
+listing, correct archive integrity and correct extraction.7z reports7zAES and
+Encrypted=+; headers/names stay unreadable without the password, and the literal
+test filename is absent from archive bytes.146 fabricated bytes restore exactly;
+archive401 bytes. One worker/1MiB dictionary/15s per-command timeout.
+
+All runners, fabricated source, archives, failed/successful extraction folders
+and JSON evidence stay OUTSIDE Git under
+`C:\Users\HP\AppData\Local\PriceYardPrivateBackup`.
+Successful result:`encryption-check-20261019-verified\encryption-results.json`.
+Temporary random test password generated in memory, supplied on redirected stdin,
+never in process arguments/logs/files, never requested from the owner and not
+retained. Thus this disposable archive is a test artifact, not a reusable backup.
+
+Initial harness incorrectly supplied bare `-p` on read operations:7-Zip treated
+that as an explicit empty password instead of prompting, so the correct-password
+stage failed. Preserved the original fixture/runner and one tiny diagnostic probe.
+Corrected read invocation uses the private password prompt; all eight checks pass.
+No security restriction bypass or ACL weakening. Initial sandbox read denial for
+the private folder was handled through normal authorized outside-workspace access.
+
+Archive encryption functionality is READY for the scoped setup. Full real-data
+backup setup is NOT ready:PG17 missing, disk encryption/protected restore storage
+unverified, source access/scope and actual restoration still pending. No Supabase,
+customer export, upload, database commands, migration or deployment occurred.
+
+## Earlier installation instruction (completed)
 
 Open https://www.7-zip.org/download.html and install the current64-bit x64 Windows
 version (official site currently lists26.04). It is free. Tell Codex when installed;
 do not send any password/key. No tool was downloaded/installed by this stage.
 Source:[official7-Zip](https://www.7-zip.org/).
 
-Then verify provenance/version and tiny invented-file encryption/decryption before
-trusting real data. Archives must use7z/AES-256/encrypted filenames, with the
+The tiny invented-file encryption/decryption drill above is complete. Archives
+must use7z/AES-256/encrypted filenames, with the
 password entered privately in the native UI/prompt, never chat/scripts/process
 arguments. Use low compression, one worker and bounded memory. Compression or
 pg_dump custom format alone is not encryption.

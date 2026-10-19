@@ -12,6 +12,10 @@ Initial tool/folder inspection completed2026-10-19; empty ACL-protected folder
 created outside Git, NOT yet encrypted. PostgreSQL17/encryption/restore setup
 remain incomplete. Next:[PY35_WINDOWS_BACKUP_SETUP.md](PY35_WINDOWS_BACKUP_SETUP.md).
 No actual export/upload/restoration approved before setup verification.
+Stage92:owner-installed7-Zip26.04 starts; eight invented-file AES-256/header/
+missing-and-wrong-password/correct-restore checks pass. All artifacts and test
+password handling stay outside Git; no real password used. Archive encryption
+ready, but PG17 and encrypted local restore storage remain unverified.
 
 ## Owner-reported inspection results - 2026-10-19
 

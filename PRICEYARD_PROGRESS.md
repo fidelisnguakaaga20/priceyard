@@ -25,6 +25,16 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest setup92:owner-installed7-Zip26.04 passes eight synthetic encryption checks:
+AES-256/header encryption, missing/wrong password listing/extraction rejection,
+correct listing/integrity and exact restore.146 fabricated bytes/401-byte archive,
+single worker/1MiB dictionary. All test runners/files/results outside Git in the
+private folder; temporary password stdin-only, never saved/displayed or retained.
+Initial bare-p read-switch harness error corrected/preserved, no ACL bypass.
+Archive encryption ready; overall backup NOT ready:PG17/disk encryption/private
+restore storage/source access and actual restoration still pending. No production,
+exports, uploads, database/migration commands or deployment. Scope/results:
+docs/PY35_WINDOWS_BACKUP_SETUP.md.35/36 complete; no live gate newly passed.
 Latest setup91:owner requests free Windows preparation, optional encrypted Drive
 copy. Created/verified EMPTY ACL-restricted folder outside Git:
 C:\Users\HP\AppData\Local\PriceYardPrivateBackup. NOT encrypted. Found bundled
