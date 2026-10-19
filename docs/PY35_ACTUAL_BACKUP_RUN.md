@@ -1,5 +1,32 @@
 # Actual encrypted backup - owner-private execution, batch97
 
+## Current115: bounded Docker startup failed; real backup untouched
+
+After owner READY, host free RAM was2.61GiB. Docker was the only installed WSL
+distro and was stopped. Created a new temporary .wslconfig with1GiB/one CPU/swap0,
+recording original file absence and SHA256. Started existing Docker Desktop; no
+image pulled, test container created or real archive loaded. Explicit local-only
+named-pipe engine readiness query timed out after15 seconds. Guest memory probe
+showed920068KiB total,30520KiB available,swap0. No confirmed kernel OOM; classified
+local logs show timeout. Exact startup root cause remains UNCONFIRMED.
+
+Stopped rather than increasing limits on a pressured host. Initial graceful-stop
+command returned125; next normal stop remained pending during cleanup, eventually
+returning0. Terminated only the test-started
+Docker process IDs and their WSL distro, then confirmed WSL stopped and no related
+processes. Original Docker disk/images/containers and backup files not deleted.
+Archived the newly-created settings under private root, checked its recorded
+hash, removed only that new file and restored the previous no-.wslconfig state.
+
+Evidence: private docker-feasibility-result.json and resource-config record.
+This is an infrastructure readiness failure BEFORE synthetic-container tests,
+not a failed customer restoration or failed backup. Adequate host memory and
+resolved Docker startup are needed before another attempt; owner normal reboot
+may free RAM but is not a confirmed fix. No automatic retry/limit increase/image
+download/cloud project or plaintext Docker restore. No source backup repetition,
+credentials, production connection, SQL/migration, app changes, push or deploy.
+35/36 unchanged; actual encrypted archive passed, full recovery still unverified.
+
 ## Current114: existing Docker inspected; no restoration started
 
 Docker Desktop/CLI exist, but WSL docker-desktop and Docker processes are stopped.

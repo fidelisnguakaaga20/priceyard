@@ -25,6 +25,28 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest115: owner READY; host still only2.61GiB free. For one fabricated-only
+feasibility attempt, created previously absent .wslconfig limiting the sole WSL
+docker-desktop distro to1GiB/one CPU/swap0; original absence recorded. Started
+existing Docker Desktop (no image download). Explicit local Linux named-pipe
+engine query timed out at15 seconds before cached-image/container inventory.
+Guest /proc confirms920068KiB total,30520KiB available,swap0. No kernel OOM
+confirmed; available local logs show startup timeout, not an established root
+cause. Do NOT claim proven OOM or assume another startup will fix compatibility.
+No new test container/image, customer restore, SQL, production connection or app
+edit. Stopped attempt rather than raising limits under host memory pressure.
+First graceful Docker stop returned125; subsequent normal stop remained pending
+during cleanup and eventually returned0. Stopped only test-started Docker PIDs
+and its WSL distro. Verified WSL stopped, no Docker/WSL
+processes left. Archived new .wslconfig under private backup root, hash checked
+before removing only that newly-created file; original no-config state restored.
+Private docker-feasibility-result.json records bounded failure/cleanup. Backup
+archive preserved;35/36, full recovery still NOT VERIFIED. Before retry, require
+adequate host memory and resolve Docker startup readiness; a normal owner reboot
+may free memory but is NOT a confirmed Docker fix. Do not repeat source backup,
+request passwords, install/download images, raise limits or use unencrypted
+Docker volumes automatically. No migration/push/merge/deploy.
+
 Latest114: read-only local Docker feasibility check only; no daemon/container
 startup, production connection, image download or customer restoration. Docker
 Desktop/CLI are installed; WSL docker-desktop is stopped. Existing Docker data

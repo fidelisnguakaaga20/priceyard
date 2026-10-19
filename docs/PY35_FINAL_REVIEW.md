@@ -1,5 +1,12 @@
 # PriceYard final review - batch 87
 
+Current115: the local Docker fallback did not reach engine readiness inside a
+1GiB/one-CPU/no-swap limit while host memory was low. No image/test container or
+customer restore executed. Exact Docker startup cause is unconfirmed; no OOM
+claim. Test Docker/WSL stopped and temporary settings archived/undone. Real
+encrypted archive remains verified, recovery blocked. Do not retry automatically
+or substitute unencrypted Docker volumes. See current115 in the actual run log.
+
 **35/36 complete; PY-35 partial. Deployment is blocked.** Current113 supersedes
 historical statuses below: an explicitly approved read-only production backup
 now PASSED encrypted archive/integrity checks using owner-private credentials.
