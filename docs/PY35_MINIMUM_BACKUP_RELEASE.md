@@ -38,6 +38,13 @@ queried. No Render/Supabase operator connection established.
 
 ## Minimum immediate owner actions
 
+Current96 supersedes the historical export instructions below:owner completed
+the helper; recovery validation and ciphertext digest independently checked.
+Matching key/RSA challenge/AES256 pass. Do not export again. Next create/retrieve
+one private off-computer encrypted PFX copy and run the prepared comparison
+helper; see [current owner steps](PY35_CONNECTION_AND_KEY_CHECK.md). Comparison
+and actual production backup remain pending. No upload performed by Codex.
+
 Current95:connection metadata supplied, do not request it again. EFS folder/ACL
 valid but no recovery PFX present. Use the single owner helper described in
 [PY35_CONNECTION_AND_KEY_CHECK.md](PY35_CONNECTION_AND_KEY_CHECK.md):AES256 PFX

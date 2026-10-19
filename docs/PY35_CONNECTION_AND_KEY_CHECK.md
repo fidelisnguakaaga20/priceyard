@@ -1,5 +1,48 @@
 # Source details and local recovery-key step - batch95
 
+## Current step - batch96: separate protected recovery copy
+
+Owner completed the original helper successfully. Non-secret result and
+ciphertext metadata independently agree: AES256 protection, matching private key,
+RSA challenge passed;2708-byte PFX matches recorded SHA256. No private key opened
+by Codex. The earlier missing-PFX/helper-not-run statements below are history.
+Do not rerun the original export.
+
+1. Sign in to your own Google Drive. In **My Drive**, choose **New > File upload**.
+   Select only `C:\Users\HP\AppData\Local\PriceYardPrivateBackup\RecoveryKeys\PriceYard-EFS-Recovery.pfx`.
+   This is already password-encrypted; never upload its password, the workspace,
+   or unencrypted exports. Use an unshared location, not a shared drive/folder.
+2. Open the uploaded file's **Share** settings: only your account may have access;
+   **General access: Restricted**. Restricted alone does not remove named users
+   or inherited folder access. Keep the passphrase separately in a trusted
+   password manager/safe paper, with Google two-step verification enabled.
+3. Download that uploaded file into Downloads. In normal Windows PowerShell run:
+
+   ```powershell
+   & "C:\Users\HP\AppData\Local\PriceYardPrivateBackup\Confirm-PriceYardRecoveryCopy.ps1"
+   ```
+
+   Press Enter if the default downloaded path is correct; otherwise enter its
+   local path. Type `PRIVATE COPY` only after checking the sharing settings.
+   Reply **COPY VERIFIED**, or error text without secrets. Never send the file,
+   password or sharing link. Do not bypass execution-policy restrictions.
+
+The helper only compares ciphertext size/hash against the validated original
+and records the owner's remote/privacy confirmation. It does not upload,
+decrypt, request passwords, query Drive permissions or contact Supabase. Syntax
+validation passed; actual downloaded-copy comparison is still pending. No
+fresh-Windows certificate recovery or production-backup success is claimed.
+
+After copy verification, next scope is the source-pinned, privately prompted
+read-only backup: PG17 tools, validated TLS, exports/logs/TEMP inside EFS,
+AES256/header-encrypted portable archive, then a new protected local17 restore.
+Review managed-object/extension coverage and isolation before restore; stop on
+unsupported objects. No migration or deployment before verified recovery and
+separate release authorization. No production access has occurred.
+
+Official instructions: [Drive upload](https://support.google.com/drive/answer/2424368?co=GENIE.Platform%3DDesktop&hl=en)
+and [Drive sharing](https://support.google.com/drive/answer/7166529?hl=en).
+
 Owner-confirmed production Session pooler, project lrvpjfbtmftjkzaxbunk:
 
 | Setting | Value |

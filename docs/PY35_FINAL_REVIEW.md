@@ -6,6 +6,14 @@ No production services, credentials, customer data, migrations, provider sends,
 push, merge or deployment were used. Conditional deployment approval does not
 substitute for the required evidence.
 
+Current96:owner-local recovery PFX export succeeded; non-secret validation and
+ciphertext metadata independently confirm AES256, matching private key/challenge
+and matching saved digest. Earlier absent-key statuses below are superseded.
+Separate private off-computer copy/retrieval comparison remains pending; helper
+prepared outside Git with syntax check only. No actual production backup, source
+connection, upload by Codex or new live gate pass. Next owner action:
+[protected recovery copy](PY35_CONNECTION_AND_KEY_CHECK.md).
+
 ## Owner-confirmed hosting update - 2026-10-18
 
 These references were supplied by the owner from Render, not independently

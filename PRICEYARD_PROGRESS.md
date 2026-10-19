@@ -25,6 +25,16 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest96:owner reports recovery helper succeeded. Independently checked only
+non-secret validation metadata and ciphertext hash/length: AES256 protection,
+matching private key and RSA challenge passed;2708-byte PFX matches saved digest.
+No key decrypted by Codex. Separate off-computer recovery copy not yet verified.
+Prepared owner-operated Confirm-PriceYardRecoveryCopy.ps1 outside Git; syntax
+check passes, real retrieval comparison NOT executed. Owner uploads only the
+password-encrypted PFX to private My Drive, downloads it and compares ciphertext;
+sharing privacy is owner-confirmed, not independently queried. See current step
+in docs/PY35_CONNECTION_AND_KEY_CHECK.md. No repeated database/app tests, source
+connection, customer export, upload by Codex, migration or deployment.35/36 stays.
 Latest95:owner supplied Session pooler aws-0-eu-west-2.pooler.supabase.com:5432,
 postgres database, postgres.lrvpjfbtmftjkzaxbunk user. No password, connection or
 export. Existing EFS workspace/probe/ACL reverified; no recovery PFX exists at
