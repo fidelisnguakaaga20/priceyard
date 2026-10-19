@@ -25,6 +25,11 @@ a new private folder; a focused PG17 fabricated restore verifies encryption of
 all database/log/temp files. EFS certificate recovery and secure Supabase access
 remain pending, so actual customer backup is not yet performed. Current concise
 scope:[PY35_MINIMUM_BACKUP_RELEASE.md](PY35_MINIMUM_BACKUP_RELEASE.md).
+Current95:source endpoint/user now supplied without password. EFS encryption/ACL
+rechecked; no PFX found at instructed locations. Prepared owner-local recovery-key
+helper and six fabricated validator checks; owner must run it privately before
+any production access. No new installations/tests of already-passed DB workflows.
+Next:[PY35_CONNECTION_AND_KEY_CHECK.md](PY35_CONNECTION_AND_KEY_CHECK.md).
 
 ## Owner-reported inspection results - 2026-10-19
 

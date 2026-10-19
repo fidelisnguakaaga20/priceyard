@@ -25,6 +25,16 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest95:owner supplied Session pooler aws-0-eu-west-2.pooler.supabase.com:5432,
+postgres database, postgres.lrvpjfbtmftjkzaxbunk user. No password, connection or
+export. Existing EFS workspace/probe/ACL reverified; no recovery PFX exists at
+instructed locations. Owner-local Save-PriceYardRecoveryKey.ps1 prepared outside
+Git:SecureString prompts, NoClobber AES256_SHA256 export, matching certificate/
+private RSA challenge with ephemeral loading, no cert-store import/deletion.
+Six fabricated validator tests pass; real owner key workflow NOT executed. Next:
+owner runs helper and replies READY/error; no secret values in chat. Details:
+docs/PY35_CONNECTION_AND_KEY_CHECK.md. No redundant native/app tests, production,
+customer export, migration, upload, push/merge/deploy.35/36 still/PY-35 partial.
 Latest94:owner rejects partitions/disks/unnecessary infrastructure. Built-in EFS
 works on new PrivateRestoreEfs folder outside Git. One newly necessary PG17 EFS
 restore check passes using existing fabricated dump, no repeat export/crypto/full

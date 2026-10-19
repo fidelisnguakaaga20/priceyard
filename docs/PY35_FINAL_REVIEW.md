@@ -38,6 +38,11 @@ GitHub get_repo/search_branches now confirm readable repository/master and calle
 permissions; repository access is no longer missing. No remote writes. Actual
 backup/key recovery/Supabase access and provider/host release gates still pending.
 Minimum owner actions:[PY35_MINIMUM_BACKUP_RELEASE.md](PY35_MINIMUM_BACKUP_RELEASE.md).
+Current95:owner supplied Session pooler host aws-0-eu-west-2.pooler.supabase.com,
+port5432/database postgres/user postgres.lrvpjfbtmftjkzaxbunk. No password or DB
+connection. EFS workspace remains valid; recovery PFX absent. Owner-local helper
+prepared for AES256 PFX export/matching-private-key validation; six fabricated
+validator tests pass, real helper not executed. Next:[PY35_CONNECTION_AND_KEY_CHECK.md](PY35_CONNECTION_AND_KEY_CHECK.md).
 
 | Setting | Backend | Frontend |
 | --- | --- | --- |
@@ -195,7 +200,7 @@ remain unverified. No Git fetch/push was performed.
 | Area | Missing information/access | How the owner can provide it securely |
 | --- | --- | --- |
 | Render | Owner confirmed services/domains/master and migration-running backend build above. Still need workspace/operator access, frontend Auto-Deploy/build/root, current runtime/start/routing settings and isolated hosted test target | Share only remaining non-secret settings or supported least-privilege operator access. Backend Auto-Deploy is On Commit: no push/merge to master or setting changes now |
-| Supabase | Owner confirmed priceyard/lrvpjfbtmftjkzaxbunk, Free/no managed backups; reported17.6/14 MB/0021. Complete schema/permissions/extensions and recoverable backup remain unverified; Codex authenticated access not established | Reuse completed owner inspection; approve private encryption/storage/17 restore tooling and secure operator password entry before export. No Codex production connection or role/grant change performed |
+| Supabase | Owner supplied exact Session pooler endpoint/username95 and reported17.6/14 MB/0021, Free/no backups. Full schema/permissions/extensions/TLS/auth and actual backup remain unverified | EFS/PG17 already verified; owner runs local recovery-key helper first, then private DB password entry at reviewed backup prompt. Do not request connection details again or secrets in chat; no production/role/grant change performed |
 | GitHub | Read-only get_repo/search_branches94 confirm repository/default master and caller pull/push/admin permissions. Full deployed commit identities/candidate remote publication remain unverified | No new repository-access grant needed. Do not push/merge or change settings: linked master automatically builds/migrates production. Candidate stays local |
 | Actual backup/rollback | Approved backup source, encrypted off-host destination/retrieval access, isolated restore target, operator, retention and recovery objectives; compatible rollback artifact | Choose the targets/operator and approve actual-backup handling separately. Use host secret storage and private encrypted files; share only storage references and redacted verification results, never a customer dump in chat |
 | Provider verification | Paystack TEST credentials and reachable nonproduction callback/webhook; Google test origin/client/accounts; test message sender and consenting recipients | Enter test-only configuration into approved protected storage yourself/operator; share only secure storage references, URLs and approved recipient identities. Never share account passwords, live keys or real cards |

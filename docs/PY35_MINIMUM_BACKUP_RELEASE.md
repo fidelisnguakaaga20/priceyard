@@ -38,6 +38,13 @@ queried. No Render/Supabase operator connection established.
 
 ## Minimum immediate owner actions
 
+Current95:connection metadata supplied, do not request it again. EFS folder/ACL
+valid but no recovery PFX present. Use the single owner helper described in
+[PY35_CONNECTION_AND_KEY_CHECK.md](PY35_CONNECTION_AND_KEY_CHECK.md):AES256 PFX
+export AND matching-private-key validation, no certificate-store import. Six
+fabricated validator tests pass; actual owner key workflow not run. Earlier manual
+cipher command below remains history; the helper supersedes it. No production yet.
+
 1. Back up the EFS certificate/key privately. Open PowerShell as your normal
    Windows account and run the command below. Confirm the Windows prompt and
    choose its protection password locally; never send password/key/PFX here.
@@ -52,11 +59,11 @@ queried. No Render/Supabase operator connection established.
    Recovery file needs a separately controlled copy, not only this PC, before
    disaster-recovery acceptance. Do not upload/share it under current authority.
    Its private-key/password validation must be operator-local, no secret chat.
-2. In Supabase priceyard > Connect > Session pooler, provide ONLY host, port,
-   database name and username. Never paste the full connection URL/password/API
-   key. Do not reset credentials. Existing password and real backup passphrase
-   must be entered only at the reviewed owner-operated local native prompt.
-   No .env or production credential store was opened. Actual DB access absent.
+2. Supplied:aws-0-eu-west-2.pooler.supabase.com:5432, database postgres,
+   username postgres.lrvpjfbtmftjkzaxbunk. No password/authentication provided.
+   Never send full URLs/passwords or reset credentials. Existing DB password goes
+   only in the later reviewed owner-local prompt after recovery verification.
+   No .env/production credential store opened; actual DB access absent.
 
 These are genuine access/recovery prerequisites, not another tool installation.
 No additional project, service, purchase, partition or disk-format task is needed.
