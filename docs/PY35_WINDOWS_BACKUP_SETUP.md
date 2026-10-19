@@ -72,6 +72,12 @@ pg_dump custom format alone is not encryption.
 
 ## Remaining setup before actual data
 
+Current94 direction:supersedes disk/container proposals. Built-in EFS directory
+and one new encrypted-filesystem fabricated restoration pass, no disk changes or
+new tools. Minimum next actions are private EFS recovery-key backup and Supabase
+connection metadata. See[PY35_MINIMUM_BACKUP_RELEASE.md](PY35_MINIMUM_BACKUP_RELEASE.md).
+No original crypto/native/application suite needs repeating.
+
 Stage93 update:owner confirmed C: BitLocker OFF. Portable PostgreSQL17.11 tools
 and a five-table/ten-row encrypted fabricated backup/independent restoration pass.
 Both sequential local17 clusters are stopped. Existing18 untouched. Actual

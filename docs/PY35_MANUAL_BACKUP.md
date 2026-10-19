@@ -20,6 +20,11 @@ Stage93 supersedes PG17-tool absence:portable17.11 version checks and fabricated
 encrypted backup/independent local restore pass. C: BitLocker OFF, so actual
 customer-data storage/restore remains blocked; synthetic fixtures cannot be reused
 for customer data. See[PY35_PG17_SETUP_RESULTS.md](PY35_PG17_SETUP_RESULTS.md).
+Current94:owner rejects new disks/partitions. Existing Windows EFS now protects
+a new private folder; a focused PG17 fabricated restore verifies encryption of
+all database/log/temp files. EFS certificate recovery and secure Supabase access
+remain pending, so actual customer backup is not yet performed. Current concise
+scope:[PY35_MINIMUM_BACKUP_RELEASE.md](PY35_MINIMUM_BACKUP_RELEASE.md).
 
 ## Owner-reported inspection results - 2026-10-19
 

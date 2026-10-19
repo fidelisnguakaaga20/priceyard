@@ -25,6 +25,18 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest94:owner rejects partitions/disks/unnecessary infrastructure. Built-in EFS
+works on new PrivateRestoreEfs folder outside Git. One newly necessary PG17 EFS
+restore check passes using existing fabricated dump, no repeat export/crypto/full
+suite:5 tables/10 rows/roles/schema/sequences/grants match, all1,302 new data/log/
+temp files EFS-encrypted, checksums pass, cluster55452 stopped. EFS recovery key
+not exported/verified; actual backup still not done. No production credentials
+available; async owner question asks only Session pooler host/port/db/username,
+never password/URL. GitHub connector read-only repo/master checks succeed with
+caller permissions; no repository-access grant needed or remote writes performed.
+docs/PY35_MINIMUM_BACKUP_RELEASE.md contains current shortest sequence/owner steps.
+Old Disk Management/VHD proposals superseded.35/36 complete/PY-35 partial; no
+production, customer exports, migrations, uploads or deploy. Key/access still gate.
 Latest setup93:owner confirms C: BitLocker OFF. Portable PG17.11 bin/share/lib
 prepared outside Git from official PostgreSQL-linked EDB source, no services/PATH
 changes. Five-table/ten-row fabricated dump/roles/AES-256/header/decrypt/independent

@@ -77,6 +77,12 @@ unencrypted C: and must NEVER receive customer data. No original files deleted.
 
 ## Remaining protection step - owner-operated Windows administration
 
+**Superseded by owner direction/batch94:**no virtual disk or partition. Existing
+Windows EFS folder encryption and a new fabricated PG17 restore on EFS now pass.
+Use[PY35_MINIMUM_BACKUP_RELEASE.md](PY35_MINIMUM_BACKUP_RELEASE.md); do NOT follow
+the historical Disk Management action below. EFS key recovery/source access and
+actual backup remain prerequisites.
+
 The session is not Windows-administrator, so it cannot safely create/mount and
 BitLocker-encrypt a new virtual volume here. Do not weaken existing folder ACLs
 or put actual exports/data on C: then encrypt/delete them afterward.

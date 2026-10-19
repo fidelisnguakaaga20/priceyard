@@ -32,6 +32,12 @@ backup/restoration now pass; roles/ownership/grants/schema/sequences match in a
 separate cluster, both stopped. Owner confirms BitLocker OFF. Customer-data
 workspace/host protection requires owner-admin setup; real backup remains blocked.
 See[PY35_PG17_SETUP_RESULTS.md](PY35_PG17_SETUP_RESULTS.md). No live gate passed.
+Current94 supersedes virtual-disk proposals:built-in EFS/new encrypted folder and
+focused fabricated PG17 restore pass, all1,302 database/log/temp files encrypted.
+GitHub get_repo/search_branches now confirm readable repository/master and caller
+permissions; repository access is no longer missing. No remote writes. Actual
+backup/key recovery/Supabase access and provider/host release gates still pending.
+Minimum owner actions:[PY35_MINIMUM_BACKUP_RELEASE.md](PY35_MINIMUM_BACKUP_RELEASE.md).
 
 | Setting | Backend | Frontend |
 | --- | --- | --- |
@@ -181,21 +187,22 @@ acceptable data-loss window and recovery time must pass before rollout.
 
 ## Exact missing access and safe provision
 
-No Render/Supabase authenticated tooling or approved targets are established in
-this session. A GitHub connector is available; this repository's permissions and
-remote candidate publication are unverified. No remote fetch/push was performed.
+Render/Supabase targets are owner-identified, but authenticated operator access
+is not established. GitHub repository/default-master read access and caller
+permissions were verified94; candidate publication/full deployed artifact IDs
+remain unverified. No Git fetch/push was performed.
 
 | Area | Missing information/access | How the owner can provide it securely |
 | --- | --- | --- |
 | Render | Owner confirmed services/domains/master and migration-running backend build above. Still need workspace/operator access, frontend Auto-Deploy/build/root, current runtime/start/routing settings and isolated hosted test target | Share only remaining non-secret settings or supported least-privilege operator access. Backend Auto-Deploy is On Commit: no push/merge to master or setting changes now |
 | Supabase | Owner confirmed priceyard/lrvpjfbtmftjkzaxbunk, Free/no managed backups; reported17.6/14 MB/0021. Complete schema/permissions/extensions and recoverable backup remain unverified; Codex authenticated access not established | Reuse completed owner inspection; approve private encryption/storage/17 restore tooling and secure operator password entry before export. No Codex production connection or role/grant change performed |
-| GitHub | Owner confirmed `fidelisnguakaaga20/priceyard`; authenticated repository permissions/current remote state and full deployed commits remain unverified; candidate branch is local | Authorize the existing GitHub connection for only that repository if needed. No push/merge now: linked master automatically builds and migrates production |
+| GitHub | Read-only get_repo/search_branches94 confirm repository/default master and caller pull/push/admin permissions. Full deployed commit identities/candidate remote publication remain unverified | No new repository-access grant needed. Do not push/merge or change settings: linked master automatically builds/migrates production. Candidate stays local |
 | Actual backup/rollback | Approved backup source, encrypted off-host destination/retrieval access, isolated restore target, operator, retention and recovery objectives; compatible rollback artifact | Choose the targets/operator and approve actual-backup handling separately. Use host secret storage and private encrypted files; share only storage references and redacted verification results, never a customer dump in chat |
 | Provider verification | Paystack TEST credentials and reachable nonproduction callback/webhook; Google test origin/client/accounts; test message sender and consenting recipients | Enter test-only configuration into approved protected storage yourself/operator; share only secure storage references, URLs and approved recipient identities. Never share account passwords, live keys or real cards |
 
-The existing GitHub connector has not been tested for repository access. No claim
-of a missing login or denied permission is made without a failed access check.
-Sharing an access reference does not authorize production writes or deployment.
+The existing GitHub connector's read-only repository checks now succeed; no new
+GitHub login or permission grant is required for those reads. Neither available
+write permissions nor sharing access references authorize publishing/deployment.
 
 ## All nine gates still open
 
