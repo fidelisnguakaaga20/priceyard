@@ -25,6 +25,21 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest106:owner approves ONE controlled read-only production backup and isolated
+PG17 restore using verified7b422e1 procedure. Current Git initially clean at that
+commit; application/private helper code unchanged. Local reconfirmation PASSES:
+owner-only ACL/EFS, current non-exporting private-key sign/verify challenge,
+unchanged verified recovery-copy evidence, free space, helper/restore hashes and
+no running backup/diagnostic. Automatic approval review REJECTED the combined
+preflight/window-launch command BEFORE execution, interpreting a visible
+PowerShell window as conflicting with requested hidden credential entry.
+The separate local-only reconfirmation was approved and passed. No workaround,
+alternate launch, credentials, production connection, export/backup, local real
+data restore or migration occurred. No actual backup attempt was consumed.
+STOP:explicit clarification/approval for a visible private local console whose
+credential input is hidden is needed before another launch review. Do not ask
+for secrets in chat or repeat completed setup.35/36; actual backup still unverified.
+
 Latest105:owner authorizes correction/review and complete FABRICATED offline
 verification only; no prompt, credentials, production connection or actual backup.
 Corrected unsupported psycopg3.3.6 PGconn.ssl_attribute call; supported native

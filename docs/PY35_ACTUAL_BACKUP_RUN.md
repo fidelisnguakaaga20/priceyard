@@ -1,5 +1,24 @@
 # Actual encrypted backup - owner-private execution, batch97
 
+## Current106: protection reconfirmed; launch blocked before production access
+
+Owner now approves ONE controlled read-only backup and protected PG17 restore.
+Existing owner ACL, EFS encryption, private-key sign/verify challenge, unchanged
+recovery/second-copy evidence, available space, verified helper hashes and absence
+of active backup processes pass local checks. No setup was recreated.
+
+Automatic approval review rejected the combined preflight/interactive-window
+command before execution:it interpreted a visible PowerShell window as conflicting
+with requested hidden credential entry. The approved helper uses getpass in a
+private TTY and hides typed secrets; it does not capture them in tool output.
+A separate local-only reconfirmation passed. No indirect/alternative launch was
+attempted, and no credentials or production connection occurred. Thus no new
+production backup or restoration succeeded or failed; they have NOT STARTED.
+
+Stop for explicit clarification/approval of the visible local console with hidden
+credential entry before another launch review. No passwords in chat, repeated
+preparation, TLS weakening, migrations, push, merge or deployment.
+
 ## Current105: offline procedure verified; actual backup remains unverified
 
 Owner authorizes offline correction and fabricated full-procedure verification,
