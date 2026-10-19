@@ -25,6 +25,18 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest97:owner explicitly authorizes actual encrypted Supabase backup and isolated
+restoration, no migrations/push/deploy. Owner confirms private Drive recovery copy;
+read non-secret second-copy report:retrieval digest matches, privacy owner-confirmed
+(not queried). Existing setup/PG17/encryption suites not repeated. Prepared
+Start-PriceYardEncryptedBackup.ps1/.py outside Git with pinned source, hidden
+owner prompts, verify-full TLS/public Windows CA roots, readonly source/snapshot,
+full custom dump/password-free roles, same-snapshot table digests, AES256/header
+archive and verified EFS-decrypted copy. Four NEW guard tests pass; actual helper
+NOT run:owner must enter existing DB password privately. No source connection or
+customer export by Codex. Launcher preparation path-variable error fixed before
+execution. Restore remains NOT RUN; managed-object/extension/isolation review must
+precede executing restored SQL. Details:docs/PY35_ACTUAL_BACKUP_RUN.md.35/36 stays.
 Latest96:owner reports recovery helper succeeded. Independently checked only
 non-secret validation metadata and ciphertext hash/length: AES256 protection,
 matching private key and RSA challenge passed;2708-byte PFX matches saved digest.

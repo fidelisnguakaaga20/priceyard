@@ -1,5 +1,12 @@
 # PY-35 manual backup preparation - production not accessed
 
+Current batch97 supersedes historical setup blockers below. Owner completed
+encrypted key export and separate private Drive retrieval/hash comparison, then
+explicitly authorized the actual read-only backup/isolated restoration. Tools and
+EFS setup already verified. Prepared owner-only command uses private prompts;
+has NOT connected/exported yet. See [current execution step](PY35_ACTUAL_BACKUP_RUN.md).
+No new approval for migrations, pushes or deployment. No recoverable-backup claim.
+
 Owner-confirmed source:Supabase `priceyard`, reference
 `lrvpjfbtmftjkzaxbunk`, Free plan, no managed backups. No successful backup,
 restore or complete production compatibility check is claimed. All nine live release

@@ -6,6 +6,14 @@ No production services, credentials, customer data, migrations, provider sends,
 push, merge or deployment were used. Conditional deployment approval does not
 substitute for the required evidence.
 
+Current97:owner confirmed separately retrieved protected recovery copy; non-secret
+report checked. Actual read-only backup/isolated restore now explicitly authorized,
+but no password or source connection available to Codex. Owner-only backup helper
+prepared outside Git;four new safety guards pass. Owner runs private prompts next:
+[actual backup step](PY35_ACTUAL_BACKUP_RUN.md). Database restoration, actual
+compatibility and all mandatory live gates remain unverified. No migration/push/
+deployment authorized or executed.
+
 Current96:owner-local recovery PFX export succeeded; non-secret validation and
 ciphertext metadata independently confirm AES256, matching private key/challenge
 and matching saved digest. Earlier absent-key statuses below are superseded.
