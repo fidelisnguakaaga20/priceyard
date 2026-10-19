@@ -1,5 +1,45 @@
 # Actual encrypted backup - owner-private execution, batch97
 
+## Current102: successful login; source-validation mismatch not yet identified
+
+Latest owner run20261019T080749Z fails with
+`Source identity/version/TLS/read-only/revision differs; no dump created`.
+The exact code path proves authenticated connection and SELECT of identity and
+Alembic metadata completed. Render credential works for the approved pooler;
+there is no evidence of stale credentials or password-encoding failure in this
+attempt. Do not reset/retrieve/paste the same credential again merely to retry.
+
+The helper's combined error discarded which of six checks disagreed, and did
+not retain observed values. Exact failed component CANNOT be recovered from
+the85-byte error. Do not claim it was TLS, permissions or a database upgrade.
+Only encrypted CA/error files exist; no dump, role export or encrypted archive.
+All files retained. No source connection or password request in this batch.
+
+One confirmed design ambiguity:server pg_stat_ssl describes the PostgreSQL
+backend connection. Through Supavisor this is the pooler-to-database hop; it
+does not measure the client's verified TLS connection. A false upstream flag
+is a possible cause, not an observed fact. Sources:
+[PostgreSQL SSL statistics](https://www.postgresql.org/docs/17/monitoring-stats.html#MONITORING-PG-STAT-SSL-VIEW),
+[Supabase upstream/client TLS distinction](https://github.com/supabase/supavisor/blob/main/docs/configuration/tenants.md).
+
+Corrected diagnostics, not the unknown underlying mismatch:record only protected
+version/database/role/read-only/revision/client TLS/upstream TLS metadata before
+the guard and label each failing requirement individually. Keep all original
+checks, including upstream SSL, and add explicit native client TLS check. No
+silent requirement removal or TLS downgrade. Previous versions retained outside
+Git as `.before-preflight-diagnostics`. Two new tests pass, including each
+individual mismatch remaining blocked; no repeated setup/native/DB test suites.
+
+**No backup prompt reopened.** Simplest next step is the prepared metadata-only
+query in [PY35_SOURCE_GUARD_DIAGNOSTIC.sql](sql/PY35_SOURCE_GUARD_DIAGNOSTIC.sql):
+Supabase project priceyard > SQL Editor > New query, paste and run the entire
+script using existing Google/GitHub dashboard login. No database password needed.
+Share only version/database/revision result values, never screenshots/secrets.
+This rules out persistent schema/version drift; SQL Editor uses a different
+connection and CANNOT establish pooler-hop SSL or pooler session settings. Further
+evidence may still be needed; do not assume this alone certifies backup/release.
+No migrations, reset, provider changes, production retry by Codex or deploy.
+
 ## Current101: private use of existing Render DATABASE_URL
 
 Owner confirms Supabase website login is Google/GitHub; existing Render backend
@@ -146,7 +186,7 @@ execution handoff for private credential entry, not another setup/approval reque
 The launcher and Python helper are outside Git in the private backup root, as are
 their four new guard-test results. The launcher pins the owning SID, private root
 ACL, existing EFS folder/key and the exact reviewed Python SHA256:
-`5e7dacdab8d8ef1b5d01344b35c88f70f572464ad463a4c3ba4e41d918e2a2e2`.
+`022c422185575bfbb1fafcc38a59f6641668e4041fffc9830e999b2f25cc792b`.
 This supersedes the earlier hashes; previous helper versions remain preserved.
 
 - Reuses PG17.11/7-Zip26.04 and existing installed psycopg3.3.6; no installs or app

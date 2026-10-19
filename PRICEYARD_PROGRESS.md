@@ -25,6 +25,20 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest102:Render URL attempt20261019T080749Z authenticated successfully and read
+source identity/Alembic metadata, then failed helper's generic combined validation
+guard. NOT authentication/URL-decoding/network denial. Error85bytes omitted actual
+values/failed component; cannot honestly identify exact mismatch from retained
+logs. Only encrypted CA/error log, no dump/roles/archive. Permissions checked only
+for metadata reached, business-table privileges/backup not run. Identified design
+ambiguity:pg_stat_ssl behind pooler reports its database hop, not client TLS;
+this is a possibility, NOT confirmed failed field. Preserved helper/logs; added
+per-field failure labels and protected metadata before guard, explicit client TLS
+check; retained EVERY prior requirement, no weakening. Two new local tests pass,
+no production retry/prompt reopened/credentials read. Owner next:bounded read-only
+SQL Editor metadata using existing Google/GitHub login, no DB password; prepared
+docs/sql/PY35_SOURCE_GUARD_DIAGNOSTIC.sql. Editor cannot prove pooler-hop TLS.
+Details/hash:docs/PY35_ACTUAL_BACKUP_RUN.md. No migration/push/deploy;35/36 stays.
 Latest101:owner uses Google/GitHub for Supabase and authorizes private reuse of
 existing Render backend DATABASE_URL, no reset/settings changes. Prepared explicit
 -UseRenderDatabaseUrl hidden-input mode outside Git:SQLAlchemy URL parser matches
