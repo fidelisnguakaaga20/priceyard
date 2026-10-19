@@ -25,6 +25,15 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest104:owner explicitly approves ONE targeted read-only pooler diagnostic.
+Prepared Inspect-PriceYardPooler.ps1/.py outside Git, reusing owner ACL/EFS/key,
+pinned source/CA and hidden Render URL parsing. Three fabricated safety tests pass.
+Opened private prompt(process40776). Captures exact metadata/Python types/client
+encoding and both TLS hops, no backup/native export tools. If actual SQL_ASCII
+bytes observed, tests UTF8 via transaction-local setting in SAME connection only;
+no persistent config change or second authentication. As of this update awaiting
+owner entry/result; no exact mismatch or successful correction claimed. No extra
+SQL Editor request, archive passphrase, migration/push/deploy.35/36 unchanged.
 Latest103:owner SQL Editor results170006/postgres/[0021_feedback_screenshot]
 match expected major/database/revision. Existing failed pooler run still has NO
 source-preflight-private.json; only generic85-byte guard error. Remaining role,

@@ -1,5 +1,24 @@
 # Actual encrypted backup - owner-private execution, batch97
 
+## Current104: one specifically approved metadata-only diagnostic
+
+Owner authorizes one read-only pooler connection with private DATABASE_URL entry.
+Inspect-PriceYardPooler.ps1/.py prepared outside Git, prior backup helper unchanged.
+Reuses existing ACL/EFS/key checks, exact source pin and verify-full CA, hidden
+URL parser and clipboard clearing. Three fabricated tests pass:typed mismatch
+capture, expected baseline, exactly one connect call/no export calls. Private
+PowerShell opened(process40776); waiting for input/result at this update.
+
+Only identity/version/revision/read-only/encoding/types/client TLS/server TLS
+metadata is queried and saved under PrivateRestoreEfs/pooler-diagnostic-*.
+No raw exception text, credentials or URL saved. No customer records, backup tools,
+archive password or migrations. If actual ASCII byte strings are observed, a
+transaction-local UTF8 setting and metadata recheck use the SAME connection;
+no persistent server setting change or second authentication. Connection is
+rolled back/closed. A diagnostic result does not authorize automatic backup.
+Owner replies DIAGNOSTIC COMPLETE only; Codex inspects protected report afterward.
+No exact mismatch or verified correction yet; no extra SQL Editor request.
+
 ## Current103: supplied metadata matches; original session evidence unavailable
 
 Owner successfully ran the metadata-only query and reports server_version_num
