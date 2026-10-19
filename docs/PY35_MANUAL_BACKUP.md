@@ -2,12 +2,66 @@
 
 Owner-confirmed source:Supabase `priceyard`, reference
 `lrvpjfbtmftjkzaxbunk`, Free plan, no managed backups. No successful backup,
-restore or production compatibility check is claimed. All nine live release
+restore or complete production compatibility check is claimed. All nine live release
 gates stay open;35/36 checklist items complete. Latest request authorizes preparing
 the manual backup/recovery workflow, with an explicit stop before production
 access if access/approval is required. No authenticated database access is set up.
 
-## Immediate owner-operated read-only step
+## Owner-reported inspection results - 2026-10-19
+
+Owner reports successful execution of the prepared inspection:PostgreSQL17.6,
+database14 MB, installed revision0021_feedback_screenshot. Exact project reference
+and Free/no-managed-backup status reconfirmed. Codex has not connected or received
+the complete schema/extension/grant inventory. Do NOT repeat the completed first
+inspection just to obtain the same three values. Retain the remaining metadata
+privately; request only the missing details needed for the next compatibility step.
+
+Static AST review of22 local migration files confirms a single head,
+0022_login_revocation, directly following0021_feedback_screenshot. Compared with
+preserved master,0022 is the only added migration; earlier migrations are unchanged.
+The exact upgrade adds:
+
+- `public.users.auth_version`:integer, NOT NULL, server default0.
+- `public.revoked_access_tokens`:token_hash varchar64 primary key, required user_id
+  referencing users.id with ON DELETE CASCADE, required timezone-aware expires_at
+  and revoked_at, indexes on user_id and expires_at.
+
+No upgrade step deletes/replaces customer rows or rewrites prices, plans, paid/
+trial dates, payment evidence or historical records. This is source inspection,
+not proof that production's actual columns/types/constraints match its revision.
+Check for drift, existing duplicate objects, privileges and extension dependencies
+before migration. ALTER operations can wait on locks; a reviewed bounded change
+window and transaction/timeout policy still need to be established. Do not rerun
+0001-0021, reset, stamp or edit installed revision metadata.0022 downgrade refuses
+because dropping revocation evidence can re-enable revoked credentials. Application
+rollback must be a tested security-compatible artifact, not assumed old-master.
+
+The machine's standard PostgreSQL installation is18. Version18 pg_dump can read17,
+but its output is NOT guaranteed to restore into17. Prefer current PostgreSQL17
+client tools and a separate17 local restore server for a recovery target matching
+production; obtaining these tools is pending, not authorized installation. Keep
+existing18 synthetic tests intact. A successful18-only restore is not evidence
+that17 recovery/migration compatibility has passed. No database version upgrade
+is proposed. Reference:[pg_dump version compatibility](https://www.postgresql.org/docs/18/app-pgdump.html#APP-PGDUMP-NOTES).
+
+### Next stage only: establish protected backup storage
+
+Owner confirms whether an existing encrypted drive/volume is available OUTSIDE
+the repository and cloud-synced folders, and provides only its non-secret folder
+path/encryption type. Do not create plaintext database dumps or a customer-data
+restore cluster on an unprotected volume. Keep encryption recovery credentials
+separately and private; plan a separately stored encrypted copy. If no encrypted
+location exists, report that first so a portable encryption method and any tool
+installation can be reviewed. No purchase, install, backup or outside-workspace
+file creation is authorized by this preparation.
+
+Once storage is approved, arrange17 tools, reviewed restore location and private
+password entry, then supply exact source-pinned export commands with failure
+checks/encryption and local-only restore controls. No placeholder command is
+being executed or presented as a completed backup. Final migration rehearsal
+requires its own local-only approval; no production migration is authorized.
+
+## Earlier owner-operated read-only instructions (completed initial stage)
 
 Open the existing Supabase project, confirm the reference above, choose SQL
 Editor > New query, paste ALL of [the prepared SQL](sql/PY35_READ_ONLY_PREFLIGHT.sql)
@@ -18,7 +72,7 @@ no customer rows, secrets, function bodies or column defaults are selected.
 If the version table is missing/elsewhere or any query fails, stop and share only
 the redacted error. Do not create a table, stamp a revision, reset or migrate.
 
-Provide PostgreSQL version, database size and installed Alembic revision first.
+Those three values were provided2026-10-19; the following requirements remain.
 Keep the remaining metadata private for reviewed comparison; do not send a full
 dashboard screenshot or connection string. The local reviewed baseline is
 `0021_feedback_screenshot`; candidate head is `0022_login_revocation`.0022 adds
@@ -30,9 +84,9 @@ this first inventory is not a final schema compatibility certificate.
 
 ## Preferred method after metadata/access and destination review
 
-Use native pg_dump/pg_restore, already present under PostgreSQL18 locally, subject
-to actual source version/extension compatibility. This avoids installing the
-Supabase CLI and Docker on this resource-limited machine. No new tools installed.
+Use native pg_dump/pg_restore rather than adding CLI/Docker on this resource-limited
+machine. Match PostgreSQL17 client/restore tooling as described above; currently
+only the standard18 installation was found. No new tools installed.
 Choose direct or Session pooler access from the project's Connect panel; not a
 transaction-pooler endpoint. Verify host/project identity and TLS certificate
 before connecting. Do not reset the production password or change grants.
@@ -114,6 +168,8 @@ Official references reviewed for this preparation:
 - [Supabase backup limitations](https://supabase.com/docs/guides/platform/backups)
 - [PostgreSQL pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html)
 
-Results:read-only production checks NOT RUN; encrypted export BLOCKED by secure
-access/storage setup; restoration NOT RUN; migration rehearsal NOT RUN. No test
-failure or backup success is inferred from these blocked/not-attempted statuses.
+Results:initial metadata inspection completed by OWNER, with the three results
+above; complete schema/grant/extension compatibility NOT VERIFIED. Codex production
+connections0. Encrypted export BLOCKED by secure access/storage/tool setup;
+restoration NOT RUN; migration rehearsal NOT RUN. No test failure or backup success
+is inferred from blocked/not-attempted statuses.

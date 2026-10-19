@@ -25,6 +25,13 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest owner evidence2026-10-19/batch90:reported production inspection17.6,
+14 MB,0021_feedback_screenshot. Static22-file chain confirms only0022 pending;
+earlier migrations unchanged vs master. Full schema compatibility not established.
+No repeated inspection, production connection or migration. Next:confirm private
+encrypted storage outside repository/cloud sync; then reviewed PG17 tools/restore
+target/private access. ExistingPG18 synthetic environment preserved. Details:
+docs/PY35_MANUAL_BACKUP.md. No backup/restoration success or new live gate pass.
 Latest preparation:batch89 records owner-confirmed Supabase priceyard,
 lrvpjfbtmftjkzaxbunk, Free/no managed backups. docs/PY35_MANUAL_BACKUP.md and
 docs/sql/PY35_READ_ONLY_PREFLIGHT.sql prepare a metadata-only owner-operated
@@ -3471,3 +3478,31 @@ require separate recovery. Missing encryption/access/setup is not successful bac
 Documentation/SQL preparation only; no database connection, secret/.env read,
 tool installation, dump, restore, migration, production change, push/merge/deploy.
 No redundant regression tests.35/36 complete, PY-35 partial, live gates unrun.
+
+### Batch 90 - reported production revision and exact migration delta (2026-10-19)
+
+Owner reports approved read-only inspection completed:PostgreSQL17.6,database14 MB,
+revision0021_feedback_screenshot, projectpriceyard/lrvpjfbtmftjkzaxbunk Free/no
+managed backups. Preserve this evidence as owner-reported, not a Codex connection
+or independently verified full schema review. Do not repeat completed first checks.
+
+Static Python AST review of22 local migration files (no imports of app/Alembic,
+database or application startup) confirms sole head0022_login_revocation directly
+after0021. Git diff against preserved master shows only0022 added; earlier migration
+files unchanged. Upgrade adds users.auth_version integer NOT NULL default0, new
+revoked_access_tokens table/FK/PK/timestamps/two indexes. No business-record rewrite
+or delete in upgrade. Drift/permissions/locks/extensions still need actual review;
+0022 downgrade refuses and an old app rollback cannot be assumed security-safe.
+
+Only standardPG18 installation found; pg_dump18 can export17, but its output is
+not guaranteed to restore on17. Official version compatibility reviewed; recommend
+PG17 client tools/separate17 restore target to match production, no tool install
+or source version change performed/authorized. Existing smallPG18 tests preserved.
+No prior regression repeated, cluster started, production connection, secret read,
+backup/export/restore, migration, production setting change, push/merge/deploy.
+
+Manual backup/final readiness documents updated. Next owner stage is identifying
+existing encrypted backup/restore storage outside Git/cloud sync; encryption keys
+must stay private and separate. Then review version-matched tools, private access
+and exact commands. Backup gate remains blocked until actual encrypted-copy
+retrieval and isolated verified restoration;35/36 complete/PY-35 partial.

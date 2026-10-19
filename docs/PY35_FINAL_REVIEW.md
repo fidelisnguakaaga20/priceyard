@@ -13,7 +13,12 @@ queried through production access. Repository: `fidelisnguakaaga20/priceyard`.
 Owner subsequently confirmed Supabase project `priceyard`, reference
 `lrvpjfbtmftjkzaxbunk`, Free plan and no managed backups. Manual backup preparation:
 [PY35_MANUAL_BACKUP.md](PY35_MANUAL_BACKUP.md). Read-only SQL is prepared but NOT
-executed; no encrypted export/restoration yet. Secure access, encrypted storage
+executed by Codex; owner reports execution2026-10-19:PostgreSQL17.6,14 MB,
+installed0021_feedback_screenshot. Complete actual schema compatibility remains
+unverified. Local22-file migration-chain review confirms only0022_login_revocation
+pending, with earlier migration files unchanged against preserved master. No
+encrypted export/restoration yet. Match17 recovery tooling rather than treating
+an18-only restoration as proof of17 recovery. Secure access, encrypted storage
 and isolated customer-data restore target remain prerequisites. No live gate passed.
 
 | Setting | Backend | Frontend |
@@ -171,7 +176,7 @@ remote candidate publication are unverified. No remote fetch/push was performed.
 | Area | Missing information/access | How the owner can provide it securely |
 | --- | --- | --- |
 | Render | Owner confirmed services/domains/master and migration-running backend build above. Still need workspace/operator access, frontend Auto-Deploy/build/root, current runtime/start/routing settings and isolated hosted test target | Share only remaining non-secret settings or supported least-privilege operator access. Backend Auto-Deploy is On Commit: no push/merge to master or setting changes now |
-| Supabase | Owner confirmed priceyard/lrvpjfbtmftjkzaxbunk, Free/no managed backups. Authenticated access/operator, actual revision/schema/permissions and backup coverage remain unknown | Owner can run prepared metadata-only SQL from the confirmed project's SQL Editor. Connection secrets stay private; secure local prompt/storage must be arranged before operator export. No production connection or role/grant change performed |
+| Supabase | Owner confirmed priceyard/lrvpjfbtmftjkzaxbunk, Free/no managed backups; reported17.6/14 MB/0021. Complete schema/permissions/extensions and recoverable backup remain unverified; Codex authenticated access not established | Reuse completed owner inspection; approve private encryption/storage/17 restore tooling and secure operator password entry before export. No Codex production connection or role/grant change performed |
 | GitHub | Owner confirmed `fidelisnguakaaga20/priceyard`; authenticated repository permissions/current remote state and full deployed commits remain unverified; candidate branch is local | Authorize the existing GitHub connection for only that repository if needed. No push/merge now: linked master automatically builds and migrates production |
 | Actual backup/rollback | Approved backup source, encrypted off-host destination/retrieval access, isolated restore target, operator, retention and recovery objectives; compatible rollback artifact | Choose the targets/operator and approve actual-backup handling separately. Use host secret storage and private encrypted files; share only storage references and redacted verification results, never a customer dump in chat |
 | Provider verification | Paystack TEST credentials and reachable nonproduction callback/webhook; Google test origin/client/accounts; test message sender and consenting recipients | Enter test-only configuration into approved protected storage yourself/operator; share only secure storage references, URLs and approved recipient identities. Never share account passwords, live keys or real cards |
