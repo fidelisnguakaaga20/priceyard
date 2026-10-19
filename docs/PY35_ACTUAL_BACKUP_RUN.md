@@ -1,5 +1,50 @@
 # Actual encrypted backup - owner-private execution, batch97
 
+## Current101: private use of existing Render DATABASE_URL
+
+Owner confirms Supabase website login is Google/GitHub; existing Render backend
+has DATABASE_URL. Website OAuth is separate from PostgreSQL password. Owner now
+authorizes privately using that existing credential, without resetting it or
+editing production settings. No Render API/credential retrieval by Codex.
+
+1. Sign into [Render Dashboard](https://dashboard.render.com), select
+   **priceyard-api > Environment**. Reveal/copy the existing **DATABASE_URL value**.
+   Do not click Edit, Save or Deploy; do not copy it into chat or a text file.
+2. Paste it only into the opened PowerShell **hidden DATABASE_URL prompt** and
+   press Enter. Nothing will appear while pasting. Do not paste into a command
+   line. Current clipboard is cleared after input; remove the copied item from
+   Windows clipboard history separately if that feature is enabled.
+3. Login/identity/initial read permissions must pass first. Then choose a separate
+   new backup passphrase, save it privately, enter twice and type BACKUP.
+   The helper rejects reusing the database password as the backup passphrase.
+4. Reply BACKUP CHECKED or BACKUP STOPPED only. No URL/password/logs in chat.
+
+Private input window opened(process70696). If unavailable, the approved mode is:
+
+```powershell
+& "C:\Users\HP\AppData\Local\PriceYardPrivateBackup\Start-PriceYardEncryptedBackup.ps1" -UseRenderDatabaseUrl
+```
+
+Do not start a second copy while one is running. Credentials exist only in local
+process memory and the dump client's private environment, not arguments/history/
+logs/files. Python cannot guarantee forensic memory erasure; clipboard history
+is not erased by clearing its current value. No Windows/Render settings changed.
+
+New mode uses the existing installed SQLAlchemy parser, matching app semantics.
+It validates direct project host/user5432 or the confirmed project-qualified
+pooler5432/6543 URL and postgres database. Only password is recovered, decoded
+once; URL host/query/TLS options are never used to connect. Existing approved
+pooler5432/verify-full remains pinned. Parser errors are generic and never include
+the URL. No dotenv reads, installation, password reset or remote setting changes.
+Prior helpers preserved as `.before-render-url` copies. Five new fabricated tests
+pass:decoding, target/TLS pinning, wrong project/input rejection without secret
+leakage, unsupported provider/port rejection, different archive password.
+Authentication and actual export/restoration are still unverified pending owner
+private input. No migrations/push/deployment. Earlier100 stop is superseded only
+by this owner-authorized private credential-entry step, not a successful login.
+
+Reference:[Render environment-variable navigation](https://render.com/docs/configure-environment-variables).
+
 ## Current100: authentication rejected; do not blindly reopen
 
 Second owner attempt20261019T074829Z reports **password authentication failed**.
@@ -101,8 +146,8 @@ execution handoff for private credential entry, not another setup/approval reque
 The launcher and Python helper are outside Git in the private backup root, as are
 their four new guard-test results. The launcher pins the owning SID, private root
 ACL, existing EFS folder/key and the exact reviewed Python SHA256:
-`796d06803cfccc02be20839f1fd04f76234db49eb7a3423dc9a391b9fb31106d`.
-This supersedes the batch97 Windows-root-only and batch99 CA-fix helper hashes.
+`5e7dacdab8d8ef1b5d01344b35c88f70f572464ad463a4c3ba4e41d918e2a2e2`.
+This supersedes the earlier hashes; previous helper versions remain preserved.
 
 - Reuses PG17.11/7-Zip26.04 and existing installed psycopg3.3.6; no installs or app
   imports/dotenv reads. The driver's existing libpq18 is only a connection client;

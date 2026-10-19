@@ -25,6 +25,18 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest101:owner uses Google/GitHub for Supabase and authorizes private reuse of
+existing Render backend DATABASE_URL, no reset/settings changes. Prepared explicit
+-UseRenderDatabaseUrl hidden-input mode outside Git:SQLAlchemy URL parser matches
+app semantics, decodes password once, validates exact project/user/database,
+uses ONLY password with existing pinned pooler5432/verify-full. URL never used
+as target/options or written to diagnostics. Clears current clipboard after input
+(Windows history separate); different archive passphrase enforced. Prior helper
+versions retained. Five fabricated URL/secret-safety tests pass, no live calls.
+Private URL prompt opened(process70696); owner manually copies from Render
+priceyard-api Environment without Edit/Save/Deploy. No credential read by Codex;
+auth/export/restore results still unverified. New hash/steps:
+docs/PY35_ACTUAL_BACKUP_RUN.md. No migrations/push/deploy;35/36 unchanged.
 Latest100:second owner attempt fails with server FATAL password authentication
 failed, not TLS. Latest protected run20261019T074829Z has only encrypted CA/error
 log; no dump, roles, archive or saved success. No native backup process active.

@@ -6,6 +6,13 @@ No production services, credentials, customer data, migrations, provider sends,
 push, merge or deployment were used. Conditional deployment approval does not
 substitute for the required evidence.
 
+Current101:owner authorizes private reuse of existing Render DATABASE_URL; hidden
+local input/extraction mode tested with five fabricated cases, preserving pinned
+source and full TLS and requiring a separate archive passphrase. Private prompt
+opened; actual credentials not seen/retrieved by Codex. No remote settings/reset,
+successful login/export/restore claim or new gate pass. Owner guidance:
+[private Render credential step](PY35_ACTUAL_BACKUP_RUN.md).
+
 Current100:latest owner attempt FAILED authentication(server password rejection),
 not TLS. No dump/archive; diagnostics preserved. Native PG17.11 client versions
 confirmed, same major but never reached by failure. Permissions/actual schema
