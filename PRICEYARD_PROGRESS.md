@@ -25,6 +25,41 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest117 COMPLETE (2026-10-20 WAT): actual encrypted database backup AND protected
+isolated restoration verified. Final real restore37.2 seconds,59 tables: all row
+counts/content SHA256 fingerprints match, recorded schema/columns/types/defaults/
+constraints/indexes/RLS/roles/memberships/settings/effective permissions match,
+sequence/large-object observations and native checksums pass. Revision remains
+0021_feedback_screenshot; NO migrations, source connections this batch, uploads,
+push/merge/deploy or application changes. Original archive SHA256 unchanged.
+Private latest-production-backup-status.json now confirms restoration; protected
+run real-ram-restore-result-private.json is passing. All test containers removed;
+Docker/WSL stopped; attempt3 resource config archived/hash-checked/removed and
+original no-.wslconfig state restored. Cached public image retained; no original
+Docker files/container configuration deleted or edited.
+Actual Supabase recovery differences were resolved without removing guards:
+runtime LOAD verifies Nix-packaged supautils/safeupdate (not a core-libdir guess),
+matching original bootstrap supabase_admin preserves explicit GRANTED BY clauses;
+only duplicate CREATE of that existing verified administrator is skipped. Two
+recorded extension view owners and two provider-initial GraphQL schema ACLs are
+replayed exactly from protected metadata, preserving owners/grant options. ACL
+order is canonicalized, live column order retains all fields while excluding
+irrelevant dropped-attribute numbering gaps, and seven equivalent CHECK casts
+are reparsed by PostgreSQL on empty temporary LIKE tables before comparison.
+Nine targeted fabricated checks pass, including rejected unbounded UPDATE,
+grantor/permission/view ownership, dropped-column gap and valid/invalid CHECK
+values; no user-facing business rule changed. Earlier failed evidence retained.
+Versioned secret-free restore helper embeds only the identical catalog query;
+static equivalence and duplicate-run refusal pass, no second real restore run.
+See docs/PY35_VERIFIED_RECOVERY.md and docs/PY35_ACTUAL_RELEASE_GATES.json.
+35/36 complete; PY-35 remains partial. Next owner step is a separately retrieved
+encrypted archive copy (the existing Drive PFX is NOT that copy).0022 actual-clone
+rehearsal, file/provider configuration coverage and external hosting/Paystack TEST/
+Google/delivery/scheduler/monitoring/cutover gates remain open. Baseline local-only
+RELEASE_GATES.json stays a fixture; new actual ledger records current evidence.
+Do not repeat source backup, passwords, completed tests or restore; no deployment
+until remaining approval/setup/compatibility/rollback requirements pass.
+
 Latest116 IN PROGRESS: owner replaced exhausted500MB mobile bundle with17GB;
 host RAM now4.16GiB free. Public Docker-registry TLS passes. With2GiB/one CPU/
 swap0 temporary WSL cap, existing engine29.2.1 becomes ready; do not assert
@@ -860,7 +895,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches14/21; batch87 closes the confirmed stale single-account GET/renewal race under existing locks. Paid/trial value, indefinite grants/review and payment evidence preserved; full307 backend tests, actual PG blocking/twelve interleavings and value/review browser checks pass |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
 | PY-34 | Expiry without unintended staff-role loss | Complete in batch2; batch87 additionally verifies locked single-account expiry versus payment for ordinary/Reporter/Admin users, genuine expiry/history/rollback and eight-role browser access |
-| PY-35 | Operational readiness and dependency evidence | Partial: local preparation through87 verified, including dependency82, synthetic backup83, URL85, offline TLS86 and final expiry/payment regression87. Full307 backend tests/five native cases/affected browsers pass; all nine external/actual-backup/hosting/rollout gates remain unrun. docs/PY35_FINAL_REVIEW.md identifies access and compatibility blockers. No production, live jobs or release authorized |
+| PY-35 | Operational readiness and dependency evidence | Partial: prior local evidence preserved;117 verifies REAL encrypted backup and RAM-isolated recovery of59 tables, data digests, recorded schema/permissions/roles, sequences and checksums at0021, with no production changes/migrations. Nine small target-specific synthetic checks pass. Second encrypted archive copy,0022 clone rehearsal and external hosting/provider/operational/cutover gates remain; see docs/PY35_ACTUAL_RELEASE_GATES.json. No live jobs or release authorized |
 | PY-36 | Accurate progress/documentation/maintainability | Current application documentation/identified six-form readability scope complete in61: exact106-operation API index, approved contracts, safe local recovery/resumption guide and README links; six original intelligence forms expanded for maintenance with identical emitted syntax and byte-identical compiled JS/CSS. Progress/approvals/evidence current; future maintenance does not reopen this scope. Production rollout/provider documentation verification remains PY-35 |
 
 ## Verified results and batch history

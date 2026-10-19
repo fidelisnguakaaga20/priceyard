@@ -53,15 +53,59 @@ CREATE EXTENSION pgcrypto WITH SCHEMA extensions VERSION '1.3';
 CREATE EXTENSION "uuid-ossp" WITH SCHEMA extensions VERSION '1.1';
 CREATE EXTENSION pg_stat_statements WITH SCHEMA extensions VERSION '1.11';
 CREATE EXTENSION supabase_vault WITH SCHEMA vault VERSION '0.3.1';
-CREATE TABLE public.fabricated_fixture(id integer PRIMARY KEY, label text NOT NULL, observed_at timestamptz);
+CREATE TABLE public.fabricated_fixture(id integer PRIMARY KEY, retired_fixture text, label text NOT NULL, observed_at timestamptz);
+ALTER TABLE public.fabricated_fixture DROP COLUMN retired_fixture;
 INSERT INTO public.fabricated_fixture VALUES (1,'FABRICATED ONLY', '2026-01-01T12:00:00Z'), (2,chr(8358)||' SYNTHETIC',NULL),(3,'NO CUSTOMER DATA','2026-01-02T12:00:00Z');
+CREATE ROLE fixture_group NOLOGIN;
+CREATE ROLE fixture_reader NOLOGIN;
+GRANT fixture_group TO fixture_reader WITH INHERIT FALSE GRANTED BY priceyard_fixture_owner;
+CREATE SCHEMA fixture_initial_acl;
+GRANT USAGE ON SCHEMA fixture_initial_acl TO fixture_reader WITH GRANT OPTION;
+CREATE ROLE fixture_extension_owner NOLOGIN;
+GRANT USAGE,CREATE ON SCHEMA extensions TO fixture_extension_owner;
+ALTER VIEW extensions.pg_stat_statements OWNER TO fixture_extension_owner;
+BEGIN;
+CREATE TEMP TABLE fixture_cast_probe(value varchar) ON COMMIT DROP;
+ALTER TABLE fixture_cast_probe ADD CONSTRAINT allowed_values CHECK ((value)::text = ANY ((ARRAY['one'::varchar,'two'::varchar])::text[]));
+INSERT INTO fixture_cast_probe VALUES ('one'),('two');
+DO $test$ BEGIN BEGIN INSERT INTO fixture_cast_probe VALUES ('three'); RAISE EXCEPTION 'Unexpected allowed value'; EXCEPTION WHEN check_violation THEN NULL; END; END $test$;
+COMMIT;
 SQL
+echo NATIVE_CHECK_CONSTRAINT_CAST_PARSER_AND_ENFORCEMENT_PASSED
+psql -X -q -v ON_ERROR_STOP=1 -c "LOAD 'supautils'; LOAD 'safeupdate';"
+if psql -X -q -v ON_ERROR_STOP=1 -c "LOAD 'safeupdate'; UPDATE public.fabricated_fixture SET label='MUST BE REJECTED';" > /work/safeupdate.log 2>&1; then exit 22; fi
+grep -qi 'WHERE' /work/safeupdate.log
+echo RECORDED_PRELOAD_LIBRARIES_AND_SAFEUPDATE_GUARD_PASSED
 echo EXACT_EXTENSION_VERSIONS_AND_LOCALE_PASSED
 psql -X -At -v ON_ERROR_STOP=1 -c "SELECT count(*)||':'||md5(string_agg(row_to_json(t)::text,'|' ORDER BY id)) FROM public.fabricated_fixture t" > /work/source-digest
 pg_dump --no-password --format=custom --file=/work/fabricated.dump > /work/dump.log 2>&1
+pg_dumpall --no-password --roles-only --no-role-passwords --file=/work/fabricated-roles.sql
+test "$(grep -c '^CREATE ROLE priceyard_fixture_owner;$' /work/fabricated-roles.sql)" = 1
+awk '$0 != "CREATE ROLE priceyard_fixture_owner;"' /work/fabricated-roles.sql > /work/restore-roles.sql
+psql -X -At -v ON_ERROR_STOP=1 -c "SELECT r.rolname,m.rolname,g.rolname,a.admin_option,a.inherit_option,a.set_option FROM pg_auth_members a JOIN pg_roles r ON r.oid=a.roleid JOIN pg_roles m ON m.oid=a.member JOIN pg_roles g ON g.oid=a.grantor WHERE r.rolname='fixture_group' ORDER BY r.rolname,m.rolname,g.rolname" > /work/source-membership
+psql -X -At -v ON_ERROR_STOP=1 -c "SELECT array_agg(x::text ORDER BY x::text) FROM pg_namespace n,unnest(n.nspacl) x WHERE n.nspname='fixture_initial_acl'" > /work/source-acl
+psql -X -At -v ON_ERROR_STOP=1 -c "SELECT array_agg(column_name ORDER BY ordinal_position) FROM information_schema.columns WHERE table_schema='public' AND table_name='fabricated_fixture'" > /work/source-column-order
+psql -X -At -v ON_ERROR_STOP=1 -c "SELECT array_agg(ordinal_position ORDER BY ordinal_position) FROM information_schema.columns WHERE table_schema='public' AND table_name='fabricated_fixture'" > /work/source-column-numbers
 pg_ctl -D /work/source -m fast -w -t 10 stop > /work/control.log 2>&1
 start_fixture /work/restore
+psql -X -q -v ON_ERROR_STOP=1 -f /work/restore-roles.sql
 pg_restore --no-password --exit-on-error --single-transaction --dbname=postgres /work/fabricated.dump > /work/restore.log 2>&1
+psql -X -At -v ON_ERROR_STOP=1 -c "SELECT r.rolname,m.rolname,g.rolname,a.admin_option,a.inherit_option,a.set_option FROM pg_auth_members a JOIN pg_roles r ON r.oid=a.roleid JOIN pg_roles m ON m.oid=a.member JOIN pg_roles g ON g.oid=a.grantor WHERE r.rolname='fixture_group' ORDER BY r.rolname,m.rolname,g.rolname" > /work/restored-membership
+cmp /work/source-membership /work/restored-membership
+echo BOOTSTRAP_AND_EXPLICIT_GRANTOR_RESTORE_PASSED
+psql -X -q -v ON_ERROR_STOP=1 -c 'REVOKE ALL PRIVILEGES ON SCHEMA fixture_initial_acl FROM fixture_reader; GRANT USAGE ON SCHEMA fixture_initial_acl TO fixture_reader WITH GRANT OPTION;'
+psql -X -At -v ON_ERROR_STOP=1 -c "SELECT array_agg(x::text ORDER BY x::text) FROM pg_namespace n,unnest(n.nspacl) x WHERE n.nspname='fixture_initial_acl'" > /work/restored-acl
+cmp /work/source-acl /work/restored-acl
+echo RECORDED_SCHEMA_PRIVILEGES_AND_GRANT_OPTION_PASSED
+psql -X -q -v ON_ERROR_STOP=1 -c 'ALTER VIEW extensions.pg_stat_statements OWNER TO fixture_extension_owner;'
+psql -X -At -v ON_ERROR_STOP=1 -c "SELECT pg_get_userbyid(c.relowner) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='extensions' AND c.relname='pg_stat_statements'" > /work/restored-view-owner
+test "$(cat /work/restored-view-owner)" = fixture_extension_owner
+echo RECORDED_EXTENSION_VIEW_OWNERSHIP_PASSED
+psql -X -At -v ON_ERROR_STOP=1 -c "SELECT array_agg(column_name ORDER BY ordinal_position) FROM information_schema.columns WHERE table_schema='public' AND table_name='fabricated_fixture'" > /work/restored-column-order
+psql -X -At -v ON_ERROR_STOP=1 -c "SELECT array_agg(ordinal_position ORDER BY ordinal_position) FROM information_schema.columns WHERE table_schema='public' AND table_name='fabricated_fixture'" > /work/restored-column-numbers
+cmp /work/source-column-order /work/restored-column-order
+if cmp -s /work/source-column-numbers /work/restored-column-numbers; then exit 23; fi
+echo LIVE_COLUMN_ORDER_WITH_DROPPED_ATTRIBUTE_GAPS_PASSED
 psql -X -At -v ON_ERROR_STOP=1 -c "SELECT count(*)||':'||md5(string_agg(row_to_json(t)::text,'|' ORDER BY id)) FROM public.fabricated_fixture t" > /work/restored-digest
 cmp /work/source-digest /work/restored-digest
 test "$(psql -X -At -v ON_ERROR_STOP=1 -c "SELECT count(*) FROM pg_extension WHERE (extname,extversion) IN (('plpgsql','1.0'),('pgcrypto','1.3'),('uuid-ossp','1.1'),('pg_stat_statements','1.11'),('supabase_vault','0.3.1'))")" = 5
@@ -133,7 +177,13 @@ def main():
         (ROOT / "ram-fixture-execution-private.log").write_text(
             completed.stdout + "\n" + completed.stderr, encoding="utf-8")
         expected_markers = ["RAM_SWAP_ROOT_AND_NETWORK_GUARDS_PASSED",
+                            "NATIVE_CHECK_CONSTRAINT_CAST_PARSER_AND_ENFORCEMENT_PASSED",
+                            "RECORDED_PRELOAD_LIBRARIES_AND_SAFEUPDATE_GUARD_PASSED",
                             "EXACT_EXTENSION_VERSIONS_AND_LOCALE_PASSED",
+                            "BOOTSTRAP_AND_EXPLICIT_GRANTOR_RESTORE_PASSED",
+                            "RECORDED_SCHEMA_PRIVILEGES_AND_GRANT_OPTION_PASSED",
+                            "RECORDED_EXTENSION_VIEW_OWNERSHIP_PASSED",
+                            "LIVE_COLUMN_ORDER_WITH_DROPPED_ATTRIBUTE_GAPS_PASSED",
                             "SYNTHETIC_RESTORE_DIGEST_EXTENSIONS_AND_CHECKSUMS_PASSED"]
         result["checks"] = {marker: marker in completed.stdout for marker in expected_markers}
         if completed.returncode or not all(result["checks"].values()):

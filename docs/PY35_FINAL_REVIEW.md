@@ -1,5 +1,25 @@
 # PriceYard final review - batch 87
 
+## Current117 supersedes historical statuses below (2026-10-20 WAT)
+
+**35/36 complete; PY-35 partial; deployment remains blocked.** Actual encrypted
+production backup and protected isolated database restoration PASSED:59 table
+counts/content digests, recorded schema/roles/permissions/settings, sequences,
+large objects and native checksums match at0021. No original records changed,
+production reconnection, migration, provider send, upload, push, merge or deploy.
+Docker stopped, RAM targets removed and temporary resource settings undone.
+Source backup is preserved; do not repeat setup/password entry/export/tests.
+
+Remaining: verified off-computer ciphertext copy, owner recovery targets and
+non-database files/configuration coverage; actual0022 clone rehearsal/rollback;
+hosted HTTPS/browser/Google/notification, Paystack TEST/recovery scheduling,
+dependency/monitoring/clock/load and historical/cutover evidence. These are not
+proved by database recovery and require approved setup/access where applicable.
+See [verified recovery](PY35_VERIFIED_RECOVERY.md) and the
+[current actual gate ledger](PY35_ACTUAL_RELEASE_GATES.json).
+RELEASE_GATES.json remains the original local-only automated fixture, not a live
+attestation. Older Current entries below are historical, not current blockers.
+
 Current115: the local Docker fallback did not reach engine readiness inside a
 1GiB/one-CPU/no-swap limit while host memory was low. No image/test container or
 customer restore executed. Exact Docker startup cause is unconfirmed; no OOM

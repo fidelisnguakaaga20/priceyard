@@ -1,5 +1,43 @@
 # Actual encrypted backup - owner-private execution, batch97
 
+## Current117: real backup AND isolated database restoration PASSED
+
+Verified2026-10-20 (WAT), using the existing20261019T213738Z archive; no new source
+connection/export/password entry. Final recovery37.2 seconds:59 tables' counts
+and content SHA256 digests match, as do recorded schema/column/type/default/live
+order, constraints/indexes/RLS, roles/memberships/settings/effective permissions,
+sequences and large objects. Native checksums pass; Alembic remains0021. No actual
+or production migrations. Original portable ciphertext checksum unchanged.
+
+Actual provider details required reviewed recovery adaptations: load the Nix
+libraries at runtime; preserve original supabase_admin bootstrap/grantors; skip
+only its duplicate CREATE, keeping every attribute/grant clause; restore exactly
+two extension-view owners and two GraphQL schema ACLs from the protected snapshot.
+No source record/history/security policy rewritten. Canonical comparison preserves
+ACL meaning, live column order despite dropped-attribute holes, and uses native
+parser checks on empty temporary tables for seven equivalent varchar-array casts.
+Failure reports and original helper variants remain protected for audit.
+
+Nine fabricated checks now cover these cases plus RAM/swap/network/readonly
+isolation, exact five extension versions/locale and restore/checksum integrity.
+SafeUpdate still rejects unbounded UPDATE. Real customer rows never displayed.
+Ordinary Docker volumes/binds/ports and persistent container logs are prohibited;
+source exports/recovered files stay EFS, database files only in bounded tmpfs.
+
+The real container was removed; Docker/WSL are stopped and the test-created WSL
+configuration was archived/hash-checked/removed, restoring its previous absence.
+Existing Docker images/data/configs preserved. Public image download367203535
+compressed bytes; no paid service/project or customer upload. App source/design
+and production unchanged. Secret-free recovery code is versioned, inlining only
+the identical reviewed catalog query; static equivalence and duplicate-run guard
+pass without repeating restoration. See [verified recovery](PY35_VERIFIED_RECOVERY.md).
+
+Private evidence: latest-production-backup-status.json; EFS run
+real-ram-restore-result-private.json. Actual database restoration is verified;
+off-computer archive copy, source0022 clone rehearsal and other live gates are NOT.
+35/36 remains. Current gate ledger:[actual gates](PY35_ACTUAL_RELEASE_GATES.json).
+All earlier Current entries below are retained chronological history.
+
 ## Current116: compatible RAM-only target passes fabricated restoration
 
 New mobile data and4.16GiB free host RAM permit a bounded retry. Public registry

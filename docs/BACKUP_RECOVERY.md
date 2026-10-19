@@ -5,6 +5,13 @@ a customer-data backup, restoring it anywhere, changing retention or performing
 a live migration/cutover requires a separately approved target and procedure.
 Never paste credentials or backup contents into chat, logs, Git or test evidence.
 
+Current117 (2026-10-20): owner separately authorized the actual read-only backup
+and protected isolated restoration. BOTH database archive/integrity and59-table
+recovery verification now pass; no production mutation/migration occurred. See
+[current verified procedure/results](PY35_VERIFIED_RECOVERY.md). The synthetic
+baseline below is retained. Second ciphertext copy, file/provider configuration
+coverage and live release gates remain open; no blanket production permission.
+
 ## Local rehearsal
 
 Use only the existing identity-pinned small PostgreSQL fixture at127.0.0.1:55449,

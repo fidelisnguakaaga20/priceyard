@@ -1,5 +1,12 @@
 # PY-35 operational readiness — local evidence and release gates
 
+Current117 (2026-10-20 WAT): actual encrypted database backup AND protected local
+restoration pass for59 tables and recorded integrity/permission evidence at0021.
+No production changes or migrations. Second encrypted archive copy and other
+release requirements remain open. Current evidence/unfinished gates:
+[actual ledger](PY35_ACTUAL_RELEASE_GATES.json), [recovery](PY35_VERIFIED_RECOVERY.md).
+Older "all gates unrun" wording below describes the earlier local-only baseline.
+
 Current checklist:35 of36 complete. PY-35 remains partial until the owner-approved
 live gates below pass. A local check returning success never authorizes release.
 Latest scoped final review: [PY35_FINAL_REVIEW.md](PY35_FINAL_REVIEW.md).
@@ -62,6 +69,7 @@ customer-backup restoration is inferred. Do not rerun solely to improve a report
 5. Owner explicitly approves deployment/cutover only after blockers are closed.
    Monitor recovery and reconciliation; stop on access/payment/privacy errors.
 
-Machine-readable unrun gates:RELEASE_GATES.json. Current progress and approved
+Machine-readable local-only fixture:RELEASE_GATES.json; current actual owner-scoped
+verification:PY35_ACTUAL_RELEASE_GATES.json. Current progress and approved
 decisions:../PRICEYARD_PROGRESS.md. Never interpret historical deployment notes as
 current permission to access hosting or deploy.
