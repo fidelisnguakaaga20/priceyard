@@ -25,6 +25,17 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest110:owner stops feature work and explicitly approves visible local console
+with hidden input for ONE controlled production backup and isolated restoration;
+this resolves the earlier review ambiguity/refusal. Initial Git clean atb788160;
+backup/restore SHA256 match offline-verified7b422e1. No tests/setup/audit repeated.
+No overlapping backup process or real success report. Approved launcher opened
+successfully(process37048) in Render-URL mode, no alternate launch/bypass. Await
+owner-private input/result; no backup/restoration success claimed. Stop at any
+source, permission, coverage, integrity or restore-inventory failure; no automatic
+unreviewed Supabase restore or migrations. No new features, credential logging,
+push/merge/production migration/deploy.35/36 unchanged until real evidence passes.
+
 Latest109:owner authorizes proactive local interface/security/maintainability
 enhancements without routine permission prompts; explicit refusal to open a
 credential window remains in force. Completed one dashboard reliability/privacy

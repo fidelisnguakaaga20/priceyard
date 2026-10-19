@@ -1,5 +1,23 @@
 # Actual encrypted backup - owner-private execution, batch97
 
+## Current110: visible hidden-entry window explicitly approved and opened
+
+Owner now explicitly approves a visible PowerShell window with hidden input for
+ONE controlled read-only source backup and protected isolated restoration.
+Earlier refusal/review ambiguity is resolved by that explicit instruction.
+Git clean atb788160; private backup/restore code hashes match offline7b422e1;
+no overlapping backup process or successful real status report existed. Reused
+all preparation without rerunning the offline suite or changing application code.
+
+Approved existing launcher opened successfully(process37048), Render DATABASE_URL
+mode. Owner enters URL and separate archive passphrase privately; no secret in
+tool arguments/chat/logs. No backup result yet at this update. Do not open another
+window/retry if waiting for input. Stop on safety failure; review real inventory
+and SQL before any fresh EFS/local17 restore. Current restore gate accepts only
+its reviewed simple inventory; do not claim general Supabase restoration support.
+No automatic role/provider enablement, migration, push, merge or deployment.
+Only after successful archive/restore evidence may the actual-backup gate change.
+
 ## Current108: main session reconciled; no redundant setup
 
 Confirmed current0b9dab3 contains verified offline7b422e1 and watchlist work.
