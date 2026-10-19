@@ -1,10 +1,16 @@
 # PriceYard final review - batch 87
 
-**35/36 complete; PY-35 partial. Deployment is blocked.** All executed checks
-below pass; the nine real-world release gates remain **not run**, not failed.
-No production services, credentials, customer data, migrations, provider sends,
-push, merge or deployment were used. Conditional deployment approval does not
-substitute for the required evidence.
+**35/36 complete; PY-35 partial. Deployment is blocked.** Current113 supersedes
+historical statuses below: an explicitly approved read-only production backup
+now PASSED encrypted archive/integrity checks using owner-private credentials.
+Full restoration has NOT RUN: actual Supabase Vault is unavailable in local PG17,
+source locale differs from the guarded restore path, and provider functions/
+publication require review. Do not omit objects or weaken guards. Need approved
+compatible isolated protected restoration and a verified second archive copy.
+No production records changed, migrations, provider sends, uploads, push, merge
+or deployment. Other unexecuted live gates remain open; do not mark backup/recovery
+or deployment ready on archive integrity alone. See current113 in
+[actual backup run](PY35_ACTUAL_BACKUP_RUN.md). Older entries below are history.
 
 Current108 main-session reconciliation:Git clean at reported0b9dab3; offline
 7b422e1 and watchlist fixes are preserved ancestors. Four private helper hashes

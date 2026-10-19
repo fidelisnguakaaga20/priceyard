@@ -1,5 +1,36 @@
 # Actual encrypted backup - owner-private execution, batch97
 
+## Current113: real encrypted backup PASSED; full restoration BLOCKED
+
+Owner entered credentials and a separate archive passphrase privately and typed
+BACKUP. Direct verified TLS, role/source/revision/read-only and table permissions
+passed. Run20261019T213738Z completed in102.8 seconds: full custom database dump,
+password-free roles,59 table fingerprints and catalog/schema/sequence/large-object
+evidence. AES-encrypted archive and filenames, independent EFS-only decryption
+and matching file digests passed. Source connection closed; backup helper stopped.
+Independent local archive SHA256 and recovered bundle hashes passed again.
+No production mutation, reset, migration or new provider connection for review.
+
+Encrypted archive is outside Git under owner-private EncryptedArchives:
+`PriceYard-20261019T213738Z.7z`. Protected run, exports and recovered copy are under
+PrivateRestoreEfs. Actual status is encrypted_backup_integrity_passed_restore_review_required;
+database_restoration_verified=false. No archive upload or second-copy claim:
+the already verified Google Drive recovery PFX is a separate object.
+
+Actual inventory review blocks the current restoration path BEFORE EXECUTION:
+
+- Supabase Vault0.3.1 is absent from installed local PG17 extension files.
+- Source en_US.UTF-8 locale differs from the reviewed C-only restore path.
+-103 functions and one publication need provider/executable-object review before
+  loading untrusted dump SQL or enabling anything that could contact providers.
+
+No server started, SQL loaded, extensions omitted or safety guard relaxed. A
+reviewed Supabase-compatible isolated restore target with protected storage is
+required; preserve all managed/customer/history objects and do not substitute
+production. Private protected restore-readiness-private.json records blockers.
+This is a successful encrypted backup/integrity check, NOT a verified recovery.
+35/36 remains; no migration/push/merge/deploy until recovery and other gates pass.
+
 ## Current112: direct TLS verified; separate guarded backup prompt opened
 
 Phone hotspot provides an IPv6 default route; the prior MiFi did not. Direct

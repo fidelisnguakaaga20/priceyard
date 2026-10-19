@@ -25,6 +25,27 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest113: ACTUAL production backup completed through verified direct TLS on
+owner's hotspot. Hidden owner credential/passphrase entry; source identity,
+read-only and permissions passed. Run20261019T213738Z: full custom dump and roles
+without passwords,59 table fingerprints, catalog/schema/sequence/large-object
+evidence;7-Zip AES/filename encryption, independent EFS decryption and file
+digests passed. Source closed; helper stopped successfully in102.8 seconds.
+Independent local archive SHA256 and recovered bundle digests reconfirmed. Root
+latest-production-backup-status.json now records integrity passed, restore review
+required. This is the first verified REAL archive, not a synthetic result.
+Restore safely BLOCKED BEFORE EXECUTION: Supabase Vault0.3.1 missing from local
+PG17 extension files; source locale en_US.UTF-8 differs from reviewed C-only
+restore path;103 functions and one publication require provider/executable-object
+review. No automatic omission, SQL execution, extra server or weakened guard.
+Need approved compatible isolated restore target/protected storage and reviewed
+provider coverage; actual encrypted archive second off-computer copy also not
+verified (existing verified Drive copy is the EFS recovery key, not this archive).
+All customer exports remain EFS or AES-encrypted outside Git. No source records
+changed, app edits, migrations, uploads, push/merge/deploy.35/36 remains; PY-35
+partial and release blocked until actual restoration/remaining live gates pass.
+Private evidence:run restore-readiness-private.json and latest backup status.
+
 Latest112: owner's phone hotspot supplies IPv6 (MiFi did not); public/default
 DNS and direct TCP5432 succeed. Credential-free PostgreSQL TLS handshake verifies
 same-project direct hostname and existing pinned CA, TLS1.3. No login/SQL in
