@@ -1,5 +1,5 @@
 import { relativePriceTime, priceAgingClass } from "../utils/priceTime";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ButtonSpinner, LoadingSpinner } from "../components/LoadingSpinner";
 import { PushAlertPrompt } from "../components/PushAlertPrompt";
@@ -31,17 +31,27 @@ export function WatchlistPage() {
   const [removingId, setRemovingId] = useState<number | null>(null);
   const [showFeedbackPrompt, setShowFeedbackPrompt] = useState(false);
   const commodityMarketPairs = useCommodityMarketPairs();
+  const activeToken = useRef(token);
+  const readVersion = useRef(0);
+  const pendingRead = useRef<AbortController | null>(null);
+  activeToken.current = token;
 
   const load = async (showLoader = true) => {
-    if (!token) return;
+    if (!token || activeToken.current !== token) return;
+    const version = ++readVersion.current;
+    pendingRead.current?.abort();
+    const controller = new AbortController();
+    pendingRead.current = controller;
+    const current = () => !controller.signal.aborted && version === readVersion.current && activeToken.current === token;
     if (showLoader) setLoading(true);
     try {
       const [watchlistItems, commodityItems, marketItems, priceItems] = await Promise.all([
-        apiFetch<WatchlistItem[]>("/watchlist", {}, token),
-        apiFetch<Commodity[]>("/commodities"),
-        apiFetch<Market[]>("/markets"),
-        apiFetchWithProvenance<PriceUpdate[]>("/price-updates"),
+        apiFetch<WatchlistItem[]>("/watchlist", { signal: controller.signal }, token),
+        apiFetch<Commodity[]>("/commodities", { signal: controller.signal }),
+        apiFetch<Market[]>("/markets", { signal: controller.signal }),
+        apiFetchWithProvenance<PriceUpdate[]>("/price-updates", { signal: controller.signal }),
       ]);
+      if (!current()) return;
       setItems(watchlistItems);
       setCommodities(commodityItems);
       setMarkets(marketItems);
@@ -49,13 +59,38 @@ export function WatchlistPage() {
       setSavedAt(priceItems.savedAt);
       setError("");
     } catch (err) {
-      setError((err as Error).message);
+      if (current()) setError((err as Error).message);
     } finally {
-      if (showLoader) setLoading(false);
+      if (current()) {
+        pendingRead.current = null;
+        setLoading(false);
+      }
     }
   };
 
-  useEffect(() => { void load(); }, [token]);
+  useLayoutEffect(() => {
+    // Clear private rows and unfinished targets before another account can paint.
+    activeToken.current = token;
+    setItems([]);
+    setPrices([]);
+    setSavedAt(null);
+    setError("");
+    setSaving(false);
+    setRemovingId(null);
+    setShowFeedbackPrompt(false);
+    setCommodityId("");
+    setMarketId("");
+    setTargetPrice("");
+    setTargetDirection("at_or_below");
+    setLoading(Boolean(token));
+    void load();
+    return () => {
+      activeToken.current = null;
+      ++readVersion.current;
+      pendingRead.current?.abort();
+      pendingRead.current = null;
+    };
+  }, [token]);
 
   useEffect(() => {
     if (items.length < 2) return;
@@ -106,7 +141,7 @@ export function WatchlistPage() {
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
-    if (!token || saving || (!commodityId && !marketId)) {
+    if (!token || activeToken.current !== token || saving || (!commodityId && !marketId)) {
       if (!commodityId && !marketId) setError("Choose a commodity, a market, or both.");
       return;
     }
@@ -121,32 +156,38 @@ export function WatchlistPage() {
           target_direction: targetPrice ? targetDirection : null,
         }),
       }, token);
+      if (activeToken.current !== token) return;
       setCommodityId("");
       setMarketId("");
       setTargetPrice("");
       setTargetDirection("at_or_below");
       await load(false);
-      showToast("Added to your watchlist.");
+      if (activeToken.current === token) showToast("Added to your watchlist.");
     } catch (err) {
-      setError((err as Error).message);
-      showToast((err as Error).message, "error");
+      if (activeToken.current === token) {
+        setError((err as Error).message);
+        showToast((err as Error).message, "error");
+      }
     } finally {
-      setSaving(false);
+      if (activeToken.current === token) setSaving(false);
     }
   };
 
   const remove = async (id: number) => {
-    if (!token || removingId !== null) return;
+    if (!token || activeToken.current !== token || removingId !== null) return;
     setRemovingId(id);
     try {
       await apiFetch(`/watchlist/${id}`, { method: "DELETE" }, token);
+      if (activeToken.current !== token) return;
       await load(false);
-      showToast("Removed from your watchlist.");
+      if (activeToken.current === token) showToast("Removed from your watchlist.");
     } catch (err) {
-      setError((err as Error).message);
-      showToast((err as Error).message, "error");
+      if (activeToken.current === token) {
+        setError((err as Error).message);
+        showToast((err as Error).message, "error");
+      }
     } finally {
-      setRemovingId(null);
+      if (activeToken.current === token) setRemovingId(null);
     }
   };
 

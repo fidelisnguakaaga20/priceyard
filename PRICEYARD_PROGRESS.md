@@ -25,6 +25,31 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest107:owner authorizes useful app/interface/security/maintainability/health
+enhancements. Completed one focused LOCAL watchlist reliability/privacy batch;
+no new audit, redesign, policy, measurement, dependency or schema changes.
+Old compiled source matches3cd973d Watchlist blobd870d2681987263ea46e37e8af2c24ab8b880106.
+Browser reproduces3 defects:stale success resurrects a removed item, stale503
+replaces a newer success, and an old-account save reloads a disposed view. Fix:
+abort superseded reads plus generation/token checks, clear private rows/draft
+targets before account-switch paint, ignore obsolete mutation errors/toasts/
+finalizers, and forward AbortSignal through existing provenance helper. Original
+JSX/styles/labels, measurements, all14 Admin cards and business rules preserved.
+Verified:2 watchlist API/storage/ownership tests; TypeScript/Vite build using the
+same dependency snapshot;8 browser checks pass after3 expected baseline failures;
+14 real-API fake-fetch/provenance/cancellation checks; all14 dashboard totals,
+single summary request and outage/reload recovery. External browser requests0,
+page errors0; TCP/DNS/providers denied by existing synthetic guards. Initial test
+harness used blocked Node route.fetch and assumed login could switch accounts
+without logout; corrected browser-only transport/logout, without relaxing guards.
+Final independent read-only review passes. Evidence:tools/local-test/runtime/
+enhancement-107-summary.json and docs/LOCAL_RELIABILITY_ENHANCEMENT_107.md.
+Native PostgreSQL not rerun:backend/schema unchanged. Only one browser/test phase
+at a time; existing snapshot reused; preview stays synthetic on127.0.0.1:55446.
+35/36 unchanged; PY35 real backup/hosting/provider gates remain unverified.
+Blocked production credential-window launch was NOT retried. No production,
+credentials, migration/push/merge/deploy. Local verified commit authorized.
+
 Latest106:owner approves ONE controlled read-only production backup and isolated
 PG17 restore using verified7b422e1 procedure. Current Git initially clean at that
 commit; application/private helper code unchanged. Local reconfirmation PASSES:

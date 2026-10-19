@@ -5,7 +5,10 @@ import {fileURLToPath,pathToFileURL} from 'node:url';
 const lab=path.dirname(fileURLToPath(import.meta.url)),root=path.resolve(lab,'../..');
 const ts=(await import(pathToFileURL(path.join(root,'frontend/node_modules/typescript/lib/typescript.js')))).default;
 const source=fs.readFileSync(path.join(root,'frontend/src/services/api.ts'),'utf8').replace('import.meta.env.VITE_API_URL','""');
-const compiled=ts.transpileModule(source,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ES2022}}).outputText;
+const compilerOptions={target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ES2022};
+const session=ts.transpileModule(fs.readFileSync(path.join(root,'frontend/src/services/sessionTransport.ts'),'utf8'),{compilerOptions}).outputText;
+const sessionUrl='data:text/javascript;base64,'+Buffer.from(session).toString('base64');
+const compiled=ts.transpileModule(source,{compilerOptions}).outputText.replace('from "./sessionTransport"','from "'+sessionUrl+'"');
 const api=await import('data:text/javascript;base64,'+Buffer.from(compiled).toString('base64'));
 let cases=0;const nativeFetch=globalThis.fetch,stamp='2026-10-17T12:00:00.000Z';
 try {
@@ -19,6 +22,17 @@ try {
   }
   globalThis.fetch=async()=>new Response('[]',{headers:{'X-PriceYard-Saved-At':stamp}});
   assert.deepEqual(await api.apiFetchWithProvenance('/price-updates'),{data:[],savedAt:null});cases++;
+  const controller=new AbortController();
+  globalThis.fetch=async(_url,options)=>{
+    assert.equal(options.signal,controller.signal);assert.equal(options.credentials,'omit');
+    return new Response('[]',{headers:{'X-PriceYard-Cache':'saved','X-PriceYard-Saved-At':stamp}});
+  };
+  assert.deepEqual(await api.apiFetchWithProvenance('/price-updates',{signal:controller.signal}),{data:[],savedAt:stamp});cases++;
+  globalThis.fetch=(_url,options)=>new Promise((_resolve,reject)=>{
+    options.signal.addEventListener('abort',()=>reject(new DOMException('Synthetic cancellation','AbortError')),{once:true});
+  });
+  const pending=api.apiFetchWithProvenance('/price-updates',{signal:controller.signal});controller.abort();
+  await assert.rejects(pending,error=>error.name==='AbortError');cases++;
   for(const status of [401,403,429,500]) {
     let token;api.setUnauthorizedHandler(value=>token=value);
     globalThis.fetch=async()=>new Response('{"detail":"Synthetic failure"}',{status});

@@ -78,9 +78,9 @@ export async function apiFetch<T>(
   return data;
 }
 
-export async function apiFetchWithProvenance<T>(path: string): Promise<{ data: T; savedAt: string | null }> {
+export async function apiFetchWithProvenance<T>(path: string, options: RequestInit = {}): Promise<{ data: T; savedAt: string | null }> {
   let savedAt: string | null = null;
-  const data = await apiFetch<T>(path, {}, null, value => { savedAt = value; });
+  const data = await apiFetch<T>(path, options, null, value => { savedAt = value; });
   return { data, savedAt };
 }
 
