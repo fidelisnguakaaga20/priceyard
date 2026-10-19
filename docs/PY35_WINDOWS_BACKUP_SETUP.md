@@ -72,6 +72,13 @@ pg_dump custom format alone is not encryption.
 
 ## Remaining setup before actual data
 
+Stage93 update:owner confirmed C: BitLocker OFF. Portable PostgreSQL17.11 tools
+and a five-table/ten-row encrypted fabricated backup/independent restoration pass.
+Both sequential local17 clusters are stopped. Existing18 untouched. Actual
+customer data remains prohibited on these unencrypted fixtures; an owner-admin
+encrypted workspace/host protection step is still required. Results/next click:
+[PY35_PG17_SETUP_RESULTS.md](PY35_PG17_SETUP_RESULTS.md). Do not repeat setup tests.
+
 1. Owner checks **Control Panel > System and Security > BitLocker Drive Encryption**;
    report only On/Off/Unavailable, never recovery keys. Do not automatically enable
    or reconfigure whole-drive encryption. If off, review a small encrypted local

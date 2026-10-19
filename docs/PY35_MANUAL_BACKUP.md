@@ -16,6 +16,10 @@ Stage92:owner-installed7-Zip26.04 starts; eight invented-file AES-256/header/
 missing-and-wrong-password/correct-restore checks pass. All artifacts and test
 password handling stay outside Git; no real password used. Archive encryption
 ready, but PG17 and encrypted local restore storage remain unverified.
+Stage93 supersedes PG17-tool absence:portable17.11 version checks and fabricated
+encrypted backup/independent local restore pass. C: BitLocker OFF, so actual
+customer-data storage/restore remains blocked; synthetic fixtures cannot be reused
+for customer data. See[PY35_PG17_SETUP_RESULTS.md](PY35_PG17_SETUP_RESULTS.md).
 
 ## Owner-reported inspection results - 2026-10-19
 

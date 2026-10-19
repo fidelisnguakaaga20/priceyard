@@ -25,6 +25,17 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest setup93:owner confirms C: BitLocker OFF. Portable PG17.11 bin/share/lib
+prepared outside Git from official PostgreSQL-linked EDB source, no services/PATH
+changes. Five-table/ten-row fabricated dump/roles/AES-256/header/decrypt/independent
+cluster restoration passes; rows/schema/constraints/indexes/sequences/ownership/
+roles/grants match. One server at a time,12 connections/32MiB buffers, fsync and
+checksums; all new clusters stopped. ExistingPG18 untouched. Native Windows pipe
+startup stall corrected to file logging; retained initial stopped fixture.
+NO actual customer-data protection/backup readiness:BitLocker off and admin-only
+encrypted volume/host protection step pending. These fixtures are SYNTHETIC ONLY.
+docs/PY35_PG17_SETUP_RESULTS.md records exact results and owner next step.
+35/36 complete; no production, customer export, app migration, upload or deploy.
 Latest setup92:owner-installed7-Zip26.04 passes eight synthetic encryption checks:
 AES-256/header encryption, missing/wrong password listing/extraction rejection,
 correct listing/integrity and exact restore.146 fabricated bytes/401-byte archive,

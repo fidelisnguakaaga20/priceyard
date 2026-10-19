@@ -27,6 +27,11 @@ upload. Next:[PY35_WINDOWS_BACKUP_SETUP.md](PY35_WINDOWS_BACKUP_SETUP.md).
 Stage92 supersedes the missing standalone-encryption-tool status:7-Zip26.04
 verified with eight synthetic AES-256/filename/password/restore checks; artifacts
 outside Git, no real password. PG17/protected disk and actual backup remain pending.
+Stage93:PG17.11 portable tools and five-table/ten-row encrypted fabricated
+backup/restoration now pass; roles/ownership/grants/schema/sequences match in a
+separate cluster, both stopped. Owner confirms BitLocker OFF. Customer-data
+workspace/host protection requires owner-admin setup; real backup remains blocked.
+See[PY35_PG17_SETUP_RESULTS.md](PY35_PG17_SETUP_RESULTS.md). No live gate passed.
 
 | Setting | Backend | Frontend |
 | --- | --- | --- |
