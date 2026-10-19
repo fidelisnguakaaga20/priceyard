@@ -6,6 +6,16 @@ No production services, credentials, customer data, migrations, provider sends,
 push, merge or deployment were used. Conditional deployment approval does not
 substitute for the required evidence.
 
+Current105:complete fabricated offline backup/restore procedure now passes using
+actual installed PG17.11/psycopg3.3.6/7-Zip;23 integration/guard checks and independent
+code/evidence review pass. Unsupported driver call, EFS signedness, connection
+encoding and passphrase-wait transaction defects corrected outside Git; prior
+helpers preserved. No application/production changes, private prompt, credentials,
+live connection, migrations or deployment.35/36 unchanged. Actual Supabase schema/
+managed objects, pooler-hop TLS, privileges and production backup restoration remain
+unverified; strict restoration inventory gate remains. STOP for owner approval.
+See[verified offline procedure](PY35_OFFLINE_PROCEDURE_VERIFICATION.md).
+
 Current102:Render credential authenticated; identity/Alembic metadata SELECTs
 completed, then generic helper source guard failed. Exact mismatch unrecorded,
 not evidence of another password failure. No dump/archive; all diagnostics kept.

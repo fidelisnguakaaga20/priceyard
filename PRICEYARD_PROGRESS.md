@@ -25,6 +25,27 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest105:owner authorizes correction/review and complete FABRICATED offline
+verification only; no prompt, credentials, production connection or actual backup.
+Corrected unsupported psycopg3.3.6 PGconn.ssl_attribute call; supported native
+ssl_in_use and verify-full remain mandatory. Also fixed Win32 EFS invalid-handle
+signedness, explicit UTF8 connection encoding and passphrase-wait transaction
+expiry; refresh identity/catalog/privileges after the wait. Prior helpers retained
+outside Git. Added guarded local restore primitives, fuller catalog/role/sequence/
+large-object evidence and exact-main offline integration. Full PG17.11 TLS -> dump
+-> AES256/header encryption -> independent decrypt -> fresh PG17 restore PASSES:
+7 fabricated tables, matching rows/hashes/schema/roles, zero checksum errors.
+11 integration/security checks plus12 small restore-guard checks pass; launcher
+syntax/pins and independent read-only code/evidence review pass. Wrong passwords,
+CA/hostname, unencrypted paths, corruption, unsafe settings/provider objects and
+non-fresh/non-local targets fail closed. One server at a time,8 connections/32MiB;
+both stopped. Initial Windows inherited-output-pipe timeout fixed in test runner;
+failed synthetic fixture retained. No app source, business rules, recovery keys or
+real records changed; no migrations/push/deploy.35/36 remains:actual Supabase
+inventory, pooler-hop TLS, permissions and recoverable production backup remain
+UNVERIFIED. No setup repetition required. STOP for owner approval before any
+new live attempt. Evidence/hashes:docs/PY35_OFFLINE_PROCEDURE_VERIFICATION.md.
+
 Latest104:owner explicitly approves ONE targeted read-only pooler diagnostic.
 Prepared Inspect-PriceYardPooler.ps1/.py outside Git, reusing owner ACL/EFS/key,
 pinned source/CA and hidden Render URL parsing. Three fabricated safety tests pass.

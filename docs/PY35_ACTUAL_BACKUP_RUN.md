@@ -1,5 +1,36 @@
 # Actual encrypted backup - owner-private execution, batch97
 
+## Current105: offline procedure verified; actual backup remains unverified
+
+Owner authorizes offline correction and fabricated full-procedure verification,
+then STOP. No private prompt/window, real credentials, production connection or
+actual backup this batch. The last diagnostic's unsupported `ssl_attribute` call
+is removed; native `ssl_in_use`, pinned CA/hostname verification and original
+source/read-only/upstream TLS requirements remain. Explicit UTF8, correct Win32
+EFS return handling and rollback before passphrase input fix additional defects.
+New snapshot/identity/privilege checks run after the passphrase wait.
+
+The exact backup main and diagnostic run with genuine installed psycopg3.3.6,
+PostgreSQL17.11 TLS and7-Zip against fabricated loopback data; console input and
+source/CA constants are overridden in test memory only. Source is stopped before
+a fresh isolated PG17 restoration. Encryption, filename secrecy, decryption,
+record/schema/role comparisons and native checksums pass. Additional restore
+guards fail closed. Existing EFS/recovery setup is reused, not recreated.
+
+Both test servers are stopped. All plaintext fixture/export files remain in EFS;
+failed first fixture is preserved. Actual Supabase object/role/locale compatibility,
+pooler-hop TLS and source privileges still require real inventory/evidence. The
+restore helper deliberately refuses unknown provider/executable objects/settings;
+it must not automatically restore an unreviewed real dump. The older source-guard
+mismatch is not retrospectively diagnosed by synthetic success. No production
+backup/restoration or release gate is newly claimed. Await owner approval before
+any live attempt. Current code hashes and evidence:
+[offline verification](PY35_OFFLINE_PROCEDURE_VERIFICATION.md).
+
+All earlier helper hashes and open-window instructions below are historical.
+No window is currently opened by this batch; do not follow an old command merely
+because it appears in the retained development history.
+
 ## Current104: one specifically approved metadata-only diagnostic
 
 Owner authorizes one read-only pooler connection with private DATABASE_URL entry.
