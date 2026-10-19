@@ -25,6 +25,22 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest114: read-only local Docker feasibility check only; no daemon/container
+startup, production connection, image download or customer restoration. Docker
+Desktop/CLI are installed; WSL docker-desktop is stopped. Existing Docker data
+VHDX is NOT EFS-encrypted; C: BitLocker remains off, so normal Docker volumes are
+not an approved plaintext customer-data destination. Host has15.7GiB physical RAM
+but only2.3GiB available at inspection; do not start an unconstrained stack given
+earlier freezes. Private saved manifest shows Vault tables have NO rows and no
+public-schema functions; no Vault root-key request justified by this snapshot.
+Candidate next step: synthetic-only single-container RAM/tmpfs feasibility test,
+with network disabled, read-only root, no persistent data/logs, one CPU, bounded
+memory and verified swap prohibition before considering real data. Docker docs
+warn tmpfs can swap; RAM-only protection is NOT yet verified. Do not simply put
+the real dump in Docker or claim the restore gate passed. Need free RAM before
+runtime testing; no settings/install/partition/service changes in this check.
+35/36 remains; backup success preserved and full recovery still unverified.
+
 Latest113: ACTUAL production backup completed through verified direct TLS on
 owner's hotspot. Hidden owner credential/passphrase entry; source identity,
 read-only and permissions passed. Run20261019T213738Z: full custom dump and roles

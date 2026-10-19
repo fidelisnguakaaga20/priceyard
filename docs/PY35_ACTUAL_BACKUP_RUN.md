@@ -1,5 +1,27 @@
 # Actual encrypted backup - owner-private execution, batch97
 
+## Current114: existing Docker inspected; no restoration started
+
+Docker Desktop/CLI exist, but WSL docker-desktop and Docker processes are stopped.
+Normal Docker data lives in an unencrypted VHDX; it must not receive plaintext
+customer records. Host has15.7GiB physical RAM, only2.3GiB currently available.
+Avoid startup of an unconstrained full stack or assumptions that free disk equals
+free memory. No daemon, container, download, new service or production connection
+was started by this inspection. No existing Docker settings/storage were changed.
+
+Saved manifest confirms Vault tables contain no rows, so this snapshot does not
+justify obtaining the provider's encryption root key. Vault extension/locale and
+provider SQL compatibility still require verification; no objects may be omitted.
+
+Potential no-new-cloud path is a small fabricated-only RAM/tmpfs container test,
+before any real restore: disabled networking, read-only root, no persistent
+volumes/customer logs, bounded CPU/memory and verified swap prohibition. This is
+a candidate, NOT proven protected storage. [Docker tmpfs documentation](https://docs.docker.com/engine/storage/tmpfs/)
+warns tmpfs can reach swap; [Docker memory controls](https://docs.docker.com/engine/containers/resource_constraints/)
+describe equal positive memory/memory-swap limits preventing container swap.
+Runtime/kernel enforcement and host-memory limitations still need verification.
+Free sufficient RAM before runtime testing. No full restore or new gate passed.
+
 ## Current113: real encrypted backup PASSED; full restoration BLOCKED
 
 Owner entered credentials and a separate archive passphrase privately and typed
