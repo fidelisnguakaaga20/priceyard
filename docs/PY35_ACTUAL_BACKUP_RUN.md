@@ -1,5 +1,32 @@
 # Actual encrypted backup - owner-private execution, batch97
 
+## Current99: TLS trust failure corrected; owner retry pending
+
+Owner's failed run20261019T073609Z stopped at certificate verification before
+authentication or SQL/export. Metadata shows only the encrypted public CA bundle
+and protected error log; no dump/roles/archive. All files preserved. The initial
+metadata-inspection command had a local PowerShell parse error; corrected before
+reading diagnostics, with no file or database changes.
+
+The helper trusted only Windows public roots. Supabase publishes its own CA;
+official dashboard configuration independently confirms its HTTPS distribution:
+[official source](https://github.com/supabase/supabase/blob/master/apps/studio/hooks/custom-content/custom-content.json).
+Downloaded only that public certificate outside Git. Verified CA constraints,
+signing usage, self-signature, validity(until2031-04-26) and DER SHA256
+`807025ad50d4ed219d2c9c7d299c004f824eb00cf7f65afef607d07b72e6cafa`.
+No Windows trust-store/provider setting change. Prior helper/launcher retained
+as `.before-ca-fix` copies. New code trusts the pinned official CA per run,
+keeps `verify-full` for psycopg and native dump clients, and rejects missing,
+malformed/private-key or mismatched CA inputs before asking for credentials.
+
+Three new CA regression tests pass; no repeated setup/PG/7z suites. One
+credential-free driver probe was inconclusive(CONNECTION_OTHER), not a successful
+database connection. A subsequent PostgreSQL SSLRequest-only probe passed
+TLS1.3/certificate/hostname verification with the official CA. No database startup
+packet, credential or SQL was sent in that handshake. Actual authenticated
+backup still awaits owner execution. Corrected private prompt reopened(process69520).
+No customer records read by Codex, deletions, migrations, push or deployment.
+
 Follow-up98:owner accidentally closed the prompt. Metadata-only inspection found
 no surviving backup process, run folder, archive or saved result. No incomplete
 export files found or deleted. Reviewed helper hash unchanged; same launcher
@@ -40,7 +67,8 @@ execution handoff for private credential entry, not another setup/approval reque
 The launcher and Python helper are outside Git in the private backup root, as are
 their four new guard-test results. The launcher pins the owning SID, private root
 ACL, existing EFS folder/key and the exact reviewed Python SHA256:
-`31c144226fe90697207d559eb646b099e0a1d3ae7569d06d8d1d5ed98add4641`.
+`8d716edc9dcfc12571cc606a0a9d82c4c528c134735e8c9049c50212525b3c3c`.
+This supersedes the initial Windows-root-only helper hash recorded in batch97.
 
 - Reuses PG17.11/7-Zip26.04 and existing installed psycopg3.3.6; no installs or app
   imports/dotenv reads. The driver's existing libpq18 is only a connection client;
@@ -48,7 +76,7 @@ ACL, existing EFS folder/key and the exact reviewed Python SHA256:
   run cannot connect; wrong identity/version/TLS/read-only/revision rejected;
   inherited libpq settings excluded; no shell/password interpolation.
 - Source pinned to supplied Session pooler5432, project-qualified user and postgres
-  database. Validates TLS with `verify-full` against public Windows trusted roots;
+  database. Validates TLS with `verify-full` against the pinned official Supabase CA;
   stops on certificate/trust failures, never downgrades TLS. Ignores inherited PG
   service/host settings. Password only in local memory/child environment, never
   arguments/history/files; same-account process memory remains a host risk.

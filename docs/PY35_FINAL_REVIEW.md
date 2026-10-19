@@ -6,6 +6,14 @@ No production services, credentials, customer data, migrations, provider sends,
 push, merge or deployment were used. Conditional deployment approval does not
 substitute for the required evidence.
 
+Current99:actual owner backup attempt FAILED TLS certificate verification before
+SQL/dump, not data corruption. No dump/archive created; protected diagnostics
+preserved. Private CA trust corrected from official Supabase dashboard distribution,
+no TLS downgrade or system trust changes. Three new certificate guards pass and
+credential-free TLS1.3 certificate/hostname handshake passes. Corrected private
+prompt reopened; authenticated backup/restoration still unverified. No release
+gate newly passed; no migrations/push/deploy. See[execution status](PY35_ACTUAL_BACKUP_RUN.md).
+
 Current97:owner confirmed separately retrieved protected recovery copy; non-secret
 report checked. Actual read-only backup/isolated restore now explicitly authorized,
 but no password or source connection available to Codex. Owner-only backup helper

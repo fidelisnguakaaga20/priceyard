@@ -25,6 +25,20 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest99:owner reports BACKUP STOPPED. Private diagnostic identifies TLS
+certificate verification failure before authentication/SQL/dump; failed run
+supabase-backup-20261019T073609Z has only encrypted public-root PEM/error log,
+no database dump/archive. Preserved all files and prior helper/launcher versions.
+Cause:Windows public roots do not include Supabase's private CA. Downloaded public
+CA from HTTPS URL confirmed in official dashboard source; validated root properties,
+self-signature/validity and pinned DER SHA256. Replaced per-run trust only;
+verify-full unchanged, Windows trust store untouched. Three new CA guards pass.
+An initial credential-free driver probe was inconclusive(CONNECTION_OTHER), not
+counted as success; subsequent SSLRequest/TLS-only handshake verifies certificate/
+hostname with TLS1.3, no startup/authentication/SQL sent. No credentials retained
+or customer data inspected. Corrected launcher reopened(process69520), awaiting
+private prompts. New helper hash/docs:docs/PY35_ACTUAL_BACKUP_RUN.md. Backup and
+database restore still UNVERIFIED; no migrations/push/deploy.35/36 unchanged.
 Latest98:owner closed the private backup window. Process/metadata-only check
 confirms no surviving backup/native dump/archive process, no supabase-backup run
 folders, no production archive and no saved backup result. No incomplete export
