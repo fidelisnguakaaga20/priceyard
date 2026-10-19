@@ -1,5 +1,40 @@
 # Actual encrypted backup - owner-private execution, batch97
 
+## Current116: compatible RAM-only target passes fabricated restoration
+
+New mobile data and4.16GiB free host RAM permit a bounded retry. Public registry
+TLS and local Docker29.2.1 readiness pass under2GiB/one CPU/swap0. Prior1GiB
+failure cause is not retrospectively established. Docker auto-starts three local
+EasySpend containers; their files/settings must not be altered for PriceYard.
+
+Downloaded only public official Supabase Postgres17.6.1.136, selected from
+[official compose](https://github.com/supabase/supabase/blob/master/docker/docker-compose.yml).
+Pinned Linux amd64 manifest:
+`sha256:5a4314708484bec672de2c09653a5c01fb1c84a998564ac231b0325e2238ed5b`.
+Compressed layers367203535 bytes. No account credential, cloud project or real
+backup export involved. No declared image volumes.
+
+New synthetic-only checker passes: non-root/no capabilities/read-only root,
+network none/no host mounts/no persisted logs,512MiB memory=memory-swap, actual
+cgroup swap0 and guest swap0, tmpfs data. Exact source extension versions and
+en_US.UTF-8 locale pass, including Vault0.3.1. Sequential fabricated PG17 dump/
+restore matches data digest, five extensions and native checksums; container
+removed. Initial SHOW lc_collate incompatibility corrected to catalog query;
+first failure retained, only affected test repeated. Actual backup not opened by
+this checker. Evidence: private ram-fixture-result.json and pinned-image result.
+
+Actual saved SQL review: hashes match; no PROGRAM/ALTER SYSTEM/LOAD/server-file IO
+or untrusted procedural language; no foreign server/subscription/custom tablespace.
+Vault tables empty. Source has six provider event triggers,103 functions, and
+supautils/safeupdate role preloads, so do not reuse the old simple-inventory
+restorer by disabling its guards. A separate reviewed isolated Supabase profile
+is needed before any real restoration. Database recovery remains unverified.
+
+Attempt3 Docker runtime currently active with owned temporary WSL cap; record
+path docker-feasibility-resource-config-attempt3.json. Stop Docker after work and
+archive/hash-check/remove only that new config to restore prior absence. No new
+source connection, app changes, migration, push/merge/deploy.35/36 unchanged.
+
 ## Current115: bounded Docker startup failed; real backup untouched
 
 After owner READY, host free RAM was2.61GiB. Docker was the only installed WSL

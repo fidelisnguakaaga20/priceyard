@@ -25,6 +25,32 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest116 IN PROGRESS: owner replaced exhausted500MB mobile bundle with17GB;
+host RAM now4.16GiB free. Public Docker-registry TLS passes. With2GiB/one CPU/
+swap0 temporary WSL cap, existing engine29.2.1 becomes ready; do not assert
+network exhaustion caused prior failure (memory limit and connectivity changed).
+Docker auto-restarts three unrelated EasySpend containers; do not change their
+files/configuration. Attempt2 stopped and its temporary config archived/removed.
+Attempt3 remains active with temporary2GiB cap (private attempt3 resource record).
+Official Supabase17 image17.6.1.136 selected from official compose; Linux amd64
+manifest sha256:5a4314708484bec672de2c09653a5c01fb1c84a998564ac231b0325e2238ed5b;
+367203535 compressed layer bytes downloaded, no credentials/cloud project/charge.
+New verify_supabase_ram_fixture.py verifies Docker configuration and actual
+tmpfs/read-only/no-network/no-swap512MiB runtime guards, exact five extension
+versions including Vault0.3.1, en_US.UTF-8, and sequential fabricated PG17 dump/
+restore with matching digest and checksums. PASS; temporary container removed.
+First fixture used removed SHOW lc_collate; changed to pg_database catalog query,
+preserved failed evidence and reran only that test. No app defect/change implied.
+Private ram-fixture-result.json passed; image-result and public manifest metadata
+saved. Real backup SQL reviewed privately: no PROGRAM/ALTER SYSTEM/LOAD/file IO/
+untrusted language, no foreign server/subscription/custom tablespace, Vault empty;
+preload libraries supautils/safeupdate and six provider event triggers require
+the reviewed isolated Supabase profile. Real backup NOT yet loaded/restored.
+35/36 unchanged; no production connection, migration, push/merge/deploy. Next
+review/prepare protected real restore; preserve old simple helper guards and
+source backup. On exit stop test-started Docker and archive/remove only the
+owned attempt3 temporary .wslconfig after hash validation, restoring absence.
+
 Latest115: owner READY; host still only2.61GiB free. For one fabricated-only
 feasibility attempt, created previously absent .wslconfig limiting the sole WSL
 docker-desktop distro to1GiB/one CPU/swap0; original absence recorded. Started
