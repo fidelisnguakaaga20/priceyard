@@ -7,6 +7,12 @@ gates stay open;35/36 checklist items complete. Latest request authorizes prepar
 the manual backup/recovery workflow, with an explicit stop before production
 access if access/approval is required. No authenticated database access is set up.
 
+Owner chose free Windows-local storage with optional encrypted Google Drive copy.
+Initial tool/folder inspection completed2026-10-19; empty ACL-protected folder
+created outside Git, NOT yet encrypted. PostgreSQL17/encryption/restore setup
+remain incomplete. Next:[PY35_WINDOWS_BACKUP_SETUP.md](PY35_WINDOWS_BACKUP_SETUP.md).
+No actual export/upload/restoration approved before setup verification.
+
 ## Owner-reported inspection results - 2026-10-19
 
 Owner reports successful execution of the prepared inspection:PostgreSQL17.6,

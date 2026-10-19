@@ -20,6 +20,10 @@ pending, with earlier migration files unchanged against preserved master. No
 encrypted export/restoration yet. Match17 recovery tooling rather than treating
 an18-only restoration as proof of17 recovery. Secure access, encrypted storage
 and isolated customer-data restore target remain prerequisites. No live gate passed.
+Windows-local setup91 has an empty private folder outside Git with verified
+user/SYSTEM ACL; it is NOT encrypted. Bundled7za23.01/PG18 found, PG17 missing in
+standard installation, BitLocker status unverified. No customer export/restore or
+upload. Next:[PY35_WINDOWS_BACKUP_SETUP.md](PY35_WINDOWS_BACKUP_SETUP.md).
 
 | Setting | Backend | Frontend |
 | --- | --- | --- |

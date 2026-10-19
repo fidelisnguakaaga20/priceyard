@@ -25,6 +25,13 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest setup91:owner requests free Windows preparation, optional encrypted Drive
+copy. Created/verified EMPTY ACL-restricted folder outside Git:
+C:\Users\HP\AppData\Local\PriceYardPrivateBackup. NOT encrypted. Found bundled
+7za23.01/standardPG18; PG17 absent there. WindowsPro/BitLocker tools present,
+protection status unverified. No downloads/installs, production, exports, restores,
+uploads or migrations. Next:standalone current7-Zip, then encrypted workspace/PG17
+and synthetic setup drill. docs/PY35_WINDOWS_BACKUP_SETUP.md. No live gate passed.
 Latest owner evidence2026-10-19/batch90:reported production inspection17.6,
 14 MB,0021_feedback_screenshot. Static22-file chain confirms only0022 pending;
 earlier migrations unchanged vs master. Full schema compatibility not established.

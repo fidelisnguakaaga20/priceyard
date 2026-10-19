@@ -1,0 +1,16 @@
+{
+  "scope": "empty-local-private-folder-only",
+  "path": "C:\\Users\\HP\\AppData\\Local\\PriceYardPrivateBackup",
+  "outside_project_and_git": true,
+  "created_empty": true,
+  "inheritance_disabled": true,
+  "explicit_full_control": ["current Windows user", "SYSTEM"],
+  "encrypted": false,
+  "customer_data_present": false,
+  "existing_bundled_7za_version": "23.01",
+  "standard_postgresql_major_versions_found": [18],
+  "bitlocker_protection_status": "unverified; additional privilege required",
+  "tool_downloads_or_installations": 0,
+  "production_connections": 0,
+  "exports_restores_migrations_uploads": 0
+}
