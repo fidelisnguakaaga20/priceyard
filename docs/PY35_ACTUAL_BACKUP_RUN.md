@@ -1,5 +1,35 @@
 # Actual encrypted backup - owner-private execution, batch97
 
+## Current112: direct TLS verified; separate guarded backup prompt opened
+
+Phone hotspot provides an IPv6 default route; the prior MiFi did not. Direct
+same-project hostname resolves, TCP5432 connects and a credential-free PostgreSQL
+TLS handshake verifies hostname and existing pinned CA with TLS1.3. No database
+authentication or SQL occurred in these checks. Sandbox socket restrictions were
+handled through normal approved escalation, not a security bypass.
+
+New private direct-route helper and launcher preserve original pooler files.
+Host is pinned to the same-project direct endpoint; user is postgres. Render URL
+still accepts only that project's direct or original pooler credentials and
+extracts the password only, never accepting URL-supplied connection options.
+The server-reported TLS guard remains mandatory (now database_connection_ssl).
+No read-only, identity, recovery, EFS, export, archive or restore guard removed.
+
+22 focused offline checks pass: accepted direct/pooler URLs, single decoding,
+wrong project/user/database/port/missing password rejection, source identity and
+TLS/revision rejection, both native/Python connection pinning/read-only behavior,
+and unchanged other backup functions. Launcher parses successfully. Existing
+full synthetic backup/restore results are reused; no database processes started.
+Evidence: private direct-route-safety-results.json. Direct helper SHA256:
+`bcd92f38c3ca888117c6c9cd5488c8ed66e4639ed37f42ebdae4dddf4731d686`.
+
+Owner instructed continuation. ONE approved visible PowerShell console opened
+(process29332), hidden Render URL/passphrase input, after hash/no-overlap/no-real-
+success-report checks. Await private entry/result; do not open another prompt or
+retry. Actual backup and restoration remain unverified. Preserve stop-on-failure
+and protected restore-inventory review. No application/provider changes,
+migrations, push, merge or deployment;35/36 local improvements unchanged.
+
 ## Current111: actual source preflight failed; no export started
 
 Protected diagnostics for run20261019T133223Z identify the exact rejected check:

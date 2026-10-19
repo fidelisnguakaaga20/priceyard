@@ -25,6 +25,24 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest112: owner's phone hotspot supplies IPv6 (MiFi did not); public/default
+DNS and direct TCP5432 succeed. Credential-free PostgreSQL TLS handshake verifies
+same-project direct hostname and existing pinned CA, TLS1.3. No login/SQL in
+those connectivity checks. Initial sandbox socket denial was resolved through
+normal escalation, not interpreted as a provider/network failure.
+Prepared separate private Start-PriceYardDirectEncryptedBackup.py/.ps1; original
+pooler helper/launcher preserved. Only pinned host/user, credential-only pooler
+URL recognition, TLS metadata label and console wording differ. Server-side TLS
+must still be true; verify-full, recovery/EFS, read-only identity/permissions,
+snapshot/export/encryption/integrity and restore-review guards remain unchanged.
+22 focused offline checks and launcher syntax pass; no database server/full drill
+rerun. Direct helper SHA256:bcd92f38c3ca888117c6c9cd5488c8ed66e4639ed37f42ebdae4dddf4731d686.
+Owner says continue; ONE approved visible hidden-entry direct-backup window opened
+(process29332) after hash/no-overlap/no-success checks. Await private owner entry
+and real result; no backup or restoration success claimed. No application edits,
+provider settings changes, migrations, push/merge/deploy.35/36 unchanged. Stop on
+any source, permission, coverage, archive or restore-inventory failure.
+
 Latest111: controlled attempt stopped at the retained upstream TLS safeguard.
 Private metadata from run20261019T133223Z confirms authenticated metadata read,
 client TLS in use with verify-full, database postgres, role postgres, read-only on,
