@@ -25,6 +25,19 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest103:owner SQL Editor results170006/postgres/[0021_feedback_screenshot]
+match expected major/database/revision. Existing failed pooler run still has NO
+source-preflight-private.json; only generic85-byte guard error. Remaining role,
+read-only and pooler-to-database SSL observations were discarded. Cannot identify
+exact original mismatch from SQL Editor's different connection; earlier metadata
+query was insufficient for pooler-session diagnosis. No guess/TLS bypass or
+automatic restart. Authentication in last attempt already proved successful.
+Current helper would capture exact per-field values on a new privately entered
+connection, but owner forbids repeating the same process before diagnosis; such
+new observation remains required, not fulfilled by supplied three values. No
+credentials retained to reconnect autonomously; no backup/export/restore, new
+tests/setup, migrations/push/deploy this batch.35/36 unchanged; resume blocked
+by missing session evidence rather than bad supplied SQL results.
 Latest102:Render URL attempt20261019T080749Z authenticated successfully and read
 source identity/Alembic metadata, then failed helper's generic combined validation
 guard. NOT authentication/URL-decoding/network denial. Error85bytes omitted actual

@@ -1,5 +1,29 @@
 # Actual encrypted backup - owner-private execution, batch97
 
+## Current103: supplied metadata matches; original session evidence unavailable
+
+Owner successfully ran the metadata-only query and reports server_version_num
+170006, database postgres, installed_revisions[0021_feedback_screenshot]. These
+match the expected guard values. They do NOT establish the remaining observed
+pooler session role, read-only text/type or pooler-to-database SSL flag. The old
+failed run contains no per-field report; its85-byte error cannot identify which
+remaining condition failed. Reinspection confirms no dump/roles/archive.
+
+The earlier SQL Editor query was insufficient to finish pooler-specific diagnosis;
+do not treat matching results as a reason to weaken any guard or assume upstream
+TLS failed. Last owner attempt already proves successful authentication and
+metadata SELECTs, not stale Render credentials. No passwords/URL retained.
+
+Exact diagnosis requires a new bounded authenticated **pooler-session metadata**
+observation with client TLS, encoding/types, role, transaction state and upstream
+SSL recorded before the guard. Current helper captures most such values, but
+source encoding/types should also be included if a focused diagnostic is prepared.
+This is not a repeated setup test or a database migration; it requires private
+credential input because secrets were deliberately discarded. Owner instructed
+no repeated attempt before diagnosis, so no prompt/connection/retry launched in
+this batch. Actual backup/restoration remains unverified. Do not claim the exact
+mismatch or successful correction without runtime evidence.
+
 ## Current102: successful login; source-validation mismatch not yet identified
 
 Latest owner run20261019T080749Z fails with
