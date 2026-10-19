@@ -25,6 +25,21 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest108:owner designates THIS conversation main session and resumes PY35 from
+actual latest Git state. Clean branch at0b9dab3285ee19a0a3d61e7fc13726a352c7c3bf;
+reported offline7b422e1 and latest0b9dab3 are confirmed ancestors, all changes
+preserved. master76dbd27/backup2589910 unchanged. Read saved offline evidence:
+whole-procedure and restore-guard reports passed; all four private code hashes
+match verified7b422e1 documentation. Watchlist107 evidence/history retained.
+No tests/setup/audit repeated, no application changes. No active backup process or
+real latest-production-backup-status result.35/36; actual backup/restore and live
+release gates unverified. Next ONLY blocker to the previously approved controlled
+attempt:explicit clarification that a visible local PowerShell console is allowed
+while credential input remains hidden; prior automatic review rejected that
+launch before execution. No bypass/alternate launch. No production connection,
+credential request, export, migration/push/merge/deploy in this batch. Main-session
+handoff persists here; do not revert to outdated helper instructions.
+
 Latest107:owner authorizes useful app/interface/security/maintainability/health
 enhancements. Completed one focused LOCAL watchlist reliability/privacy batch;
 no new audit, redesign, policy, measurement, dependency or schema changes.

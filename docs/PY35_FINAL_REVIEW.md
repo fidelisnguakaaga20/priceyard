@@ -6,6 +6,16 @@ No production services, credentials, customer data, migrations, provider sends,
 push, merge or deployment were used. Conditional deployment approval does not
 substitute for the required evidence.
 
+Current108 main-session reconciliation:Git clean at reported0b9dab3; offline
+7b422e1 and watchlist fixes are preserved ancestors. Four private helper hashes
+match offline verification; saved whole-drill/restore-guard reports passed.
+No repeat tests/audit or application changes. Actual production backup/restoration
+still NOT VERIFIED; no active backup process/result. Prior launch was rejected
+by automatic approval review before execution due to visible-window versus
+hidden-input ambiguity. Require explicit clarification for a visible local
+console with hidden credential input before resubmission; no workaround. All
+production migration/push/merge/deploy restrictions remain.35/36 unchanged.
+
 Current105:complete fabricated offline backup/restore procedure now passes using
 actual installed PG17.11/psycopg3.3.6/7-Zip;23 integration/guard checks and independent
 code/evidence review pass. Unsupported driver call, EFS signedness, connection

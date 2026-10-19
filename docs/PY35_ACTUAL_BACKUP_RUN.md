@@ -1,5 +1,16 @@
 # Actual encrypted backup - owner-private execution, batch97
 
+## Current108: main session reconciled; no redundant setup
+
+Confirmed current0b9dab3 contains verified offline7b422e1 and watchlist work.
+Private helper hashes and saved passing offline reports match; master/backup
+branches and all completed changes preserved. No tests or setup repeated.
+No real backup result or active backup process. The previously approved controlled
+attempt remains unstarted after the recorded automatic-review rejection106.
+Next clarify permission for a **visible local window with hidden credential input**;
+no secrets in chat. Do not reinterpret general resume as resolving the specific
+review ambiguity or launch by another route. No production/push/migration/deploy.
+
 ## Current106: protection reconfirmed; launch blocked before production access
 
 Owner now approves ONE controlled read-only backup and protected PG17 restore.
