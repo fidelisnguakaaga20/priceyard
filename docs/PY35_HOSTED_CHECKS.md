@@ -1,5 +1,18 @@
 # PY-35 hosted verification — 2026-10-20 WAT
 
+Current124: owner conditionally authorizes temporary zero-cost staging and a
+development-branch push after production isolation and sufficient free resources
+are confirmed. GitHub repository access passes; development branch search returns
+no matches. Local workflows absent and remote master.github directory404 do not
+prove external push hooks are absent. Workflow-list API is unsupported by the
+connector. Render integration is discoverable but not installed/connected, so
+current usage and service branch/autodeploy bindings remain unverified. Secure
+connection offered; no credentials requested in chat. No push, staging creation,
+purchase, migration, repeated test or deployment occurred. Hosted tests remain
+BLOCKED/not attempted; deployment approval must wait for actual evidence. Next
+owner action: install/connect Render using the existing account. Then inspect
+usage and service settings read-only before any conditional staging action.
+
 35/36 recommendations remain complete; PY-35 is partial. Resume point verified:
 `af8aa77b99bc1be4925f436f8becb3105a0eb989`, clean working tree on
 `codex/priceyard-original-preserved-20261016`. Verified recovery commit8c7ea61 is
