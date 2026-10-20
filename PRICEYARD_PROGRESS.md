@@ -25,6 +25,20 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest127 CONFIGURATION LOCATED (2026-10-20 WAT): owner explicitly requests secure
+inspection of existing local configuration before further setup. Narrow read-only
+provider-field classification (no application import, provider/network call,
+database URL inspection, credential output/copy or file changes) finds Paystack
+secret/public keys markedTEST, backend Google client ID, frontend Google client
+ID, Brevo credential and configured sender. Do not ask owner to recreate these
+settings or paste keys. Owner approves fidelisnguakaaga20@gmail.com as test email.
+Presence/mode are verified; validity, matching Google client IDs/test identity/
+tunnel origin and actual email/Paystack receipt are NOT yet verified. Credentials
+remain in existing files; original synthetic guard still denies dotenv/transports.
+Use only a separately guarded provider runner, pinned synthetic PG17 and explicit
+recipient/endpoint restrictions; never expose unchanged mocked preview or load
+production DATABASE_URL. Tunnel not started;35/36 unchanged, no hosted PASS claim.
+
 Latest126 PROVIDER INPUT BLOCKER (2026-10-20 WAT): owner approves ONE temporary
 free Cloudflare Quick Tunnel for essential real provider TEST checks, synthetic
 data only, PostgreSQL private, close tunnel afterward, no charges/production
