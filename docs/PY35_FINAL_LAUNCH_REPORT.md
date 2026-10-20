@@ -1,5 +1,15 @@
 # PY-35 final launch result — 2026-10-20 WAT
 
+Current143: **FAIL — blocked prerequisites, no new hosted test run.** Owner's
+conditional Free API approval requires an isolated test database before creation
+and stopping the service within two hours. Read-only Render listing confirms only
+the excluded SettleTrack database. Private local PostgreSQL stays private; memory
+SQLite loses revocations across restart/rollback and cannot certify that safety.
+No suitable permitted hosted database is confirmed. The connected Render tools
+also cannot suspend/delete a service; no authenticated alternative stop path is
+verified. Created nothing and stopped as instructed. **35/36; NOT READY for
+deployment approval.** Existing test passes and previous POST502 evidence remain.
+
 Current142 final hosted result: **FAIL**. Render GET reaches the synthetic API;
 the latest POST returns502 before the counted handler. Login/cookie/CSRF/logout
 were not attempted. Controller cleanup happened after failure/count collection;
@@ -89,13 +99,17 @@ a **scoped hosted routing/runtime verification window**, not an unconditional
 production launch. No new service, purchase, push, merge, production migration or
 deployment was performed.
 
-## Smallest next hosted option, not authorized or created
+## Conditional hosted option — blocked before creation
 
-Use one temporary **Free Render API test service**, reusing the existing temporary
-static site. Synthetic in-memory records only, no database service, production
-credentials, provider calls or migrations; auto-deploy off and a development
-branch only. This removes the Quick Tunnel hop and tests the same Render rewrite
-against a stable upstream. It does not presume which hop caused502. The earlier
-exception covered one static test site, so the additional API service requires
-owner approval before creation. No service, branch push or deployment is included
-in this proposal.
+Owner conditionally approved one temporary **Free Render API**, reusing the
+existing static test site. No API has been created. The earlier in-memory proposal
+can check forwarding but cannot verify revocation persistence across hosted
+rollback. Confirm a separate permitted synthetic database and an actual service
+suspension arrangement before creation; do not substitute SettleTrack, production,
+an exposed local database, idle sleep or a resetting memory fixture.
+Render permits only one Free Postgres per workspace and Free service local files
+are lost across restart/redeploy ([official limits](https://render.com/docs/free)).
+Render has a [suspend API](https://api-docs.render.com/reference/suspend-service-1),
+but this connected toolset does not expose it. No API keys were requested or read.
+This is a prerequisite block, not an established application defect. No service,
+expense, branch push, production setting, migration or deployment was performed.

@@ -25,6 +25,26 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current143 CONDITIONAL HOSTED API BLOCKED (2026-10-20 WAT): owner approved ONE
+temporary Free Render API only after confirming a suitable isolated database,
+with hosted sessions/rollback tests and service stopped within two hours.
+Read-only Render database listing in confirmed My Workspace returns only
+settletrack-db; it was not connected to or modified. Existing private synthetic
+PostgreSQL remains private. The proposed memory SQLite fixture supports one
+process's session tests but loses revocations/account state on restart; it cannot
+establish durable hosted rollback safety. No suitable permitted hosted database
+has been confirmed. Current Render connector exposes no suspend/delete control;
+Render CLI is not available on PATH, and no authenticated alternative stop path
+has been verified. Idle sleep or process exit is not a two-hour suspension.
+STOPPED before API creation, branch push, tests or deployment, as instructed.
+No failed application test is claimed for this blocked attempt. Previous hosted
+POST502 and all completed work/evidence remain preserved. 35/36 complete; PY-35
+partial, deployment approval NOT READY. Minimum prerequisites: a separate
+permitted test database that retains revocations across rollback and a verified
+Dashboard/API suspension arrangement before any service is created. No new
+database, paid resource, production access/settings, migrations or repeated tests.
+Evidence: batch-143-hosted-api-prerequisites.json.
+
 Current142 HOSTED TRANSPORT FAIL (2026-10-20 WAT): after owner saved latest kai
 destination, automatic corrected suite ran once. Actual Render GET synthetic
 identity PASS; POST/probe returned502, stopping before body/query/cookie/login
