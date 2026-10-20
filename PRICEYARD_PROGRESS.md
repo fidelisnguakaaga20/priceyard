@@ -25,6 +25,32 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current137 TEMPORARY FREE TARGET (2026-10-20 WAT): owner grants the requested
+one-site exception. Created exactly one static-only synthetic Render target:
+priceyard-py35-check-20261020, srv-dbbs8omi0phs73e1mtd0,
+https://priceyard-py35-check-20261020.onrender.com. Initial non-production deploy
+dep-dbbs8oui0phs73e1mu50 is live. Auto-deploy NO, no env vars/credentials/database,
+no cloned production environment or migration build. Existing repo/master is read
+only for checkout; build merely writes a tiny synthetic HTML page to py35-check.
+No code push, dependency install, production setting/migration/deployment or paid
+service. Do not create another site on resume. Connector cannot edit rewrite rules
+or delete the test target; its Dashboard is the owner action path. Preparing one
+bounded synthetic-memory API + hash-verified cached tunnel, no provider keys/PG17.
+Setup syntax/isolation review passes. First pre-test hostname lookup raced tunnel
+registration; processes stopped cleanly. Source corrected to wait boundedly for
+registration and verified HTTPS identity. Exact failed setup logs retained in
+runtime/render-hosted-20261020/dns-readiness-stop; one gated setup resume only.
+New synthetic HTTPS identity and independent POST/body/query control PASS.
+State now awaiting ONLY test-site rewrite: /api/* to active state.destination,
+then unchanged SPA /*->/index.html; owner question sent with verified current URL.
+One15-minute controller window, then tunnel/API stop automatically. No real keys,
+provider calls, production data, copied config or PostgreSQL. Runtime progress under
+runtime/render-hosted-20261020; check state/result/expiry before confirming SAVED.
+On genuine owner SAVED only, write rewrite-saved.txt to trigger single bounded
+hosted browser run. Never confirm for owner, reuse expired URL, rerun completed
+checks or create another site. No Render edge result yet.35/36 unchanged.
+Final release authority remains withheld. Test-site cleanup requires its Dashboard.
+
 Current136 HOSTED TARGET CHECK (2026-10-20 WAT): owner requests one controlled
 safe-target hosted verification, no paid resources or production change. One
 approved-workspace Render list_services(includePreviews=true) confirms no isolated

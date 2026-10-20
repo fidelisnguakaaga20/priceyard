@@ -1,0 +1,65 @@
+{
+  "date_wat": "2026-10-20",
+  "scope": "one owner-approved temporary Free static Render target and bounded synthetic API; actual edge test awaiting owner rewrite",
+  "completed_recommendations": 35,
+  "remaining_recommendations": 1,
+  "release_authorized": false,
+  "test_target": {
+    "id": "srv-dbbs8omi0phs73e1mtd0",
+    "name": "priceyard-py35-check-20261020",
+    "url": "https://priceyard-py35-check-20261020.onrender.com",
+    "type": "static_site",
+    "auto_deploy": "no",
+    "environment_variables": 0,
+    "databases": 0,
+    "dependency_installs": 0,
+    "build": "tiny fabricated HTML only",
+    "deployment": "dep-dbbs8oui0phs73e1mu50",
+    "status": "live",
+    "production_environment_copied": false,
+    "instance_hours": 0
+  },
+  "synthetic_backend": {
+    "storage": "fresh_in_memory_SQLite_only",
+    "app": "original_current_backend",
+    "allowed_workflows": [
+      "health/proof",
+      "synthetic_body_query_multiple_cookie_probe",
+      "browser_login",
+      "browser_session",
+      "auth_me",
+      "logout"
+    ],
+    "admin_email_payment_Google_reset_routes_admitted": false,
+    "production_secrets_read": false,
+    "provider_credentials_used": false,
+    "TCP_DNS_libpq_dotenv_app_egress": "denied_by_existing_guard",
+    "public_transport": "one_cached_hash_verified_temporary_Cloudflare_tunnel",
+    "maximum_manual_window_seconds": 900,
+    "browser_deadline_seconds": 90,
+    "owned_browser_tree_timeout_cleanup": true
+  },
+  "setup": {
+    "syntax": "PASS",
+    "isolation_source_review": "PASS",
+    "initial_result": "pre_verification_DNS_propagation_race_stopped_cleanly",
+    "logs_preserved": true,
+    "correction": "bounded_wait_for_tunnel_registration_DNS_and_verified_HTTPS_identity",
+    "gated_setup_resume": 1,
+    "independent_public_synthetic_identity": "PASS",
+    "independent_upstream_POST_body_control": "PASS"
+  },
+  "edge": {
+    "status": "NOT_RUN_awaiting_test_only_rewrite",
+    "owner_action": "Save two exact Rewrite rows on temporary site only; verify live state destination and expiry",
+    "Render_forwarding_certified": false
+  },
+  "production_changes": false,
+  "production_data_access": false,
+  "push": false,
+  "merge": false,
+  "production_migration": false,
+  "production_deploy": false,
+  "paid_services": 0,
+  "new_features": 0
+}
