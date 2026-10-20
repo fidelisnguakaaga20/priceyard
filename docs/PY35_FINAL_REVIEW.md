@@ -1,5 +1,13 @@
 # PriceYard final review - batch 87
 
+Current128 (2026-10-20 WAT) supersedes older provider statuses: public-tunnel
+HTTPS/API session/CSRF/reset/logout, one actually received reset email, Paystack
+TEST initialization and local PG17 application rollback pass. Actual Google
+consent, completed TEST payment/provider webhook/public browser and Render
+operational/artifact evidence remain open. Tunnel/app/PG17 stopped.35/36 remains;
+no production changes/push/migration/deployment. Current detail:
+[provider results](PY35_HOSTED_CHECKS.md), [actual ledger](PY35_ACTUAL_RELEASE_GATES.json).
+
 ## Current122: protected local 0022 rehearsal passed (2026-10-20 WAT)
 
 **35/36 complete; PY-35 partial.** Docker readiness blocker is superseded.

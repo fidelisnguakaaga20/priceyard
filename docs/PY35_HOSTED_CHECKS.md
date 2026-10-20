@@ -1,5 +1,41 @@
 # PY-35 hosted verification — 2026-10-20 WAT
 
+Current128 actual provider drill: **35/36 complete, PY-35 partial; release blocked.**
+
+| Essential check | Verified result |
+| --- | --- |
+| Public HTTPS/API sessions | PASS: private gateway, real original API login, Secure/HttpOnly/SameSite cookie attributes and session persistence |
+| CSRF/logout/reset | PASS over the tunnel: missing CSRF403; logout clears access; actual sent reset link works once, replay fails and prior session is revoked |
+| Email | PASS: existing credential authenticates, available included credits checked, one original reset message accepted; approved owner confirms receipt. No resend needed |
+| Paystack | PARTIAL: TEST credentials accepted; original2500 monthly checkout initialization200. No completed payment, callback or provider webhook yet |
+| Google | NOT ATTEMPTED: matching existing frontend/backend client IDs found; real browser consent/origin and sign-in remain open |
+| Application rollback | PASS locally on PG17: exact reviewed2cfbfa6 app source, security storage retained, revoked session still rejected, normal login works. This does not certify a Render deploy artifact/runtime |
+| Public browser workflow | NOT VERIFIED: initial runner omitted existing browser cache settings. Corrected cache startup/cleanup now passes; public workflow must still run |
+| Cleanup | PASS: one public tunnel closed; owned app stopped; synthetic PG17 stopped;55452/55453/55454 closed |
+
+Only fabricated application records and the approved test identity/email were
+used. No production connection/data/settings, real charge, Render resource,
+paid purchase, push, migration or deployment. Existing backup/restore/migration
+checks were not repeated. No application source, design or business policy edit.
+
+Earlier runner failures are retained: pg_ctl inherited capture handles caused a
+timeout despite a ready server (fixed with file-backed output); browser cache
+path/UTF-8 handling; legitimate backend tar directory root refused by an overly
+narrow archive guard (corrected before successful local rollback). They are not
+evidence of production/application failures. No duplicate email or second tunnel
+was used to finish the local rollback.
+
+**Current necessary owner input:** report the existing Paystack **TEST** webhook
+URL or blank, without keys or changes. Completing a test payment could notify
+that destination, so it must not be production. Actual Google login also needs
+owner browser participation and an approved origin. Continue only unfinished
+checks in a separately bounded public window; the old tunnel and its callback
+address are now closed. No deployment approval should be requested until these
+results and the remaining Render operational checks pass.
+
+Redacted evidence:[batch128](../tools/local-test/evidence/batch-128-provider-tunnel.json).
+Runtime reports and test transaction reference stay ignored/outside Git history.
+
 Current125 supersedes connection/quota blockers below: owner confirms installed,
 working Render access in ChatGPT, both production services bound to master, and
 today's Billing usage451.6/750 Free hours,34MB/5GB bandwidth,25/500 build minutes,

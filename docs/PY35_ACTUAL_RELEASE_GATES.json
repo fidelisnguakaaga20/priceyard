@@ -13,11 +13,14 @@
   "gates": [
     {
       "id": "hosting_cookies_browsers",
-      "status": "awaiting_external_verification",
+      "status": "partial_public_tunnel_API_passed_browser_pending",
+      "public_tunnel_API_sessions_csrf_reset_logout": "passed_2026-10-20",
+      "public_browser_workflow_verified": false,
+      "provider_drill_evidence": "../tools/local-test/evidence/batch-128-provider-tunnel.json",
       "public_tls_handshakes": "passed_2026-10-20T12:30:16Z_frontend_and_backend_TLS1.3_chain_and_hostname_only",
       "public_tls_evidence": "PY35_HOSTED_CHECKS.md",
       "candidate_application_sessions_verified": false,
-      "remaining": "Approved HTTPS staging, test identities and supported-browser/session checks on real hosting."
+      "remaining": "Public tunnel API HTTPS/session/reset/logout checks passed. Complete the original browser workflow and Google consent; confirm actual Render proxy/artifact behavior under separately approved rollout. Do not repeat passed API checks merely for a report."
     },
     {
       "id": "actual_backup_restoration",
@@ -61,14 +64,18 @@
       "migration_sha256": "6b7cd540b41982c13091be3805f4660144b8b9b389224cecf7fa5b85d77469fa",
       "fabricated_privacy_cases_passed": 4,
       "security_aware_application_artifact_runtime_verified": false,
+      "security_aware_application_local_PG17_rollback": "passed_2026-10-20_exact_reviewed_app_source_revoked_token_stays_rejected_and_normal_login_works",
       "rollback_backend_application_tree_matches_current": true,
       "rollback_source_comparison_scope": "backend/app tree matches; earlier candidate lacks current0022 migration privacy safeguard. Preserve current security grants and evidence; do not replay old migration or downgrade. Hosted runtime remains unverified.",
       "production_migration_authorized": false
     },
     {
       "id": "paystack_provider",
-      "status": "awaiting_external_verification",
-      "remaining": "Approved Paystack TEST setup and real provider checkout/webhook/replay/recovery evidence; no real charges."
+      "status": "partial_TEST_initialization_passed_completion_webhook_pending",
+      "TEST_key_authentication_and_monthly_checkout_initialization": "passed_2026-10-20_original_API_HTTP200",
+      "real_money_transactions": 0,
+      "completed_TEST_payment_and_provider_webhook_verified": false,
+      "remaining": "Existing TEST keys and monthly checkout initialization passed. Owner must identify the current TEST webhook destination before completing a TEST payment, then verify genuine signed webhook/replay/recovery; never notify production or use real money. The previous tunnel callback has closed."
     },
     {
       "id": "recovery_scheduler",
@@ -77,8 +84,13 @@
     },
     {
       "id": "google_notification_delivery",
-      "status": "awaiting_external_verification",
-      "remaining": "Approved OAuth test configuration, credentials/recipients and actual login/email/push/notification delivery evidence."
+      "status": "partial_reset_email_received_Google_pending",
+      "original_reset_email_provider_acceptance": "passed_2026-10-20",
+      "approved_recipient_receipt": "owner_confirmed_received_2026-10-20",
+      "test_emails_sent": 1,
+      "frontend_backend_Google_client_IDs_match": true,
+      "actual_Google_sign_in_verified": false,
+      "remaining": "Existing credentials/approved recipient located and original reset email received. Complete actual Google browser consent/sign-in on an approved origin. Additional channels require separate evidence only if enabled for launch; do not request existing credentials or resend the passed email test."
     },
     {
       "id": "monitoring_load_clock",

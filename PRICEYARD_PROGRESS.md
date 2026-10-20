@@ -25,6 +25,38 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest128 PARTIAL VERIFIED (2026-10-20 WAT): ONE public free Quick Tunnel was
+opened/closed for real-provider testing; no Render/Supabase database/service
+created and settletrack-db untouched. Reused fixed fabricated PG17.11 cluster
+55452, identifier7698190245493700556; added one private synthetic schema/role.
+Original cluster HBA/config unchanged; process-only loopback bootstrap HBA and
+SCRAM application role used, new schema retained, cluster stopped afterward.
+Actual public HTTPS gateway, login/Secure HttpOnly SameSite cookies/session,
+CSRF403, reset-email send, single-use reset/token replay rejection, old-session
+revocation and logout401 PASSED. Paystack TEST initialization for approved2500
+monthly plan returns200; no payment was completed/charged. Email provider accepted
+ONE message; owner explicitly confirms Received. Existing Google IDs match, but
+actual Google account consent/sign-in is NOT yet tested.
+Harness-only failures preserved/fixed: Windows pg_ctl pipes caused TimeoutExpired
+despite ready server; file-backed control output fixes launcher. Initial browser
+lacked existing cached-browser environment; corrected cache launch/close passes,
+but public browser workflow remains unverified. UTF-8 capture corrected. Git tar
+root backend entry rejected; narrow root handling corrected and application-only
+rollback then PASSED locally using exact2cfbfa6 app source: revoked token stays401,
+normal login works, security schema retained, no migration or provider calls.
+No second tunnel, repeated backup/restore/migration suite, app/business/design
+edit, real payment, provider setting change, push, purchase or deployment.
+All owned workers stopped;55452/55453/55454 closed.35/36 unchanged; PY-35 partial.
+Real Google login, completed TEST checkout/signed provider webhook/replay/public
+browser and Render operational/artifact checks remain OPEN. Do not rerun passed
+email/reset/API checks. Credentials were found securely; never request their
+setup again or paste keys. Only current owner input requested: Paystack TEST
+webhook URL (or blank), read-only, to avoid sending TEST events to production.
+Next public window must continue only remaining checks, preserve prior result,
+reinitialize checkout only if its expired tunnel callback makes that necessary.
+Evidence:tools/local-test/evidence/batch-128-provider-tunnel.json; local runtime
+result/initial-timeout/rollback-result retained. See docs/PY35_HOSTED_CHECKS.md.
+
 Latest127 CONFIGURATION LOCATED (2026-10-20 WAT): owner explicitly requests secure
 inspection of existing local configuration before further setup. Narrow read-only
 provider-field classification (no application import, provider/network call,

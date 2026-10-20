@@ -1,5 +1,25 @@
 # Local verification only
 
+Owner-approved provider exception,2026-10-20: `provider_tunnel.py` is separate from
+the original guard/preview. Its pinned existing fabricated PG17 target, temporary
+private HTTPS gateway, TEST-only Paystack key/destination/amount checks, approved
+recipient/two-message ceiling and automatic cleanup must remain intact. Only
+explicitly selected provider settings are read under the owner's later approval;
+application dotenv/config and production DATABASE_URL are never loaded. Runtime
+credentials pass in memory/stdin, not command lines or reports. No real backup
+contents/customer database is a provider-test fixture. Do not expose preview.py.
+The process-only local bootstrap HBA leaves the original cluster HBA unchanged;
+it is solely for the positively identified fabricated cluster. Application role
+uses SCRAM on literal loopback. No configuration may be applied to another server.
+
+Batch128 real HTTPS/API/reset/email and initialization checks passed; do not
+rerun the whole drill. Existing results deliberately prevent automatic repeats.
+`provider_rollback.py` completed only the interrupted rollback without another
+tunnel/provider request/migration; its result is retained. Browser cache fix has
+startup evidence only. Google consent, TEST checkout/provider webhook/replay,
+public browser and actual Render deployment-runtime checks remain unfinished.
+Check PRICEYARD_PROGRESS.md and docs/PY35_HOSTED_CHECKS.md before any continuation.
+
 This tooling is separate from application startup. Never run the application with
 real configuration to test changes. The guard scrubs inherited configuration,
 disables dotenv reads, denies external sockets/DNS/native PostgreSQL/children,
