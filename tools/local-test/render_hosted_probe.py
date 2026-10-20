@@ -126,6 +126,8 @@ def controller():
             archive = RUN / ('expired-window-' + str(int(old['expires_at_epoch'])))
             retained_post = old['independent_upstream_POST']
             names = ('result.json', 'state.json', 'worker.log', 'tunnel.log')
+            if (RUN / 'saved-route-observation.json').exists():
+                names += ('saved-route-observation.json',)
         else:
             if (old.get('status') != 'STOPPED' or not old.get('owned_processes_stopped')
                     or 'NameResolutionError' not in old.get('error', '')
@@ -220,20 +222,38 @@ def controller():
             control = http.post(upstream + '/probe?one=a%20b&one=c', data=raw, timeout=(5, 20), allow_redirects=False)
             if control.status_code != 207 or control.json().get('body_sha256') != hashlib.sha256(raw).hexdigest():
                 raise RuntimeError('Synthetic POST control failed')
+        window_seconds = 1800 if renewal else 900
         report.update(status='awaiting_test_only_rewrite', upstream=upstream,
                       destination=upstream + '/*', proof=cfg['proof'],
-                      created_at_epoch=time.time(), expires_at_epoch=time.time() + 900,
+                      created_at_epoch=time.time(), expires_at_epoch=time.time() + window_seconds,
+                      manual_window_seconds=window_seconds,
                       independent_upstream_POST=retained_post if renewal else 'PASS')
         (RUN / 'state.json').write_text(json.dumps(report, indent=2))
         print(json.dumps({key: report[key] for key in ('status', 'origin', 'destination', 'expires_at_epoch')}), flush=True)
-        deadline = time.monotonic() + 900
+        deadline = time.monotonic() + window_seconds
+        route_ready = False
+        next_route_check = 0
         while time.monotonic() < deadline and not (RUN / 'rewrite-saved.txt').exists():
             if any(process.poll() is not None for process in processes):
                 raise RuntimeError('Owned test process stopped before confirmation')
             if (RUN / 'stop.txt').exists():
                 raise RuntimeError('Controlled stop requested')
+            if time.monotonic() >= next_route_check:
+                next_route_check = time.monotonic() + 15
+                try:
+                    check = http.get(ORIGIN + '/api/health?py35check=' + cfg['proof'],
+                                     timeout=(3, 5), allow_redirects=False)
+                    if check.status_code == 200 and check.json().get('proof') == cfg['proof']:
+                        # The owner has authorized this drill. Matching the new
+                        # identity proves the test-only rewrite was saved; no
+                        # login is sent through an old, redirected or wrong route.
+                        route_ready = True
+                        report['route_confirmation'] = 'fresh_saved_Render_route_identity_verified'
+                        break
+                except (requests.RequestException, ValueError):
+                    pass
             time.sleep(1)
-        if not (RUN / 'rewrite-saved.txt').exists():
+        if not route_ready and not (RUN / 'rewrite-saved.txt').exists():
             raise RuntimeError('Test window expired without rewrite confirmation')
         with (RUN / 'browser.log').open('w') as log:
             checker = subprocess.Popen([str(python), str(LAB / 'run_browser.py'), 'render_hosted_checks.mjs'],

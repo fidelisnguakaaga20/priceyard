@@ -25,6 +25,20 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current140 CORRECTED ACTION / BOUNDED CONTINUATION (2026-10-20 WAT): owner confirms
+the temporary API row was changed from Redirect to Rewrite and saved. Previous
+15-minute tunnel expired before this reply; result confirms no browser/login run
+and clean helper shutdown. Renew only the same synthetic environment/test target,
+preserving all evidence; completed POST/provider/backup/migration tests stay skipped.
+Renewed manual window is bounded30minutes so owner can replace only its destination.
+Controller polls ONLY pinned temporary Render /api/health at15-second intervals,
+without redirects; fresh matching synthetic proof permits the already-approved
+single hosted suite automatically after save. No fabricated SAVED marker, login
+through old/wrong route, new service, production setting, migration or deployment.
+Close tunnel/API/browser immediately after result or timeout. Current active URL
+and expiry remain in runtime/render-hosted-20261020/state.json; old URLs are stale.
+35/36 unchanged until actual hosted result. Do not repeat earlier completed work.
+
 Current139 SAVED ROUTE OBSERVATION (2026-10-20 WAT): owner confirms SAVED for
 renewed reforms-describe-smithsonian-contrast tunnel. Before any login/POST, exact
 temporary Render /api/health responds301 Location->current tunnel /health. One
