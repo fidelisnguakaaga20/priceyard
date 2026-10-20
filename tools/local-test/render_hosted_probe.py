@@ -290,6 +290,15 @@ def controller():
             raise RuntimeError('Hosted browser produced no safe report')
         report['browser'] = json.loads(browser_result.read_text())
         report['status'] = report['browser']['status']
+        if report['status'] != 'PASS':
+            # A safe GET distinguishes a live tunnel from an external rewrite
+            # failure. Never retry a POST or follow a redirect to force a pass.
+            try:
+                direct = http.get(upstream + '/health', timeout=(3, 5), allow_redirects=False)
+                report['failure_upstream_health'] = {'status': direct.status_code,
+                    'identity_matches': direct.status_code == 200 and direct.json().get('proof') == cfg['proof']}
+            except (requests.RequestException, ValueError) as error:
+                report['failure_upstream_health'] = {'error_type': type(error).__name__}
         report['upstream_counts'] = http.get(f'http://127.0.0.1:{PORT}/__probe_status', timeout=3).json()['counts']
     except Exception as error:
         report.update(status='STOPPED', error_type=type(error).__name__, error=str(error))

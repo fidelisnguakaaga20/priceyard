@@ -1,5 +1,13 @@
 # PY-35 final launch result — 2026-10-20 WAT
 
+Current142 final hosted result: **FAIL**. Render GET reaches the synthetic API;
+the latest POST returns502 before the counted handler. Login/cookie/CSRF/logout
+were not attempted. Controller cleanup happened after failure/count collection;
+all helpers closed. Worker/tunnel logs do not identify the exact cause; earlier
+POST207 prevents concluding that Render cannot forward POST. No application
+defect is established. Failed evidence is retained; no automatic retries or new
+services were started. Production remains untouched.
+
 Current141 supersedes the initial redirect observation: corrected Rewrite reaches
 the synthetic API through Render (GET identity200, POST method/status207). The
 browser stopped before login on an overly strict raw query-encoding assertion:
@@ -17,8 +25,8 @@ checking whether the test-only row Action is Redirect or Rewrite; platform
 support is not judged until that is known. Current saved transport fails the
 same-origin requirement. Production remains unchanged; no deployment approval.
 
-**Local routing: PASS. Release: NOT READY — actual Render GET/POST reaches the
-synthetic API; hosted session checks are pending the corrected test.35/36 complete.**
+**Local routing: PASS. Latest hosted verification: FAIL (POST502). Release:
+NOT READY. Hosted sessions are unverified;35/36 complete.**
 
 | Check | Result |
 | --- | --- |
@@ -27,7 +35,8 @@ synthetic API; hosted session checks are pending the corrected test.35/36 comple
 | Original API behind proposed same-origin route | PASS; two guarded tests, including raw POST/query, status, multiple cookies, fixed destination, React fallback, CSRF, cache headers, logout and revoked-token rejection |
 | Original React browser workflow against original API | PASS; virtual HTTPS only, synthetic memory database, real login/dashboard/reload/API/CSRF/logout; all page traffic fulfilled locally or blocked |
 | Application rollback compatibility | PASS retained; current backend/app tree equals the already-tested security-aware rollback tree fcc47f0a0d5a1596d8f3cd5790e61f624c3e04ed; no repeat restoration or migration |
-| Temporary Render forwarding | Corrected Rewrite GET200/POST207; query-format harness corrected, full session result pending |
+| Temporary Render forwarding | Latest GET200/POST502; earlier POST207 retained; exact failure cause unknown |
+| Hosted login/cookie/CSRF/logout | NOT RUN; fail-closed before login |
 | Candidate runtime/rollback artifact | NOT RUN; production remains unchanged |
 
 No backend application, UI component/style, database schema, measurement,
@@ -79,3 +88,14 @@ edge/candidate/rollback tests cannot be completed. The next required approval is
 a **scoped hosted routing/runtime verification window**, not an unconditional
 production launch. No new service, purchase, push, merge, production migration or
 deployment was performed.
+
+## Smallest next hosted option, not authorized or created
+
+Use one temporary **Free Render API test service**, reusing the existing temporary
+static site. Synthetic in-memory records only, no database service, production
+credentials, provider calls or migrations; auto-deploy off and a development
+branch only. This removes the Quick Tunnel hop and tests the same Render rewrite
+against a stable upstream. It does not presume which hop caused502. The earlier
+exception covered one static test site, so the additional API service requires
+owner approval before creation. No service, branch push or deployment is included
+in this proposal.

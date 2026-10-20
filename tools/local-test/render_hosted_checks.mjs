@@ -25,9 +25,10 @@ try{
  assert.equal(JSON.parse(health.body).proof,state.proof,'Wrong target: no login request will be sent');
  report.cases.synthetic_target_identity=true;
  const raw='{\n  "synthetic": true\n}';
- const probe=await page.evaluate(async body=>{const r=await fetch('/api/probe?one=a%20b&one=c&literal=a%2Bb',{method:'POST',body,credentials:'include',cache:'no-store'});return {status:r.status,cache:r.headers.get('cache-control'),body:await r.text()};},raw);
+ const probe=await page.evaluate(async body=>{const r=await fetch('/api/probe?one=a%20b&one=c&literal=a%2Bb',{method:'POST',body,credentials:'include',cache:'no-store'});return {status:r.status,cache:r.headers.get('cache-control'),body:await r.text(),diagnostic_headers:Object.fromEntries(['server','via','cf-ray','content-type','cache-control'].map(name=>[name,r.headers.get(name)]))};},raw);
  report.probe_status=probe.status;
- assert.equal(probe.status,207,'Render did not preserve the synthetic POST; login not attempted');
+ if(probe.status!==207)report.probe_failure={headers:probe.diagnostic_headers,body_excerpt:probe.body.slice(0,500)};
+ assert.equal(probe.status,207,'Hosted POST probe failed; login not attempted');
  const payload=JSON.parse(probe.body);assert.equal(payload.method,'POST');
  // Query parsers treat %20 and + as spaces. Preserve decoded values and the
  // order of repeated values; independent key ordering is immaterial here.

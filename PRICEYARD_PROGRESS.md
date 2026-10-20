@@ -25,6 +25,27 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current142 HOSTED TRANSPORT FAIL (2026-10-20 WAT): after owner saved latest kai
+destination, automatic corrected suite ran once. Actual Render GET synthetic
+identity PASS; POST/probe returned502, stopping before body/query/cookie/login
+checks. Handler counts show GET/health4 and GET/status1, no POST or /auth calls.
+Outer RequestBounds/Uvicorn are not counted, so do not assert request never reached
+the host. Worker log empty; tunnel log registered successfully with no recorded
+error. Browser failed before controller collected counts and closed helpers;
+cleanup did not cause the502. Exact failing layer/cause cannot be established
+from retained logs: response headers/body were not retained by that run. Earlier
+POST207 remains evidence forwarding can work; do not claim Render unsupported,
+blame MTN/passwords, loosen checks or automatically repeat tunnels/tests.
+All owned browser/API/tunnel processes stopped; failed results/logs preserved.
+No production data/settings, provider/backup/migration tests, push or deployment.
+35/36 remains, PY-35 partial. Hosted login/cookie/cache/CSRF/logout NOT RUN, not PASS.
+Added only future failure diagnostics: whitelisted synthetic-probe response
+headers/error excerpt and one direct-upstream health GET before cleanup; no
+automatic POST retry or additional attempt launched. Safe next investigation
+requires distinguishing Render forwarding from the transient tunnel hop; a stable
+isolated backend is an alternative requiring a separately approved resource.
+Evidence:batch-142-hosted-transport-failure.json. Release approval still withheld.
+
 Current141 HOSTED POST / QUERY HARNESS CORRECTION (2026-10-20 WAT): automatic
 drill did run after owner saved corrected Rewrite. Actual temporary Render GET
 verified synthetic identity; POST/probe returned207 with method POST. The harness
