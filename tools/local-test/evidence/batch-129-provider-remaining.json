@@ -29,6 +29,7 @@
   "tunnel_closed": true,
   "worker_stopped": true,
   "synthetic_PG17_stopped": true,
-  "owner_TEST_webhook_cleanup": "clear_expired_temporary_TEST_URL_LIVE_unchanged",
+  "owner_TEST_webhook_cleanup": "owner_confirmed_CLEARED_2026-10-20_not_independently_queried_LIVE_unchanged_by_Codex",
+  "Google_continuation_scope": "existing_Render_frontend_origin_for_production_separately_authorised_localhost_for_development_no_more_tunnels",
   "application_source_or_business_rules_changed": false
 }

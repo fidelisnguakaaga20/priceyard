@@ -25,6 +25,19 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current130 (2026-10-20 WAT): owner confirms CLEARED after removing expired Paystack
+TEST webhook; record as owner-confirmed, not an independent provider-settings
+inspection. LIVE settings unchanged by Codex. Completed payment tests retained.
+Owner explicitly requires no further Cloudflare URLs for Google authentication.
+Permanent frontend origin is https://priceyard.onrender.com; backend is
+https://priceyard-api.onrender.com. No purchased/custom domain is required.
+For Google-only isolated testing, inspect whether an authorised localhost origin
+already exists; any needed development origin must be separately authorised.
+Next owner action: inspect existing Google web client's Authorized JavaScript
+origins read-only, supplying public website addresses only, no secret and no
+settings edit. Do not repeat provider payment/email/backup/migration tests or
+create a new tunnel.35/36; PY-35 partial; no production change or deployment.
+
 Current129 GOOGLE BLOCKER CONFIRMED: owner Screenshot4211 shows Google's actual
 400 origin_mismatch and instruction to register the JavaScript origin, for the
 races-son temporary frontend. This confirms an external test-origin configuration
