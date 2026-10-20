@@ -200,12 +200,14 @@ def worker():
     original_email = email_service.send_email
     private_email_ids = []
     private_reset_urls = []
+    private_webhooks = []
 
     class NoRedirect(urllib.request.HTTPRedirectHandler):
         def redirect_request(self, *args, **kwargs):
             raise RuntimeError('Provider redirect rejected')
 
     def send_only_approved(*, recipient, subject, body):
+        require(not cfg.get('email_disabled', False), 'Previously verified email sending disabled')
         require(recipient == EMAIL and cfg['origin'] in body, 'Unapproved email recipient or link')
         require(counts['email_messages_accepted'] < 2, 'Email ceiling reached')
         require('priceyard.onrender.com' not in body and 'priceyard-api.onrender.com' not in body, 'Production link rejected')
@@ -275,7 +277,8 @@ def worker():
     async def gate(request: Request, call_next):
         if request.url.path == '/__provider_status' and request.client.host == '127.0.0.1' and request.headers.get('x-provider-controller') == cfg['gate']:
             return JSONResponse({'synthetic_only': True, 'postgresql_major': 17, **counts,
-                                 'private_email_ids': private_email_ids, 'private_reset_urls': private_reset_urls})
+                                 'private_email_ids': private_email_ids, 'private_reset_urls': private_reset_urls,
+                                 'private_webhooks': private_webhooks})
         if request.url.path == '/' and request.query_params.get('ticket') == cfg['gate']:
             response = RedirectResponse('/login', status_code=303)
             response.set_cookie('__Host-priceyard_test_gate', cfg['gate'], secure=True, httponly=True, samesite='lax', path='/')
@@ -289,7 +292,16 @@ def worker():
                 require(json.loads(body).get('email', '').lower() == EMAIL, 'Only approved test identity')
             except Exception:
                 return JSONResponse({'detail': 'Only approved test identity'}, status_code=403)
+        webhook_body = None
+        if request.url.path == '/api/payments/webhook' and request.method == 'POST':
+            webhook_body = await request.body()
+            if len(webhook_body) > 262144:
+                return JSONResponse({'detail': 'Test payload ceiling'}, status_code=413)
         response = await call_next(request)
+        if webhook_body and response.status_code == 200 and len(private_webhooks) < 3:
+            import base64
+            private_webhooks.append({'body': base64.b64encode(webhook_body).decode('ascii'),
+                                     'signature': request.headers.get('x-paystack-signature', '')})
         response.headers['Referrer-Policy'] = 'no-referrer'
         response.headers['Cache-Control'] = 'private, no-store'
         response.headers['X-Robots-Tag'] = 'noindex, nofollow'

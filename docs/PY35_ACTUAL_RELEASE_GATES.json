@@ -13,14 +13,16 @@
   "gates": [
     {
       "id": "hosting_cookies_browsers",
-      "status": "partial_public_tunnel_API_passed_browser_pending",
+      "status": "public_tunnel_API_and_original_browser_passed_Render_runtime_pending",
       "public_tunnel_API_sessions_csrf_reset_logout": "passed_2026-10-20",
-      "public_browser_workflow_verified": false,
+      "public_browser_workflow_verified": true,
+      "public_browser_login_verified_date_wat": "2026-10-20",
+      "public_browser_evidence": "remaining provider window: original login/dashboard and Secure HttpOnly SameSite session cookie passed; no application source edit",
       "provider_drill_evidence": "../tools/local-test/evidence/batch-128-provider-tunnel.json",
       "public_tls_handshakes": "passed_2026-10-20T12:30:16Z_frontend_and_backend_TLS1.3_chain_and_hostname_only",
       "public_tls_evidence": "PY35_HOSTED_CHECKS.md",
       "candidate_application_sessions_verified": false,
-      "remaining": "Public tunnel API HTTPS/session/reset/logout checks passed. Complete the original browser workflow and Google consent; confirm actual Render proxy/artifact behavior under separately approved rollout. Do not repeat passed API checks merely for a report."
+      "remaining": "Public tunnel API and original browser login passed. Google consent remains pending; actual Render proxy/artifact behavior requires separately approved rollout. Do not repeat passed API/browser checks merely for a report."
     },
     {
       "id": "actual_backup_restoration",
@@ -71,11 +73,17 @@
     },
     {
       "id": "paystack_provider",
-      "status": "partial_TEST_initialization_passed_completion_webhook_pending",
+      "status": "TEST_payment_signed_webhook_subscription_and_replay_passed_operational_recovery_pending",
       "TEST_key_authentication_and_monthly_checkout_initialization": "passed_2026-10-20_original_API_HTTP200",
       "real_money_transactions": 0,
-      "completed_TEST_payment_and_provider_webhook_verified": false,
-      "remaining": "Existing TEST keys and monthly checkout initialization passed. Owner must identify the current TEST webhook destination before completing a TEST payment, then verify genuine signed webhook/replay/recovery; never notify production or use real money. The previous tunnel callback has closed."
+      "completed_TEST_payment_and_provider_webhook_verified": true,
+      "genuine_TEST_webhook_subscription_activation": "passed_2026-10-20_original_handler_exact_reference_2500NGN_paid_monthly",
+      "genuine_received_event_replays": 2,
+      "replay_preserves_payment_and_subscription_snapshot": true,
+      "provider_evidence": "../tools/local-test/evidence/batch-129-provider-remaining.json",
+      "TEST_webhook_previous_destination_owner_reported": "production API; no TEST payment completed against it",
+      "TEST_webhook_isolated_destination_owner_confirmed": "2026-10-20 races-son-letting-indication temporary tunnel; rechecked HTTPS backend route before accepting confirmation",
+      "remaining": "Actual monthly TEST payment, genuinely signed provider webhook, subscription activation and two unchanged-value replays passed on isolated PG17. Do not charge again. Actual hosted payment-recovery scheduling and live-provider/Render configuration remain release-gated; no production payment test authorized."
     },
     {
       "id": "recovery_scheduler",

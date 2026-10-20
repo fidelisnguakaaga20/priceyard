@@ -1,5 +1,43 @@
 # PY-35 hosted verification — 2026-10-20 WAT
 
+Current129 PAYMENT PASS: real TEST charge.success reached the exact confirmed
+isolated endpoint; original signature verification/handler activated the correct
+2500NGN paid_monthly purchase. Two public HTTPS replays of that genuinely received
+body/signature returned200 with unchanged payment/subscription snapshots. No
+duplicate days, fabricated provider proof, real money or production access.
+Original browser login also passes. Google owner sign-in remains pending; do not
+repeat payment/email/backup/migration tests. Current active-window cleanup and
+Google results must be read from remaining-result.json before release claims.
+
+Current129 browser PASS: after owner confirmed SAVED, exact active races-son
+HTTPS endpoint and all three local fixture ports rechecked before confirmation
+marker. Original UI browser login/dashboard and Secure/HttpOnly/SameSite cookie
+pass with the existing cached browser. Fresh TEST checkout initialized for the
+active callback and opened in owner browser. Headless checkout inspection meets
+human verification; no challenge bypass or payment submission. Owner asked to
+complete visibly TEST checkout using published fabricated Paystack card and
+Google sign-in with approved email. Actual payment/webhook/replay/Google remain
+PENDING, not passed. Email disabled and all previous completed work retained.
+
+Current129 ACTIVE REPLACEMENT: previous george-weight and modes-address windows
+closed cleanly without checkout. Owner saved george-weight and requested explicit
+verification. Current races-son-letting-indication.trycloudflare.com passes real
+HTTPS GET /api/payments/webhook=405/Allow:POST and local protected fixture status.
+One bounded900s window awaits exact new TEST-only URL confirmation; no payment
+initiated. Initial immediate public ConnectionError retained; bounded serial
+readiness now succeeds. No LIVE/production changes. Consult remaining-result.json
+for expiry/cleanup before claiming any URL remains active.
+
+Current129 IN PROGRESS: owner confirms the existing TEST webhook points to the
+production API. TEST payment completion is blocked until owner saves/confirms the
+replacement temporary TEST-only URL. LIVE settings must remain unchanged. The
+earlier modes-address-cdna-safe.trycloudflare.com window was bounded to900seconds;
+the earlier george-weight window was stopped before checkout for a checker-only
+plan-name correction (original app uses paid_monthly). All evidence retained.
+Reuse original build/marked synthetic PG17; email sending disabled. New helper
+syntax/original plan-name contract checks pass. No hosted/provider success is
+claimed yet; consult ignored remaining-result.json for final state/cleanup.
+
 Current128 actual provider drill: **35/36 complete, PY-35 partial; release blocked.**
 
 | Essential check | Verified result |

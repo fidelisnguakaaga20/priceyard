@@ -25,6 +25,72 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current129 PAYMENT PASS: while awaiting owner browser action, the real TEST
+charge.success event arrived at the confirmed isolated HTTPS endpoint. Original
+signature validation/handler passed; exact checkout reference has success2500.00
+NGN and active paid_monthly subscription. Reposted the same genuinely received
+body/signature twice through public HTTPS; both200 and complete payment/
+subscription snapshot unchanged (no duplicate paid days). No fabricated webhook
+used as provider proof; raw event/signature stay in worker/controller memory,
+not Git/logs. No further payment needed. Google owner consent/sign-in is the only
+remaining check in this window. Still35/36, PY-35 partial; actual Render runtime/
+operations and separate release approval remain required. Read session11082 and
+remaining-result.json for Google result and automatic cleanup. Never restart a
+payment window or rerun prior backup/migration checks merely to resume Google.
+
+Current129 OWNER CONFIRMED SAVED: independently rechecked all three loopback
+ports and live HTTPS405/Allow:POST before recording exact races-son URL
+confirmation. Original application browser login now PASSED with real secure,
+HttpOnly/SameSite cookie; browser storage contains no bearer secret. Original
+API initialized a fresh TEST monthly checkout for the new callback; default
+browser opened original login and Paystack checkout. Actual payment/webhook and
+Google consent are still pending. One separate headless checkout inspection
+encountered Paystack's human-verification UI (cf-turnstile-response), no TEST
+mode proven and no submission; no challenge bypass/retry attempted. Secondary
+empty-frame URL TypeError is a harness diagnostic, not an app/payment failure;
+safe frame parsing corrected without repeating inspection. Owner asked to
+complete only visibly TEST checkout using Paystack's official fabricated card,
+then Google sign-in with approved email. Do not use real cards or automate Google
+passwords. Email remains disabled; completed checks not repeated. Read session11082
+and remaining-result.json for event/expiry/cleanup before continuing.
+
+Current129 RESUME NOTE (2026-10-20 WAT): owner saved the old george-weight TEST
+URL and explicitly requested active-backend verification before payment. Both
+george-weight and modes-address windows are confirmed closed, all test ports
+stopped, no checkout/result/provider event. A fresh startup hit ConnectionError
+on immediate public readiness; retained it and added bounded serial HTTPS
+startup retries with exception-class-only diagnostics. Fresh replacement now
+PASSES verified TLS and GET /api/payments/webhook returns405/Allow:POST from the
+original isolated backend; private synthetic worker status also passes.
+ACTIVE URL: https://races-son-letting-indication.trycloudflare.com/api/payments/webhook
+Session11082 waits for this EXACT TEST-only setting confirmation, maximum900s.
+All older URLs are closed; never infer confirmation from the earlier saved URL.
+No payment initiated/completed. Runtime remaining-result.json tracks expiry and
+cleanup. After actual owner confirmation, write exact new URL to ignored
+remaining_TEST_webhook_confirmed.txt to continue; do not repeat completed checks.
+
+Current129 IN PROGRESS (2026-10-20 WAT): owner reports TEST webhook currently
+points to production https://priceyard-api.onrender.com/payments/webhook. No TEST
+payment may be completed against that destination. Added remaining-only runner,
+reusing the cached binary, original frontend build and existing marked synthetic
+PG17 schema. Email disabled; no backup/restore/migration/rollback repeat.
+Pre-payment checker naming mismatch (monthly versus original paid_monthly) was
+caught before checkout; cleanly stopped that window, retained all results/logs,
+corrected checker and verified its naming contract statically against the app.
+The first remaining-only george-weight URL is CLOSED; no checkout/provider call.
+Earlier replacement modes-address-cdna-safe.trycloudflare.com ran at most900s,
+one tunnel at a time, with DB/metrics loopback-only and controlled cleanup.
+Owner was asked to save ONLY its TEST webhook /api/payments/webhook, leaving LIVE
+unchanged. Await explicit confirmation of this exact replacement URL; no elapsed
+time/old confirmation authorizes payment. Runner session30041 expired cleanly;
+runtime remaining-result.json is authoritative for current cleanup/state.
+After owner confirms new URL, write that exact URL into ignored runtime
+remaining_TEST_webhook_confirmed.txt; then original browser login and fresh
+TEST checkout can continue (old callback host is closed). Real Google consent
+requires approved owner identity. No new features/business/source changes,
+production access/settings, push, merge or deployment.35/36 remains; PY-35 partial.
+Do not mark this active window passed or clean until its final results are read.
+
 Latest128 PARTIAL VERIFIED (2026-10-20 WAT): ONE public free Quick Tunnel was
 opened/closed for real-provider testing; no Render/Supabase database/service
 created and settletrack-db untouched. Reused fixed fabricated PG17.11 cluster
