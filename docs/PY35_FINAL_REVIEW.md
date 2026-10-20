@@ -1,5 +1,18 @@
 # PriceYard final review - batch 87
 
+## Current121: local 0022 rehearsal blocked before startup (2026-10-20 WAT)
+
+35/36 unchanged. Encrypted backup, protected restoration and independent Drive
+retrieval SHA256 verification remain passed. Owner now approves isolated0022
+rehearsal; production migration remains unauthorized. Offline migration compiler,
+downgrade refusal, three admission checks and three focused synthetic rollback
+authentication tests pass. One bounded Docker4.96 startup attempt timed out before
+Linux/database/controller startup; no migration or customer-data load occurred.
+Exact startup cause unconfirmed. Own processes and temporary settings were cleaned
+up; original application/backups are unchanged. Need Docker readiness, then actual
+clone upgrade/rollback/recovery and provider-role permissions checks. No production
+access, push, merge or deployment. See [rehearsal checkpoint](PY35_0022_REHEARSAL.md).
+
 ## Current117 supersedes historical statuses below (2026-10-20 WAT)
 
 **35/36 complete; PY-35 partial; deployment remains blocked.** Actual encrypted

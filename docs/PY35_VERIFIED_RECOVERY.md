@@ -75,8 +75,9 @@ state, without querying their databases or editing their configuration.
    this logical backup; Vault tables contain no secrets in this snapshot.
    Application account records/password hashes were preserved by data digests.
 3. Review0022 migration on the actual-data clone, permissions, rollback and owner
-   recovery targets before approving any production migration. No0022 rehearsal
-   or migration was run in this batch.
+   recovery targets before approving any production migration. Owner approved
+   local rehearsal on2026-10-20, but Docker startup blocked execution before
+   database creation; no0022 migration ran. See [current checkpoint](PY35_0022_REHEARSAL.md).
 4. Complete [external release gates](PY35_ACTUAL_RELEASE_GATES.json). Reconcile any
    writes/payments since the snapshot at an approved cutover; never overwrite
    newer customer activity with an old backup. No push/merge/deploy authorized.

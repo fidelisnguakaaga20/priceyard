@@ -15,9 +15,16 @@ def protected(p):
  f.argtypes=[wintypes.LPCWSTR];f.restype=wintypes.DWORD
  a=f(str(p))
  if a==0xffffffff or a&0x400 or not a&0x4000:raise RuntimeError('Missing EFS/no-reparse protection')
-def main():
+def main(*, rehearsal=None):
  status=json.loads((ROOT/'latest-production-backup-status.json').read_text())
- if status.get('database_restoration_verified'):raise RuntimeError('Already verified; no repeat restoration')
+ if rehearsal is None:
+  if status.get('database_restoration_verified'):raise RuntimeError('Already verified; no repeat restoration')
+ else:
+  if not callable(rehearsal) or getattr(rehearsal,'purpose',None)!='0022_local_only':raise RuntimeError('Unreviewed rehearsal purpose')
+  if status.get('database_restoration_verified') is not True:raise RuntimeError('Original restoration must already be verified')
+  previous=Path(status['protected_restore_report']);protected(previous)
+  if json.loads(previous.read_text()).get('status')!='passed':raise RuntimeError('Original recovery evidence is not passing')
+  previous_sha=digest(previous)
  run=Path(status['protected_run_path']);bundle=run/'recovered-copy'
  if run.parent!=ROOT/'PrivateRestoreEfs' or run.name!='supabase-backup-20261019T213738Z':raise RuntimeError('Unexpected source bundle path')
  protected(run);protected(bundle)
@@ -45,13 +52,14 @@ def main():
  query=CATALOG
  env={k:os.environ[k] for k in ('SYSTEMROOT','WINDIR','USERPROFILE','APPDATA','LOCALAPPDATA','TEMP','TMP') if k in os.environ}
  base=[CLI,'--config',str(ROOT/'docker-feasibility-cli'),'--host','npipe:////./pipe/dockerDesktopLinuxEngine']
+ report_name=('migration0022-ram-'+time.strftime('%Y%m%dT%H%M%SZ',time.gmtime())+'-'+uuid.uuid4().hex[:8]+'-private.json') if rehearsal else 'real-ram-restore-result-private.json'
  def docker(args,input=None,timeout=15):
   p=subprocess.run(base+args,input=input,env=env,capture_output=True,timeout=timeout,creationflags=subprocess.CREATE_NO_WINDOW)
   if p.returncode:
-   path=run/'ram-restore-command-error-private.log';path.write_bytes(p.stdout+b'\n'+p.stderr);protected(path)
+   path=run/(report_name+'.error.log' if rehearsal else 'ram-restore-command-error-private.log');path.write_bytes(p.stdout+b'\n'+p.stderr);protected(path)
    raise RuntimeError('Local restore command failed; error retained only in EFS')
   return p.stdout
- name='priceyard-private-ram-'+uuid.uuid4().hex[:10]
+ name=('priceyard-0022-ram-' if rehearsal else 'priceyard-private-ram-')+uuid.uuid4().hex[:10]
  image=json.loads(docker(['image','inspect',IMAGE,'--format','{{json .}}']))
  if image['Config'].get('Volumes') or image['Os']!='linux' or image['Architecture']!='amd64':raise RuntimeError('Image isolation profile differs')
  docker(['container','create','--pull=never','--name',name,'--label','purpose=priceyard-approved-private-restore','--network=none','--read-only','--user=postgres','--cap-drop=ALL','--security-opt=no-new-privileges','--log-driver=none','--no-healthcheck','--memory=512m','--memory-swap=512m','--cpus=1','--pids-limit=64','--shm-size=16m','--ulimit=core=0','--stop-signal=SIGTERM','--tmpfs=/work:rw,noexec,nosuid,nodev,size=268435456,mode=1777','--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=8388608,mode=1777','--entrypoint=/bin/sh',IMAGE,'-c','umask 077; exec sleep 900'])
@@ -59,9 +67,10 @@ def main():
  started=time.monotonic()
  def execute(args,input=None,timeout=15):return docker(['exec','--interactive',name,*args],input,timeout)
  def shell(text,timeout=20):return execute(['/bin/sh','-c',text],timeout=timeout)
- def psql(statement,database='postgres',readonly=True):
+ def psql(statement,database='postgres',readonly=True,role=None):
+  if role is not None and role not in {'postgres',OPERATOR}:raise RuntimeError('Unreviewed local SQL login role')
   options='-c timezone=UTC -c datestyle=ISO -c extra_float_digits=3 -c bytea_output=hex -c row_security=off -c default_transaction_read_only='+('on' if readonly else 'off')
-  return docker(['exec','--interactive','--env','PGOPTIONS='+options,name,'psql','-X','-q','-At','-v','ON_ERROR_STOP=1','-h','/work/socket','-U',('postgres' if readonly and database=='postgres' and result.get('data_restore_finished') else OPERATOR),'-d',database],statement.encode('utf-8'))
+  return docker(['exec','--interactive','--env','PGOPTIONS='+options,name,'psql','-X','-q','-At','-v','ON_ERROR_STOP=1','-h','/work/socket','-U',(role or ('postgres' if readonly and database=='postgres' and result.get('data_restore_finished') else OPERATOR)),'-d',database],statement.encode('utf-8'))
  def ident(value):return '"'+value.replace('"','""')+'"'
 
  def literal(value):return "'"+value.replace("'","''")+"'"
@@ -167,7 +176,7 @@ def main():
   after=json.loads(psql(query+';'))
   result['recorded_acl_objects_replayed']=restore_recorded_acls(after)
   after=json.loads(psql(query+';'))
-  after_path=run/'ram-restored-catalog-private.json';after_path.write_text(json.dumps(after,indent=2),encoding='utf-8');protected(after_path)
+  after_path=run/(report_name+'.catalog-private.json' if rehearsal else 'ram-restored-catalog-private.json');after_path.write_text(json.dumps(after,indent=2),encoding='utf-8');protected(after_path)
   compared_after=comparable(after);compared_source=comparable(catalog)
   result['recorded_check_constraints_parser_canonicalized']=parse_recorded_check_constraints(compared_source,compared_after)
   for key in ('schemas','relations','columns','constraints','indexes','functions','extensions','policies','publications','subscriptions','foreign_servers','tablespaces'):
@@ -191,6 +200,11 @@ def main():
   large=json.loads(psql("SELECT COALESCE(json_agg(row_to_json(t)),'[]'::json) FROM (SELECT oid,octet_length(lo_get(oid)) AS bytes,encode(sha256(lo_get(oid)),'hex') AS digest FROM pg_largeobject_metadata ORDER BY oid) t;"))
   if [list(o.values()) for o in large]!=manifest['large_objects']:raise RuntimeError('Large objects differ')
   if psql('SELECT version_num FROM public.alembic_version;').strip()!=b'0021_feedback_screenshot':raise RuntimeError('Restored migration revision differs')
+  if rehearsal is not None:
+   result['migration_rehearsal']=rehearsal(psql,execute,shell,manifest,catalog,result)
+   if result['migration_rehearsal'].get('status')!='passed':raise RuntimeError('Local migration rehearsal is not passing')
+   if psql('SELECT version_num FROM public.alembic_version;').strip()!=b'0021_feedback_screenshot':raise RuntimeError('Pristine baseline revision was changed')
+   if digest(previous)!=previous_sha:raise RuntimeError('Original recovery evidence was changed')
   shell('pg_ctl -D /work/cluster -m fast -w -t 15 stop > /work/control.log 2>&1; pg_checksums --check -D /work/cluster > /work/checksums.log 2>&1')
   result.update(status='passed',database_restoration_verified=True,tables_checked=checked,all_table_counts_and_digests_match=True,catalog_roles_memberships_settings_and_permissions_match=True,sequences_and_large_objects_match=True,native_checksums_passed=True,original_revision_unchanged=True,portable_archive_sha256=status['archive_sha256'],duration_seconds=round(time.monotonic()-started,1))
  except Exception as exc:
@@ -200,8 +214,8 @@ def main():
   docker(['container','stop','--time=5',name],timeout=10)
   docker(['container','rm',name])
   result['ram_container_removed']=True
-  report=run/'real-ram-restore-result-private.json';report.write_text(json.dumps(result,indent=2),encoding='utf-8');protected(report)
- if result['status']=='passed':
+  report=run/report_name;report.write_text(json.dumps(result,indent=2),encoding='utf-8');protected(report)
+ if result['status']=='passed' and rehearsal is None:
   status.update(status='encrypted_backup_integrity_and_protected_restoration_passed',database_restoration_verified=True,protected_restore_report=str(run/'real-ram-restore-result-private.json'),restored_tables_verified=result['tables_checked'],migrations_run=0,deployment=False)
   (ROOT/'latest-production-backup-status.json').write_text(json.dumps(status,indent=2),encoding='utf-8')
  print(json.dumps(result,indent=2))

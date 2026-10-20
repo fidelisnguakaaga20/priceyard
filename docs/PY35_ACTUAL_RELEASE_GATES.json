@@ -37,9 +37,17 @@
     },
     {
       "id": "production_schema_rollout",
-      "status": "awaiting_approval_and_compatibility",
-      "actual_data_clone_0022_rehearsal": "not_run",
-      "remaining": "Review exact 0021-to-0022 clone rehearsal, production permissions, additive rollout and rollback before any production migration."
+      "status": "blocked_local_runtime",
+      "local_rehearsal_owner_approved_date_wat": "2026-10-20",
+      "actual_data_clone_0022_rehearsal": "blocked_before_database_start_docker_startup_timeout",
+      "offline_0021_to_0022_compilation": "passed",
+      "destructive_downgrade_refusal": "passed",
+      "rehearsal_admission_guard_checks_passed": 3,
+      "rollback_candidate_synthetic_authentication_checks_passed": 3,
+      "rollback_candidate_commit": "2cfbfa65447d51b225a0d367433709c25bd6da4a",
+      "rollback_candidate_backend_app_tree": "fcc47f0a0d5a1596d8f3cd5790e61f624c3e04ed",
+      "local_actual_clone_migrations_run": 0,
+      "remaining": "Owner approved isolated rehearsal, but Docker4.96 did not become ready within90seconds; no Linux target/controller/customer-data load or migration started. Exact startup cause unconfirmed; temporary test settings/owned processes cleaned up. Resume protected0022 clone transaction rollback/failure recovery,59-table preservation, role/default-ACL security and restart checks after Docker readiness. Synthetic authentication checks do not establish actual-clone or hosted rollback compatibility. Production migration remains unauthorized."
     },
     {
       "id": "paystack_provider",

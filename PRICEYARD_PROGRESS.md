@@ -25,6 +25,26 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest121 BLOCKED (2026-10-20 WAT): owner explicitly approves0022 on an isolated
+restored PG17 clone, including safe rollback/recovery; production remains barred.
+Prepared bounded rehearsal using existing protected export/cached image, no new
+backup/password/provider connection. Actual offline Alembic0021:0022 compilation
+and destructive downgrade refusal pass; three admission guards pass. Three
+focused synthetic authentication rollback regressions pass with socket/dotenv/
+external DB guards. Candidate2cfbfa65447d51b225a0d367433709c25bd6da4a backend/app
+tree matches currentfcc47f0a0d5a1596d8f3cd5790e61f624c3e04ed.
+One bounded Docker4.96 startup attempt failed readiness90seconds BEFORE any
+Linux target/controller/customer-data load/migration. Exact cause unconfirmed;
+installed WSL2.6.3 is not evidence an update is required. No automatic retries.
+Graceful Desktop cleanup was unresponsive; only verified own-started Docker
+processes stopped, exact hash-archived temporary config removed, original stopped
+Docker/no-.wslconfig state restored. Original backups/recovery evidence unchanged.
+Actual clone upgrade/transaction rollback/restart/provider-role permission checks
+remain NOT RUN. Never claim original0021 application is security-safe rollback.
+35/36 unchanged; PY-35 partial. See docs/PY35_0022_REHEARSAL.md. Next owner action:
+open Docker Desktop and report its engine/startup message; do not install/reset
+or alter settings automatically. No production migration, push, merge or deploy.
+
 Latest120 VERIFIED (2026-10-20 WAT): individual encrypted7z downloaded from
 owner-confirmed private Google Drive now matches the original encrypted archive
 and recorded recovery SHA256 exactly:
