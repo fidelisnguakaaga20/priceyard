@@ -25,6 +25,32 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current135 SAME-ORIGIN LOCAL PASS (2026-10-20 WAT): owner approves narrow routing
+implementation/verification, preserving existing services and React fallback;
+production changes/push/merge/migration/deploy still forbidden. Proposed exact
+VITE_API_URL=/api and API-first external Rewrite recorded in
+docs/RENDER_LAUNCH_SETTINGS.json; unchanged SPA /*->/index.html remains second.
+Actual production Vite build now rejects separate-site API destinations. Seven
+configuration cases and TypeScript/Vite production build PASS in reused isolated
+snapshot, no installs. Normal approval resolved esbuild sandbox directory denial;
+network/dotenv guards retained. Pre-existing untracked routing test preserved and
+completed, fixing import shadowing and synthetic probe lifespan handling only.
+Two guarded in-memory tests PASS: actual API sessions/CSRF/logout/revocation,
+raw POST/query/multiple cookies, private cache, fixed route/fallback and mocked
+payment/direct-webhook compatibility. No real provider test repeated.
+One cached Chromium workflow PASS with rebuilt original React and actual original
+API over stdio: virtual HTTPS host-only Secure/HttpOnly/Lax login/dashboard/reload,
+API requests, CSRF403, logout204/cookie deletion and revoked replay401. All page
+traffic fulfilled locally/blocked; no sockets, real TLS/Render/provider request,
+production credential or record. Browser/bridge closed; no persistent DB fixture.
+Backend/app tree fcc47f0a0d5a1596d8f3cd5790e61f624c3e04ed still matches already
+tested rollback2cfbfa6; no repeat backup/restoration/migration/rollback drill.
+Render edge POST/cookie/private-cache and hosted candidate/secure rollback artifact
+remain NOT RUN, requiring scoped hosted-change approval, not observed failures.
+No UI/design/business/backend-application/migration change.35/36 remains; PY-35
+partial. Final exact launch changes/approval boundary:
+docs/PY35_FINAL_LAUNCH_REPORT.md. Evidence:batch-135-same-origin-release.json.
+
 Current134 RENDER READ-ONLY VERIFICATION (2026-10-20 WAT): owner explicitly
 confirms My Workspace, tea-d281vqh5pdvs7383f86g. Pinned service reads and five
 recent deploys per service confirm both use master with on-commit auto-deploy.

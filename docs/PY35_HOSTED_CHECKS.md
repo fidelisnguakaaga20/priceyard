@@ -1,5 +1,12 @@
 # PY-35 hosted verification — 2026-10-20 WAT
 
+Current135: proposed API-first rewrite and VITE_API_URL=/api tested locally with
+original React/actual API; production build and seven build-admission cases pass.
+Cookie/CSRF/cache/logout/revocation and two guarded routing tests pass. This does
+NOT verify Render edge forwarding or eligible hosted rollback artifacts. No
+provider/backup/migration drill repeated; no hosted change. See
+[final launch report](PY35_FINAL_LAUNCH_REPORT.md).35/36 remains.
+
 Current134: approved-workspace Render metadata independently confirms correct
 backend start app.main:app, master/on-commit deployment on both services, backend
 migration-running build and frontend static dist output. No settings changed.

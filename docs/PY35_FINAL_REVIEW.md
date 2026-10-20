@@ -1,5 +1,14 @@
 # PriceYard final review - batch 87
 
+Current135: narrow same-origin routing application verification PASS; actual
+production build rejects cross-site API URLs and seven config cases pass. Original
+React + actual API browser login/reload/CSRF/logout/revocation pass over virtual
+HTTPS, no external transport. Two guarded routing tests pass. Existing backend
+application rollback tree unchanged; backup/migration/provider passes not repeated.
+Exact proposed settings and remaining hosted-change boundary are in
+[final launch report](PY35_FINAL_LAUNCH_REPORT.md). No Render settings applied;
+actual edge/runtime/secure hosted rollback NOT RUN.35/36, release not ready.
+
 Current134 supersedes startup uncertainty: owner confirmed My Workspace and
 read-only Render service metadata verifies the saved backend start is correctly
 `uvicorn app.main:app --host 0.0.0.0 --port $PORT`. No startup edit is needed.

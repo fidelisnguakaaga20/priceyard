@@ -1,0 +1,31 @@
+{
+  "scope": "proposed changes to existing services only; not applied",
+  "production_change_approved": false,
+  "workspace_id": "tea-d281vqh5pdvs7383f86g",
+  "frontend": {
+    "service_id": "srv-da6ddb2jnfac73e39490",
+    "service_name": "priceyard",
+    "build_environment_changes": {"VITE_API_URL": "/api"},
+    "ordered_rewrites": [
+      {"source": "/api/*", "destination": "https://priceyard-api.onrender.com/*", "action": "Rewrite"},
+      {"source": "/*", "destination": "/index.html", "action": "Rewrite"}
+    ],
+    "API_response_requirement": "Forward method, raw body, query, Cookie, all Set-Cookie headers and private/no-store; do not redirect or cache private responses",
+    "platform_edge_verified": false,
+    "fallback_rewrite_preserved": true
+  },
+  "backend": {
+    "service_id": "srv-da6d9gqjnfac73e2sbfg",
+    "service_name": "priceyard-api",
+    "start_command_unchanged": "uvicorn app.main:app --host 0.0.0.0 --port $PORT",
+    "frontend_url_required": "https://priceyard.onrender.com",
+    "required_allowed_browser_origin": "https://priceyard.onrender.com",
+    "cookie_policy_unchanged": "host-only Secure HttpOnly SameSite=Lax Path=/",
+    "direct_API_and_webhook_routes_preserved": true
+  },
+  "release_boundary": "Do not save Render settings, push, merge, run production migrations or deploy before exact release approval. Both services auto-deploy master; backend build currently runs Alembic.",
+  "rollback_requirement": "Retained security-aware application artifact using current0022 schema and revocation evidence; do not roll back to pre-security application or restore over newer payments. Verify routing and frontend environment together.",
+  "new_services": 0,
+  "new_dependencies": 0,
+  "paid_resources": 0
+}

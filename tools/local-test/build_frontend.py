@@ -16,6 +16,7 @@ RUNTIME = LAB / "runtime"
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--reuse", action="store_true", help="Rebuild the marked isolated snapshot without copying dependencies again")
+    parser.add_argument("--production", action="store_true", help="Verify the actual production-mode build with same-origin /api")
     options = parser.parse_args()
     if options.reuse:
         # Never update a snapshot being served, or build during native testing.
@@ -56,7 +57,12 @@ def main():
     env = {name: os.environ[name] for name in ("SYSTEMROOT", "WINDIR", "TEMP", "TMP", "PATH") if name in os.environ}
     env.update(VITE_API_URL="/api", VITE_GOOGLE_CLIENT_ID="", NODE_ENV="production")
     node = r"C:\Program Files\nodejs\node.exe"
-    for arguments in ([str(target / "node_modules/typescript/bin/tsc"), "-b"], [str(target / "node_modules/vite/bin/vite.js"), "build", "--mode", "synthetic"]):
+    if options.production:
+        result = subprocess.run([node, "--require", str(LAB / "node_guard.cjs"),
+                                 str(LAB / "render_build_checks.mjs"), str(target)], cwd=target, env=env)
+        if result.returncode:
+            return result.returncode
+    for arguments in ([str(target / "node_modules/typescript/bin/tsc"), "-b"], [str(target / "node_modules/vite/bin/vite.js"), "build", "--mode", "production" if options.production else "synthetic"]):
         result = subprocess.run([node, "--require", str(LAB / "node_guard.cjs"), *arguments], cwd=target, env=env)
         if result.returncode:
             return result.returncode

@@ -1,0 +1,84 @@
+{
+  "date_wat": "2026-10-20",
+  "scope": "narrow local same-origin application release checks, no hosted changes",
+  "completed_recommendations": 35,
+  "remaining_recommendations": 1,
+  "release_authorized": false,
+  "build": {
+    "actual_production_TypeScript_Vite": "PASS",
+    "configuration_admission_cases": 7,
+    "snapshot_reused": true,
+    "new_dependencies": 0,
+    "cross_site_API_production_builds_rejected": true,
+    "initial_sandbox_esbuild_resolution_error": "retried_with_normal_approval_guards_unchanged",
+    "new_backend_source": false,
+    "new_frontend_components_or_styles": false
+  },
+  "backend": {
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "runtime": "in_process_memory_SQLite_DNS_TCP_native_PG_dotenv_and_providers_denied",
+    "cases": [
+      "fixed_API_destination_and_original_SPA_fallback",
+      "raw_POST_body_query_status_multiple_cookies",
+      "real_login_Secure_HttpOnly_Lax_host_only_session",
+      "reload_private_no_store_CSRF",
+      "mocked_checkout_direct_webhook_signature_and_replay_compatibility",
+      "logout_cookie_deletion_revoked_replay401_independent_bearer_retained"
+    ],
+    "preexisting_untracked_test_preserved_and_completed": true,
+    "test_harness_fixes": [
+      "Python_import_shadowing",
+      "synthetic_probe_ASGI_lifespan"
+    ]
+  },
+  "browser": {
+    "status": "PASS_local_application_routing",
+    "frontend": "actual_current_production_build_original_React",
+    "backend": "actual_original_API_synthetic_fixture_stdio_only",
+    "transport": "virtual_HTTPS_frontend_origin_all_page_requests_fulfilled_or_aborted",
+    "cases": [
+      "original_login_dashboard_secure_host_cookie",
+      "reload_API_requests_CSRF_and_private_cache",
+      "logout_deletion_and_server_revocation"
+    ],
+    "production_requests": 0,
+    "provider_requests": 0,
+    "browser_and_bridge_closed": true,
+    "Render_edge_certified": false
+  },
+  "rollback": {
+    "backend_app_tree": "fcc47f0a0d5a1596d8f3cd5790e61f624c3e04ed",
+    "same_as_previously_tested_security_aware_candidate": true,
+    "reference_commit": "2cfbfa65447d51b225a0d367433709c25bd6da4a",
+    "existing_PG17_rollback_pass_retained": true,
+    "backup_restore_migration_drill_repeated": false,
+    "actual_hosted_artifact_runtime_verified": false
+  },
+  "configuration": {
+    "proposal": "../../../docs/RENDER_LAUNCH_SETTINGS.json",
+    "settings_applied": false,
+    "frontend_build_API": "/api",
+    "first_rewrite": "/api/* -> https://priceyard-api.onrender.com/*",
+    "original_fallback_preserved": "/* -> /index.html",
+    "backend_start_unchanged": true,
+    "cookie_policy_unchanged": true,
+    "business_rules_unchanged": true
+  },
+  "overall": "NOT_READY_required_hosted_checks_NOT_RUN_not_observed_failures",
+  "remaining": [
+    "actual_Render_edge_and_candidate_runtime_under_separate_approval",
+    "retained_secure_hosted_rollback_artifact",
+    "controlled_current_revision0022_cutover_and_post_snapshot_write_reconciliation",
+    "payment_recovery_operator_and_alert_response"
+  ],
+  "production_changes": false,
+  "production_data_access": false,
+  "production_migration": false,
+  "push": false,
+  "merge": false,
+  "deploy": false,
+  "new_services": 0,
+  "expenses": 0
+}

@@ -13,7 +13,12 @@
   "gates": [
     {
       "id": "hosting_cookies_browsers",
-      "status": "blocked_confirmed_direct_Render_routing_incompatible_with_candidate_Lax_sessions",
+      "status": "same_origin_application_tests_passed_actual_Render_route_not_applied_or_verified",
+      "same_origin_proposed_settings": "RENDER_LAUNCH_SETTINGS.json",
+      "same_origin_local_evidence": "../tools/local-test/evidence/batch-135-same-origin-release.json",
+      "same_origin_original_React_and_API_virtual_HTTPS": "passed_login_reload_API_CSRF403_logout204_revoked_replay401",
+      "same_origin_guarded_routing_tests": "two_passed_memory_SQLite_DNS_TCP_provider_dotenv_denied",
+      "same_origin_hosted_edge_verified": false,
       "public_tunnel_API_sessions_csrf_reset_logout": "passed_2026-10-20",
       "public_browser_workflow_verified": true,
       "public_browser_login_verified_date_wat": "2026-10-20",
@@ -30,7 +35,7 @@
       "owner_confirmed_API_proxy_exists": false,
       "candidate_cookie_compatibility_with_confirmed_settings": "fail_based_on_source_and_prior_virtual_browser_contract",
       "configuration_evidence": "../tools/local-test/evidence/batch-133-render-configuration.json",
-      "remaining": "Resolve confirmed candidate-session/direct-Render-site incompatibility without weakening account security; same-origin API is the robust target, no domain purchase required. Platform POST/cookie/private-cache handling and approved release configuration must be verified before production changes. Passed provider/browser tests retained; no live outage is inferred."
+      "remaining": "Local same-origin application route/configuration passes. Existing Render configuration remains incompatible and unchanged. Verify actual platform POST/cookie/private-cache behavior under scoped hosted-change approval; preserve React fallback, cookie security and existing provider passes. No custom domain or new service required by the proposed settings; no live outage inferred."
     },
     {
       "id": "actual_backup_restoration",
@@ -134,6 +139,11 @@
     {
       "id": "hosted_dependencies_environment",
       "status": "saved_start_command_verified_correct_candidate_build_rollback_still_unverified",
+      "candidate_production_frontend_build": "passed_2026-10-20_TypeScript_and_Vite_reused_isolated_snapshot",
+      "candidate_production_Vite_configuration_cases": 7,
+      "candidate_production_build_rejects_cross_site_API": true,
+      "candidate_backend_app_tree": "fcc47f0a0d5a1596d8f3cd5790e61f624c3e04ed",
+      "candidate_backend_app_tree_still_matches_verified_local_rollback": true,
       "Render_workspace_owner_confirmed": "tea-d281vqh5pdvs7383f86g",
       "Render_verified_start_command": "uvicorn app.main:app --host 0.0.0.0 --port $PORT",
       "Render_start_command_verification": "passed_readonly_service_metadata_2026-10-20_supersedes_earlier_owner_transcription",
