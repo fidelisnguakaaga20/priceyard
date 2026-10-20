@@ -25,6 +25,35 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current132 RENDER RELEASE CONTRACT (2026-10-20 WAT): owner independently reports
+priceyard-api Start Command `uvicorn app.main --host 0.0.0.0 --port $PORT` and
+Health Check Path blank. Local Uvicorn importer rejects exact
+target app.main before any app import: module:attribute required. AST confirms
+backend/app/main.py defines FastAPI app; proposed release command is
+uvicorn app.main:app --host 0.0.0.0 --port $PORT. As-provided startup defect is
+confirmed; no claim made that current live process was started with that setting.
+No production read/setting edit/restart/deploy. Blank health path means Render's
+default TCP probe, not no checks. Proposed /health is existing HTTP process
+liveness only; AST confirms constant response, no database-readiness proof.
+Reviewed Render current deployment/health/rollback docs; Free has no paid-only
+pre-deploy command. Existing migration-running build still requires approved
+release sequencing; do not save settings that may trigger deploy/migrations now.
+Reviewed existing PY-07 same-site routing requirement (not reopened feature).
+Current candidate uses Secure/HttpOnly/SameSite=Lax. Public Suffix List includes
+onrender.com. ONE serial cached-browser virtual test fulfils/aborts every request
+before transport: direct separate Render sites login200 then session401/no cookie;
+same-origin /api control login200/session200/cookie present. No production request,
+database, provider, tunnel, dependency install or repeated prior workflow test.
+This confirms the transport contract, not deployed route configuration. Frontend
+VITE_API_URL and existing /api rewrite/proxy remain unverified; no live defect
+claimed if a compatible same-origin route already exists. No custom domain needed.
+Next read-only owner action: Render priceyard frontend's VITE_API_URL public URL
+and existing /api Redirects/Rewrites rule or absent; no keys or settings changes.
+Render MCP tools absent in this session; do not repeat plugin/billing/Google tests.
+Evidence:tools/local-test/evidence/batch-132-render-contract.json.35/36 remains;
+production start/routing/health/configuration and existing rollback/operations
+gates still block deployment approval. All previous passed work preserved.
+
 Current131 GOOGLE PASS (2026-10-20 WAT): owner Screenshots4216/4217 confirm existing
 PriceYard web client already authorises http://127.0.0.1:5173 and permanent
 https://priceyard.onrender.com. Its public client ID matches selected existing

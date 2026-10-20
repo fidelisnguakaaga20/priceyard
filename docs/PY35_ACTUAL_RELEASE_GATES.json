@@ -13,7 +13,7 @@
   "gates": [
     {
       "id": "hosting_cookies_browsers",
-      "status": "public_tunnel_API_and_original_browser_passed_Render_runtime_pending",
+      "status": "provider_browser_checks_passed_Render_same_origin_route_unverified",
       "public_tunnel_API_sessions_csrf_reset_logout": "passed_2026-10-20",
       "public_browser_workflow_verified": true,
       "public_browser_login_verified_date_wat": "2026-10-20",
@@ -22,7 +22,10 @@
       "public_tls_handshakes": "passed_2026-10-20T12:30:16Z_frontend_and_backend_TLS1.3_chain_and_hostname_only",
       "public_tls_evidence": "PY35_HOSTED_CHECKS.md",
       "candidate_application_sessions_verified": false,
-      "remaining": "Public HTTPS API/original browser sessions and actual Google local sign-in now pass. All owned test servers stopped. Actual Render candidate proxy/artifact behavior requires approved release verification. Do not repeat passed provider/API/browser checks."
+      "virtual_Render_cookie_routing": "direct_separate_sites_session401_cookie_absent_same_origin_API_control200_cookie_present",
+      "routing_evidence": "../tools/local-test/evidence/batch-132-render-contract.json",
+      "deployed_frontend_API_route_verified": false,
+      "remaining": "Passed provider/browser checks retained. Read-only frontend VITE_API_URL and existing /api routing evidence needed: direct separate Render sites cannot retain current Lax browser session; same-origin control passes. Not a confirmed live routing defect until actual topology is known. No custom domain required. Actual candidate runtime remains separately gated."
     },
     {
       "id": "actual_backup_restoration",
@@ -114,11 +117,17 @@
     {
       "id": "monitoring_load_clock",
       "status": "awaiting_external_verification",
+      "owner_reported_Render_health_check_path": "blank_default_TCP_probe",
+      "proposed_HTTP_health_path": "/health_process_liveness_only_not_database_readiness",
       "remaining": "Approved hosted readiness/alerts/clock and bounded load checks with owner-selected response/recovery targets."
     },
     {
       "id": "hosted_dependencies_environment",
-      "status": "awaiting_external_verification",
+      "status": "blocked_as_reported_start_command_missing_app_attribute",
+      "owner_reported_start_command": "uvicorn app.main --host 0.0.0.0 --port $PORT",
+      "offline_Uvicorn_target_validation": "rejected_before_application_import_module_attribute_required",
+      "proposed_start_command_not_applied": "uvicorn app.main:app --host 0.0.0.0 --port $PORT",
+      "production_settings_changes": false,
       "remaining": "Exact hosted build/dependency/runtime/environment compatibility and artifact provenance; local evidence alone is insufficient."
     },
     {

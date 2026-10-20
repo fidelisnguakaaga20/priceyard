@@ -1,5 +1,16 @@
 # PY-35 hosted verification — 2026-10-20 WAT
 
+Current132 remaining Render contract: owner-provided start command omits `:app`;
+local Uvicorn rejects it before app import, and AST verifies `app.main:app` exists.
+Health path blank means default Render TCP probe; proposed existing `/health`
+is process HTTP liveness only. No production setting applied or process checked.
+One new browser-only virtual routing test (all requests fulfilled/aborted, no
+network) confirms direct separate Render sites cannot use the current Lax cookie;
+same-origin `/api` control passes. Actual frontend API URL/rewrite/proxy remains
+unverified, so do not claim a live routing defect yet. Inspect these public
+settings read-only before scoped release approval. No custom domain, new service,
+repeated provider/backup/migration tests or code/policy change. Evidence batch132.
+
 Current131 GOOGLE PASS: existing authorised local and Render origins confirmed by
 owner screenshots; existing public client ID matches local frontend/backend.
 Actual Google ID-token verification and original linked-user authentication PASS

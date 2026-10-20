@@ -1,5 +1,29 @@
 # PriceYard final review - batch 87
 
+Current132 RENDER SETTINGS REVIEW (2026-10-20 WAT), no production changes:
+
+| Setting/contract | Verified evidence | Proposed release action, not applied |
+| --- | --- | --- |
+| Backend start | Owner supplies `uvicorn app.main --host 0.0.0.0 --port $PORT`; local Uvicorn rejects missing attribute before importing app. Actual live-process command not observed | `uvicorn app.main:app --host 0.0.0.0 --port $PORT`, only during approved release |
+| Health | Owner says blank; Render defaults to TCP. Existing `/health` returns constant healthy status without a DB query | Configure `/health` for HTTP liveness under release approval; retain separate application/data readiness and alert checks |
+| Protected browser routing | Original approved Lax-cookie contract; entirely virtual browser test: direct separate Render sites lose cookie/session401; same-origin `/api` control200 | Inspect actual frontend API URL and `/api` rewrite/proxy before proposing the smallest compatible routing change. Existing route not yet observed; no custom domain purchase |
+| Rollback | Retained local security-aware rollback passed. Render rollback needs a retained compatible artifact and restores target start/health/env, but not database writes | Verify eligible secure candidate artifact/settings and preserve security/database evidence; no rollback trigger now |
+
+Next owner read-only action: frontend Render `priceyard` public `VITE_API_URL`
+value and existing `/api` Redirects/Rewrites rule (or absent). Do not edit/save
+production settings, expose secrets, switch cookie policy or trigger deployment.
+Build still runs Alembic automatically; approval must cover exact controlled
+release configuration/migration/rollback sequence.35/36; PY-35 partial.
+New bounded evidence:[batch132](../tools/local-test/evidence/batch-132-render-contract.json).
+Sources: [Render FastAPI](https://render.com/docs/deploy-fastapi),
+[health checks](https://render.com/docs/health-checks),
+[deploys](https://render.com/docs/deploys),
+[rollbacks](https://render.com/docs/rollbacks),
+[Public Suffix List](https://publicsuffix.org/list/public_suffix_list.dat),
+[browser cookie semantics](https://web.dev/articles/samesite-cookies-explained).
+Markdown references returned unsupported/empty responses; corresponding HTML
+documents above were retrieved and read. No live Render tool is exposed here.
+
 Current131 (2026-10-20 WAT): Google local end-to-end PASS using already authorised
 http://127.0.0.1:5173; genuine signed token verified by original backend against
 synthetic PG17, owner confirms dashboard. Existing Render frontend origin also

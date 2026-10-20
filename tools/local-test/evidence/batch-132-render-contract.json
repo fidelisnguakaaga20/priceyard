@@ -1,0 +1,30 @@
+{
+  "date_wat": "2026-10-20",
+  "scope": "new offline startup and virtual browser Render transport checks only",
+  "completed_recommendations": 35,
+  "remaining_recommendations": 1,
+  "release_authorized": false,
+  "production_connections_changes_migrations_push_merge_deploy": false,
+  "existing_provider_backup_restoration_migration_tests_repeated": false,
+  "owner_reported_backend_start": "uvicorn app.main --host 0.0.0.0 --port $PORT",
+  "local_Uvicorn_importer_result": "rejected_missing_module_attribute_before_app_import",
+  "candidate_main_FastAPI_app_exists_AST": true,
+  "proposed_start_not_applied": "uvicorn app.main:app --host 0.0.0.0 --port $PORT",
+  "owner_reported_health_path": "blank",
+  "blank_health_path_platform_meaning": "default_TCP_probe",
+  "proposed_HTTP_health_path_not_applied": "/health",
+  "current_health_implementation": "constant_process_liveness_not_database_readiness",
+  "browser_virtual_requests": "all_fulfilled_locally_or_aborted_no_route_continue",
+  "real_network_requests_allowed_by_browser_fixture": 0,
+  "browser_cookie_contract": [
+    {"topology": "direct_separate_Render_sites", "login_response": 200, "session_response": 401, "cookie_present": false},
+    {"topology": "same_origin_API_path", "login_response": 200, "session_response": 200, "cookie_present": true}
+  ],
+  "actual_frontend_API_route_verified": false,
+  "production_routing_defect_confirmed": false,
+  "custom_domain_required": false,
+  "browser_closed": true,
+  "database_provider_or_tunnel_started": false,
+  "application_source_or_cookie_policy_changed": false,
+  "remaining_owner_readonly_input": "frontend VITE_API_URL and existing /api rewrite/proxy or absent"
+}
