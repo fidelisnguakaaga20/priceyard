@@ -1,5 +1,24 @@
 # PriceYard final review - batch 87
 
+Current133 confirmed owner configuration, no repeated tests or production change:
+frontend calls https://priceyard-api.onrender.com directly and has only
+`/* -> /index.html` Rewrite; no API proxy. This matches prior browser evidence
+where the upgraded Lax cookie is unavailable cross-site (session401). It is a
+confirmed candidate-release incompatibility, not a live production outage claim.
+Same-origin API transport is the robust correction target without a purchased
+domain; CORS alone does not change SameSite restrictions. Do not promise that a
+static external rewrite supports authenticated POST/cookies/private-cache behavior
+without verification. Preserve settings until an exact reviewed change is approved.
+
+Owner says startup already correctly contains app.main but does not clarify the
+`:app` attribute. The earlier supplied string fails Uvicorn grammar; the actual
+saved target remains unverified, not an independently confirmed live startup fault.
+Use app.main:app in any exact release configuration. Blank health path provides
+default TCP checks, so blank alone is not another proven launch blocker.
+Existing hosted candidate/rollback artifact, migration cutover/reconciliation and
+operational acceptance remain unverified;35/36, no deployment authorization.
+Evidence:[batch133](../tools/local-test/evidence/batch-133-render-configuration.json).
+
 Current132 RENDER SETTINGS REVIEW (2026-10-20 WAT), no production changes:
 
 | Setting/contract | Verified evidence | Proposed release action, not applied |

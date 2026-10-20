@@ -1,5 +1,14 @@
 # PY-35 hosted verification — 2026-10-20 WAT
 
+Current133: owner confirms direct backend VITE_API_URL, sole SPA rewrite and no
+API proxy. Reuse batch132 browser contract: candidate Lax sessions are incompatible
+with these separate Render sites. No source/settings edit or repeated test needed
+to establish this release blocker; no claim of a live outage. Resolve the same-site
+transport under reviewed production approval; no domain purchase required. Startup
+clarification supplies module name only, so exact saved attribute is unverified.
+Blank health means TCP checking, not absence of monitoring. All passed provider/
+backup/migration/Google evidence preserved;35/36, production untouched.
+
 Current132 remaining Render contract: owner-provided start command omits `:app`;
 local Uvicorn rejects it before app import, and AST verifies `app.main:app` exists.
 Health path blank means default Render TCP probe; proposed existing `/health`

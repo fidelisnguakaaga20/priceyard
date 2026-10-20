@@ -25,6 +25,30 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current133 CONFIRMED RELEASE ROUTING BLOCKER (2026-10-20 WAT): owner verifies
+frontend VITE_API_URL=https://priceyard-api.onrender.com and sole rewrite
+/* -> /index.html (Rewrite), explicitly no /api rewrite/proxy. These settings
+match the already-tested direct/separate-Render-sites topology; do not rerun it.
+Current upgraded source sets Secure/HttpOnly/SameSite=Lax, so cross-site browser
+login cannot retain/use this session. Exact CORS alone cannot fix the cookie
+restriction. This is an upgrade-release incompatibility established from confirmed
+settings + source + retained browser test, not a claim of a checked live outage.
+No purchased domain is needed; same-origin API transport is the robust target.
+Do not assume external static rewrites proxy POST, cookies and private-cache
+semantics correctly without platform verification. No proxy/cookie/API setting
+changed, no public probe, source change or repeated provider/database test.
+User clarifies Start Command already contains app.main but supplies no new exact
+attribute value. Retain prior malformed-target evidence; actual saved command is
+UNVERIFIED, not a confirmed live startup fault. Exact valid target is app.main:app.
+Blank health remains default TCP; /health would improve HTTP liveness and is not
+alone evidence of an outage or a separate proven launch defect. Existing hosted
+candidate/compatible rollback/migration cutover and operational acceptance remain
+unverified; do not declare PY-35 complete or deploy. Record35/36 and preserve all
+provider/backup/migration/Google passes. Current production settings preserved.
+Evidence:tools/local-test/evidence/batch-133-render-configuration.json. Stop at
+confirmed incompatibility before any production modification; resolve transport
+in the reviewed release proposal, with separate production approval.
+
 Current132 RENDER RELEASE CONTRACT (2026-10-20 WAT): owner independently reports
 priceyard-api Start Command `uvicorn app.main --host 0.0.0.0 --port $PORT` and
 Health Check Path blank. Local Uvicorn importer rejects exact

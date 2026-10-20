@@ -13,7 +13,7 @@
   "gates": [
     {
       "id": "hosting_cookies_browsers",
-      "status": "provider_browser_checks_passed_Render_same_origin_route_unverified",
+      "status": "blocked_confirmed_direct_Render_routing_incompatible_with_candidate_Lax_sessions",
       "public_tunnel_API_sessions_csrf_reset_logout": "passed_2026-10-20",
       "public_browser_workflow_verified": true,
       "public_browser_login_verified_date_wat": "2026-10-20",
@@ -24,8 +24,13 @@
       "candidate_application_sessions_verified": false,
       "virtual_Render_cookie_routing": "direct_separate_sites_session401_cookie_absent_same_origin_API_control200_cookie_present",
       "routing_evidence": "../tools/local-test/evidence/batch-132-render-contract.json",
-      "deployed_frontend_API_route_verified": false,
-      "remaining": "Passed provider/browser checks retained. Read-only frontend VITE_API_URL and existing /api routing evidence needed: direct separate Render sites cannot retain current Lax browser session; same-origin control passes. Not a confirmed live routing defect until actual topology is known. No custom domain required. Actual candidate runtime remains separately gated."
+      "deployed_frontend_API_route_verified": "owner_confirmed_settings_not_live_request",
+      "owner_confirmed_frontend_VITE_API_URL": "https://priceyard-api.onrender.com",
+      "owner_confirmed_frontend_rewrites": [{"source": "/*", "destination": "/index.html", "action": "Rewrite"}],
+      "owner_confirmed_API_proxy_exists": false,
+      "candidate_cookie_compatibility_with_confirmed_settings": "fail_based_on_source_and_prior_virtual_browser_contract",
+      "configuration_evidence": "../tools/local-test/evidence/batch-133-render-configuration.json",
+      "remaining": "Resolve confirmed candidate-session/direct-Render-site incompatibility without weakening account security; same-origin API is the robust target, no domain purchase required. Platform POST/cookie/private-cache handling and approved release configuration must be verified before production changes. Passed provider/browser tests retained; no live outage is inferred."
     },
     {
       "id": "actual_backup_restoration",
@@ -123,10 +128,12 @@
     },
     {
       "id": "hosted_dependencies_environment",
-      "status": "blocked_as_reported_start_command_missing_app_attribute",
+      "status": "saved_start_attribute_ambiguous_hosted_build_rollback_still_unverified",
       "owner_reported_start_command": "uvicorn app.main --host 0.0.0.0 --port $PORT",
       "offline_Uvicorn_target_validation": "rejected_before_application_import_module_attribute_required",
       "proposed_start_command_not_applied": "uvicorn app.main:app --host 0.0.0.0 --port $PORT",
+      "owner_later_start_clarification": "already correctly contains app.main; exact module:attribute value not supplied",
+      "confirmed_live_startup_fault": false,
       "production_settings_changes": false,
       "remaining": "Exact hosted build/dependency/runtime/environment compatibility and artifact provenance; local evidence alone is insufficient."
     },
