@@ -1,5 +1,19 @@
 # PY-35 hosted verification — 2026-10-20 WAT
 
+Current131 GOOGLE PASS: existing authorised local and Render origins confirmed by
+owner screenshots; existing public client ID matches local frontend/backend.
+Actual Google ID-token verification and original linked-user authentication PASS
+on synthetic PG17; owner confirms dashboard reached. No new Google setting,
+client, domain or Cloudflare tunnel. Original app/design/security source unchanged.
+Initial FAILED TO FETCH was the private test wrapper blocking credential-free
+CORS preflight403; corrected only its local origin allowlist/outer middleware.
+Six CORS/isolation checks and three origin admission guards pass. Payment/email
+disabled; successful earlier provider/backup/migration tests not repeated.
+Local frontend/API/PG17 confirmed stopped. This is HTTP local development proof;
+previous public HTTPS session proof is retained separately. Actual Render candidate
+runtime/proxy/artifact/operations remain release-gated, not certified by localhost.
+35/36; PY-35 partial. See batch131 evidence and actual gate ledger.
+
 Current129 FINAL WINDOW: Google human popup actually attempted and rejected with
 400 origin_mismatch (owner Screenshot4211), identifying the temporary test origin
 as unregistered. Not a password failure or proof of a production login defect;

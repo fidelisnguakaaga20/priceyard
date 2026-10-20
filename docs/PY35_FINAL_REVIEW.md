@@ -1,5 +1,16 @@
 # PriceYard final review - batch 87
 
+Current131 (2026-10-20 WAT): Google local end-to-end PASS using already authorised
+http://127.0.0.1:5173; genuine signed token verified by original backend against
+synthetic PG17, owner confirms dashboard. Existing Render frontend origin also
+shown configured; no custom domain or provider-setting change required. Corrected
+only local test wrapper's credential-free CORS preflight handling, six isolation
+checks pass. No further tunnel, repeated payment/email or production access.
+All test processes stopped. Passed provider/backup/migration evidence retained.
+Remaining existing gates are actual Render candidate runtime/artifact/proxy,
+operational monitoring/payment-recovery and safe release/rollback/cutover approval.
+35/36; no push, merge, production migration or deployment authorised/performed.
+
 Current129 (2026-10-20 WAT) supersedes older provider statuses: original public
 browser login and protected cookie PASS; genuine Paystack TEST payment, signed
 webhook, correct subscription activation and two idempotent replays PASS. Email,

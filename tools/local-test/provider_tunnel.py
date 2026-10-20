@@ -88,7 +88,9 @@ def rollback_source():
 def worker():
     cfg = json.loads(sys.stdin.readline())
     require(re.fullmatch(r'py_provider_[0-9a-f]{12}', cfg['schema']), 'Unapproved synthetic schema')
-    require(re.fullmatch(r'https://[a-z0-9-]+\.trycloudflare\.com', cfg['origin']), 'Unapproved tunnel origin')
+    local_google = cfg.get('google_only_local', False)
+    require((local_google and cfg['origin'] == 'http://127.0.0.1:5173')
+            or (not local_google and re.fullmatch(r'https://[a-z0-9-]+\.trycloudflare\.com', cfg['origin'])), 'Unapproved test origin')
     require(cfg['PAYSTACK_SECRET_KEY'].startswith('sk_test_') and cfg['PAYSTACK_PUBLIC_KEY'].startswith('pk_test_'), 'TEST keys required')
     env = clean_environment()
     os.environ.clear()
@@ -109,7 +111,7 @@ def worker():
     pydantic_settings.BaseSettings.__init__ = settings_without_files
     from app.config import Settings
     import app.config
-    settings = Settings(_env_file=None, app_env='staging', debug=False,
+    settings = Settings(_env_file=None, app_env='test' if local_google else 'staging', debug=False,
                         database_url=cfg['database_url'], jwt_secret=cfg['jwt_secret'],
                         frontend_url=cfg['origin'], cors_origins=cfg['origin'],
                         paystack_secret_key=cfg['PAYSTACK_SECRET_KEY'], paystack_public_key=cfg['PAYSTACK_PUBLIC_KEY'],
@@ -151,6 +153,8 @@ def worker():
     def bounded_request(session, method, url, **kwargs):
         require(cfg.get('external_enabled', True), 'External providers disabled for offline rollback')
         parsed = urlsplit(url)
+        if local_google:
+            require(method.upper() == 'GET' and url == 'https://www.googleapis.com/oauth2/v1/certs', 'Google-only test forbids other providers')
         require(parsed.scheme == 'https' and not parsed.username and not parsed.password and parsed.port in (None, 443), 'Unsafe provider URL')
         allowed = (parsed.hostname == 'api.paystack.co' and (
             (method.upper() == 'POST' and parsed.path == '/transaction/initialize') or
@@ -280,12 +284,17 @@ def worker():
                                  'private_email_ids': private_email_ids, 'private_reset_urls': private_reset_urls,
                                  'private_webhooks': private_webhooks})
         if request.url.path == '/' and request.query_params.get('ticket') == cfg['gate']:
-            response = RedirectResponse('/login', status_code=303)
-            response.set_cookie('__Host-priceyard_test_gate', cfg['gate'], secure=True, httponly=True, samesite='lax', path='/')
+            response = RedirectResponse(cfg['origin'] + '/login' if local_google else '/login', status_code=303)
+            response.set_cookie('priceyard_google_test_gate' if local_google else '__Host-priceyard_test_gate',
+                                cfg['gate'], secure=not local_google, httponly=True, samesite='lax', path='/')
             response.headers['Referrer-Policy'] = 'no-referrer'
             return response
-        if request.url.path != '/api/payments/webhook' and request.cookies.get('__Host-priceyard_test_gate') != cfg['gate']:
+        gate_name = 'priceyard_google_test_gate' if local_google else '__Host-priceyard_test_gate'
+        if (local_google or request.url.path != '/api/payments/webhook') and request.cookies.get(gate_name) != cfg['gate']:
             return JSONResponse({'detail': 'Private synthetic test session required'}, status_code=403)
+        if local_google and (request.url.path.startswith('/api/payments') or (request.method == 'POST'
+                and request.url.path not in ('/api/auth/browser/google', '/api/auth/logout'))):
+            return JSONResponse({'detail': 'Google-only check; other writes disabled'}, status_code=403)
         if request.method == 'POST' and request.url.path in ('/api/auth/register', '/api/auth/forgot-password', '/api/auth/browser/login', '/api/auth/login'):
             body = await request.body()
             try:
@@ -302,12 +311,20 @@ def worker():
             import base64
             private_webhooks.append({'body': base64.b64encode(webhook_body).decode('ascii'),
                                      'signature': request.headers.get('x-paystack-signature', '')})
-        response.headers['Referrer-Policy'] = 'no-referrer'
+        response.headers['Referrer-Policy'] = 'no-referrer-when-downgrade' if local_google else 'no-referrer'
         response.headers['Cache-Control'] = 'private, no-store'
         response.headers['X-Robots-Tag'] = 'noindex, nofollow'
         response.headers['Cross-Origin-Opener-Policy'] = 'same-origin-allow-popups'
         return response
 
+    if local_google:
+        # Credentialed browser preflights intentionally carry no cookies. Keep
+        # CORS outside the private gate, restricted to the already approved
+        # loopback UI origin; actual requests still pass the unchanged gate.
+        from starlette.middleware.cors import CORSMiddleware
+        web.add_middleware(CORSMiddleware, allow_origins=[cfg['origin']], allow_credentials=True,
+                           allow_methods=['GET', 'POST'],
+                           allow_headers=['Content-Type', 'X-PriceYard-Csrf', 'X-PriceYard-Session'])
     # Serve original compiled appearance; no test UI or local-only debug endpoints.
     web.mount('/api', api)
     web.mount('/assets', StaticFiles(directory=RUN / 'dist/assets'))
@@ -325,7 +342,7 @@ def worker():
         if event in ('subprocess.Popen', 'os.system'):
             raise RuntimeError('Worker child processes denied')
     sys.addaudithook(block_private_files)
-    uvicorn.run(web, host='127.0.0.1', port=PORT, workers=1, access_log=False,
+    uvicorn.run(web, host='127.0.0.1', port=55446 if local_google else PORT, workers=1, access_log=False,
                 log_level='critical', proxy_headers=True, forwarded_allow_ips='127.0.0.1')
 
 

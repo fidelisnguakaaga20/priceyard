@@ -25,6 +25,35 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current131 GOOGLE PASS (2026-10-20 WAT): owner Screenshots4216/4217 confirm existing
+PriceYard web client already authorises http://127.0.0.1:5173 and permanent
+https://priceyard.onrender.com. Its public client ID matches selected existing
+frontend/backend configuration. No Google setting, project/domain/credential,
+Render service or production record changed. No new tunnel.
+Reused original frontend snapshot and existing marked synthetic PG17 schema;
+built only local API destination http://127.0.0.1:55446/api, no source edits or
+dependency installs. Native DB bound127.0.0.1:55452,32MB shared buffers/12connections.
+Three new origin-admission rejection cases passed before DB/provider access.
+Initial owner FAILED TO FETCH diagnosed precisely: test wrapper required private
+cookie on credential-free CORS OPTIONS, returning403 with no allowed-origin header.
+Controlled stop preserved report/build; local-only exact-origin CORS placed outside
+the private gate. Six bounded checks passed: allowed preflight, rejected unrelated
+origin, actual-request gate retained, payment and email writes blocked, anonymous
+session401 readable by the approved frontend. No production/app security change.
+Reused build on correction; no repeat payment/email/backup/migration checks.
+Actual Google signed ID token verified for approved account/client; an already-
+linked synthetic fixture passes original Google authentication, and owner explicitly
+confirms YES REACHED DASHBOARD. Tokens/passwords/Google subject ID never requested
+in chat or saved in logs/Git. Original HTTP-only local cookie exception stays in
+test environment/127.0.0.1:55446; no production cookie policy changes or HTTPS claim.
+Final local-Google report PASS; frontend/worker/PG17 all confirmed stopped.
+Google local end-to-end, public HTTPS sessions, actual received reset email and
+genuine Paystack TEST payment/webhook/replay now pass. Actual Render candidate
+artifact/proxy/monitoring/scheduler and release/rollback/cutover approval remain
+open existing PY-35 gates;35/36 complete, no push/merge/deploy/production migration.
+Evidence:tools/local-test/evidence/batch-131-local-google.json. Do not repeat these
+passed checks. Remaining work is final release configuration/operational approval.
+
 Current130 (2026-10-20 WAT): owner confirms CLEARED after removing expired Paystack
 TEST webhook; record as owner-confirmed, not an independent provider-settings
 inspection. LIVE settings unchanged by Codex. Completed payment tests retained.

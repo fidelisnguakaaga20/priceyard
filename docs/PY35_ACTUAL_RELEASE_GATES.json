@@ -22,7 +22,7 @@
       "public_tls_handshakes": "passed_2026-10-20T12:30:16Z_frontend_and_backend_TLS1.3_chain_and_hostname_only",
       "public_tls_evidence": "PY35_HOSTED_CHECKS.md",
       "candidate_application_sessions_verified": false,
-      "remaining": "Public tunnel API and original browser login passed. Google test login is blocked by owner-observed origin_mismatch; tunnel/app/synthetic PG17 stopped. Inspect configured authorized origins before a separately approved Google-only test. Actual Render proxy/artifact behavior still requires approved rollout. Do not repeat passed API/browser/payment checks."
+      "remaining": "Public HTTPS API/original browser sessions and actual Google local sign-in now pass. All owned test servers stopped. Actual Render candidate proxy/artifact behavior requires approved release verification. Do not repeat passed provider/API/browser checks."
     },
     {
       "id": "actual_backup_restoration",
@@ -92,15 +92,24 @@
     },
     {
       "id": "google_notification_delivery",
-      "status": "reset_email_passed_Google_blocked_by_test_origin_configuration",
+      "status": "reset_email_and_actual_local_Google_sign_in_passed_Render_candidate_runtime_pending",
       "original_reset_email_provider_acceptance": "passed_2026-10-20",
       "approved_recipient_receipt": "owner_confirmed_received_2026-10-20",
       "test_emails_sent": 1,
       "frontend_backend_Google_client_IDs_match": true,
-      "actual_Google_sign_in_verified": false,
+      "actual_Google_sign_in_verified": true,
       "Google_owner_browser_error": "400 origin_mismatch; Screenshot4211 instructs registering the JavaScript origin",
-      "Google_backend_ID_token_received": false,
-      "remaining": "Inspect existing OAuth web client's authorized public origins without exposing secrets or changing production settings. Then arrange an explicitly approved test origin/client and complete Google-only sign-in. The temporary tunnel is closed. Do not register an expired hostname or repeat passed email/payment checks."
+      "Google_backend_ID_token_received": true,
+      "Google_local_test_origin": "http://127.0.0.1:5173",
+      "Google_existing_production_origin_owner_screenshot": "https://priceyard.onrender.com",
+      "Google_client_matches_existing_frontend_backend_configuration": true,
+      "Google_signed_token_original_linked_account_authentication": "passed_2026-10-20_synthetic_fixture",
+      "Google_dashboard_reached": "owner_confirmed_YES_REACHED_DASHBOARD",
+      "Google_local_CORS_isolation_checks_passed": 6,
+      "Google_provider_settings_changed": false,
+      "Google_hosted_Render_candidate_runtime_verified": false,
+      "Google_local_evidence": "../tools/local-test/evidence/batch-131-local-google.json",
+      "remaining": "Actual Google sign-in and original dashboard passed using existing authorised loopback origin without Google settings changes; all test servers closed. Do not repeat. Existing production origin is shown configured, but actual Render candidate runtime/proxy and release verification remain separate gates."
     },
     {
       "id": "monitoring_load_clock",
