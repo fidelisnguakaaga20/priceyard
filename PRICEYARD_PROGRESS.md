@@ -25,6 +25,25 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest126 PROVIDER INPUT BLOCKER (2026-10-20 WAT): owner approves ONE temporary
+free Cloudflare Quick Tunnel for essential real provider TEST checks, synthetic
+data only, PostgreSQL private, close tunnel afterward, no charges/production
+changes. Workspace already has settletrack-db: DO NOT create another Render DB
+or use that unrelated database. Existing PG17 synthetic environment remains the
+approved database target. No completed audit/backup/restore/tests repeated.
+Read-only harness inspection finds current preview uses memory SQLite, denies
+external transports, mocks provider calls and includes local-only test endpoints;
+do not expose it unchanged or relax its original guard for real providers.
+cloudflared is not on PATH. No dedicated TEST credential storage reference,
+approved real email recipient or Google test identity/origin is recorded.
+Do not open a public tunnel or download/start tools before these essential inputs
+are supplied; do not read.env or reuse production credentials as substitutes.
+Next owner input: approved test recipient and secure TEST configuration reference,
+or confirmation that keys are ready for hidden local entry. Never request keys
+in chat.35/36 unchanged; hosted tests BLOCKED/not attempted, no FAIL/PASS claim.
+No app changes, credentials opened, database/tunnel started, provider call,
+purchase, push, migration or deployment performed.
+
 Latest125 ACCESS BLOCKER (2026-10-20 WAT): owner confirms Render plugin installed
 and independently connected in ChatGPT, both production services auto-deploy
 master. Accept those confirmations; do not ask to reconnect or repeat Billing.
