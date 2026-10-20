@@ -1,5 +1,15 @@
 # PriceYard final review - batch 87
 
+Current129 (2026-10-20 WAT) supersedes older provider statuses: original public
+browser login and protected cookie PASS; genuine Paystack TEST payment, signed
+webhook, correct subscription activation and two idempotent replays PASS. Email,
+recovery/migration and local security-aware rollback evidence retained. Google
+human popup is BLOCKED by400 origin_mismatch for the unregistered temporary test
+origin (Screenshot4211); no backend ID-token result. Tunnel/app/synthetic PG17
+confirmed stopped. Inspect Google authorized origins read-only before approved
+Google-only continuation; clear expired TEST webhook, LIVE unchanged. Actual
+Render operations/artifact verification still open;35/36 remains, no deployment.
+
 Current128 (2026-10-20 WAT) supersedes older provider statuses: public-tunnel
 HTTPS/API session/CSRF/reset/logout, one actually received reset email, Paystack
 TEST initialization and local PG17 application rollback pass. Actual Google

@@ -1,5 +1,17 @@
 # PY-35 hosted verification — 2026-10-20 WAT
 
+Current129 FINAL WINDOW: Google human popup actually attempted and rejected with
+400 origin_mismatch (owner Screenshot4211), identifying the temporary test origin
+as unregistered. Not a password failure or proof of a production login defect;
+no backend Google credential/token verification completed. Stopped window with
+tunnel/app/synthetic PG17 all confirmed stopped. All earlier API/browser/email/
+genuine payment/subscription/replay/backup/rollback evidence remains valid.
+Read-only next step: inspect existing Google client's Authorized JavaScript
+origins; any settings change needs owner approval and a live test window, never
+an expired hostname. Owner should clear the expired Paystack TEST webhook and
+leave LIVE unchanged. No provider setting changed by Codex, production access,
+repeat charge, new feature, migration, push or deployment.35/36; PY-35 partial.
+
 Current129 PAYMENT PASS: real TEST charge.success reached the exact confirmed
 isolated endpoint; original signature verification/handler activated the correct
 2500NGN paid_monthly purchase. Two public HTTPS replays of that genuinely received

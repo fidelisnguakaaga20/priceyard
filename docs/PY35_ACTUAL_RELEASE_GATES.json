@@ -22,7 +22,7 @@
       "public_tls_handshakes": "passed_2026-10-20T12:30:16Z_frontend_and_backend_TLS1.3_chain_and_hostname_only",
       "public_tls_evidence": "PY35_HOSTED_CHECKS.md",
       "candidate_application_sessions_verified": false,
-      "remaining": "Public tunnel API and original browser login passed. Google consent remains pending; actual Render proxy/artifact behavior requires separately approved rollout. Do not repeat passed API/browser checks merely for a report."
+      "remaining": "Public tunnel API and original browser login passed. Google test login is blocked by owner-observed origin_mismatch; tunnel/app/synthetic PG17 stopped. Inspect configured authorized origins before a separately approved Google-only test. Actual Render proxy/artifact behavior still requires approved rollout. Do not repeat passed API/browser/payment checks."
     },
     {
       "id": "actual_backup_restoration",
@@ -92,13 +92,15 @@
     },
     {
       "id": "google_notification_delivery",
-      "status": "partial_reset_email_received_Google_pending",
+      "status": "reset_email_passed_Google_blocked_by_test_origin_configuration",
       "original_reset_email_provider_acceptance": "passed_2026-10-20",
       "approved_recipient_receipt": "owner_confirmed_received_2026-10-20",
       "test_emails_sent": 1,
       "frontend_backend_Google_client_IDs_match": true,
       "actual_Google_sign_in_verified": false,
-      "remaining": "Existing credentials/approved recipient located and original reset email received. Complete actual Google browser consent/sign-in on an approved origin. Additional channels require separate evidence only if enabled for launch; do not request existing credentials or resend the passed email test."
+      "Google_owner_browser_error": "400 origin_mismatch; Screenshot4211 instructs registering the JavaScript origin",
+      "Google_backend_ID_token_received": false,
+      "remaining": "Inspect existing OAuth web client's authorized public origins without exposing secrets or changing production settings. Then arrange an explicitly approved test origin/client and complete Google-only sign-in. The temporary tunnel is closed. Do not register an expired hostname or repeat passed email/payment checks."
     },
     {
       "id": "monitoring_load_clock",

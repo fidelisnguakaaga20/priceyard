@@ -25,6 +25,25 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current129 GOOGLE BLOCKER CONFIRMED: owner Screenshot4211 shows Google's actual
+400 origin_mismatch and instruction to register the JavaScript origin, for the
+races-son temporary frontend. This confirms an external test-origin configuration
+blocker; no Google ID token reached the original backend and actual Google login
+has NOT passed. Earlier automated google_origin_rejected:false only means that
+runner saw no error before the human popup; it is not an authorization result.
+Stopped the completed payment window rather than repeat tests or bypass Google's
+origin validation. Final runner result: partial, tunnel_closed/worker_stopped/
+postgres_stopped all true; genuine TEST payment and replay PASS retained.
+The races-son URL is now CLOSED. Owner should clear the expired TEST-only webhook
+(never restore production as a TEST destination; LIVE unchanged). Read-only next
+step: inspect existing Google web client's Authorized JavaScript origins, sharing
+only public website addresses. No client-secret/key request or production OAuth
+setting change authorized. Any new temporary origin or separate test client needs
+a bounded owner-approved configuration step; never register an expired tunnel.
+Google official setup guidance confirms scheme+hostname-only Authorized JavaScript
+origins; not a redirect-URI/password/measurement/UI change.35/36 unchanged.
+Verified browser/payment work committed locally a13004d; no push/deploy/migration.
+
 Current129 PAYMENT PASS: while awaiting owner browser action, the real TEST
 charge.success event arrived at the confirmed isolated HTTPS endpoint. Original
 signature validation/handler passed; exact checkout reference has success2500.00

@@ -20,10 +20,15 @@
   "genuine_event_replays": 2,
   "replay_HTTP200_and_unchanged_payment_subscription_snapshot": true,
   "private_event_body_signature_and_credentials_in_Git_or_logs": false,
-  "Google_actual_sign_in": "awaiting_owner_browser_consent",
+  "Google_actual_sign_in": "blocked_owner_screenshot4211_400_origin_mismatch_temporary_test_origin_unregistered",
+  "Google_ID_token_reached_backend": false,
   "automated_checkout_inspection": "human_verification_encountered_no_bypass_no_payment_submission",
   "prepayment_stops": "expired_closed_windows_and_checker_naming_correction_preserved_no_checkout_before_owner_confirmation",
   "public_readiness": "verified_TLS_405_Allow_POST_and_private_synthetic_worker_status",
-  "final_window_cleanup": "pending_automatic_900_second_bound_or_completed_Google_check",
+  "final_window_cleanup": "passed_controlled_stop_after_Google_configuration_blocker",
+  "tunnel_closed": true,
+  "worker_stopped": true,
+  "synthetic_PG17_stopped": true,
+  "owner_TEST_webhook_cleanup": "clear_expired_temporary_TEST_URL_LIVE_unchanged",
   "application_source_or_business_rules_changed": false
 }
