@@ -25,6 +25,31 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current134 RENDER READ-ONLY VERIFICATION (2026-10-20 WAT): owner explicitly
+confirms My Workspace, tea-d281vqh5pdvs7383f86g. Pinned service reads and five
+recent deploys per service confirm both use master with on-commit auto-deploy.
+Actual backend start is uvicorn app.main:app --host 0.0.0.0 --port $PORT:
+CORRECT, superseding earlier supplied malformed command/attribute uncertainty.
+Backend build still runs pip install then alembic upgrade head; no settings saved.
+Frontend is a static site, root frontend, publish dist. Live backend a9cf1b9 and
+frontend76dbd27 match previous owner reports. Reviewed secure rollback candidate
+2cfbfa6 is not an ancestor of the live backend; limited history does not establish
+retained compatible rollback artifact availability. Local rollback pass retained.
+One coarse one-hour backend metrics read returns CPU0.001338-0.001425 cores and
+memory about120.2-120.7MiB; instance-count series empty. One bounded last24h event
+read returns no server_failed/server_restarted events. These describe the old
+deployed app, not candidate load/readiness, alert delivery or failure recovery.
+Blank health path means default TCP. Notify-on-fail is default; recipient/delivery
+not verified. Owner-confirmed API URL/SPA-only rewrite remains the candidate Lax
+session blocker; no live request/proxy/cookie configuration change or outage claim.
+No app logs, secrets, database/customer reads, repeated provider/backup/migration
+tests, app-source edits, production mutation, push, merge, migration or deploy.
+35/36 remains. Next: approve/rehearse the smallest compatible same-origin API
+release route, then verify candidate hosted runtime/secure rollback and controlled
+cutover/operational acceptance. No paid domain/service assumed or created.
+Pre-existing untracked backend/tests/test_render_routing_contract.py preserved,
+not executed/staged/discarded. Evidence:batch-134-render-readonly.json.
+
 Current133 CONFIRMED RELEASE ROUTING BLOCKER (2026-10-20 WAT): owner verifies
 frontend VITE_API_URL=https://priceyard-api.onrender.com and sole rewrite
 /* -> /index.html (Rewrite), explicitly no /api rewrite/proxy. These settings

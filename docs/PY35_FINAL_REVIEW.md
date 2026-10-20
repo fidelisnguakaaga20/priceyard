@@ -1,5 +1,19 @@
 # PriceYard final review - batch 87
 
+Current134 supersedes startup uncertainty: owner confirmed My Workspace and
+read-only Render service metadata verifies the saved backend start is correctly
+`uvicorn app.main:app --host 0.0.0.0 --port $PORT`. No startup edit is needed.
+Both services auto-deploy master; backend build runs Alembic. Latest live backend
+is a9cf1b9, frontend76dbd27. Five recent deploys per service do not establish a
+retained security-aware rollback artifact; local rollback evidence remains passed.
+One coarse backend metrics read succeeds; no failure/restart events returned for
+the bounded last24h query. This is old-runtime observation, not candidate runtime,
+load, alert-delivery or rollback certification. No logs, secrets or DB reads.
+The confirmed direct-Render cookie-routing blocker below remains. Blank health
+uses TCP, not a separate established defect.35/36 unchanged; no production changes,
+repeated passed tests, push, migrations or deployment. Evidence:
+[batch134](../tools/local-test/evidence/batch-134-render-readonly.json).
+
 Current133 confirmed owner configuration, no repeated tests or production change:
 frontend calls https://priceyard-api.onrender.com directly and has only
 `/* -> /index.html` Rewrite; no API proxy. This matches prior browser evidence

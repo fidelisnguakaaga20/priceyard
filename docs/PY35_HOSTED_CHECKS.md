@@ -1,5 +1,16 @@
 # PY-35 hosted verification — 2026-10-20 WAT
 
+Current134: approved-workspace Render metadata independently confirms correct
+backend start app.main:app, master/on-commit deployment on both services, backend
+migration-running build and frontend static dist output. No settings changed.
+Live revisions backend a9cf1b9/frontend76dbd27; five recent deploys each do not
+certify an eligible secure rollback artifact. One coarse backend CPU/memory read
+succeeds; bounded last24h failure/restart query empty, instance series empty.
+Monitoring visibility passes; candidate readiness, alert receipt, secure hosted
+rollback and approved cutover remain unverified. No logs, secrets or DB reads;
+no repeated passed provider/backup/migration tests.35/36, production unchanged.
+Evidence:[batch134](../tools/local-test/evidence/batch-134-render-readonly.json).
+
 Current133: owner confirms direct backend VITE_API_URL, sole SPA rewrite and no
 API proxy. Reuse batch132 browser contract: candidate Lax sessions are incompatible
 with these separate Render sites. No source/settings edit or repeated test needed
