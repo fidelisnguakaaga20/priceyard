@@ -25,6 +25,22 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest123 VERIFIED (2026-10-20 WAT): resumed clean ataf8aa77 on original-preserved
+development branch; prior verified recovery is an ancestor. No completed backup,
+restore, migration or regression tests repeated. Two bounded TLS-only handshakes
+to existing Render frontend/backend pass trusted chain/hostname andTLS1.3; no
+HTTP request, account/provider/database access or configuration change. This is
+only certificate evidence, not hosted candidate/session verification. Static
+backend/app tree equals previously checked security-aware rollback candidate;
+only migration privacy safeguard differs. Hosted rollback runtime remains open;
+retain current grants/revocations and never run old migration/downgrade. Google,
+HTTPS sessions, Paystack TEST/webhooks, delivery and monitoring/scheduler checks
+need an approved separate test target/provider setup. No such target is recorded;
+do not replace production.35/36 complete, PY-35 partial. Next owner step: report
+existing non-production Render service name/URL or none, without secrets/settings
+changes. No push, merge, migration, deployment, paid service or unrelated feature.
+See docs/PY35_HOSTED_CHECKS.md for bounded evidence and exact remaining scope.
+
 Latest122 VERIFIED (2026-10-20 WAT): owner-started Docker4.96 ready. Protected
 local PG17 clone rehearsal PASSED in54.6seconds, using the existing EFS export
 and cached image; no repeated production export or archive extraction. Exact0022

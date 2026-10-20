@@ -14,6 +14,9 @@
     {
       "id": "hosting_cookies_browsers",
       "status": "awaiting_external_verification",
+      "public_tls_handshakes": "passed_2026-10-20T12:30:16Z_frontend_and_backend_TLS1.3_chain_and_hostname_only",
+      "public_tls_evidence": "PY35_HOSTED_CHECKS.md",
+      "candidate_application_sessions_verified": false,
       "remaining": "Approved HTTPS staging, test identities and supported-browser/session checks on real hosting."
     },
     {
@@ -58,6 +61,8 @@
       "migration_sha256": "6b7cd540b41982c13091be3805f4660144b8b9b389224cecf7fa5b85d77469fa",
       "fabricated_privacy_cases_passed": 4,
       "security_aware_application_artifact_runtime_verified": false,
+      "rollback_backend_application_tree_matches_current": true,
+      "rollback_source_comparison_scope": "backend/app tree matches; earlier candidate lacks current0022 migration privacy safeguard. Preserve current security grants and evidence; do not replay old migration or downgrade. Hosted runtime remains unverified.",
       "production_migration_authorized": false
     },
     {
