@@ -8,6 +8,7 @@ never printed or written to disk by this callback.
 import hashlib
 import json
 import re
+import struct
 
 
 UPGRADE_SQL = None
@@ -35,6 +36,105 @@ SELECT jsonb_build_object(
 SEQUENCES_SQL = """SELECT COALESCE(jsonb_agg(to_jsonb(s) ORDER BY schemaname,sequencename),'[]'::jsonb)
 FROM (SELECT schemaname,sequencename,last_value,increment_by,start_value,min_value,max_value,cycle
 FROM pg_sequences WHERE schemaname !~ '^pg_') s;"""
+USER_ACCESS_SQL = """WITH u AS (SELECT * FROM pg_class WHERE oid='public.users'::regclass),
+ columns AS (SELECT * FROM pg_attribute WHERE attrelid='public.users'::regclass AND attnum>0 AND NOT attisdropped),
+ privileges(privilege) AS (VALUES ('SELECT'),('INSERT'),('UPDATE'),('REFERENCES'),
+ ('SELECT WITH GRANT OPTION'),('INSERT WITH GRANT OPTION'),('UPDATE WITH GRANT OPTION'),('REFERENCES WITH GRANT OPTION'))
+ SELECT jsonb_build_object(
+ 'column_names',(SELECT jsonb_agg(attname ORDER BY attnum) FROM columns WHERE attname<>'auth_version'),
+ 'table_grants',(SELECT COALESCE(jsonb_agg(jsonb_build_array(pg_get_userbyid(a.grantor),CASE WHEN a.grantee=0 THEN 'PUBLIC' ELSE pg_get_userbyid(a.grantee) END,a.privilege_type,a.is_grantable) ORDER BY a.grantor,a.grantee,a.privilege_type),'[]'::jsonb) FROM u CROSS JOIN LATERAL aclexplode(COALESCE(u.relacl,acldefault('r',u.relowner))) a),
+ 'column_grants',(SELECT COALESCE(jsonb_agg(jsonb_build_array(c.attname,pg_get_userbyid(a.grantor),CASE WHEN a.grantee=0 THEN 'PUBLIC' ELSE pg_get_userbyid(a.grantee) END,a.privilege_type,a.is_grantable) ORDER BY c.attnum,a.grantor,a.grantee,a.privilege_type),'[]'::jsonb) FROM columns c CROSS JOIN LATERAL aclexplode(c.attacl) a),
+ 'effective_original_columns',(SELECT jsonb_agg(jsonb_build_array(r.rolname,c.attname,p.privilege,has_column_privilege(r.oid,'public.users',c.attnum,p.privilege)) ORDER BY r.rolname,c.attnum,p.privilege) FROM pg_roles r CROSS JOIN columns c CROSS JOIN privileges p WHERE c.attname<>'auth_version'));
+"""
+
+
+COPY_SIGNATURE = b"PGCOPY\n\xff\r\n\x00"
+
+
+def copy_stream_fingerprints(payload, expected_streams):
+    """Count/hash exact concatenated one-column COPY streams without row output.
+
+    Only the reviewed canonical binary header (zero flags/no extension) is
+    accepted. Length-delimited parsing never searches for signatures inside
+    field contents, and rejects truncation, extra fields and trailing bytes.
+    """
+    if not isinstance(payload, bytes) or type(expected_streams) is not int or expected_streams < 0:
+        raise RuntimeError("Invalid binary COPY framing input")
+    view = memoryview(payload)
+    offset, fingerprints = 0, []
+    for unused in range(expected_streams):
+        start = offset
+        if len(view) - offset < 19 or view[offset:offset + 11] != COPY_SIGNATURE:
+            raise RuntimeError("Missing canonical binary COPY header")
+        flags, extension_length = struct.unpack_from("!ii", view, offset + 11)
+        if flags != 0 or extension_length != 0:
+            raise RuntimeError("Unreviewed binary COPY header flags or extension")
+        offset += 19
+        rows = 0
+        while True:
+            if len(view) - offset < 2:
+                raise RuntimeError("Truncated binary COPY field count or trailer")
+            fields = struct.unpack_from("!h", view, offset)[0]
+            offset += 2
+            if fields == -1:
+                break
+            if fields != 1:
+                raise RuntimeError("Binary COPY must contain exactly one field per row")
+            if len(view) - offset < 4:
+                raise RuntimeError("Truncated binary COPY field length")
+            length = struct.unpack_from("!i", view, offset)[0]
+            offset += 4
+            if length < -1 or (length >= 0 and length > len(view) - offset):
+                raise RuntimeError("Invalid or truncated binary COPY field payload")
+            if length >= 0:
+                offset += length
+            rows += 1
+        fingerprints.append((rows, hashlib.sha256(view[start:offset]).hexdigest()))
+    if offset != len(view):
+        raise RuntimeError("Unexpected trailing bytes or binary COPY streams")
+    return fingerprints
+
+
+def verify_copy_parser_fixtures():
+    """Small fabricated-only parser checks, callable without any database."""
+    header = COPY_SIGNATURE + struct.pack("!ii", 0, 0)
+
+    def stream(values):
+        result = bytearray(header)
+        for value in values:
+            result.extend(struct.pack("!hi", 1, -1 if value is None else len(value)))
+            if value is not None:
+                result.extend(value)
+        result.extend(struct.pack("!h", -1))
+        return bytes(result)
+
+    first, empty, nullable = stream([b"fabricated", COPY_SIGNATURE]), stream([]), stream([None, b""])
+    if copy_stream_fingerprints(first + empty, 2) != [
+            (2, hashlib.sha256(first).hexdigest()), (0, hashlib.sha256(empty).hexdigest())]:
+        raise RuntimeError("Fabricated concatenated COPY parser check failed")
+    if copy_stream_fingerprints(nullable, 1) != [(2, hashlib.sha256(nullable).hexdigest())]:
+        raise RuntimeError("Fabricated null/empty COPY field check failed")
+    if copy_stream_fingerprints(b"", 0) != []:
+        raise RuntimeError("Fabricated zero-stream COPY check failed")
+    invalid = [
+        (first[:10], 1), (header[:-1], 1), (first[:-1], 1),
+        (header + struct.pack("!h", 1) + b"\x00\x00", 1),
+        (header + struct.pack("!hi", 1, 9) + b"short", 1),
+        (b"X" + first[1:], 1),
+        (header + struct.pack("!h", 2) + struct.pack("!h", -1), 1),
+        (header + struct.pack("!hi", 1, -2) + struct.pack("!h", -1), 1),
+        (first + b"trailing", 1), (first + empty, 1), (first, 2),
+        (COPY_SIGNATURE + struct.pack("!ii", 1, 0) + struct.pack("!h", -1), 1),
+        (COPY_SIGNATURE + struct.pack("!ii", 0, 1) + b"x" + struct.pack("!h", -1), 1),
+    ]
+    for payload, count in invalid:
+        try:
+            copy_stream_fingerprints(payload, count)
+        except RuntimeError:
+            continue
+        raise RuntimeError("Malformed fabricated binary COPY was accepted")
+    return {"concatenated_streams": True, "empty_and_null_fields": True,
+            "embedded_signature": True, "malformed_cases_rejected": len(invalid)}
 
 
 def run(psql, execute, shell, manifest, catalog, result):
@@ -51,6 +151,7 @@ def run(psql, execute, shell, manifest, catalog, result):
               "security_aware_application_artifact_runtime_verified": False}
     result["migration_0022_rehearsal"] = checks
     result["migration_rehearsal"] = checks
+    checks["binary_copy_parser_fixtures"] = verify_copy_parser_fixtures()
 
     def sql(statement, database=CLONE, readonly=True):
         return psql("SET statement_timeout='12s'; SET lock_timeout='2s';\n" + statement,
@@ -67,36 +168,68 @@ def run(psql, execute, shell, manifest, catalog, result):
         return obj(CATALOG_SQL + ";", database), obj(SEQUENCES_SQL, database)
 
     def verify_data(database, upgraded=False, fixture=False):
-        checked = 0
+        commands = ["BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY;"]
         for table in manifest["tables"]:
             schema, name = table["schema"], table["table"]
             if not re.fullmatch(r"[a-z_][a-z_0-9]*", schema + "") or not re.fullmatch(r"[a-z_][a-z_0-9]*", name):
                 raise RuntimeError("Unexpected source table identifier")
             reference = '"' + schema + '"."' + name + '"'
             where = " WHERE t.id<>" + str(FIXTURE_ID) if fixture and (schema, name) == ("public", "users") else ""
-            if int(sql("SELECT count(*) FROM ONLY " + reference + " t" + where + ";", database)) != table["rows"]:
+            expression = "to_jsonb(t)" + (" - 'auth_version'" if upgraded and (schema, name) == ("public", "users") else "")
+            commands.append("COPY (SELECT (" + expression + ")::text FROM ONLY " + reference + " t" + where +
+                            " ORDER BY (" + expression + ')::text COLLATE "C") TO STDOUT (FORMAT binary);')
+        commands.append("COMMIT;")
+        payload = sql("\n".join(commands), database)
+        fingerprints = copy_stream_fingerprints(payload, len(manifest["tables"]))
+        del payload
+        for table, (rows, digest) in zip(manifest["tables"], fingerprints):
+            if rows != table["rows"]:
                 raise RuntimeError("Original table count differs during rehearsal")
-            if upgraded and (schema, name) == ("public", "alembic_version"):
-                if sql("SELECT version_num FROM public.alembic_version;", database).strip() != b"0022_login_revocation":
-                    raise RuntimeError("Expected exact upgraded revision")
-            else:
-                expression = "to_jsonb(t)" + (" - 'auth_version'" if upgraded and (schema, name) == ("public", "users") else "")
-                payload = sql("COPY (SELECT (" + expression + ")::text FROM ONLY " + reference + " t" + where +
-                              " ORDER BY (" + expression + ')::text COLLATE "C") TO STDOUT (FORMAT binary);', database)
-                if hashlib.sha256(payload).hexdigest() != table["copy_json_sha256"]:
-                    raise RuntimeError("Original table digest differs during rehearsal")
-            checked += 1
-        return checked
+            if upgraded and (table["schema"], table["table"]) == ("public", "alembic_version"):
+                continue  # Count is retained; its one allowed value is checked separately.
+            if digest != table["copy_json_sha256"]:
+                raise RuntimeError("Original table digest differs during rehearsal")
+        if upgraded and sql("SELECT version_num FROM public.alembic_version;", database).strip() != b"0022_login_revocation":
+            raise RuntimeError("Expected exact upgraded revision")
+        return len(fingerprints)
 
     if sql("SELECT version_num FROM public.alembic_version;", "postgres").strip() != b"0021_feedback_screenshot":
         raise RuntimeError("Original verified baseline must remain 0021")
     before, sequences = snapshot("postgres")
+    before_user_access = obj(USER_ACCESS_SQL, "postgres")
     if psql("SELECT count(*) FROM pg_database WHERE datname='" + CLONE + "';").strip() != b"0":
         raise RuntimeError("Rehearsal clone already exists; preserve it")
-    psql("CREATE DATABASE " + CLONE + " WITH TEMPLATE postgres;", readonly=False)
+    original_roles = {row[0] for row in catalog["roles"]}
+    owner = catalog["database"]["owner"]
+    if owner not in original_roles:
+        raise RuntimeError("Original database owner is not recorded")
+    owner_sql = '"' + owner.replace('"', '""') + '"'
+    psql("CREATE DATABASE " + CLONE + " WITH TEMPLATE postgres OWNER " + owner_sql + ";", readonly=False)
+    database_acl = """SELECT COALESCE(jsonb_agg(jsonb_build_array(pg_get_userbyid(a.grantor),
+      CASE WHEN a.grantee=0 THEN 'PUBLIC' ELSE pg_get_userbyid(a.grantee) END,
+      a.privilege_type,a.is_grantable) ORDER BY a.grantor,a.grantee,a.privilege_type),'[]'::jsonb)
+      FROM pg_database d CROSS JOIN LATERAL aclexplode(COALESCE(d.datacl,acldefault('d',d.datdba))) a
+      WHERE d.datname=current_database();"""
+    wanted_acl, current_acl = obj(database_acl, "postgres"), obj(database_acl)
+    if wanted_acl != current_acl:
+        if any(row[0] != owner or row[2] not in {"CONNECT", "CREATE", "TEMPORARY"}
+               for row in wanted_acl):
+            raise RuntimeError("Clone database ACL grant chain requires separate review")
+        commands = ["BEGIN; SET LOCAL ROLE " + owner_sql + ";"]
+        for grantee in sorted({row[1] for row in current_acl} | {"PUBLIC", owner}):
+            target = "PUBLIC" if grantee == "PUBLIC" else '"' + grantee.replace('"', '""') + '"'
+            commands.append("REVOKE ALL PRIVILEGES ON DATABASE " + CLONE + " FROM " + target + ";")
+        for grantor, grantee, privilege, grantable in wanted_acl:
+            target = "PUBLIC" if grantee == "PUBLIC" else '"' + grantee.replace('"', '""') + '"'
+            commands.append("GRANT " + privilege + " ON DATABASE " + CLONE + " TO " + target +
+                            (" WITH GRANT OPTION" if grantable else "") + ";")
+        commands.append("COMMIT;")
+        psql("\n".join(commands), readonly=False)
+    if obj(database_acl) != wanted_acl or sql("SELECT pg_get_userbyid(datdba) FROM pg_database WHERE datname=current_database();").decode().strip() != owner:
+        raise RuntimeError("Clone database owner or effective grants differ")
+    checks["original_database_owner_and_grants_preserved"] = True
     # CREATE DATABASE TEMPLATE does not copy database-scoped role settings.
     # Replay only the recorded baseline DB's settings onto this new local clone.
-    original_roles = {row[0] for row in catalog["roles"]}
     for database, role, settings in catalog.get("database_role_settings") or []:
         if database != "postgres":
             continue
@@ -141,6 +274,24 @@ def run(psql, execute, shell, manifest, catalog, result):
     checks["migration_applied_to_isolated_clone_only"] = True
     checks["preserved_original_tables"] = verify_data(CLONE, upgraded=True)
     after, observed_sequences = snapshot(CLONE)
+    user_access = obj(USER_ACCESS_SQL)
+    converted_grants = [row for row in before_user_access["table_grants"]
+                        if row[1] in {"PUBLIC", "anon", "authenticated"} and row[2] == "UPDATE"]
+    expected_table_grants = [row for row in before_user_access["table_grants"] if row not in converted_grants]
+    expected_column_grants = {}
+    for row in before_user_access["column_grants"]:
+        expected_column_grants[tuple(row[:-1])] = row[-1]
+    for grantor, grantee, privilege, grantable in converted_grants:
+        for column in before_user_access["column_names"]:
+            key = (column, grantor, grantee, privilege)
+            expected_column_grants[key] = expected_column_grants.get(key, False) or grantable
+    observed_column_grants = {tuple(row[:-1]): row[-1] for row in user_access["column_grants"]}
+    if (user_access["effective_original_columns"] != before_user_access["effective_original_columns"]
+            or sorted(user_access["table_grants"]) != sorted(expected_table_grants)
+            or observed_column_grants != expected_column_grants):
+        raise RuntimeError("Original user-column rights, grant options or grant chains changed unexpectedly")
+    checks["original_user_column_access_and_grant_options_preserved"] = True
+    checks["only_new_counter_excluded_from_existing_api_update_grants"] = True
     allowed_names = {"revoked_access_tokens", "revoked_access_tokens_pkey",
                      "ix_revoked_access_tokens_user_id", "ix_revoked_access_tokens_expires_at"}
     filtered = json.loads(json.dumps(after))
@@ -148,6 +299,15 @@ def run(psql, execute, shell, manifest, catalog, result):
         filtered[key] = [row for row in filtered[key] or [] if not
                          (row[0] == "public" and row[1] in allowed_names)]
     filtered["columns"] = [row for row in filtered["columns"] if row[:3] != ["public", "users", "auth_version"]]
+    # Raw ACL representations change only by the exact validated conversion above.
+    original_columns = {tuple(row[:3]): row for row in before["columns"]}
+    for row in filtered["columns"]:
+        if row[:2] == ["public", "users"]:
+            row[9] = original_columns[tuple(row[:3])][9]
+    original_user_relation = next(row for row in before["relations"] if row[:2] == ["public", "users"])
+    for row in filtered["relations"]:
+        if row[:2] == ["public", "users"]:
+            row[6] = original_user_relation[6]
     if filtered != before or observed_sequences != sequences:
         raise RuntimeError("Unexpected original catalog or sequence change")
     checks["original_catalog_and_sequences_preserved"] = True
@@ -165,16 +325,33 @@ def run(psql, execute, shell, manifest, catalog, result):
     assert_true("EXISTS (SELECT 1 FROM pg_constraint WHERE conrelid='public.revoked_access_tokens'::regclass AND contype='f' AND confrelid='public.users'::regclass AND confdeltype='c' AND conkey=ARRAY[2]::smallint[])", "Revocation user constraint differs")
     assert_true("(SELECT count(*) FROM pg_indexes WHERE schemaname='public' AND tablename='revoked_access_tokens' AND indexname IN ('ix_revoked_access_tokens_user_id','ix_revoked_access_tokens_expires_at'))=2", "Security indexes missing")
     checks["expected_schema_defaults_constraints_and_indexes"] = True
+    token_relation = next(row for row in after["relations"] if row[:2] == ["public", "revoked_access_tokens"])
+    if token_relation[3:5] != [True, False]:
+        raise RuntimeError("New revocation storage must enforce RLS without forcing its trusted owner")
 
     # Provider defaults must never publish or permit forgery/deletion of tokens.
     exposure = obj("""SELECT jsonb_build_object(
       'public',EXISTS(SELECT 1 FROM pg_class c CROSS JOIN LATERAL aclexplode(COALESCE(c.relacl,acldefault('r',c.relowner))) a WHERE c.oid='public.revoked_access_tokens'::regclass AND a.grantee=0),
-      'api_roles',EXISTS(SELECT 1 FROM pg_roles r CROSS JOIN (VALUES ('SELECT'),('INSERT'),('UPDATE'),('DELETE'),('TRUNCATE'),('REFERENCES'),('TRIGGER')) p(privilege) WHERE r.rolname IN ('anon','authenticated') AND has_table_privilege(r.oid,'public.revoked_access_tokens',p.privilege)));""")
+      'api_roles',EXISTS(SELECT 1 FROM pg_roles r CROSS JOIN (VALUES ('SELECT'),('INSERT'),('UPDATE'),('DELETE'),('TRUNCATE'),('REFERENCES'),('TRIGGER')) p(privilege) WHERE r.rolname IN ('anon','authenticated') AND has_table_privilege(r.oid,'public.revoked_access_tokens',p.privilege)),
+      'public_columns',EXISTS(SELECT 1 FROM pg_attribute c CROSS JOIN LATERAL aclexplode(c.attacl) a WHERE c.attrelid='public.revoked_access_tokens'::regclass AND c.attnum>0 AND NOT c.attisdropped AND a.grantee=0),
+      'api_columns',EXISTS(SELECT 1 FROM pg_roles r CROSS JOIN (VALUES ('SELECT'),('INSERT'),('UPDATE'),('REFERENCES')) p(privilege) WHERE r.rolname IN ('anon','authenticated') AND has_any_column_privilege(r.oid,'public.revoked_access_tokens',p.privilege)));""")
     checks["private_table_provider_role_exposure"] = exposure
+    # Table-wide UPDATE grants automatically extend to this newly added column.
+    # RLS does not make such a security-counter grant acceptable: the provider
+    # API roles must not be able to reverse password-reset/session revocation.
+    counter_exposure = obj("""SELECT jsonb_build_object(
+      'public_table_update',EXISTS(SELECT 1 FROM pg_class c CROSS JOIN LATERAL aclexplode(COALESCE(c.relacl,acldefault('r',c.relowner))) a WHERE c.oid='public.users'::regclass AND a.grantee=0 AND a.privilege_type='UPDATE'),
+      'public_column_update',EXISTS(SELECT 1 FROM pg_attribute c CROSS JOIN LATERAL aclexplode(c.attacl) a WHERE c.attrelid='public.users'::regclass AND c.attname='auth_version' AND a.grantee=0 AND a.privilege_type='UPDATE'),
+      'api_roles_update',EXISTS(SELECT 1 FROM pg_roles r WHERE r.rolname IN ('anon','authenticated') AND has_column_privilege(r.oid,'public.users','auth_version','UPDATE')));""")
+    checks["security_counter_provider_role_exposure"] = counter_exposure
+    checks["new_security_table_private"] = not any(exposure.values())
+    checks["security_counter_provider_writes_denied"] = not any(counter_exposure.values())
     if any(exposure.values()):
         checks.update(status="failed", failure="Provider default grants expose login revocation table")
         raise RuntimeError("Provider default grants expose login revocation table; release blocked")
-    checks["new_security_table_private"] = True
+    if any(counter_exposure.values()):
+        checks.update(status="failed", failure="Provider roles can update account security counters")
+        raise RuntimeError("Provider roles can update account security counters; release blocked")
     assert_true("NOT EXISTS (SELECT 1 FROM public.users WHERE id IN (2147483646,2147483645) OR email='py35-rehearsal@example.invalid' OR referral_code='PY35RAMONLY')", "Synthetic identity conflicts; existing records preserved")
     fixture = """INSERT INTO public.users(id,full_name,email,password_hash,auth_provider,role,is_active,referral_code)
       VALUES (2147483646,'PY35 synthetic rehearsal','py35-rehearsal@example.invalid','fabricated-unusable-password-hash','local','free_user',true,'PY35RAMONLY');

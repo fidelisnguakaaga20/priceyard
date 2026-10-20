@@ -74,10 +74,13 @@ state, without querying their databases or editing their configuration.
    server-role passwords, Vault root keys and post-snapshot writes are outside
    this logical backup; Vault tables contain no secrets in this snapshot.
    Application account records/password hashes were preserved by data digests.
-3. Review0022 migration on the actual-data clone, permissions, rollback and owner
-   recovery targets before approving any production migration. Owner approved
-   local rehearsal on2026-10-20, but Docker startup blocked execution before
-   database creation; no0022 migration ran. See [current checkpoint](PY35_0022_REHEARSAL.md).
+3. **Verified 2026-10-20 WAT:**0022 protected local clone upgrade, transaction
+   rollback/injected-error recovery,59 original table fingerprints, old-column
+   privileges, new security storage privacy, restart recovery and native checksums
+   pass. Source0021 baseline and backup archives unchanged. Earlier Docker startup
+   blocker is superseded. No production migration occurred. Post-commit destructive
+   downgrade remains refused; hosted security-aware application rollback and owner
+   recovery targets remain open. See [rehearsal result](PY35_0022_REHEARSAL.md).
 4. Complete [external release gates](PY35_ACTUAL_RELEASE_GATES.json). Reconcile any
    writes/payments since the snapshot at an approved cutover; never overwrite
    newer customer activity with an old backup. No push/merge/deploy authorized.

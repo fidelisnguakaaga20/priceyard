@@ -25,6 +25,29 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest122 VERIFIED (2026-10-20 WAT): owner-started Docker4.96 ready. Protected
+local PG17 clone rehearsal PASSED in54.6seconds, using the existing EFS export
+and cached image; no repeated production export or archive extraction. Exact0022
+upgrade, full transaction ROLLBACK, injected-error atomic recovery, all59 original
+table values/counts, original catalog/sequences and old user-column access/grant
+options pass. Pristine0021 remains intact. Synthetic counter/revocation constraints
+and restart recovery preserve both original records and new security evidence;
+native checksums pass and RAM target is removed. Actual provider defaults exposed
+the new security objects in the earlier local attempt:0022 now removes only new
+security exposure, preserving old user-column rights. Four fabricated privacy
+cases pass, including inherited/dependent-grant atomic refusal. Offline SQL uses
+named parameter style to avoid raw-psql percent escaping. Helpers preserve clone
+owner, DB grants and recorded settings; bounded batched COPY avoids excessive
+Docker processes. Independent diff review passed. Original and retrieved encrypted
+archive SHA256 remain unchanged; original recovery report retained. Docker remains
+owner-running; other container settings/volumes untouched. Unused VM swap was
+temporarily disabled before private transfer; no persistent WSL setting changed.
+35/36 complete; PY-35 partial. Hosted HTTPS/Google/Paystack TEST/delivery/scheduler/
+monitoring/runtime and security-aware application rollback checks remain unverified,
+along with non-DB recovery coverage, recovery targets and controlled cutover.
+No production connection/change/migration, push, merge or deployment. Evidence:
+tools/local-test/evidence/batch-122-0022-rehearsal.json; docs/PY35_0022_REHEARSAL.md.
+
 Latest121 BLOCKED (2026-10-20 WAT): owner explicitly approves0022 on an isolated
 restored PG17 clone, including safe rollback/recovery; production remains barred.
 Prepared bounded rehearsal using existing protected export/cached image, no new

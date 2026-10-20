@@ -1,5 +1,5 @@
 {
-  "scope": "owner-approved-actual-backup-and-isolated-recovery",
+  "scope": "owner-approved-actual-backup-isolated-recovery-and-local-0022-rehearsal",
   "verified_date_wat": "2026-10-20",
   "release_authorized": false,
   "completed_recommendations": 35,
@@ -7,7 +7,7 @@
   "production_readonly_backup_completed_previously": true,
   "production_connections_during_restore": 0,
   "production_changes": false,
-  "migrations_run": 0,
+  "migrations_run": 1,
   "push_merge_deploy_performed": false,
   "local_fixture_manifest": "RELEASE_GATES.json",
   "gates": [
@@ -37,17 +37,28 @@
     },
     {
       "id": "production_schema_rollout",
-      "status": "blocked_local_runtime",
+      "status": "local_rehearsal_passed_awaiting_release_verification",
       "local_rehearsal_owner_approved_date_wat": "2026-10-20",
-      "actual_data_clone_0022_rehearsal": "blocked_before_database_start_docker_startup_timeout",
+      "actual_data_clone_0022_rehearsal": "passed",
       "offline_0021_to_0022_compilation": "passed",
       "destructive_downgrade_refusal": "passed",
       "rehearsal_admission_guard_checks_passed": 3,
       "rollback_candidate_synthetic_authentication_checks_passed": 3,
       "rollback_candidate_commit": "2cfbfa65447d51b225a0d367433709c25bd6da4a",
       "rollback_candidate_backend_app_tree": "fcc47f0a0d5a1596d8f3cd5790e61f624c3e04ed",
-      "local_actual_clone_migrations_run": 0,
-      "remaining": "Owner approved isolated rehearsal, but Docker4.96 did not become ready within90seconds; no Linux target/controller/customer-data load or migration started. Exact startup cause unconfirmed; temporary test settings/owned processes cleaned up. Resume protected0022 clone transaction rollback/failure recovery,59-table preservation, role/default-ACL security and restart checks after Docker readiness. Synthetic authentication checks do not establish actual-clone or hosted rollback compatibility. Production migration remains unauthorized."
+      "local_actual_clone_migrations_run": 1,
+      "remaining": "Local0022 rehearsal passed on restored0021 snapshot. Before release separately confirm current target revision/table owner, exact hosted migration artifact and security-aware application rollback runtime. Never downgrade/delete revocation evidence or overwrite post-snapshot activity. Already0022 targets need separately reviewed follow-up. Production migration remains unauthorized.",
+      "local_rehearsal_tables_preserved": 59,
+      "local_transaction_rollback_and_failure_recovery": "passed",
+      "local_restart_preserves_original_and_security_records": "passed",
+      "local_original_user_column_access_and_grant_options": "preserved",
+      "local_provider_security_object_privacy": "passed_after_narrow_0022_grant_safeguard",
+      "local_native_checksums": "passed",
+      "local_ram_target_removed": true,
+      "migration_sha256": "6b7cd540b41982c13091be3805f4660144b8b9b389224cecf7fa5b85d77469fa",
+      "fabricated_privacy_cases_passed": 4,
+      "security_aware_application_artifact_runtime_verified": false,
+      "production_migration_authorized": false
     },
     {
       "id": "paystack_provider",
@@ -80,5 +91,8 @@
       "historical_database_snapshot_digests": "passed",
       "remaining": "Owner-scoped legacy/ambiguous-payment review, post-snapshot payment/write reconciliation, fresh rollback acceptance and explicit cutover approval."
     }
-  ]
+  ],
+  "migrations_run_scope": "One committed upgrade in final successful local clone rehearsal; excludes rollback probes and earlier isolated diagnostic attempts. No production migration.",
+  "production_migrations_run": 0,
+  "production_connections_during_local_rehearsal": 0
 }

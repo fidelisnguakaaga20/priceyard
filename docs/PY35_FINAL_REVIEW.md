@@ -1,5 +1,28 @@
 # PriceYard final review - batch 87
 
+## Current122: protected local 0022 rehearsal passed (2026-10-20 WAT)
+
+**35/36 complete; PY-35 partial.** Docker readiness blocker is superseded.
+Exact0022 applied only to a protected local PG17 clone. All59 original tables,
+catalog/sequences and original user-column access/grant options are preserved.
+Transaction rollback, injected-failure recovery, synthetic security constraints,
+restart recovery and native checksums pass; pristine0021 retained, RAM target
+removed. Provider default grants revealed a security issue in the new objects:
+the amended0022 keeps revocations private and denies API-role counter UPDATE,
+while preserving old columns' rights. Four fabricated privacy cases and independent
+review pass. This amendment is for an installed0021 target; an already0022 target
+would require a separately reviewed follow-up, not stamping/replaying migration.
+
+Original encrypted backups/checksums and successful recovery evidence unchanged.
+No production access/migration, push, merge or deployment. Transaction rollback
+does not authorize a destructive downgrade after commit. Security-aware hosted
+application rollback artifact is still unverified; an original app ignoring
+revocations is unsafe. Remaining gates: approved HTTPS/Google, Paystack TEST,
+email/push/notifications, scheduler/monitoring, hosted runtime/dependencies,
+non-database backup coverage/recovery targets and controlled cutover/reconciliation.
+See [rehearsal result](PY35_0022_REHEARSAL.md) and
+[actual gate ledger](PY35_ACTUAL_RELEASE_GATES.json). Older statuses below are history.
+
 ## Current121: local 0022 rehearsal blocked before startup (2026-10-20 WAT)
 
 35/36 unchanged. Encrypted backup, protected restoration and independent Drive

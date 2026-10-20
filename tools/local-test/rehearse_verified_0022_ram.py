@@ -22,7 +22,7 @@ MIGRATION = ROOT / "backend/migrations/versions/0022_login_revocation.py"
 OFFLINE_ENV = """from alembic import context
 if not context.is_offline_mode():
     raise RuntimeError('This rehearsal compiler never connects to a database')
-context.configure(dialect_name='postgresql', literal_binds=True, transactional_ddl=True)
+context.configure(dialect_name='postgresql', dialect_opts={'paramstyle': 'named'}, literal_binds=True, transactional_ddl=True)
 with context.begin_transaction():
     context.run_migrations()
 """
