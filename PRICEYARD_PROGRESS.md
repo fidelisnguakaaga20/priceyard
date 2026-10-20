@@ -25,6 +25,20 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current139 SAVED ROUTE OBSERVATION (2026-10-20 WAT): owner confirms SAVED for
+renewed reforms-describe-smithsonian-contrast tunnel. Before any login/POST, exact
+temporary Render /api/health responds301 Location->current tunnel /health. One
+cache-busted GET with no-cache confirms301 again. Independent current tunnel and
+loopback health both200 with matching synthetic proof. This is a saved-route
+redirect, not failed credentials, TLS, DB or production availability. Owner asked
+to check ONLY temporary /api/* row Action: change Redirect to Rewrite if needed;
+if already Rewrite, report it without changes. Do not infer platform failure until
+saved Action is confirmed. Confirmation marker NOT written, hosted browser/login
+not run. Do not follow301 or send auth data to a different origin to hide failure.
+Current controller remains bounded by state expiry; check result before resuming.
+35/36 unchanged, migration/rollback/provider/backup passes preserved. No production
+change, push, migration or deployment. Evidence:batch-139-hosted-route-observation.
+
 Current138 TUNNEL RENEWAL (2026-10-20 WAT): owner explicitly requests renewal of
 only the expired test window, retaining the same temporary Render site/environment.
 Previous result confirms expiry without SAVED, no hosted browser run and clean

@@ -1,7 +1,15 @@
 # PY-35 final launch result — 2026-10-20 WAT
 
-**Local routing: PASS. Release: NOT READY — required hosted checks are NOT RUN,
-not observed failures. 35/36 complete; PY-35 stays partial.**
+Current139 hosted observation: owner saved the temporary route. Both a plain
+and cache-busted GET to its /api/health return301 to the exact current tunnel;
+the tunnel and loopback health themselves return200 with matching synthetic
+identity. Login/browser tests stopped before sending credentials. The owner is
+checking whether the test-only row Action is Redirect or Rewrite; platform
+support is not judged until that is known. Current saved transport fails the
+same-origin requirement. Production remains unchanged; no deployment approval.
+
+**Local routing: PASS. Release: NOT READY — the temporary saved route returns301;
+full hosted session checks are NOT RUN pending Action confirmation.35/36 complete.**
 
 | Check | Result |
 | --- | --- |
@@ -10,7 +18,8 @@ not observed failures. 35/36 complete; PY-35 stays partial.**
 | Original API behind proposed same-origin route | PASS; two guarded tests, including raw POST/query, status, multiple cookies, fixed destination, React fallback, CSRF, cache headers, logout and revoked-token rejection |
 | Original React browser workflow against original API | PASS; virtual HTTPS only, synthetic memory database, real login/dashboard/reload/API/CSRF/logout; all page traffic fulfilled locally or blocked |
 | Application rollback compatibility | PASS retained; current backend/app tree equals the already-tested security-aware rollback tree fcc47f0a0d5a1596d8f3cd5790e61f624c3e04ed; no repeat restoration or migration |
-| Actual Render forwarding and candidate runtime/rollback artifact | NOT RUN; requires an explicitly approved hosted change |
+| Temporary Render forwarding | Initial GET returns301; Action confirmation pending, login/session tests not run |
+| Candidate runtime/rollback artifact | NOT RUN; production remains unchanged |
 
 No backend application, UI component/style, database schema, measurement,
 subscription rule or provider setting changed. Google, Paystack TEST/webhook/replay,
