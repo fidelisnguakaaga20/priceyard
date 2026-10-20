@@ -25,6 +25,23 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current136 HOSTED TARGET CHECK (2026-10-20 WAT): owner requests one controlled
+safe-target hosted verification, no paid resources or production change. One
+approved-workspace Render list_services(includePreviews=true) confirms no isolated
+PriceYard test/preview target. Do not reuse unrelated applications. No provider,
+database, customer, secret, setting or application endpoint accessed/changed.
+Connector create_static_site cannot set routes; no route-update/delete tool is
+exposed. A temporary Free static target plus one owner Dashboard test-only rewrite
+is the smallest available path. Earlier no-new-services restriction conflicts with
+creating that target, so one explicit exception requested; no target created or
+branch pushed while pending. Production/parent preview settings stay unchanged.
+Unchanged0022 SHA2566b7cd540b41982c13091be3805f4660144b8b9b389224cecf7fa5b85d77469fa
+and unchanged backend/app tree fcc47f0a0d5a1596d8f3cd5790e61f624c3e04ed confirm
+previous rehearsal/secure local rollback evidence still applies; no tests repeated.
+Hosted result BLOCKED/NOT RUN, not PASS or observed application failure.35/36
+remains. Final deployment approval must wait for actual edge/runtime/rollback
+verification and controlled cutover approval; no production migration/deploy.
+
 Current135 SAME-ORIGIN LOCAL PASS (2026-10-20 WAT): owner approves narrow routing
 implementation/verification, preserving existing services and React fallback;
 production changes/push/merge/migration/deploy still forbidden. Proposed exact
