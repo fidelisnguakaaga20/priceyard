@@ -25,6 +25,17 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest120 VERIFIED (2026-10-20 WAT): individual encrypted7z downloaded from
+owner-confirmed private Google Drive now matches the original encrypted archive
+and recorded recovery SHA256 exactly:
+f26ed1548064ca95666b0459ae5187ab583e13bff566df16fcecf7b4a8d67045.
+Both files174448 bytes. No extraction, decompression, modification or deletion
+of either backup; no repeat backup/restore, production access or migrations.
+Off-computer ciphertext retrieval verification PASSED; earlier ZIP-wrapper
+blocker superseded. Actual backup gate remains partial for file/provider config
+coverage and accepted recovery targets.35/36 unchanged; PY-35 partial, no push,
+merge or deployment. Remaining release gates retain their existing status.
+
 Latest119 CHECK (2026-10-20 WAT): original encrypted7z SHA256 rechecked and matches
 the verified recovery evidence. Downloads contains a Drive folder ZIP, not the
 individual7z. ZIP directory lists exactly one matching-name encrypted archive,

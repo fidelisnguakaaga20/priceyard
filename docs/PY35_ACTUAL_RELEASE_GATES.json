@@ -24,13 +24,16 @@
       "tables_with_matching_counts_and_digests": 59,
       "recorded_catalog_roles_permissions_sequences_and_checksums": "passed",
       "restored_revision": "0021_feedback_screenshot",
-      "off_computer_archive_copy_verified": false,
+      "off_computer_archive_copy_verified": true,
       "off_computer_archive_upload_owner_confirmed": true,
       "off_computer_archive_upload_reported_date_wat": "2026-10-20",
       "original_archive_sha256_rechecked": "f26ed1548064ca95666b0459ae5187ab583e13bff566df16fcecf7b4a8d67045",
+      "downloaded_archive_sha256": "f26ed1548064ca95666b0459ae5187ab583e13bff566df16fcecf7b4a8d67045",
+      "downloaded_archive_bytes": 174448,
+      "off_computer_archive_copy_verified_date_wat": "2026-10-20",
       "downloaded_wrapper_sha256": "bd5b40c9d2aef31e70187cf187dd272553f2c04e91802d08a4b167abb7557e3c",
-      "downloaded_copy_check": "blocked_by_compressed_zip_wrapper_and_owner_no_extraction_instruction",
-      "remaining": "Original ciphertext SHA256 matches prior verified evidence. Drive downloaded a ZIP folder containing one matching-name 174448-byte 7z member using Deflate; no extraction/decompression performed. Download the individual encrypted 7z file to compare its SHA256 directly. This is not a proven mismatch. Non-database file/configuration coverage and owner recovery targets remain open. Provider service recreation is outside this database-only verification."
+      "downloaded_copy_check": "passed_individual_7z_sha256_matches_original_and_verified_record",
+      "remaining": "Owner-confirmed Drive upload and individually downloaded encrypted 7z retrieval verified by matching SHA256 and size; neither archive extracted, modified or deleted. Non-database file/configuration coverage and owner recovery targets remain open. Provider service recreation is outside this database-only verification."
     },
     {
       "id": "production_schema_rollout",

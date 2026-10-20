@@ -63,10 +63,12 @@ state, without querying their databases or editing their configuration.
 
 ## Remaining before release
 
-1. Owner may copy **only the encrypted7z archive** to the existing private Google
-   Drive backup folder, then download a copy for ciphertext checksum verification.
-   Do not upload the EFS workspace or passphrases. The earlier Drive PFX is the
-   recovery key, not a second copy of the database archive. No upload performed.
+1. **Verified 2026-10-20 WAT:** owner confirms private Google Drive upload; the
+   individually downloaded encrypted7z and original archive both have174448 bytes
+   and SHA256 `f26ed1548064ca95666b0459ae5187ab583e13bff566df16fcecf7b4a8d67045`.
+   Neither backup was extracted, modified or deleted. The earlier folder-ZIP
+   comparison blocker is superseded. Upload/download was owner-performed; no
+   Drive access by Codex. Keep archive passphrase and EFS recovery key separate.
 2. Confirm non-database file coverage, provider/hosting configuration and server
    role credentials separately. Storage file bytes/provider secrets and settings,
    server-role passwords, Vault root keys and post-snapshot writes are outside
