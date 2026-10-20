@@ -100,7 +100,8 @@ def worker():
 
 
 def controller():
-    renewal = sys.argv[1:] == ['--renew-expired-window']
+    query_resume = sys.argv[1:] == ['--resume-query-normalization']
+    renewal = sys.argv[1:] == ['--renew-expired-window'] or query_resume
     retained_post = None
     if hashlib.sha256(CLOUD.read_bytes()).hexdigest() != CLOUD_SHA:
         raise RuntimeError('Cached tunnel binary hash mismatch')
@@ -113,19 +114,33 @@ def controller():
             raise RuntimeError('Existing drill preserved; read its result instead of repeating')
         old = json.loads((RUN / 'result.json').read_text())
         if renewal:
-            if (old.get('status') != 'STOPPED' or not old.get('owned_processes_stopped')
-                    or old.get('error') != 'Test window expired without rewrite confirmation'
+            if (not old.get('owned_processes_stopped')
                     or old.get('origin') != ORIGIN or old.get('synthetic_only') is not True
                     or old.get('production_access') is not False or old.get('providers_contacted') != 0
-                    or not isinstance(old.get('expires_at_epoch'), (int, float))
-                    or old['expires_at_epoch'] > time.time()
                     or old.get('independent_upstream_POST') != 'PASS'
-                    or (RUN / 'browser-result.json').exists()
                     or (RUN / 'rewrite-saved.txt').exists() or RUN.is_symlink()):
-                raise RuntimeError('Only a stopped, expired and unconfirmed test window may be renewed')
-            archive = RUN / ('expired-window-' + str(int(old['expires_at_epoch'])))
+                raise RuntimeError('Stopped synthetic-only evidence is required')
             retained_post = old['independent_upstream_POST']
             names = ('result.json', 'state.json', 'worker.log', 'tunnel.log')
+            if query_resume:
+                failed = old.get('browser', {})
+                if (old.get('status') != 'FAIL' or failed.get('status') != 'FAIL'
+                        or failed.get('error_type') != 'AssertionError' or failed.get('probe_status') != 207
+                        or failed.get('cases') != {'synthetic_target_identity': True}
+                        or 'one=a+b&one=c' not in failed.get('error', '')
+                        or 'one=a%20b&one=c' not in failed.get('error', '')
+                        or any('/auth/' in key for key in old.get('upstream_counts', {}))):
+                    raise RuntimeError('Only the known pre-login query-format assertion may resume')
+                archive = RUN / 'query-normalization-stop'
+                names += ('browser.log', 'browser-result.json')
+            else:
+                if (old.get('status') != 'STOPPED'
+                        or old.get('error') != 'Test window expired without rewrite confirmation'
+                        or not isinstance(old.get('expires_at_epoch'), (int, float))
+                        or old['expires_at_epoch'] > time.time()
+                        or (RUN / 'browser-result.json').exists()):
+                    raise RuntimeError('Only a stopped, expired and unconfirmed test window may be renewed')
+                archive = RUN / ('expired-window-' + str(int(old['expires_at_epoch'])))
             if (RUN / 'saved-route-observation.json').exists():
                 names += ('saved-route-observation.json',)
         else:
@@ -156,8 +171,9 @@ def controller():
     report = {'status': 'starting', 'synthetic_only': True, 'production_access': False,
               'providers_contacted': 0, 'new_database': False, 'origin': ORIGIN}
     if renewal:
-        report['expired_window_renewed'] = True
-        report['completed_tests_repeated'] = False
+        report['expired_window_renewed'] = not query_resume
+        report['interrupted_query_check_resumed'] = query_resume
+        report['completed_provider_backup_migration_tests_repeated'] = False
         report['independent_upstream_POST_retained_without_rerun'] = True
     import requests
     http = requests.Session()

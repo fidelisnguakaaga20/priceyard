@@ -1,5 +1,14 @@
 # PY-35 final launch result — 2026-10-20 WAT
 
+Current141 supersedes the initial redirect observation: corrected Rewrite reaches
+the synthetic API through Render (GET identity200, POST method/status207). The
+browser stopped before login on an overly strict raw query-encoding assertion:
+'+' versus '%20' for the same decoded space. Failed evidence is preserved. The
+test now compares exact decoded values, duplicate values/order/count and a literal
+plus, keeping body bytes/cookies/cache/CSRF/logout strict. Resume only this
+unfinished batch; no prior provider/backup/migration tests repeated or production
+changes. Full hosted session result remains pending.
+
 Current139 hosted observation: owner saved the temporary route. Both a plain
 and cache-busted GET to its /api/health return301 to the exact current tunnel;
 the tunnel and loopback health themselves return200 with matching synthetic
@@ -8,8 +17,8 @@ checking whether the test-only row Action is Redirect or Rewrite; platform
 support is not judged until that is known. Current saved transport fails the
 same-origin requirement. Production remains unchanged; no deployment approval.
 
-**Local routing: PASS. Release: NOT READY — the temporary saved route returns301;
-full hosted session checks are NOT RUN pending Action confirmation.35/36 complete.**
+**Local routing: PASS. Release: NOT READY — actual Render GET/POST reaches the
+synthetic API; hosted session checks are pending the corrected test.35/36 complete.**
 
 | Check | Result |
 | --- | --- |
@@ -18,7 +27,7 @@ full hosted session checks are NOT RUN pending Action confirmation.35/36 complet
 | Original API behind proposed same-origin route | PASS; two guarded tests, including raw POST/query, status, multiple cookies, fixed destination, React fallback, CSRF, cache headers, logout and revoked-token rejection |
 | Original React browser workflow against original API | PASS; virtual HTTPS only, synthetic memory database, real login/dashboard/reload/API/CSRF/logout; all page traffic fulfilled locally or blocked |
 | Application rollback compatibility | PASS retained; current backend/app tree equals the already-tested security-aware rollback tree fcc47f0a0d5a1596d8f3cd5790e61f624c3e04ed; no repeat restoration or migration |
-| Temporary Render forwarding | Initial GET returns301; Action confirmation pending, login/session tests not run |
+| Temporary Render forwarding | Corrected Rewrite GET200/POST207; query-format harness corrected, full session result pending |
 | Candidate runtime/rollback artifact | NOT RUN; production remains unchanged |
 
 No backend application, UI component/style, database schema, measurement,

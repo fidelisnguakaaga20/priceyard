@@ -25,6 +25,26 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current141 HOSTED POST / QUERY HARNESS CORRECTION (2026-10-20 WAT): automatic
+drill did run after owner saved corrected Rewrite. Actual temporary Render GET
+verified synthetic identity; POST/probe returned207 with method POST. The harness
+then failed before body/cookie/login assertions because Render serialized a query
+space as '+' instead of '%20'. Both decode identically for this query; this was
+an overly strict test assertion, not an established application defect. Original
+FAIL/result/logs retained under runtime/render-hosted-20261020/query-normalization-stop.
+All owned helpers closed; upstream counts confirm zero /auth requests.
+Corrected only harness: exact decoded duplicate values/order/count and literal
+plus (%2B) must survive; independent key ordering/space encoding may normalize.
+Raw body SHA,207 status, cookies, private cache, CSRF/logout remain strict. Local
+query sanity/syntax checks and narrow independent source review pass. One-time
+--resume-query-normalization admits only this exact pre-login stopped failure,
+preserves all evidence, and resumes unfinished batch against SAME test site/memory
+API. No provider/backup/migration tests repeated, new services or production changes.
+New verified tunnel destination is in current state.json; owner instructed to
+replace only that destination and Save. Fresh-proof auto-detection starts one
+bounded suite, then closes tunnel/API/browser.35/36 remains; hosted login pending.
+Evidence:batch-141-hosted-query-check.json. No push/migration/deployment authority.
+
 Current140 CORRECTED ACTION / BOUNDED CONTINUATION (2026-10-20 WAT): owner confirms
 the temporary API row was changed from Redirect to Rewrite and saved. Previous
 15-minute tunnel expired before this reply; result confirms no browser/login run

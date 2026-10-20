@@ -25,10 +25,18 @@ try{
  assert.equal(JSON.parse(health.body).proof,state.proof,'Wrong target: no login request will be sent');
  report.cases.synthetic_target_identity=true;
  const raw='{\n  "synthetic": true\n}';
- const probe=await page.evaluate(async body=>{const r=await fetch('/api/probe?one=a%20b&one=c',{method:'POST',body,credentials:'include',cache:'no-store'});return {status:r.status,cache:r.headers.get('cache-control'),body:await r.text()};},raw);
+ const probe=await page.evaluate(async body=>{const r=await fetch('/api/probe?one=a%20b&one=c&literal=a%2Bb',{method:'POST',body,credentials:'include',cache:'no-store'});return {status:r.status,cache:r.headers.get('cache-control'),body:await r.text()};},raw);
  report.probe_status=probe.status;
  assert.equal(probe.status,207,'Render did not preserve the synthetic POST; login not attempted');
- const payload=JSON.parse(probe.body);assert.equal(payload.method,'POST');assert.equal(payload.query,'one=a%20b&one=c');assert.equal(payload.body_sha256,crypto.createHash('sha256').update(raw).digest('hex'));privateCache(probe.cache);
+ const payload=JSON.parse(probe.body);assert.equal(payload.method,'POST');
+ // Query parsers treat %20 and + as spaces. Preserve decoded values and the
+ // order of repeated values; independent key ordering is immaterial here.
+ const query=new URLSearchParams(payload.query);
+ assert.deepEqual(query.getAll('one'),['a b','c']);
+ assert.deepEqual(query.getAll('literal'),['a+b']);
+ assert.equal([...query].length,3);
+ assert.equal(payload.body_sha256,crypto.createHash('sha256').update(raw).digest('hex'));privateCache(probe.cache);
+ report.cases.POST_body_and_query_values=true;
  const cookies=await context.cookies();for(const name of ['__Host-py_route_one','__Host-py_route_two'])assert.ok(cookies.some(c=>c.name===name&&c.secure&&c.httpOnly&&c.domain===new URL(origin).hostname));
  report.cases.POST_body_query_status_multiple_cookies_private_cache=true;
  const login=await page.evaluate(async()=>{const r=await fetch('/api/auth/browser/login',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:'routing@example.com',password:'SyntheticRouting8!',remember:true})});return {status:r.status,body:await r.json(),cache:r.headers.get('cache-control')};});
