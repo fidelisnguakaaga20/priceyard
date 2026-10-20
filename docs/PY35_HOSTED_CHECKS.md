@@ -1,5 +1,23 @@
 # PY-35 hosted verification — 2026-10-20 WAT
 
+Current125 supersedes connection/quota blockers below: owner confirms installed,
+working Render access in ChatGPT, both production services bound to master, and
+today's Billing usage451.6/750 Free hours,34MB/5GB bandwidth,25/500 build minutes,
+charges0. Do not repeat those checks. One temporary Free backend capped at2 total
+running hours fits298.4 remaining hours after conservatively reserving288 hours
+for one production Free backend through month-end, leaving8.4 hours margin.
+475 build minutes remain; restrict test builds/transfers, no load/keep-alive tests
+or paid fallback. Delays/additional Free workloads invalidate the estimate.
+The cap needs an operator to stop/remove staging: it is not self-enforcing.
+
+This Codex session still has no Render tools, so hosted work cannot be performed
+here despite the independently confirmed ChatGPT connection. Use that existing
+Render-connected conversation for bounded staging operation or expose the
+connection here. No new session or API key is required by this report. No staging
+created/deployed, push, migration, provider test or expense. Hosted checks remain
+BLOCKED/not attempted, not failed and not passed. User production/deployment
+approval boundaries remain unchanged.
+
 Current124: owner conditionally authorizes temporary zero-cost staging and a
 development-branch push after production isolation and sufficient free resources
 are confirmed. GitHub repository access passes; development branch search returns

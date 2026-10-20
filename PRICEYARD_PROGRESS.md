@@ -25,6 +25,23 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest125 ACCESS BLOCKER (2026-10-20 WAT): owner confirms Render plugin installed
+and independently connected in ChatGPT, both production services auto-deploy
+master. Accept those confirmations; do not ask to reconnect or repeat Billing.
+Owner reports today's usage:451.6/750 free hours,34MB/5GB bandwidth,25/500 build
+minutes,charges0. Remaining298.4 hours,475 build minutes. Conservative reserve
+288 production hours from Oct20 00:00 WAT to Nov1, assuming only the one known
+production Free backend, leaves10.4hours; cap staging backend at2 TOTAL running
+hours, leaving8.4hours beyond that reserve. Reassess only if delayed/new usage or
+other Free workloads appear. This is a bounded capacity estimate, not a quota
+reservation or an automatic stop guarantee. No paid upgrades/keep-alive/load.
+Current session still exposes ZERO Render MCP tools despite ChatGPT installation;
+cannot inspect/create/stop staging here, configure test recipients/keys or execute
+hosted provider tests. No API key requested, new session started, push, resource,
+migration, expense or deployment.35/36 unchanged. Genuine next action: use the
+existing Render-connected ChatGPT conversation to perform approved bounded
+staging work or make that connection available here; never claim hosted PASS.
+
 Latest124 BLOCKED (2026-10-20 WAT): owner conditionally approves zero-cost staging
 and development-branch push only after proving no production deployment/resource
 impact. Resumed clean at2c2075b; no completed tests/export/restore repeated.
