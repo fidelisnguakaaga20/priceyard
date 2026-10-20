@@ -25,7 +25,9 @@
       "recorded_catalog_roles_permissions_sequences_and_checksums": "passed",
       "restored_revision": "0021_feedback_screenshot",
       "off_computer_archive_copy_verified": false,
-      "remaining": "Second ciphertext copy/retrieval, non-database file/configuration coverage and owner recovery targets. Provider service recreation is outside this database-only verification."
+      "off_computer_archive_upload_owner_confirmed": true,
+      "off_computer_archive_upload_reported_date_wat": "2026-10-20",
+      "remaining": "Owner confirms private Google Drive upload; independent downloaded-copy SHA256 verification remains pending. Non-database file/configuration coverage and owner recovery targets remain open. Provider service recreation is outside this database-only verification."
     },
     {
       "id": "production_schema_rollout",
