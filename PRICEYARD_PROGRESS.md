@@ -25,6 +25,20 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Latest119 CHECK (2026-10-20 WAT): original encrypted7z SHA256 rechecked and matches
+the verified recovery evidence. Downloads contains a Drive folder ZIP, not the
+individual7z. ZIP directory lists exactly one matching-name encrypted archive,
+174448 bytes, but Deflate compression prevents direct raw-ciphertext comparison.
+No archive contents extracted/decompressed, files modified/deleted, backup/export
+repeated or production accessed. Downloaded7z SHA256 is NOT verified or mismatched;
+owner must download the individual7z rather than its folder under the current
+no-extraction instruction. Wrapper SHA256 recorded in the actual gate ledger.
+Narrow next-step review confirms0022 protected-clone rehearsal needs migration
+approval; preserve0021 and security evidence rather than running downgrade.
+Hosted HTTPS/Google/Paystack TEST/delivery/monitoring gates still need approved
+test setup. Render master auto-deploy/build migration remain controlled-release
+blockers.35/36 unchanged; no migration, push, merge, deployment or new feature.
+
 Latest118 REVIEW (2026-10-20 WAT): owner confirms encrypted archive uploaded to
 private Google Drive; downloaded-copy SHA256 verification is still pending.
 Current Git/evidence reviewed; completed recovery/tests were not repeated.
