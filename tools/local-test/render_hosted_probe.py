@@ -100,35 +100,63 @@ def worker():
 
 
 def controller():
-    if RUN.exists():
-        if sys.argv[1:] != ['--resume-dns-readiness']:
-            raise RuntimeError('Existing drill preserved; read its result instead of repeating')
-        old = json.loads((RUN / 'result.json').read_text())
-        if (old.get('status') != 'STOPPED' or not old.get('owned_processes_stopped')
-                or 'NameResolutionError' not in old.get('error', '')
-                or (RUN / 'state.json').exists() or (RUN / 'browser-result.json').exists()
-                or (RUN / 'dns-readiness-stop').exists() or RUN.is_symlink()):
-            raise RuntimeError('Only the preserved pre-verification DNS-readiness stop may resume once')
-        archive = RUN / 'dns-readiness-stop'
-        archive.mkdir()
-        for name in ('result.json', 'worker.log', 'tunnel.log'):
-            item = RUN / name
-            if item.is_symlink():
-                raise RuntimeError('Unexpected synthetic log link')
-            item.replace(archive / name)
+    renewal = sys.argv[1:] == ['--renew-expired-window']
+    retained_post = None
     if hashlib.sha256(CLOUD.read_bytes()).hexdigest() != CLOUD_SHA:
         raise RuntimeError('Cached tunnel binary hash mismatch')
     with socket.socket() as probe:
         probe.settimeout(1)
         if probe.connect_ex(('127.0.0.1', PORT)) == 0:
             raise RuntimeError('Test port already occupied; no process stopped')
-    RUN.mkdir(exist_ok=sys.argv[1:] == ['--resume-dns-readiness'])
+    if RUN.exists():
+        if not renewal and sys.argv[1:] != ['--resume-dns-readiness']:
+            raise RuntimeError('Existing drill preserved; read its result instead of repeating')
+        old = json.loads((RUN / 'result.json').read_text())
+        if renewal:
+            if (old.get('status') != 'STOPPED' or not old.get('owned_processes_stopped')
+                    or old.get('error') != 'Test window expired without rewrite confirmation'
+                    or old.get('origin') != ORIGIN or old.get('synthetic_only') is not True
+                    or old.get('production_access') is not False or old.get('providers_contacted') != 0
+                    or not isinstance(old.get('expires_at_epoch'), (int, float))
+                    or old['expires_at_epoch'] > time.time()
+                    or old.get('independent_upstream_POST') != 'PASS'
+                    or (RUN / 'browser-result.json').exists()
+                    or (RUN / 'rewrite-saved.txt').exists() or RUN.is_symlink()):
+                raise RuntimeError('Only a stopped, expired and unconfirmed test window may be renewed')
+            archive = RUN / ('expired-window-' + str(int(old['expires_at_epoch'])))
+            retained_post = old['independent_upstream_POST']
+            names = ('result.json', 'state.json', 'worker.log', 'tunnel.log')
+        else:
+            if (old.get('status') != 'STOPPED' or not old.get('owned_processes_stopped')
+                    or 'NameResolutionError' not in old.get('error', '')
+                    or (RUN / 'state.json').exists() or (RUN / 'browser-result.json').exists()
+                    or (RUN / 'dns-readiness-stop').exists() or RUN.is_symlink()):
+                raise RuntimeError('Only the preserved pre-verification DNS-readiness stop may resume once')
+            archive = RUN / 'dns-readiness-stop'
+            names = ('result.json', 'worker.log', 'tunnel.log')
+        if archive.exists() or archive.resolve().parent != RUN.resolve():
+            raise RuntimeError('Refusing to overwrite preserved test-window evidence')
+        # Fixed local files only; preserve all previous results without deleting.
+        for name in names:
+            if (RUN / name).is_symlink() or not (RUN / name).is_file():
+                raise RuntimeError('Unexpected synthetic log entry')
+        archive.mkdir()
+        for name in names:
+            item = RUN / name
+            item.replace(archive / name)
+    elif renewal:
+        raise RuntimeError('Renewal requires the existing verified synthetic environment')
+    RUN.mkdir(exist_ok=renewal or sys.argv[1:] == ['--resume-dns-readiness'])
     cfg = {'origin': ORIGIN, 'proof': secrets.token_hex(16)}
     env = {key: os.environ[key] for key in ('SYSTEMROOT', 'SYSTEMDRIVE', 'WINDIR', 'PATH', 'TEMP', 'TMP') if key in os.environ}
     python = ROOT / '.git/priceyard-local-recovery-20261015/p00/runtime/venv/Scripts/python.exe'
     processes = []
     report = {'status': 'starting', 'synthetic_only': True, 'production_access': False,
               'providers_contacted': 0, 'new_database': False, 'origin': ORIGIN}
+    if renewal:
+        report['expired_window_renewed'] = True
+        report['completed_tests_repeated'] = False
+        report['independent_upstream_POST_retained_without_rerun'] = True
     import requests
     http = requests.Session()
     http.trust_env = False
@@ -185,15 +213,17 @@ def controller():
             time.sleep(1)
         else:
             raise RuntimeError('Public synthetic target identity not verified within readiness budget')
-        # Independent target control before Render rewrites are configured.
-        raw = b'{\n  "synthetic": true\n}'
-        control = http.post(upstream + '/probe?one=a%20b&one=c', data=raw, timeout=(5, 20), allow_redirects=False)
-        if control.status_code != 207 or control.json().get('body_sha256') != hashlib.sha256(raw).hexdigest():
-            raise RuntimeError('Synthetic POST control failed')
+        # Renewal needs only fresh HTTPS identity/liveness. Retain the completed
+        # transport control instead of repeating POST/login/browser tests.
+        if not renewal:
+            raw = b'{\n  "synthetic": true\n}'
+            control = http.post(upstream + '/probe?one=a%20b&one=c', data=raw, timeout=(5, 20), allow_redirects=False)
+            if control.status_code != 207 or control.json().get('body_sha256') != hashlib.sha256(raw).hexdigest():
+                raise RuntimeError('Synthetic POST control failed')
         report.update(status='awaiting_test_only_rewrite', upstream=upstream,
                       destination=upstream + '/*', proof=cfg['proof'],
                       created_at_epoch=time.time(), expires_at_epoch=time.time() + 900,
-                      independent_upstream_POST='PASS')
+                      independent_upstream_POST=retained_post if renewal else 'PASS')
         (RUN / 'state.json').write_text(json.dumps(report, indent=2))
         print(json.dumps({key: report[key] for key in ('status', 'origin', 'destination', 'expires_at_epoch')}), flush=True)
         deadline = time.monotonic() + 900

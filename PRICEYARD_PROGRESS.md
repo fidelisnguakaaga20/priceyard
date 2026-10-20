@@ -25,6 +25,20 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current138 TUNNEL RENEWAL (2026-10-20 WAT): owner explicitly requests renewal of
+only the expired test window, retaining the same temporary Render site/environment.
+Previous result confirms expiry without SAVED, no hosted browser run and clean
+owned-process shutdown. New --renew-expired-window admits exactly that state,
+rejects live/confirmed/completed windows, checks cached binary/free test port first,
+and preserves prior result/state/logs in an expired-window-* directory. Same
+synthetic-only API/settings/guard and same Render target; no new site/DB/service,
+production settings, provider credentials or deployment. Skip completed POST/browser
+checks; check only renewed tunnel registration and fresh verified HTTPS identity.
+New active URL/15-minute expiry must come from current runtime state.json, never
+the expired question/old rewrite. Wait for owner to save that exact test-only
+rewrite; do not generate SAVED or run browser automatically before confirmation.
+35/36 and all previous passes retained. Production release approval still withheld.
+
 Current137 TEMPORARY FREE TARGET (2026-10-20 WAT): owner grants the requested
 one-site exception. Created exactly one static-only synthetic Render target:
 priceyard-py35-check-20261020, srv-dbbs8omi0phs73e1mtd0,
