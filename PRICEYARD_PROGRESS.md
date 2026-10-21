@@ -25,6 +25,29 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current151 APPROVED CONTROLLED RELEASE PASS / LIVE (2026-10-21 WAT): owner
+confirmed PASS for actual permanent-site Google login, dashboard refresh retaining
+login, logout and refresh retaining signed-out state. Authenticated hosted cookie
+lifecycle now passes in owner's browser; no tokens/passwords shared. Together with
+actual Render routing/body/private-cache/negative-CSRF/API404/SPA/JS checks,
+protected PG17 recovery/migration/rollback and previously completed genuine TEST
+payment/webhook/replay/email/provider evidence, the approved release is GO/LIVE.
+Backend dep-dbc17ocs728c73dkqn9g and frontend dep-dbc19kvavr4c73egctug both LIVE
+64a32909d0185d9487d45aa26b47466492a92557; production0022 applied once by owner.
+Auto-Deploy stays Off, routine backend build pip-only. No rollback was needed or
+performed. Retain exact secure artifact IDs/current0022; never downgrade/erase
+payments/revocations or choose pre-security backend as fallback. Original master
+backup branch and encrypted recoverable DB backup remain preserved.
+STOP release implementation/testing: no demonstrated launch blocker remains,
+no new staging/services, no repeat checks or migration. Existing operational
+follow-ups are explicitly NOT verified: automatic payment recovery schedule,
+alert delivery/on-call/broader load/browser checks, ongoing backup targets and
+coverage, exceptional ambiguous historical payments. They are separate from
+successful approved launch. Original tracker remains35 fully complete + PY-35
+partial for these broader operations; do not falsely claim all nine gates passed.
+All planned application changes are live. Preserve this handoff and perform no
+further production change merely to make the checklist read36/36.
+
 Current150 BOTH PRODUCTION SERVICES LIVE / OWNER SESSION ACCEPTANCE PENDING
 (2026-10-21 WAT): frontend dep-dbc19kvavr4c73egctug is LIVE at exact reviewed
 64a32909d0185d9487d45aa26b47466492a92557, same as live backend dep-dbc17ocs728c73dkqn9g.
@@ -1599,7 +1622,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches14/21; batch87 closes the confirmed stale single-account GET/renewal race under existing locks. Paid/trial value, indefinite grants/review and payment evidence preserved; full307 backend tests, actual PG blocking/twelve interleavings and value/review browser checks pass |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
 | PY-34 | Expiry without unintended staff-role loss | Complete in batch2; batch87 additionally verifies locked single-account expiry versus payment for ordinary/Reporter/Admin users, genuine expiry/history/rollback and eight-role browser access |
-| PY-35 | Operational readiness and dependency evidence | Partial: prior local evidence preserved;117 verifies REAL encrypted backup and RAM-isolated recovery of59 tables, data digests, recorded schema/permissions/roles, sequences and checksums at0021, with no production changes/migrations. Nine small target-specific synthetic checks pass. Second encrypted archive copy,0022 clone rehearsal and external hosting/provider/operational/cutover gates remain; see docs/PY35_ACTUAL_RELEASE_GATES.json. No live jobs or release authorized |
+| PY-35 | Operational readiness and dependency evidence | Approved production release PASS/LIVE151: owner0022 once, both64a3290 builds live, actual Render routing/private cache/negative-CSRF/API404/SPA/assets and owner Google login/refresh/logout/refresh passed; genuine TEST payment/webhook/replay/email and protected backup/restoration/PG17 rollback evidence retained. Partial only for broader post-launch operations: automatic recovery scheduling, alert delivery/on-call/broader checks, continuing backup targets/coverage and exceptional historical review. No launch blocker demonstrated; do not repeat tests, rerun migration or label every operational gate Passed. |
 | PY-36 | Accurate progress/documentation/maintainability | Current application documentation/identified six-form readability scope complete in61: exact106-operation API index, approved contracts, safe local recovery/resumption guide and README links; six original intelligence forms expanded for maintenance with identical emitted syntax and byte-identical compiled JS/CSS. Progress/approvals/evidence current; future maintenance does not reopen this scope. Production rollout/provider documentation verification remains PY-35 |
 
 ## Verified results and batch history

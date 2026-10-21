@@ -4,7 +4,7 @@
   "release_authorized": true,
   "controlled_release_authorization_date_wat": "2026-10-21",
   "controlled_release_authorization_scope": "existing Render services, same-origin routing, exact0022 migration and controlled deployment with security-compatible application rollback; no new staging/resources",
-  "controlled_release_execution_status": "owner0022_SUCCESS;master64a3290_published;both_services_LIVE64a3290;production_route_security_HTML_asset_checks_PASS;owner_authenticated_acceptance_pending",
+  "controlled_release_execution_status": "PASS_GO_APPROVED_RELEASE_LIVE_BOTH64a3290_OWNER_GOOGLE_LOGIN_REFRESH_LOGOUT_REFRESH_PASS",
   "controlled_release_source_commit": "64a32909d0185d9487d45aa26b47466492a92557",
   "controlled_release_source_remote_branch": "codex/priceyard-original-preserved-20261016",
   "original_master_remote_backup_branch": "backup/priceyard-production-pre-release-20261021",
@@ -35,12 +35,12 @@
   "gates": [
     {
       "id": "hosting_cookies_browsers",
-      "status": "production_candidate_anonymous_route_security_cache_checks_PASS;owner_authenticated_acceptance_pending",
+      "status": "PASS_approved_real_Render_and_owner_browser_session_flow",
       "production_rewrite_owner_saved": true,
       "production_API_health_probe": "200_application_JSON",
       "production_API_anonymous_invalid_JSON_POST": "422_json_invalid; no_credentials_or_customer_rows_submitted",
       "production_API_stable_direct_backend_routing_verified": true,
-      "production_candidate_cookies_and_sessions_verified": false,
+      "production_candidate_cookies_and_sessions_verified": true,
       "same_origin_proposed_settings": "RENDER_LAUNCH_SETTINGS.json",
       "same_origin_local_evidence": "../tools/local-test/evidence/batch-135-same-origin-release.json",
       "same_origin_original_React_and_API_virtual_HTTPS": "passed_login_reload_API_CSRF403_logout204_revoked_replay401",
@@ -82,10 +82,11 @@
       "owner_confirmed_API_proxy_exists": false,
       "candidate_cookie_compatibility_with_confirmed_settings": "fail_based_on_source_and_prior_virtual_browser_contract",
       "configuration_evidence": "../tools/local-test/evidence/batch-133-render-configuration.json",
-      "remaining": "Owner final live Google sign-in, dashboard refresh, logout and guest refresh. Real stable Render routing now passes; retired tunnel failure does not block this route. No additional staging or repeat provider tests.",
+      "remaining": "No mandatory launch-session blocker remains. Broader browser matrix not certified; do not repeat approved session/provider checks.",
       "production_candidate_missing_CSRF_rejected": "403_with_fabricated_invalid_cookie_no_real_credentials",
       "production_candidate_private_no_store": "passed_on_guest_session_invalid_cookie_me_and_missing_CSRF_logout",
-      "production_candidate_API_404_JSON": "passed"
+      "production_candidate_API_404_JSON": "passed",
+      "production_owner_Google_dashboard_reload_logout_guest_refresh": "PASS_owner_confirmed_2026-10-21"
     },
     {
       "id": "actual_backup_restoration",
@@ -160,7 +161,7 @@
     },
     {
       "id": "google_notification_delivery",
-      "status": "reset_email_and_actual_local_Google_sign_in_passed_Render_candidate_runtime_pending",
+      "status": "actual_Google_TEST_email_provider_evidence_retained_and_production_owner_Google_session_PASS",
       "original_reset_email_provider_acceptance": "passed_2026-10-20",
       "approved_recipient_receipt": "owner_confirmed_received_2026-10-20",
       "test_emails_sent": 1,
@@ -175,9 +176,9 @@
       "Google_dashboard_reached": "owner_confirmed_YES_REACHED_DASHBOARD",
       "Google_local_CORS_isolation_checks_passed": 6,
       "Google_provider_settings_changed": false,
-      "Google_hosted_Render_candidate_runtime_verified": false,
+      "Google_hosted_Render_candidate_runtime_verified": true,
       "Google_local_evidence": "../tools/local-test/evidence/batch-131-local-google.json",
-      "remaining": "Actual Google sign-in and original dashboard passed using existing authorised loopback origin without Google settings changes; all test servers closed. Do not repeat. Existing production origin is shown configured, but actual Render candidate runtime/proxy and release verification remain separate gates."
+      "remaining": "Owner production Google sign-in/reload/logout confirmed. Prior genuinely received reset email/provider evidence retained without another send. Continuing delivery monitoring is an operational follow-up."
     },
     {
       "id": "monitoring_load_clock",
@@ -219,16 +220,29 @@
     },
     {
       "id": "historical_review_cutover",
-      "status": "awaiting_approval_and_external_verification",
+      "status": "approved_cutover_completed_no_bulk_historical_payment_changes",
       "historical_database_snapshot_digests": "passed",
-      "remaining": "Owner-scoped legacy/ambiguous-payment review, post-snapshot payment/write reconciliation, fresh rollback acceptance and explicit cutover approval."
+      "remaining": "Exceptional ambiguous historical payments require case-specific operator review; none were automatically repaired, deleted or reset by this release."
     }
   ],
   "migrations_run_scope": "One committed upgrade in final successful local clone rehearsal; excludes rollback probes and earlier isolated diagnostic attempts. No production migration.",
   "production_migrations_run": 1,
   "production_connections_during_local_rehearsal": 0,
   "production_frontend_HTTP_checks": "login_HTML200_original_React_root_dashboard200_same_SPA_built_JS200",
-  "production_owner_browser_acceptance": "pending_Google_login_dashboard_refresh_logout_guest_refresh",
+  "production_owner_browser_acceptance": "PASS_Google_login_dashboard_refresh_persists_logout_refresh_stays_signed_out",
   "all_original_operational_gates_passed": false,
-  "hosted_rollback_triggered": false
+  "hosted_rollback_triggered": false,
+  "controlled_release_result": "PASS",
+  "approved_launch_mandatory_checks_passed": true,
+  "remaining_mandatory_launch_blockers": [],
+  "original_operational_followups_remaining": true,
+  "controlled_release_complete": true,
+  "automatic_deployment_deliberately_left_off": true,
+  "operational_followups_not_certified": [
+    "automatic_payment_recovery_scheduling_checkpoints",
+    "alert_delivery_response_ownership_broader_load_browser_checks",
+    "ongoing_backup_targets_and_non_database_coverage",
+    "exceptional_ambiguous_historical_payments"
+  ],
+  "final_Render_metadata_check": "both_latest_deploys_live64a3290_and_both_autoDeployOff_after_owner_browser_PASS"
 }

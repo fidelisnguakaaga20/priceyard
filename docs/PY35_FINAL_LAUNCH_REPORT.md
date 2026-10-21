@@ -1,5 +1,27 @@
 # PY-35 controlled release — 2026-10-21 WAT
 
+Current151: **PASS — approved controlled release is LIVE / GO.** Owner confirmed
+actual permanent-site Google login, dashboard refresh retaining login, logout and
+refresh remaining signed out. Both services are live at approved64a3290; production
+0022 was applied once. Real routing/security/cache/static checks passed. No observed
+failure required rollback; Auto-Deploy remains Off and routine builds run no migration.
+
+All planned application changes are deployed. Original tracker:35 fully complete,
+PY-35 broader operations partial. Automatic payment-recovery scheduling, alert
+delivery/on-call/broader load/browser checks, continuing backup targets/coverage
+and exceptional historical-payment review are not certified. These are disclosed
+operational follow-ups, not newly invented blockers to the approved launch. No
+more staging, duplicate tests, migrations or production edits are required now.
+
+Retain secure backend `dep-dbc17ocs728c73dkqn9g`, frontend
+`dep-dbc19kvavr4c73egctug`, exact release source, verified encrypted recovery copy
+and original code backup. Local security-aware rollback passed; an actual Render
+rollback was not triggered. Recovery preserves0022 and all live business/security
+records, and must not select the old pre-security backend or restore over newer
+payments. `PY35_ACTUAL_RELEASE_GATES.json` preserves individual gate limitations.
+
+## Previous deployment checkpoints
+
 Current150: **Both approved production deployments are LIVE** at
 `64a32909d0185d9487d45aa26b47466492a92557`. Owner applied reviewed0022 once and
 confirmed `0022_login_revocation`. Auto-Deploy is Off; routine builds no longer
