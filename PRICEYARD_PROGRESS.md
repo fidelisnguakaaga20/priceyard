@@ -25,6 +25,25 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current145 AUTO-DEPLOY PAUSE VERIFIED / RELEASE SOURCE PUBLISHED (2026-10-21 WAT):
+owner saved Off on both services; fresh Render metadata confirms autoDeploy=no
+for priceyard-api and priceyard. Both remain running; no deployment triggered.
+Published release source64a32909d0185d9487d45aa26b47466492a92557 to GitHub branch
+codex/priceyard-original-preserved-20261016. Preserved remote original master76dbd27
+in backup/priceyard-production-pre-release-20261021. Atomic push succeeded; remote
+refs verified. Remote master is still76dbd27588de4aa37f3163d8b263d4b72a2cff32.
+NEXT owner Dashboard edits pending (connector cannot edit these): backend Build
+Command becomes `pip install -r requirements.txt` (remove automatic Alembic);
+frontend FIRST Rewrite `/api/*` -> `https://priceyard-api.onrender.com/*`, retain
+SECOND Rewrite `/*` -> `/index.html`. Save only, no Manual Deploy. Async SAVED
+confirmation requested. Verify settings and bounded anonymous routing after save;
+then coordinate the already-prepared guarded Supabase SQL, publish master by
+normal fast-forward only, and deploy backend before frontend. Do not run the SQL
+before explicit migration-step instructions. No production database connection,
+migration, customer-data change, merge, master push or deployment yet. Production
+settings changed so far ONLY owner-confirmed Auto-Deploy Off. No tests repeated.
+Do not request release approval again; it remains explicitly granted.35/36 remains.
+
 Current144 CONTROLLED PRODUCTION RELEASE APPROVED (2026-10-21 WAT): owner
 explicitly approved Render routing changes, migration0022 and deployment, with
 rollback on failed checks. This supersedes earlier no-production-change approval

@@ -1,7 +1,7 @@
 {
   "date_wat": "2026-10-21",
   "baseline_commit": "ccef8d4",
-  "result": "APPROVED_PREPARATION_WAITING_FOR_AUTODEPLOY_PAUSE",
+  "result": "AUTO_DEPLOY_OFF_VERIFIED_SOURCE_BRANCH_PUBLISHED_WAITING_BUILD_AND_REWRITE_SETTINGS",
   "completed_recommendations": 35,
   "remaining_recommendations": 1,
   "owner_authorization": "controlled production release including Render routing changes, migration0022 and deployment, with rollback if checks fail",
@@ -14,7 +14,14 @@
   "production_frontend_live_commit": "76dbd27588de4aa37f3163d8b263d4b72a2cff32",
   "production_frontend_live_deploy": "dep-db62ce0ae00c73a7g9i0",
   "both_auto_deploy_at_inspection": "yes",
-  "owner_AutoDeploy_Off_confirmation": "pending",
+  "owner_AutoDeploy_Off_confirmation": "PAUSED_both_services_saved_Off",
+  "both_AutoDeploy_Off_independently_verified": true,
+  "source_branch_pushed": "codex/priceyard-original-preserved-20261016",
+  "source_branch_commit": "64a32909d0185d9487d45aa26b47466492a92557",
+  "original_master_backup_branch_created": "backup/priceyard-production-pre-release-20261021",
+  "remote_master_still_original": true,
+  "atomic_push_and_remote_refs_verified": true,
+  "backend_build_command_removal_and_frontend_rewrite_owner_confirmation": "pending",
   "backend_app_tree_unchanged": "fcc47f0a0d5a1596d8f3cd5790e61f624c3e04ed",
   "migration_source_sha256": "6b7cd540b41982c13091be3805f4660144b8b9b389224cecf7fa5b85d77469fa",
   "original_rehearsed_compiled_SQL_sha256": "221e1ec1a801936d66fe037fa39727ae36e986984eac92147a7cf051d41143f8",
@@ -27,8 +34,12 @@
   "production_database_connections": 0,
   "production_migrations_run": 0,
   "production_settings_changed_by_agent": false,
+  "production_settings_changed_by_owner": "Auto-Deploy_Off_on_both_only",
   "customer_records_read_or_modified": false,
   "new_services_or_databases": 0,
   "prior_tests_backups_restorations_repeated": false,
-  "push_merge_deploy": false
+  "push": "development_and_backup_branches_only",
+  "master_push": false,
+  "merge": false,
+  "deploy": false
 }
