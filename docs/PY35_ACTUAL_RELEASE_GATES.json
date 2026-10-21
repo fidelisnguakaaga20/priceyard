@@ -1,7 +1,11 @@
 {
   "scope": "owner-approved-actual-backup-isolated-recovery-and-local-0022-rehearsal",
   "verified_date_wat": "2026-10-20",
-  "release_authorized": false,
+  "release_authorized": true,
+  "controlled_release_authorization_date_wat": "2026-10-21",
+  "controlled_release_authorization_scope": "existing Render services, same-origin routing, exact0022 migration and controlled deployment with security-compatible application rollback; no new staging/resources",
+  "controlled_release_execution_status": "awaiting_owner_Dashboard_AutoDeploy_Off_on_both_services; not_pushed_or_deployed",
+  "controlled_release_evidence": "../tools/local-test/evidence/batch-144-controlled-release-authorized.json",
   "completed_recommendations": 35,
   "remaining_recommendations": 1,
   "production_readonly_backup_completed_previously": true,
@@ -96,7 +100,9 @@
       "security_aware_application_local_PG17_rollback": "passed_2026-10-20_exact_reviewed_app_source_revoked_token_stays_rejected_and_normal_login_works",
       "rollback_backend_application_tree_matches_current": true,
       "rollback_source_comparison_scope": "backend/app tree matches; earlier candidate lacks current0022 migration privacy safeguard. Preserve current security grants and evidence; do not replay old migration or downgrade. Hosted runtime remains unverified.",
-      "production_migration_authorized": false
+      "production_migration_authorized": true,
+      "approved_production_SQL": "sql/PY35_APPROVED_0022_RELEASE.sql",
+      "approved_production_SQL_executed": false
     },
     {
       "id": "paystack_provider",

@@ -25,6 +25,36 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current144 CONTROLLED PRODUCTION RELEASE APPROVED (2026-10-21 WAT): owner
+explicitly approved Render routing changes, migration0022 and deployment, with
+rollback on failed checks. This supersedes earlier no-production-change approval
+flags for this exact release; no new staging/services/database or repeated tests.
+Branch clean at ccef8d4 before release preparation; 35/36 work preserved. Native
+Git remote access works (master remains76dbd27588de4aa37f3163d8b263d4b72a2cff32).
+Live Render backend remains a9cf1b9/dep-db6214p5efls73b651j0; frontend remains
+76dbd27/dep-db62ce0ae00c73a7g9i0. Both auto-deploy yes at this checkpoint.
+Required owner Dashboard action pending: set Auto-Deploy Off on BOTH existing
+services. Connector cannot edit this setting; no push or deployment before that
+change is verified. Existing fallback source/migration/backup passes retained.
+Prepared docs/sql/PY35_APPROVED_0022_RELEASE.sql for the exact existing Supabase
+project's SQL Editor, avoiding another password prompt. Offline generation only:
+reviewed0022 source SHA6b7cd540...69fa and original compiled SQL SHA221e1ec1...43f8
+match the successful rehearsal; compiled migration body preserved unchanged.
+Added transactional metadata baseline/role/PG17/ownership/absent-object guards,
+lock2s/statement30s/idle30s limits and public creation search path. Independent
+review corrected an initial search-path draft before use. Source project must be
+confirmed in the exact Supabase Dashboard URL; role/database names alone do not
+identify a project. SQL SHA40d29dc7bb10981a5bb393e4e5a51a69164bd3933e897f8e3f02ee07a0707b1f.
+No production DB connection, SQL execution, migration, application source edit,
+push, merge or deployment has occurred. Local compile/hash/transaction checks only;
+no previous test/backup/rehearsal repeated. Continue AFTER Auto-Deploy Off verified:
+publish exact release source, remove migration from routine backend build, coordinate
+guarded Supabase SQL once, then backend and same-origin frontend release. Retain
+security-aware candidate artifact and preserve0022/payment/revocation data on any
+application rollback; never select old pre-security backend as fallback.
+Evidence: batch-144-controlled-release-authorized.json. PY-35 still partial until
+actual hosted sessions/runtime/rollback acceptance; do not mark36/36 yet.
+
 Current143 CONDITIONAL HOSTED API BLOCKED (2026-10-20 WAT): owner approved ONE
 temporary Free Render API only after confirming a suitable isolated database,
 with hosted sessions/rollback tests and service stopped within two hours.
