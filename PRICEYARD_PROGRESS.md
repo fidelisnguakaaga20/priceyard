@@ -25,6 +25,25 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current157 OWNER-APPROVED CHART USABILITY FIX / VERIFIED FOR RELEASE
+(2026-10-21 WAT): owner rejected the oversized, poorly labelled charts and
+explicitly authorized implementation, commit, push and frontend deployment.
+History plots now remain250px high with responsive readable naira axes/grid,
+WAT date ticks (time ticks for same-day records), commodity/market/specification
+headings, and persistent exact-record details selectable by mouse, touch or
+keyboard/previous-next arrows. Single records use compact dated price summaries
+without an empty SVG. Fully matching records retain lines; incomplete records
+stay unconnected; same-time observations do not imply a temporal trend. History,
+measurements, current-price grouping, access rules and backend stay unchanged.
+Production-mode TypeScript/Vite build and seven existing origin-admission cases
+passed;14 focused synthetic browser checks passed, including actual mobile tap,
+keyboard/pointer selection, axes/height, flat/tied times, same-dayWAT, retained
+actions/filtering and mobile/easy-reading/light-dark themes. Visual review used
+fabricated month-spanning histories, incomplete records and a single outlier.
+No new dependencies, backend/DB/workflow changes, credentials or migrations.
+Evidence: batch-149-history-chart-usability.json. Proceed only with the approved
+frontend release;35/36 remain complete pending secure automatic backup success.
+
 Current156 APPROVED PRESENTATION RELEASE LIVE / READ-ONLY CHECKS PASSED
 (2026-10-21 WAT): owner explicitly approved commit, push and Render deployment
 of the grouped commodity cards and restored history graph. Reused155 build/

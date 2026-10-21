@@ -1,0 +1,32 @@
+{
+  "date_wat": "2026-10-21",
+  "authorization": "Owner requested professional chart correction, commit, push and frontend deployment",
+  "scope": "History chart presentation and interaction only",
+  "build": {"typescript": "PASS", "vite": "PASS", "existing_origin_admission_cases": 7, "snapshot_reused": true},
+  "browser": {
+    "passed": 14,
+    "checks": {
+      "one_photo_all_distinct_records_and_guest_actions": true,
+      "commodity_ids_not_names_control_grouping": true,
+      "filters_replace_grouped_results": true,
+      "watch_action_preserves_record_identity": true,
+      "matching_lines_separate_sizes_legacy_points_and_history_preserved": true,
+      "single_zero_price_uses_compact_dated_summary": true,
+      "invalid_prices_and_ambiguous_times_not_plotted_but_retained": true,
+      "readable_axes_grid_and_keyboard_chronological_selection": true,
+      "pointer_selection_shows_exact_record_details": true,
+      "mobile_tap_shows_exact_record_details": true,
+      "flat_matching_series_remains_readable": true,
+      "same_time_records_remain_separate_and_keyboard_accessible": true,
+      "same_day_prices_have_distinct_wat_time_ticks": true,
+      "mobile_easy_reading_and_theme_compatible_graphs": true
+    },
+    "widths": [375, 1366], "themes": ["dark", "light"], "easy_reading": true,
+    "plot_height_pixels": 250,
+    "external_page_requests": 0, "production_connections": 0, "database_changes": 0
+  },
+  "visual_review": "Month-spanning fabricated history, complete and incomplete specifications, compact singleton; desktop and mobile layouts",
+  "comparison_guards_unchanged": true,
+  "dependencies_added": false, "backend_changed": false, "migrations": false,
+  "checklist": {"complete": 35, "remaining": "PY-35 secure automatic backup verification"}
+}

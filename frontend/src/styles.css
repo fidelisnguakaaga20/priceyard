@@ -254,18 +254,48 @@ html.easy-reading .confidence-badge, html.easy-reading .movement { font-weight: 
 .aging-warn { color: #d99a2b; font-weight: 700; }
 .aging-stale { color: #e4674a; font-weight: 700; }
 .season-note { display: block; margin-top: 6px; color: #d99a2b; font-weight: 700; }
-.trend-chart { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px; padding: 18px 20px 14px; margin: 0 0 22px; box-shadow: 0 8px 30px var(--color-card-shadow); }
-.trend-chart svg { width: 100%; height: auto; display: block; }
+.history-trends { display: grid; gap: 18px; margin-bottom: 24px; min-width: 0; }
+.trend-chart, .history-single-price { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px; padding: 20px; min-width: 0; box-shadow: 0 8px 30px var(--color-card-shadow); }
+.trend-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; }
+.trend-heading > div { min-width: 0; }
+.trend-heading h2 { margin: 0; font-size: 1.15rem; color: var(--color-text); overflow-wrap: anywhere; }
+.trend-heading p { margin: 5px 0 0; color: var(--color-text-muted); overflow-wrap: anywhere; }
+.trend-record-count { flex-shrink: 0; padding: 5px 9px; border-radius: 20px; background: var(--color-surface-subtle); font-size: .78rem; color: var(--color-text-muted); }
+.trend-specification { margin: 12px 0; color: var(--color-text-muted); font-size: .85rem; line-height: 1.5; overflow-wrap: anywhere; }
+.trend-chart svg { width: 100%; height: 250px; display: block; }
+.trend-plot { min-width: 0; border-radius: 8px; }
+.trend-plot:focus-visible { outline: 2px solid var(--color-link); outline-offset: 3px; }
 .trend-band { fill: var(--color-link); opacity: .15; stroke: none; }
 .trend-line { stroke: var(--color-link); stroke-width: 2.5; }
 .trend-dot { fill: var(--color-link); }
+.trend-dot-selected { stroke: var(--color-surface); stroke-width: 2; }
 .trend-range { stroke: var(--color-link); stroke-width: 2; }
-.trend-explanation { margin: 0 0 12px; color: var(--color-text-muted); font-size: .85rem; line-height: 1.5; }
-.trend-chart-scale { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: .85rem; color: var(--color-text); }
-.history-price-series > p { overflow-wrap: anywhere; }
-.trend-chart-labels { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px; font-size: .78rem; color: var(--color-text-muted); }
-.trend-chart-labels .muted { flex: 1; text-align: center; }
-@media (max-width: 640px) { .trend-chart-labels .muted { display: none; } }
+.trend-grid-line { stroke: var(--color-border); stroke-width: 1; stroke-dasharray: 3 4; }
+.trend-axis { stroke: var(--color-border-strong); stroke-width: 1; }
+.trend-y-tick, .trend-x-tick { fill: var(--color-text-muted); font-size: 12px; }
+.trend-cursor { stroke: var(--color-text-muted); stroke-width: 1; stroke-dasharray: 4 4; opacity: .6; }
+.trend-explanation { margin: 0 0 12px; color: var(--color-text-muted); font-size: .85rem; line-height: 1.5; overflow-wrap: anywhere; }
+.trend-axis-captions { display: flex; justify-content: space-between; gap: 12px; font-size: .78rem; color: var(--color-text-muted); }
+.trend-inspector { display: flex; align-items: center; justify-content: space-between; gap: 14px; border-top: 1px solid var(--color-border); padding-top: 14px; }
+.trend-selection { display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: baseline; min-width: 0; line-height: 1.5; }
+.trend-selection time, .trend-selection span { color: var(--color-text-muted); font-size: .85rem; }
+.trend-selection strong { color: var(--color-text); }
+.trend-selection span { flex-basis: 100%; }
+.trend-controls { display: flex; gap: 8px; flex-shrink: 0; }
+.trend-controls button { min-width: 44px; min-height: 44px; border: 1px solid var(--color-border-strong); border-radius: 9px; background: var(--color-surface-subtle); color: var(--color-link); font-weight: 700; }
+.trend-controls button:hover:not(:disabled) { background: var(--color-hover-surface); }
+.trend-help { margin: 10px 0 0; font-size: .78rem; line-height: 1.5; color: var(--color-text-muted); }
+.single-price-details { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px 24px; margin: 14px 0 8px; }
+.single-price-details strong { font-size: 1.2rem; color: var(--color-text); }
+.single-price-details time { font-size: .85rem; color: var(--color-text-muted); }
+.history-single-price .trend-explanation { margin-bottom: 0; }
+@media (max-width: 640px) {
+  .trend-chart, .history-single-price { padding: 16px 12px; }
+  .trend-heading h2 { font-size: 1.05rem; }
+  .trend-inspector { flex-wrap: wrap; }
+  .trend-controls { margin-left: auto; }
+  .trend-y-tick, .trend-x-tick { font-size: 11px; }
+}
 
 /* Stage 26 commodity images */
 .commodity-image { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 12px; margin-bottom: 16px; background: var(--color-surface-subtle); display: block; }
