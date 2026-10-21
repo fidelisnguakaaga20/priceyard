@@ -25,6 +25,70 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current150 BOTH PRODUCTION SERVICES LIVE / OWNER SESSION ACCEPTANCE PENDING
+(2026-10-21 WAT): frontend dep-dbc19kvavr4c73egctug is LIVE at exact reviewed
+64a32909d0185d9487d45aa26b47466492a92557, same as live backend dep-dbc17ocs728c73dkqn9g.
+Actual anonymous HTTPS frontend checks PASS: /login200HTML with original React
+root, /dashboard200 identical SPA entry (fallback preserved), built JS asset200
+JavaScript. Backend routing/security checks from149 remain passed; not repeated.
+Owner asked to open permanent /login, hard refresh, Google sign in with approved
+owner account, refresh dashboard, log out, refresh and report PASS/visible error.
+This is the remaining authenticated hosted acceptance for the approved controlled
+release. No passwords/tokens requested. Do not claim valid login/cookies/logout
+before owner's result. Do NOT redeploy or rerun0022 on resume: both services are
+already live, migrations applied once, Auto-Deploy deliberately Off.
+Rollback uses retained secure64a3290 backend artifact/current0022; never select
+old pre-securitya9cf1b9, downgrade or overwrite live payments/revocations. Local
+PG17 rollback remains passed; actual Render rollback was not triggered because
+no observed check failed. Original source backup and protected database recovery
+evidence are preserved; new environment changes were public URL keys only.
+35 recommendations remain fully complete; PY-35 launch acceptance pending.
+Existing broader operational follow-ups (automatic recovery scheduling, alert
+delivery/on-call, ongoing backup targets/coverage and exceptional historical
+payments) must not be falsely labelled tested or used to restart staging/audits.
+Keep release PASS/GO distinct from claiming every original operational gate passed.
+Master remains pinned reviewed release64a3290; local progress notes do not deploy.
+
+Current149 BACKEND LIVE / FRONTEND BUILD ACTIVE (2026-10-21 WAT): backend
+dep-dbc17ocs728c73dkqn9g is LIVE at exact approved64a3290. Five bounded actual
+frontend-origin checks passed: /api/health200; guest /auth/browser/session401 and
+forged-cookie /auth/me401 with private/no-store; forged-cookie logout without CSRF
+403 with private/no-store; nonexistent /api route404 JSON (not React HTML).
+Fabricated invalid cookie only; no owner/customer credentials, business records,
+payment or email used. This is real candidate/backend/cache/CSRF forwarding proof,
+not a claim of successful authenticated login. Secure backend artifact now exists
+at that retained deployment ID; original pre-security backend is not a fallback.
+Frontend VITE_API_URL=/api saved by merge only; all other env/secrets preserved.
+Save started frontend dep-dbc19kvavr4c73egctug at exact64a3290. No duplicate deploy.
+Monitor that ID to terminal state, then bounded HTML/SPA/asset checks and owner's
+Google sign-in -> dashboard reload -> logout -> guest refresh acceptance. Do not
+mark36/36 or fully validated until actual authenticated workflow passes.
+Migration0022 remains applied once; no repeat tests/backups or new services.
+
+Current148 APPROVED MASTER PUBLISHED / BACKEND BUILD ACTIVE (2026-10-21 WAT):
+after owner-confirmed0022 and fresh Off/pip-only checks, normal master push
+76dbd27->64a32909d0185d9487d45aa26b47466492a92557 succeeded; remote exact SHA verified.
+Original backup branch76dbd27 preserved. Backend FRONTEND_URL merged (replace=false)
+to https://priceyard.onrender.com, leaving secrets/other environment untouched.
+Environment save started Render deployment dep-dbc17ocs728c73dkqn9g of exact
+approved64a3290. No duplicate trigger issued. Monitor this ID to terminal state.
+Do NOT update/deploy frontend until backend live and bounded health/session-route
+readiness passes. Frontend VITE_API_URL then changes to /api (merge only), and its
+resulting exact64a3290 deployment must be monitored before hosted session checks.
+Both Auto-Deploy remain Off; no migration rerun or data reset. Owner-applied0022
+is already successful. Local prior tests/backups retained without repetition.
+
+Current147 OWNER CONFIRMED PRODUCTION0022 (2026-10-21 WAT): owner ran the exact
+approved guarded SQL in the existing Supabase project and reported SUCCESS with
+installed_revision0022_login_revocation. Record as owner-operated confirmation;
+agent did not connect to the database. Do NOT rerun0022, stamp, downgrade or
+restore over live data. Fresh Render metadata again verifies Auto-Deploy Off on
+both, master branches unchanged, backend build pip-only. Controlled release
+approval remains granted. Now publish reviewed release64a3290 by normal master
+fast-forward, retain original remote backup, merge only required public URL
+configuration without touching secrets, deploy backend first, then frontend/API
+configuration and perform missing hosted sessions. No repeated tests or backups.
+
 Current146 PRODUCTION ROUTE VERIFIED / APPROVED SQL STEP PENDING (2026-10-21 WAT):
 owner saved backend build-only pip command and ordered frontend rewrites. Fresh
 Render metadata verifies backend Auto-Deploy Off, `pip install -r requirements.txt`,

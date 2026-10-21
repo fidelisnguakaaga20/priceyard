@@ -1,32 +1,41 @@
 {
   "scope": "owner-approved-actual-backup-isolated-recovery-and-local-0022-rehearsal",
-  "verified_date_wat": "2026-10-20",
+  "verified_date_wat": "2026-10-21",
   "release_authorized": true,
   "controlled_release_authorization_date_wat": "2026-10-21",
   "controlled_release_authorization_scope": "existing Render services, same-origin routing, exact0022 migration and controlled deployment with security-compatible application rollback; no new staging/resources",
-  "controlled_release_execution_status": "both_AutoDeploy_Off_verified; backend_build_only_pip_verified; actual_production_API_rewrite_GET_and_invalid_POST_passed; guarded_SQL_given_to_owner_awaiting0022_result; master_unchanged_not_deployed",
+  "controlled_release_execution_status": "owner0022_SUCCESS;master64a3290_published;both_services_LIVE64a3290;production_route_security_HTML_asset_checks_PASS;owner_authenticated_acceptance_pending",
   "controlled_release_source_commit": "64a32909d0185d9487d45aa26b47466492a92557",
   "controlled_release_source_remote_branch": "codex/priceyard-original-preserved-20261016",
   "original_master_remote_backup_branch": "backup/priceyard-production-pre-release-20261021",
   "both_production_auto_deploy_verified_off": true,
-  "production_master_updated": false,
-  "production_application_deployed": false,
+  "production_master_updated": true,
+  "production_master_release_commit": "64a32909d0185d9487d45aa26b47466492a92557",
+  "production_backend_candidate_deploy_id": "dep-dbc17ocs728c73dkqn9g",
+  "production_backend_candidate_status": "live_exact64a3290",
+  "production_frontend_candidate_deploy_id": "dep-dbc19kvavr4c73egctug",
+  "production_frontend_candidate_status": "live_exact64a3290",
+  "production_backend_HTTP_checks": "health200_guest_session401_invalid_cookie401_missing_CSRF403_private_no_store_API404_all_passed",
+  "production_backend_secure_artifact_retained": "dep-dbc17ocs728c73dkqn9g_exact64a3290",
+  "production_application_deployed": true,
   "production_business_data_changed": false,
+  "production0022_owner_confirmed_date_wat": "2026-10-21",
+  "production0022_confirmation_source": "owner_SQL_Editor_SUCCESS_installed_revision0022_login_revocation; no_agent_DB_connection",
   "controlled_release_evidence": "../tools/local-test/evidence/batch-144-controlled-release-authorized.json",
   "completed_recommendations": 35,
   "remaining_recommendations": 1,
   "production_readonly_backup_completed_previously": true,
   "production_connections_during_restore": 0,
   "production_changes": true,
-  "production_change_scope": "owner_saved_AutoDeploy_Off_on_both,backend_build_only_pip_and_frontend_API_rewrite; application_artifacts_unchanged; owner_SQL_result_pending",
+  "production_change_scope": "approved_owner0022_SQL_Render_build_and_routing;approved_master_fast_forward_public_URL_merges_and_both_deployments;no_business_record_resets_or_deletes",
   "migrations_run": 1,
   "push_merge_deploy_performed": true,
-  "push_merge_deploy_scope": "development_and_original_master_backup_branches_pushed_only; no_master_push_merge_or_deployment",
+  "push_merge_deploy_scope": "approved_branches_backup_and_master_fast_forward64a3290;both_Render_services_live",
   "local_fixture_manifest": "RELEASE_GATES.json",
   "gates": [
     {
       "id": "hosting_cookies_browsers",
-      "status": "real_production_same_origin_GET200_invalid_JSON_POST422_passed; candidate_sessions_pending",
+      "status": "production_candidate_anonymous_route_security_cache_checks_PASS;owner_authenticated_acceptance_pending",
       "production_rewrite_owner_saved": true,
       "production_API_health_probe": "200_application_JSON",
       "production_API_anonymous_invalid_JSON_POST": "422_json_invalid; no_credentials_or_customer_rows_submitted",
@@ -63,11 +72,20 @@
       "routing_evidence": "../tools/local-test/evidence/batch-132-render-contract.json",
       "deployed_frontend_API_route_verified": "owner_confirmed_settings_not_live_request",
       "owner_confirmed_frontend_VITE_API_URL": "https://priceyard-api.onrender.com",
-      "owner_confirmed_frontend_rewrites": [{"source": "/*", "destination": "/index.html", "action": "Rewrite"}],
+      "owner_confirmed_frontend_rewrites": [
+        {
+          "source": "/*",
+          "destination": "/index.html",
+          "action": "Rewrite"
+        }
+      ],
       "owner_confirmed_API_proxy_exists": false,
       "candidate_cookie_compatibility_with_confirmed_settings": "fail_based_on_source_and_prior_virtual_browser_contract",
       "configuration_evidence": "../tools/local-test/evidence/batch-133-render-configuration.json",
-      "remaining": "Local same-origin application route/configuration passes. Existing Render configuration remains incompatible and unchanged. Verify actual platform POST/cookie/private-cache behavior under scoped hosted-change approval; preserve React fallback, cookie security and existing provider passes. No custom domain or new service required by the proposed settings; no live outage inferred."
+      "remaining": "Owner final live Google sign-in, dashboard refresh, logout and guest refresh. Real stable Render routing now passes; retired tunnel failure does not block this route. No additional staging or repeat provider tests.",
+      "production_candidate_missing_CSRF_rejected": "403_with_fabricated_invalid_cookie_no_real_credentials",
+      "production_candidate_private_no_store": "passed_on_guest_session_invalid_cookie_me_and_missing_CSRF_logout",
+      "production_candidate_API_404_JSON": "passed"
     },
     {
       "id": "actual_backup_restoration",
@@ -90,7 +108,7 @@
     },
     {
       "id": "production_schema_rollout",
-      "status": "local_rehearsal_passed_awaiting_release_verification",
+      "status": "protected_PG17_rehearsal_passed_production0022_owner_confirmed_secure_candidate_live",
       "local_rehearsal_owner_approved_date_wat": "2026-10-20",
       "actual_data_clone_0022_rehearsal": "passed",
       "offline_0021_to_0022_compilation": "passed",
@@ -100,7 +118,7 @@
       "rollback_candidate_commit": "2cfbfa65447d51b225a0d367433709c25bd6da4a",
       "rollback_candidate_backend_app_tree": "fcc47f0a0d5a1596d8f3cd5790e61f624c3e04ed",
       "local_actual_clone_migrations_run": 1,
-      "remaining": "Local0022 rehearsal passed on restored0021 snapshot. Before release separately confirm current target revision/table owner, exact hosted migration artifact and security-aware application rollback runtime. Never downgrade/delete revocation evidence or overwrite post-snapshot activity. Already0022 targets need separately reviewed follow-up. Production migration remains unauthorized.",
+      "remaining": "Production0022 owner-confirmed successfully once. Preserve migration/grants and all live payments/revocations. Secure exact candidate artifact is now live and retained; local PG17 rollback passed. Do not rerun migration or claim an actual hosted rollback occurred.",
       "local_rehearsal_tables_preserved": 59,
       "local_transaction_rollback_and_failure_recovery": "passed",
       "local_restart_preserves_original_and_security_records": "passed",
@@ -110,13 +128,16 @@
       "local_ram_target_removed": true,
       "migration_sha256": "6b7cd540b41982c13091be3805f4660144b8b9b389224cecf7fa5b85d77469fa",
       "fabricated_privacy_cases_passed": 4,
-      "security_aware_application_artifact_runtime_verified": false,
+      "security_aware_application_artifact_runtime_verified": true,
       "security_aware_application_local_PG17_rollback": "passed_2026-10-20_exact_reviewed_app_source_revoked_token_stays_rejected_and_normal_login_works",
       "rollback_backend_application_tree_matches_current": true,
       "rollback_source_comparison_scope": "backend/app tree matches; earlier candidate lacks current0022 migration privacy safeguard. Preserve current security grants and evidence; do not replay old migration or downgrade. Hosted runtime remains unverified.",
       "production_migration_authorized": true,
       "approved_production_SQL": "sql/PY35_APPROVED_0022_RELEASE.sql",
-      "approved_production_SQL_executed": false
+      "approved_production_SQL_executed": true,
+      "production_installed_revision_owner_confirmed": "0022_login_revocation",
+      "production_SQL_actor": "owner_in_existing_Supabase_SQL_Editor",
+      "hosted_rollback_triggered": false
     },
     {
       "id": "paystack_provider",
@@ -172,7 +193,7 @@
     },
     {
       "id": "hosted_dependencies_environment",
-      "status": "saved_start_command_verified_correct_candidate_build_rollback_still_unverified",
+      "status": "backend_and_frontend_native_builds_live_exact64a3290_secure_backend_artifact_retained",
       "candidate_production_frontend_build": "passed_2026-10-20_TypeScript_and_Vite_reused_isolated_snapshot",
       "candidate_production_Vite_configuration_cases": 7,
       "candidate_production_build_rejects_cross_site_API": true,
@@ -181,10 +202,10 @@
       "Render_workspace_owner_confirmed": "tea-d281vqh5pdvs7383f86g",
       "Render_verified_start_command": "uvicorn app.main:app --host 0.0.0.0 --port $PORT",
       "Render_start_command_verification": "passed_readonly_service_metadata_2026-10-20_supersedes_earlier_owner_transcription",
-      "Render_backend_live_commit": "a9cf1b91029ab6e55e9658a6c2852fdb2f240473",
-      "Render_frontend_live_commit": "76dbd27588de4aa37f3163d8b263d4b72a2cff32",
-      "Render_both_auto_deploy": "master_on_commit_do_not_push_or_change_settings",
-      "Render_backend_build_runs_migration": true,
+      "Render_backend_live_commit": "64a32909d0185d9487d45aa26b47466492a92557",
+      "Render_frontend_live_commit": "64a32909d0185d9487d45aa26b47466492a92557",
+      "Render_both_auto_deploy": "master_Off_verified",
+      "Render_backend_build_runs_migration": false,
       "Render_frontend_type_publish_path": "static_site_dist",
       "Render_recent_deploys_reviewed": "five_per_service_metadata_only_no_rollback_artifact_eligibility_proven",
       "Render_evidence": "../tools/local-test/evidence/batch-134-render-readonly.json",
@@ -193,8 +214,8 @@
       "proposed_start_command_not_applied": "uvicorn app.main:app --host 0.0.0.0 --port $PORT",
       "owner_later_start_clarification": "already correctly contains app.main; exact module:attribute value not supplied",
       "confirmed_live_startup_fault": false,
-      "production_settings_changes": false,
-      "remaining": "Exact hosted build/dependency/runtime/environment compatibility and artifact provenance; local evidence alone is insufficient."
+      "production_settings_changes": true,
+      "remaining": "Owner final authenticated browser acceptance. Both actual native builds and bounded runtime/static checks passed. Existing secrets preserved; actual hosted rollback not intentionally triggered."
     },
     {
       "id": "historical_review_cutover",
@@ -204,6 +225,10 @@
     }
   ],
   "migrations_run_scope": "One committed upgrade in final successful local clone rehearsal; excludes rollback probes and earlier isolated diagnostic attempts. No production migration.",
-  "production_migrations_run": 0,
-  "production_connections_during_local_rehearsal": 0
+  "production_migrations_run": 1,
+  "production_connections_during_local_rehearsal": 0,
+  "production_frontend_HTTP_checks": "login_HTML200_original_React_root_dashboard200_same_SPA_built_JS200",
+  "production_owner_browser_acceptance": "pending_Google_login_dashboard_refresh_logout_guest_refresh",
+  "all_original_operational_gates_passed": false,
+  "hosted_rollback_triggered": false
 }

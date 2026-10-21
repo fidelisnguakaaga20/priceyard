@@ -1,4 +1,30 @@
-# PY-35 final launch result — 2026-10-20 WAT
+# PY-35 controlled release — 2026-10-21 WAT
+
+Current150: **Both approved production deployments are LIVE** at
+`64a32909d0185d9487d45aa26b47466492a92557`. Owner applied reviewed0022 once and
+confirmed `0022_login_revocation`. Auto-Deploy is Off; routine builds no longer
+run migrations. Original master backup and verified encrypted DB recovery remain.
+
+- Backend artifact: `dep-dbc17ocs728c73dkqn9g`; frontend: `dep-dbc19kvavr4c73egctug`.
+- Real Render API GET/POST routing, private/no-store, guest/invalid-cookie401,
+  missing-CSRF403 and API404 JSON checks passed.
+- Production login HTML, original React dashboard fallback and built JS passed.
+- Existing Google/provider TEST/email/PG17/recovery passes retained, not repeated.
+- **Final owner Google login → dashboard refresh → logout → guest refresh is
+  pending.** Do not claim authenticated hosted sessions passed before that result.
+
+No observed failure required rollback. The security-aware backend artifact is
+live/retained and local PG17 rollback passed; an actual Render rollback was not
+triggered. Recovery must preserve0022, grants and live payments/revocations; the
+old pre-security backend is not a safe fallback.
+
+35 recommendations are fully complete; PY-35 approved launch acceptance is pending.
+Broader operational follow-ups (automatic recovery scheduling, alert delivery/
+response ownership, ongoing backup coverage/targets and exceptional historical
+payments) remain explicitly unverified. Do not label all nine original gates
+Passed or restart staging/audits. Current state: `PY35_ACTUAL_RELEASE_GATES.json`.
+
+## Previous prerelease evidence retained for history
 
 Current143: **FAIL — blocked prerequisites, no new hosted test run.** Owner's
 conditional Free API approval requires an isolated test database before creation
