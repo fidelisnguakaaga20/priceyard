@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     paystack_secret_key: str | None = None
     paystack_public_key: str | None = None
     cron_secret: str | None = None
+    ops_recovery_enabled: bool = False
     vapid_public_key: str | None = None
     vapid_private_key: str | None = None
     vapid_claim_email: str = "fidelisnguakaaga20@gmail.com"

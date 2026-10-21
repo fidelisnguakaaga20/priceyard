@@ -19,6 +19,7 @@ from app.routes.feedback_routes import router as feedback_router
 from app.routes.feedback_routes import testimonials_router
 from app.routes.market_routes import router as market_router
 from app.routes.market_signal_routes import router as market_signal_router
+from app.routes.operations_routes import router as operations_router
 from app.routes.payment_routes import router as payment_router
 from app.routes.price_update_routes import router as price_update_router
 from app.routes.push_routes import router as push_router
@@ -64,6 +65,7 @@ app.include_router(market_router)
 app.include_router(price_update_router)
 app.include_router(push_router)
 app.include_router(market_signal_router)
+app.include_router(operations_router)
 app.include_router(quality_signal_router)
 app.include_router(report_export_router)
 app.include_router(buying_zone_router)

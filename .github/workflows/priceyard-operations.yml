@@ -1,0 +1,61 @@
+name: PriceYard operational safeguards
+
+on:
+  schedule:
+    # Two-hour fallback: webhooks remain immediate; avoid keeping Free Render awake.
+    - cron: '17 */2 * * *'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Recover payments, check health only, or verify the failure alert'
+        required: true
+        default: health-only
+        type: choice
+        options:
+          - health-only
+          - recover
+          - simulate-failure
+
+permissions:
+  contents: read
+  actions: read
+  id-token: write
+
+concurrency:
+  group: priceyard-operational-safeguards
+  cancel-in-progress: false
+
+jobs:
+  check-and-recover:
+    # Publishing this workflow does not activate recovery. Enable only after rollout.
+    if: >-
+      github.ref == 'refs/heads/master' &&
+      (vars.PRICEYARD_OPERATIONS_ENABLED == 'true' ||
+       (github.event_name == 'workflow_dispatch' &&
+        (inputs.mode == 'health-only' || inputs.mode == 'simulate-failure')))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    steps:
+      - name: Read the approved operations runner
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1; Node 24
+        with:
+          persist-credentials: false
+          clean: false
+          sparse-checkout: tools/operations
+      - name: Check application and recover recorded payments
+        id: operations
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          OPS_MODE: ${{ inputs.mode || 'recover' }}
+          OPS_STATE_PATH: ${{ runner.temp }}/priceyard-operations/checkpoint.json
+        run: python3 tools/operations/run_operations.py
+      - name: Preserve only the encrypted recovery position
+        if: ${{ always() && steps.operations.outputs.checkpoint-written == 'true' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2; Node 24
+        with:
+          name: priceyard-payment-checkpoint
+          path: ${{ runner.temp }}/priceyard-operations/checkpoint.json
+          retention-days: 14
+          compression-level: 0
+          archive: true
+          if-no-files-found: error

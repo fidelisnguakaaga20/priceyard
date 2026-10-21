@@ -25,6 +25,28 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current152 REQUESTED OPERATIONS VERIFIED LOCALLY / ACTIVATION PENDING
+(2026-10-21 WAT): owner reopened only PY-35 automatic payment recovery, essential
+failure alerts and regular encrypted backups. Original live application/design,
+business rules, revision0022 and all completed evidence preserved. New code:
+hidden disabled-by-default GitHub-OIDC recovery endpoint; existing reconciliation
+rules/PG lock, encrypted cursor, aggregate-only output; gated two-hour GitHub
+schedule with bounded checks and controlled failure test; existing encrypted
+backup core adapted narrowly for0022 and DPAPI/EFS enrolled daily Windows task.
+43 new targeted tests passed (12 backend,21 scheduler,10 backup), six fabricated
+source-identity negatives refused, owner/ACL/EFS/key/DPAPI/child-job/PS syntax
+checks passed. No completed audit, real backup, restoration or migration repeated.
+Owner confirmed GitHub failure-email settings SAVED and browser-only Drive folder
+PriceYard Private Backups. No software/sync client installed; off-device copies
+remain manual encrypted uploads. New code is prepared, not falsely called active.
+Latest owner instruction forbids production changes: no master push, deployment,
+live recovery/alert check, new export, credential enrollment or task registration
+has occurred. Need approval for exact backend-only activation and one private
+backup enrollment; observe real workflow/alert receipt/first scheduled backup
+before claiming completion. 35 fully complete, PY-35 partial, 1 remaining.
+See docs/PY35_OPERATIONAL_SAFEGUARDS.md and batch-145 local evidence. No new
+features, schema, customer-data edits, provider credentials or paid resources.
+
 Current151 APPROVED CONTROLLED RELEASE PASS / LIVE (2026-10-21 WAT): owner
 confirmed PASS for actual permanent-site Google login, dashboard refresh retaining
 login, logout and refresh retaining signed-out state. Authenticated hosted cookie
