@@ -289,6 +289,7 @@ html.easy-reading .confidence-badge, html.easy-reading .movement { font-weight: 
 .single-price-details strong { font-size: 1.2rem; color: var(--color-text); }
 .single-price-details time { font-size: .85rem; color: var(--color-text-muted); }
 .history-single-price .trend-explanation { margin-bottom: 0; }
+.history-back-to-filters { position: fixed; left: max(12px, calc((100vw - 1180px) / 2)); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); z-index: 45; gap: 8px; max-width: calc(100vw - 112px); box-shadow: 0 4px 18px rgba(0, 0, 0, .18); }
 @media (max-width: 640px) {
   .trend-chart, .history-single-price { padding: 16px 12px; }
   .trend-heading h2 { font-size: 1.05rem; }

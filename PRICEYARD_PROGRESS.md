@@ -25,6 +25,26 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current159 THREE APPROVED NAVIGATION IMPROVEMENTS / VERIFIED FOR RELEASE
+(2026-10-22 WAT): resumed the saved changes; owner explicitly approved completing,
+committing, pushing and deploying all three frontend improvements. Every price
+card now has View history using existing commodity/market IDs; history preselects
+them, handles back/forward links and preserves manual choices during session
+refresh. Compact header retains all navigation/ticker/preferences, readable Easy
+reading and44px navigation/toggle targets; brand/Menu share one mobile row.
+Measured header offset bounds the menu in short landscape screens. Back to filters
+appears after the form scrolls above the header, avoids WhatsApp, scrolls beneath
+the sticky header, focuses Commodity and honors reduced motion. No access or
+business-rule changes. TypeScript/Vite production build +seven existing origin
+admission cases passed;14 price/chart regressions passed; nine focused navigation
+checks passed on final build, including seven widths320–1920/Easy on-off,
+844x390 landscape, guest/trial/Admin access, stable renamed IDs and keyboard focus.
+Landscape clipping found in the first run was corrected before release. Visual
+desktop/mobile/filter screenshots reviewed. Synthetic-only, no DB writes,
+production contacts, migrations, dependency changes or new services. Evidence:
+batch-151-navigation-ux.json. Release only the existing frontend;35/36 remain
+complete, secure automatic backup still paused awaiting Supabase support.
+
 Current158 CHART USABILITY CORRECTION LIVE / RELEASE PASS
 (2026-10-21 WAT): approved13c9e3b4ab75cade0ea6d7d68cef1387c48da86c
 committed and atomic fast-forward pushed to master/development after157 build,

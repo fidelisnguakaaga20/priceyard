@@ -29,3 +29,7 @@ export function addIdentityFilter(query: URLSearchParams, key: "commodity" | "ma
 export function commodityLink(record: NamedRecord): string {
   return `/commodities/${encodeURIComponent(record.name)}?commodity_id=${record.id}`;
 }
+
+export function priceHistoryLink(record: { commodity_id: number; market_id: number }): string {
+  return `/history?${new URLSearchParams({ commodity_id: String(record.commodity_id), market_id: String(record.market_id) })}`;
+}

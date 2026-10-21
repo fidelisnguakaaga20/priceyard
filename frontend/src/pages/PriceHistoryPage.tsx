@@ -1,4 +1,6 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { BackToFilters } from "../components/BackToFilters";
 import { Disclaimer, PRICE_DISCLAIMER } from "../components/Disclaimer";
 import { ButtonSpinner, LoadingSpinner } from "../components/LoadingSpinner";
 import { PremiumGate } from "../components/PremiumGate";
@@ -7,7 +9,7 @@ import { useAuth } from "../context/AuthContext";
 import { useHistoricalCommodityMarketPairs } from "../hooks/useCommodityMarketPairs";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { apiFetch } from "../services/api";
-import { addIdentityFilter, identityLabel, identityValue, nameSelection, selectedIdentity } from "../services/priceIdentity";
+import { addIdentityFilter, identityLabel, identityValue, nameSelection, selectedIdentity, selectionFromQuery } from "../services/priceIdentity";
 import type { Commodity, Market, PriceUpdate } from "../types/api";
 import { confidenceClass, money, movementIcon } from "../utils";
 
@@ -16,11 +18,15 @@ import { PRICE_TIME_LABEL, shortPriceDate } from "../utils/priceTime";
 export function PriceHistoryPage() {
   useDocumentTitle("Price History");
   const { token, hasFullAccess, loading: authLoading } = useAuth();
+  const [searchParams] = useSearchParams();
+  const lastQuery = useRef(searchParams.toString());
+  const filtersRef = useRef<HTMLFormElement>(null);
   const [items, setItems] = useState<PriceUpdate[]>([]);
   const [commodities, setCommodities] = useState<Commodity[]>([]);
   const [markets, setMarkets] = useState<Market[]>([]);
-  const [commodity, setCommodity] = useState(nameSelection("Egusi"));
-  const [market, setMarket] = useState("");
+  const [commodity, setCommodity] = useState(() => searchParams.has("commodity_id") || searchParams.has("commodity")
+    ? selectionFromQuery(searchParams, "commodity") : nameSelection("Egusi"));
+  const [market, setMarket] = useState(() => selectionFromQuery(searchParams, "market"));
   const commodityMarketPairs = useHistoricalCommodityMarketPairs(hasFullAccess ? token : null);
   const commodityLabel = identityLabel(commodity, commodities);
   const marketLabel = identityLabel(market, markets);
@@ -65,6 +71,15 @@ export function PriceHistoryPage() {
   useEffect(() => {
     let current = true;
     if (!authLoading && hasFullAccess) {
+      const queryChanged = lastQuery.current !== searchParams.toString();
+      lastQuery.current = searchParams.toString();
+      const requestedCommodity = queryChanged
+        ? searchParams.has("commodity_id") || searchParams.has("commodity")
+          ? selectionFromQuery(searchParams, "commodity") : nameSelection("Egusi")
+        : commodity;
+      const requestedMarket = queryChanged ? selectionFromQuery(searchParams, "market") : market;
+      const requestedTime = queryChanged ? "" : timeOfDay;
+      setCommodity(requestedCommodity); setMarket(requestedMarket); setTimeOfDay(requestedTime);
       setLoading(true);
       void Promise.all([
         apiFetch<Commodity[]>("/commodities"),
@@ -73,16 +88,18 @@ export function PriceHistoryPage() {
         if (!current) return;
         setCommodities(commodityItems);
         setMarkets(marketItems);
-        const chosenCommodity = selectedIdentity(commodity, commodityItems);
-        const chosenMarket = selectedIdentity(market, marketItems);
+        const chosenCommodity = selectedIdentity(requestedCommodity, commodityItems);
+        const chosenMarket = selectedIdentity(requestedMarket, marketItems);
         setCommodity(chosenCommodity); setMarket(chosenMarket);
-        void load({ commodity: chosenCommodity, market: chosenMarket, timeOfDay });
+        void load({ commodity: chosenCommodity, market: chosenMarket, timeOfDay: requestedTime });
       }).catch((err: Error) => { if (current) { setError(err.message); setLoading(false); } });
     } else if (!authLoading) {
       setItems([]); setError(""); setLoading(false);
     }
     return () => { current = false; requestSequence.current++; };
-  }, [authLoading, hasFullAccess, token]);
+  }, [authLoading, hasFullAccess, token, searchParams]);
+
+  useEffect(() => { window.scrollTo({ top: 0, behavior: "auto" }); }, [searchParams]);
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
@@ -104,12 +121,13 @@ export function PriceHistoryPage() {
     </div>
 
     {authLoading ? <LoadingSpinner label="Checking price-history access…" /> : !hasFullAccess ? <PremiumGate><></></PremiumGate> : <>
-      <form className="filter-bar" onSubmit={submit}>
+      <form ref={filtersRef} className="filter-bar history-filters" onSubmit={submit}>
         <label>Commodity<select value={selectedIdentity(commodity, commodities)} onChange={(e) => changeCommodity(e.target.value)}><option value="">Choose a commodity</option>{commodities.map((item) => <option value={identityValue(item.id)} key={item.id}>{item.name}</option>)}</select></label>
         <label>Market<select value={selectedIdentity(market, markets)} onChange={(e) => setMarket(e.target.value)}><option value="">Choose a market</option>{availableMarkets.map((item) => <option value={identityValue(item.id)} key={item.id}>{item.name}</option>)}</select>{commodity && availableMarkets.length < markets.length && <small className="muted">{commodityLabel} is only tracked at {availableMarkets.length} market{availableMarkets.length === 1 ? "" : "s"} here.</small>}</label>
         <label>Time of day<select value={timeOfDay} onChange={(e) => setTimeOfDay(e.target.value)}><option value="">Any time</option><option>morning</option><option>afternoon</option><option>evening</option><option>closing</option></select></label>
         <div className="filter-actions"><button className="button button-small" disabled={loading}>{loading ? <ButtonSpinner label="Please wait…" /> : "Search history"}</button></div>
       </form>
+      <BackToFilters filtersRef={filtersRef} enabled={hasFullAccess && !authLoading} />
 
       {loading ? <LoadingSpinner label="Loading price history…" /> : error ? <div className="status-box error">{error}</div> : <>
         <PriceTrendChart items={items} />

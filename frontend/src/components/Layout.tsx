@@ -34,11 +34,24 @@ export function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
   const menuButton = useRef<HTMLButtonElement>(null);
   const [loggingOut, setLoggingOut] = useState(false);
   const [tickerPrices, setTickerPrices] = useState<PriceUpdate[]>([]);
   const [tickerSavedAt, setTickerSavedAt] = useState<string | null>(null);
   const showTicker = !TICKER_HIDDEN_PREFIXES.some((prefix) => location.pathname.startsWith(prefix));
+
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+    // Keep the menu within the space below the whole sticky header, including
+    // preferences and ticker, even on a short landscape screen.
+    const measure = () => header.style.setProperty("--priceyard-header-bottom", `${Math.ceil(header.getBoundingClientRect().bottom)}px`);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(header);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!showTicker) return;
@@ -84,7 +97,7 @@ export function Layout() {
 
   return (
     <div className="app-shell">
-      <header className="site-header">
+      <header ref={headerRef} className="site-header">
         <div className="header-inner">
           <Link to="/" className="brand" onClick={() => setOpen(false)}>
             <span className="brand-mark">PY</span>
@@ -112,7 +125,7 @@ export function Layout() {
           </nav>
         </div>
         <div className="access-strip">
-          <span>Access: <strong>{accessLabel}</strong></span>{user && <span>{user.full_name}</span>}
+          <span className="access-identity"><span>Access: <strong>{accessLabel}</strong></span>{user && <span>{user.full_name}</span>}</span>
           <span className="display-toggles">
             <button type="button" className={dataSaver ? "toggle-pill on" : "toggle-pill"} aria-pressed={dataSaver} onClick={toggleDataSaver}>Data saver: {dataSaver ? "On" : "Off"}</button>
             <button type="button" className={easyReading ? "toggle-pill on" : "toggle-pill"} aria-pressed={easyReading} onClick={toggleEasyReading}>Easy reading: {easyReading ? "On" : "Off"}</button>

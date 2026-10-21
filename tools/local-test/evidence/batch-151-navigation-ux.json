@@ -1,0 +1,29 @@
+{
+  "date_wat": "2026-10-22",
+  "owner_approved": ["View history beside prices", "Compact header", "Back to filters", "Commit, push and frontend deployment"],
+  "production_build": {"typescript": "PASS", "vite": "PASS", "existing_api_origin_admission_cases": 7},
+  "price_chart_regressions": {"passed": 14, "scope": "Existing price presentation suite after navigation changes"},
+  "navigation_checks": {
+    "passed": 9,
+    "stable_id_links_and_guest_gate": true,
+    "renamed_records_selected_by_ids": true,
+    "browser_back_forward_updates_filters": true,
+    "manual_filters_survive_session_refresh": true,
+    "back_to_filters_visibility_focus_reduced_motion_sticky_offset": true,
+    "admin_direct_history_access_preserved": true,
+    "header_and_every_nav_action_fit_all_tested_widths": true,
+    "mobile_menu_admin_links_escape_focus_preserved": true,
+    "landscape_menu_and_logout_reachable": true,
+    "widths": [320, 375, 768, 1280, 1281, 1366, 1920],
+    "easy_reading": [false, true],
+    "landscape": {"width": 844, "height": 390},
+    "minimum_nav_and_preference_target_pixels": 44,
+    "external_page_requests": 0, "production_connections": 0,
+    "database_changes": 0, "page_errors": []
+  },
+  "visual_review": "Desktop Admin/Easy reading, mobile header/filters and keyboard return focus screenshots reviewed",
+  "initial_failure_fixed": "Landscape menu bound now includes header screen offset before deployment",
+  "backend_workflow_dependencies_changed": false,
+  "migrations": false,
+  "checklist": {"complete": 35, "remaining": "PY-35 secure automatic backup verification"}
+}
