@@ -74,6 +74,15 @@ html.easy-reading .confidence-badge, html.easy-reading .movement { font-weight: 
 .price-card { min-width: 0; overflow-wrap: anywhere; }
 .price-card .card-row > div { min-width: 0; }
 .price-card .movement { flex-shrink: 0; }
+.commodity-price-card { align-self: start; }
+.commodity-price-card > h2 { font-size: 1.4rem; margin: 0 0 16px; }
+.commodity-price-card .price-option { padding-block: 18px; border-top: 1px solid var(--color-border); }
+.commodity-price-card .price-option:last-child { padding-bottom: 0; }
+.commodity-price-card .price-option .card-row { gap: 10px; }
+.commodity-price-card .price-option h3 { font-size: 1rem; margin: 0; }
+.commodity-price-card .price-option .price-range { font-size: 1.35rem; margin-top: 10px; }
+.commodity-price-card .price-option .muted { margin-block: 6px; }
+.commodity-price-card .price-option .mini-grid { margin-block: 14px; }
 .movement { display: inline-flex; padding: 5px 9px; border-radius: 999px; background: #eef1ec; font-size: .77rem; text-transform: capitalize; font-weight: 800; }.movement-up { background: #e4f0df; color: #27622f; }.movement-down { background: #f5e6e3; color: #914238; }.movement-stable { background: #e9edf0; color: #4d5c67; }
 .three-column { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }.info-tile { border-top: 2px solid #638148; padding: 22px 5px; }.info-tile span { font-weight: 800; color: #8a9a83; }.info-tile p { line-height: 1.65; color: var(--color-text-muted); }
 .testimonial-card { display: flex; flex-direction: column; gap: 10px; }.testimonial-stars { color: #c9971f; letter-spacing: 2px; }.testimonial-card p { line-height: 1.6; color: var(--color-text); font-style: italic; }.testimonial-card strong { color: var(--color-text); }
@@ -247,9 +256,13 @@ html.easy-reading .confidence-badge, html.easy-reading .movement { font-weight: 
 .season-note { display: block; margin-top: 6px; color: #d99a2b; font-weight: 700; }
 .trend-chart { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px; padding: 18px 20px 14px; margin: 0 0 22px; box-shadow: 0 8px 30px var(--color-card-shadow); }
 .trend-chart svg { width: 100%; height: auto; display: block; }
-.trend-band { fill: #d9ead1; opacity: .6; stroke: none; }
-.trend-line { stroke: #214e34; stroke-width: 2.5; }
-.trend-dot { fill: #214e34; }
+.trend-band { fill: var(--color-link); opacity: .15; stroke: none; }
+.trend-line { stroke: var(--color-link); stroke-width: 2.5; }
+.trend-dot { fill: var(--color-link); }
+.trend-range { stroke: var(--color-link); stroke-width: 2; }
+.trend-explanation { margin: 0 0 12px; color: var(--color-text-muted); font-size: .85rem; line-height: 1.5; }
+.trend-chart-scale { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: .85rem; color: var(--color-text); }
+.history-price-series > p { overflow-wrap: anywhere; }
 .trend-chart-labels { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px; font-size: .78rem; color: var(--color-text-muted); }
 .trend-chart-labels .muted { flex: 1; text-align: center; }
 @media (max-width: 640px) { .trend-chart-labels .muted { display: none; } }

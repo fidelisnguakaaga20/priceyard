@@ -25,6 +25,25 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current155 OWNER-APPROVED PRICE PRESENTATION / LOCAL VERIFICATION PASSED
+(2026-10-21 WAT): owner approved reducing repeated commodity photographs and
+restoring useful history graphs while awaiting Supabase support. Current Prices
+now shares one photo/title per commodity ID, retaining every returned record's
+market, recorded measurements, status, notes, watch/share/report actions and
+filters. Homepage cards remain unchanged. History retains connected trends for
+complete matching specifications; older records missing measurement/type details
+now appear as separate, explicitly unconnected low/high-range markers. Single
+records remain visible. Invalid prices/unconfirmed timestamps stay in the table
+with an explanation, without guessed dates, units or cross-measurement trends.
+Chart colours follow the original light/dark themes. Production-mode TypeScript/
+Vite build passed, including seven existing API-origin admission cases; eight
+focused synthetic browser checks passed (identity/actions/filtering, graph
+accuracy and desktop/mobile/easy-reading/themes), no external requests/database
+changes. Evidence: batch-147-price-presentation.json. Local changes only: no push,
+deployment, backend/database change or repeat backup/restore. 35/36 remain
+complete: daily encrypted backup is still paused for the documented transport
+blocker; live payment recovery/alerts and verified backups remain preserved.
+
 Current154 TWO OPERATIONAL SAFEGUARDS PASS / BACKUP TRANSPORT BLOCKED
 (2026-10-21 WAT): approved backendce0ca70 remains LIVE; two-hourly GitHub recovery
 and actual delivered failure email passed153. Owner completed private enrollment

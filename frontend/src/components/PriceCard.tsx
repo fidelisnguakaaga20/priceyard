@@ -12,7 +12,7 @@ import { commodityLink } from "../services/priceIdentity";
 import type { PriceUpdate } from "../types/api";
 import { commodityTitleColor, confidenceClass, money, movementIcon, priceShareContent, whatsAppShareUrl } from "../utils";
 
-export function PriceCard({ item }: { item: PriceUpdate }) {
+export function PriceCard({ item, compact = false }: { item: PriceUpdate; compact?: boolean }) {
   const { token } = useAuth();
   const { showToast } = useToast();
   const [saving, setSaving] = useState(false);
@@ -40,13 +40,16 @@ export function PriceCard({ item }: { item: PriceUpdate }) {
     }
   };
 
+  const Container = compact ? "section" : "article";
   return (
-    <article className="card price-card">
-      <CommodityImage src={item.commodity.image_url} alt={item.commodity.name} />
+    <Container className={compact ? "price-card price-option" : "card price-card"}>
+      {!compact && <CommodityImage src={item.commodity.image_url} alt={item.commodity.name} />}
       <div className="card-row">
         <div>
-          <span className="eyebrow">{item.market.name}</span>
-          <h3 style={{ color: commodityTitleColor(item.commodity.name) }}>{item.commodity.name}</h3>
+          {compact ? <h3>{item.market.name}</h3> : <>
+            <span className="eyebrow">{item.market.name}</span>
+            <h3 style={{ color: commodityTitleColor(item.commodity.name) }}>{item.commodity.name}</h3>
+          </>}
         </div>
         <span className={`movement movement-${item.movement}`}>{movementIcon(item.movement)} {item.movement}</span>
       </div>
@@ -70,6 +73,6 @@ export function PriceCard({ item }: { item: PriceUpdate }) {
         )}
         <FlagPriceButton priceUpdateId={item.id} />
       </div>
-    </article>
+    </Container>
   );
 }

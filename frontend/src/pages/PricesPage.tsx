@@ -2,7 +2,7 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Disclaimer, PRICE_DISCLAIMER } from "../components/Disclaimer";
 import { ButtonSpinner, LoadingSpinner } from "../components/LoadingSpinner";
-import { PriceCard } from "../components/PriceCard";
+import { GroupedPriceCards } from "../components/GroupedPriceCards";
 import { SavedPriceNotice } from "../components/SavedPriceNotice";
 import { useCommodityMarketPairs } from "../hooks/useCommodityMarketPairs";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
@@ -114,7 +114,7 @@ export function PricesPage() {
     </form>
     {error && <div className="status-box error">{error}</div>}
     {!loading && items.length > 0 && <SavedPriceNotice savedAt={savedAt} />}
-    {loading || filtersLoading ? <LoadingSpinner label="Loading approved prices…" /> : items.length ? <div className="card-grid">{items.map((item) => <PriceCard key={item.id} item={item} />)}</div> : <div className="status-box">No current prices found{commodity ? ` for ${commodityLabel}` : ""}{market ? ` at ${marketLabel}` : ""}. Try clearing the filters or check back soon for new records.</div>}
+    {loading || filtersLoading ? <LoadingSpinner label="Loading approved prices…" /> : items.length ? <GroupedPriceCards items={items} /> : <div className="status-box">No current prices found{commodity ? ` for ${commodityLabel}` : ""}{market ? ` at ${marketLabel}` : ""}. Try clearing the filters or check back soon for new records.</div>}
     <Disclaimer>{PRICE_DISCLAIMER}</Disclaimer>
   </section>;
 }
