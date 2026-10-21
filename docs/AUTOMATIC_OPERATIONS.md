@@ -57,8 +57,11 @@ simulate-failure**; this mode contacts neither the application nor Paystack.
 - Rotating the application's existing signing secret invalidates old encrypted
   checkpoints. Stop the workflow and deliberately remove only its checkpoint
   artifacts before resuming a full idempotent scan; never alter payment records.
-- The workflow is prepared locally until the release evidence records its
-  production activation, a successful run, and confirmed failure-email receipt.
+- Activated with owner approval on2026-10-21 at reviewedce0ca70. Real runs
+  39559936636 and39560074138 passed, including saved checkpoint retrieval;
+  intentional failure39560232468 produced the confirmed approved-owner email.
+  This does not certify the separately paused Windows backup task. Exact results:
+  `tools/local-test/evidence/batch-146-operational-activation.json`.
 
 Sources: [GitHub OIDC](https://docs.github.com/en/actions/concepts/security/openid-connect),
 [workflow notifications](https://docs.github.com/en/account-and-profile/managing-subscriptions-and-notifications-on-github/setting-up-notifications/configuring-notifications),

@@ -25,6 +25,60 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current154 TWO OPERATIONAL SAFEGUARDS PASS / BACKUP TRANSPORT BLOCKED
+(2026-10-21 WAT): approved backendce0ca70 remains LIVE; two-hourly GitHub recovery
+and actual delivered failure email passed153. Owner completed private enrollment
+and switched to the correct phone hotspot. Both tested local connections still
+cannot resolve the pinned Direct host (Windows11001) and have no usable IPv6.
+Existing confirmed IPv4 Session pooler is reachable. One pinned verify-full/
+same-CA/enrolled-password identity probe passed client TLS, PG17, dbpostgres,
+rolepostgres, read-onlyON and revision0022; its distinct pooler-to-database
+connection reports PostgreSQL SSL=false. One final own-backend metadata-only
+classification confirmed nonlocal transport, not Unix/loopback. GSS encryption
+was not checked; do not claim all transport is unencrypted. This fails the
+unchanged existing database-TLS guard; verified client TLS does not prove upstream
+TLS. No guard weakened, export/dump/new archive/restore/migration or provider
+setting change occurred. No more probes, password requests or network-switch
+loops. Only the newly registered daily backup task is Disabled; protected
+enrollment, task settings, original helpers and verified archives/Drive copy stay.
+35/36 complete; PY-35 cannot close until backup can use a transport satisfying
+the required security guard and an actual scheduled archive succeeds. A working
+IPv6 Direct connection is the unchanged secure path. Any alternative trust-policy
+exception needs a separate explicit decision, not a silent relaxation.
+Recovery/alerts remain active; production application and data are preserved.
+No further development, services, spending or production changes are authorized
+merely to force36/36. Evidence: batch-146-operational-activation.json.
+
+Current153 APPROVED OPERATIONAL ACTIVATION / BACKUP VERIFICATION PENDING
+(2026-10-21 WAT): owner explicitly approved backend-only deployment, two-hourly
+recovery/alerts and existing-tool daily encrypted backups; manual Drive uploads.
+Reviewed ce0ca7066e465c19b64498744c805b08e1eed03f was fast-forward published to
+master/development with both Auto-Deploy settings verified Off and backend build
+pip-only. Only backend OPS_RECOVERY_ENABLED=true merged; deployment
+dep-dbc68a5g1s2s7396tnog LIVE at exactce0ca70. Existing frontend remains64a3290;
+no migrations/schema/business-rule changes or new services/expenses. Missing and
+fabricated operational auth both401 private/no-store; health200. Immutable GitHub
+repo/owner identities independently matched before activation. Public repository
+variable PRICEYARD_OPERATIONS_ENABLED=true verified, workflow active. Real runs
+39559936636 and39560074138 PASSED, including persisted encrypted checkpoint read
+on second run. Intentional alert-only run39560232468 failed exactly as designed;
+actual matching GitHub email verified in approved owner's Gmail INBOX at
+2026-10-21T07:11:41Z. No application/provider call in the alert simulation.
+Reviewed backup adapter installed outside Git; owner confirmed hidden enrollment
+ENROLLED. Daily20:00WAT original-owner/limited/network/catchup/no-overlap/10min task
+registered; first actual task failed safely before any pg_dump/roles export/new
+archive. Current network lacks the Direct endpoint's required IPv6 route; exact
+native failure not logged, so do not claim an unconfirmed cause. Bounded
+credential-free connectivity check pending; preserve enrollment/old archives,
+New task now Disabled with registration/enrollment preserved. Credential-free
+pinned-host lookup returned Windows DNS11001 and no address; no TCP/auth/export
+was attempted by that probe. Current network therefore cannot reach the Direct
+backup endpoint. Owner asked to reconnect the previously working phone hotspot;
+then verify reachability before enabling/running the already-enrolled task once.
+No password re-entry or repeat setup needed. No new
+password prompt, restore, migration or upload. 35 complete, PY-35 partial until
+the first scheduled backup succeeds; recovery and delivered alerts are verified.
+
 Current152 REQUESTED OPERATIONS VERIFIED LOCALLY / ACTIVATION PENDING
 (2026-10-21 WAT): owner reopened only PY-35 automatic payment recovery, essential
 failure alerts and regular encrypted backups. Original live application/design,
@@ -1644,7 +1698,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-32 | Preserve unused purchased/trial time | Complete for approved rules in batches14/21; batch87 closes the confirmed stale single-account GET/renewal race under existing locks. Paid/trial value, indefinite grants/review and payment evidence preserved; full307 backend tests, actual PG blocking/twelve interleavings and value/review browser checks pass |
 | PY-33 | Validate payment evidence | Complete for application evidence paths in batches 8/9/15/19: signed webhook, checkout/reference/amount/currency/ID verification and concurrent provider-verification/webhook replay; live-provider operational verification separate |
 | PY-34 | Expiry without unintended staff-role loss | Complete in batch2; batch87 additionally verifies locked single-account expiry versus payment for ordinary/Reporter/Admin users, genuine expiry/history/rollback and eight-role browser access |
-| PY-35 | Operational readiness and dependency evidence | Approved production release PASS/LIVE151: owner0022 once, both64a3290 builds live, actual Render routing/private cache/negative-CSRF/API404/SPA/assets and owner Google login/refresh/logout/refresh passed; genuine TEST payment/webhook/replay/email and protected backup/restoration/PG17 rollback evidence retained. Partial only for broader post-launch operations: automatic recovery scheduling, alert delivery/on-call/broader checks, continuing backup targets/coverage and exceptional historical review. No launch blocker demonstrated; do not repeat tests, rerun migration or label every operational gate Passed. |
+| PY-35 | Operational readiness and dependency evidence | Application LIVE; reviewed backendce0ca70 operational rollout PASS153. Two-hourly GitHub recovery passed two real runs including encrypted checkpoint retrieval; controlled failure email received in approved inbox. Existing release/provider/backup/restoration/rollback evidence retained. Remaining requested safeguard: daily encrypted backup installed/enrolled but paused154; Direct host unavailable on tested IPv4 networks and Session pooler's nonlocal database hop fails the unchanged PostgreSQL TLS guard. No guard relaxation or export; preserve existing backups. 35/36 complete until secure scheduled backup verification succeeds. No repeat audits/migrations or invented new release tasks. |
 | PY-36 | Accurate progress/documentation/maintainability | Current application documentation/identified six-form readability scope complete in61: exact106-operation API index, approved contracts, safe local recovery/resumption guide and README links; six original intelligence forms expanded for maintenance with identical emitted syntax and byte-identical compiled JS/CSS. Progress/approvals/evidence current; future maintenance does not reopen this scope. Production rollout/provider documentation verification remains PY-35 |
 
 ## Verified results and batch history

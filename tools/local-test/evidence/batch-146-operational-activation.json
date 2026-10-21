@@ -1,0 +1,70 @@
+{
+  "date": "2026-10-21",
+  "scope": "Approved final PY-35 operational activation",
+  "source_commit": "ce0ca7066e465c19b64498744c805b08e1eed03f",
+  "backend_deploy": "dep-dbc68a5g1s2s7396tnog",
+  "backend_status": "live",
+  "frontend_unchanged": true,
+  "auto_deploy_both_services": "off",
+  "backend_build_migrations": false,
+  "production_migrations": 0,
+  "new_services": 0,
+  "new_paid_resources": 0,
+  "operational_endpoint_negative_auth": {
+    "missing": 401,
+    "fabricated": 401,
+    "private_no_store": true
+  },
+  "github_workflow_state": "active",
+  "github_schedule_gate": true,
+  "schedule": "17 */2 * * * UTC",
+  "recovery_runs": [
+    {"id": 39559936636, "conclusion": "success"},
+    {"id": 39560074138, "conclusion": "success", "persisted_checkpoint_retrieval": "passed"}
+  ],
+  "controlled_alert": {
+    "run_id": 39560232468,
+    "conclusion": "expected_simulated_failure",
+    "production_requests": 0,
+    "email_received": true,
+    "receipt_verified_at": "2026-10-21T07:11:41Z",
+    "approved_owner_inbox": true
+  },
+  "backup": {
+    "adapter_installed_outside_git": true,
+    "owner_hidden_enrollment": "confirmed_and_protected",
+    "task": "PriceYard encrypted daily backup 0022",
+    "daily_local_time": "20:00 Africa/Lagos",
+    "owner_limited_interactive": true,
+    "network_and_missed_run_catchup": true,
+    "overlap": "IgnoreNew",
+    "runtime_minutes": 10,
+    "first_execution": "failed_safely",
+    "new_archive_created": false,
+    "current_task_state": "disabled_pending_network_correction",
+    "confirmed_direct_endpoint_dns_error": 11001,
+    "current_ipv6_default_route": false,
+    "phone_hotspot_correctly_selected": true,
+    "phone_hotspot_direct_dns_error": 11001,
+    "session_pooler_probe": {
+      "pinned_ipv4_session_endpoint_reachable": true,
+      "enrolled_password_valid": true,
+      "client_tls_verified_full_existing_ca": true,
+      "read_only_on": true,
+      "expected_pg17_database_role_revision": true,
+      "distinct_database_connection_postgresql_ssl": false,
+      "database_connection_transport": "nonlocal_not_unix_or_loopback",
+      "database_connection_gss_encryption": "not_checked_unknown",
+      "source_guard": "failed_unchanged_upstream_tls_requirement",
+      "exports": 0,
+      "provider_setting_changes": 0,
+      "security_guard_relaxed": false
+    },
+    "earlier_native_exception": "not_recorded_cause_not_assumed",
+    "existing_archives_and_enrollment_preserved": true,
+    "drive": "manual browser uploads only"
+  },
+  "overall": "incomplete_backup_secure_transport_blocker",
+  "recommendations_fully_complete": 35,
+  "remaining": ["PY-35 scheduled backup verification"]
+}

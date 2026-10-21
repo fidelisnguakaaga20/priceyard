@@ -1,7 +1,11 @@
 # Existing Windows encrypted backup: recurring adapter
 
-Prepared only. No enrollment, scheduled task, new export or upload is performed
-by adding these files. Preserve the verified original archive/recovery evidence.
+2026-10-21 activation: adapter installed outside Git, owner privately enrolled and
+daily task registered. The task is **paused** after failing safely before export.
+Tested networks lack usable Direct IPv6; existing Session pooler passes client
+TLS but fails the unchanged separate database-TLS guard on a nonlocal hop. Do
+not weaken that guard or claim a successful daily backup. Enrollment and the
+verified original archive/recovery evidence are preserved; no upload occurred.
 
 The immutable existing Direct helper is reused by SHA256. Exactly three entry
 changes are reviewed: installed revision0022, explicit enrolled-context guard,
