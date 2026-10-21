@@ -25,6 +25,25 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current160 THREE NAVIGATION IMPROVEMENTS LIVE / RELEASE PASS
+(2026-10-22 WAT): reviewed a0cb706cd8abfeb2ed3e0c67e1c498629a462a89 committed
+and atomic fast-forward pushed to master/development. Existing frontendpriceyard
+deploydep-dbckl4vb9u1s73c0l530 is LIVE at exacta0cb706. Both services Auto-Deploy
+remain Off; only frontend triggered, with no settings changes. Reused verified
+159 build/seven admission cases,14 price/chart regressions and9 focused navigation
+checks. Read-only live browser PASS: View history IDs match public price records,
+compact mobile header/Menu work, all3 feature code served in
+/assets/index-S0KrnKA7.js, all public prices preserved, guest history gate and
+private401 session boundary intact. All writes blocked; no account login or
+customer access. Protected history selection/Back to filters verified with
+synthetic trial/Admin accounts, not production accounts. Backend remainsce0ca70
+atdep-dbc68a5g1s2s7396tnog; no backend deploy, migrations, subscriptions/payment/data
+changes or new services. Prior frontend13c9e3b/deploydep-dbc886ss728c73eav8ag
+retained for rollback. Local synthetic preview stopped after verification.
+Evidence: batch-152-navigation-release.json. Owner can hard-refresh /prices,
+click View history and verify filters, shrink browser for Menu, then scroll
+history and use Back to filters. 35/36 complete; backup transport blocker remains.
+
 Current159 THREE APPROVED NAVIGATION IMPROVEMENTS / VERIFIED FOR RELEASE
 (2026-10-22 WAT): resumed the saved changes; owner explicitly approved completing,
 committing, pushing and deploying all three frontend improvements. Every price

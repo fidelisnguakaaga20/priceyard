@@ -1,0 +1,33 @@
+{
+  "date_wat": "2026-10-22",
+  "status": "PASS",
+  "owner_authorized": true,
+  "source_commit": "a0cb706cd8abfeb2ed3e0c67e1c498629a462a89",
+  "git": {"atomic_fast_forward_master_and_development": true, "published_refs_verified": true},
+  "local_evidence": "batch-151-navigation-ux.json",
+  "frontend": {
+    "service": "srv-da6ddb2jnfac73e39490",
+    "deploy": "dep-dbckl4vb9u1s73c0l530",
+    "status": "live", "exact_commit_verified": true,
+    "retained_previous_deploy": "dep-dbc886ss728c73eav8ag"
+  },
+  "read_only_live_browser": {
+    "status": "PASS",
+    "public_history_links_match_price_record_ids": true,
+    "mobile_compact_header_and_menu": true,
+    "all_three_navigation_features_served": true,
+    "all_public_price_options_preserved": true,
+    "desktop_mobile_no_overflow": true,
+    "guest_history_access_preserved": true,
+    "unauthenticated_session_private_401": true,
+    "app_asset": "/assets/index-S0KrnKA7.js",
+    "write_requests_sent": 0,
+    "blocked_write_requests": [{"method": "POST", "path": "/api/activity/ping"}],
+    "blocked_external_requests": 0,
+    "account_login_or_customer_access_attempts": 0,
+    "protected_history_and_return_button": "Verified with synthetic accounts in batch151; no production account login"
+  },
+  "backend": {"commit": "ce0ca7066e465c19b64498744c805b08e1eed03f", "deploy": "dep-dbc68a5g1s2s7396tnog", "status": "live", "new_deploy": false},
+  "production_setting_changes": false, "database_migrations": false,
+  "checklist": {"complete": 35, "remaining": "PY-35 secure automatic backup verification"}
+}
