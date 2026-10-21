@@ -25,6 +25,28 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current146 PRODUCTION ROUTE VERIFIED / APPROVED SQL STEP PENDING (2026-10-21 WAT):
+owner saved backend build-only pip command and ordered frontend rewrites. Fresh
+Render metadata verifies backend Auto-Deploy Off, `pip install -r requirements.txt`,
+and unchanged correct Uvicorn start. One bounded anonymous actual production
+frontend check passed: GET /api/health ->200 application/json; POST /api/auth/login
+with deliberately invalid fabricated JSON ->422 json_invalid. No credentials,
+accounts, payments or customer records submitted. This verifies real Render
+method/body routing to the stable existing backend; cookies/session checks still
+pending the candidate release. No Cloudflare/staging tests or prior checks repeated.
+Hash-verified guarded SQL40d29dc7...707b1f copied to owner clipboard, not executed
+by agent. Owner instructed to open ONLY existing project lrvpjfbtmftjkzaxbunk SQL
+Editor, paste ENTIRE script, Run once and report installed_revision0022 or stop on
+error. Async result pending. Do NOT execute SQL again if owner reports success.
+Next: confirm migration result, publish exact reviewed release64a3290 to master
+by normal fast-forward, set required public frontend origin on backend, deploy
+backend first and verify/retain its secure artifact. Then VITE_API_URL=/api on
+frontend, deploy frontend and complete only missing hosted login/CSRF/logout checks.
+Both Auto-Deploy settings must stay Off. On failure retain0022/security/payment
+records and use security-compatible application recovery; no DB downgrade/reset.
+No master push, application deployment or agent production DB connection yet.
+35/36 remains. Release approval already granted; do not ask again.
+
 Current145 AUTO-DEPLOY PAUSE VERIFIED / RELEASE SOURCE PUBLISHED (2026-10-21 WAT):
 owner saved Off on both services; fresh Render metadata confirms autoDeploy=no
 for priceyard-api and priceyard. Both remain running; no deployment triggered.
