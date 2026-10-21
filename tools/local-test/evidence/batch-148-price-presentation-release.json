@@ -1,0 +1,49 @@
+{
+  "date_wat": "2026-10-21",
+  "owner_authorization": "Commit, push and deploy the two approved frontend presentation changes",
+  "scope": "Existing production frontend only",
+  "source_commit": "5a60e3679ebd4b2d758bfa3333941b5fb6f6ed71",
+  "git": {
+    "working_tree_clean_before_publish": true,
+    "remote_master_before": "ce0ca7066e465c19b64498744c805b08e1eed03f",
+    "atomic_fast_forward_master_and_development": true,
+    "published_refs_verified": true,
+    "backend_database_migration_workflow_diff": false,
+    "existing_local_build_and_eight_browser_checks_reused": true
+  },
+  "frontend": {
+    "service": "srv-da6ddb2jnfac73e39490",
+    "deploy": "dep-dbc7ji3rjlhs73b3s3f0",
+    "status": "live",
+    "exact_commit_verified": true,
+    "auto_deploy": "off",
+    "retained_rollback_deploy": "dep-dbc19kvavr4c73egctug"
+  },
+  "backend": {
+    "service": "srv-da6d9gqjnfac73e2sbfg",
+    "deploy": "dep-dbc68a5g1s2s7396tnog",
+    "commit": "ce0ca7066e465c19b64498744c805b08e1eed03f",
+    "status": "live",
+    "new_deployment": false,
+    "auto_deploy": "off"
+  },
+  "live_read_only_browser": {
+    "status": "PASS",
+    "public_grouped_prices_rendered": true,
+    "all_public_price_options_preserved": true,
+    "one_photo_per_commodity": true,
+    "desktop_mobile_no_overflow": true,
+    "restored_history_code_served": true,
+    "guest_history_access_preserved": true,
+    "unauthenticated_session_private_401": true,
+    "app_asset": "/assets/index-BFs4sw3w.js",
+    "write_requests_sent": 0,
+    "blocked_write_requests": [{"method": "POST", "path": "/api/activity/ping"}],
+    "blocked_external_requests": 0,
+    "login_or_customer_access_attempts": 0,
+    "paid_history_graph_rendering": "Verified with synthetic records in155; no production account login attempted"
+  },
+  "database_migrations": false,
+  "production_setting_changes": false,
+  "remaining": "PY-35 automatic encrypted backup paused for documented secure transport blocker; await Supabase support"
+}

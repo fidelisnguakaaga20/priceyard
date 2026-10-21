@@ -25,6 +25,28 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current156 APPROVED PRESENTATION RELEASE LIVE / READ-ONLY CHECKS PASSED
+(2026-10-21 WAT): owner explicitly approved commit, push and Render deployment
+of the grouped commodity cards and restored history graph. Reused155 build/
+browser evidence rather than repeating completed tests. Confirmed both existing
+Render services Auto-Deploy Off, frontend root/dist configuration, retained64a3290
+rollback artifact, and exact remote masterce0ca70 ancestry. Backend/workflows
+are identical across the release. Atomic fast-forward pushed exact5a60e36 to
+master/development; only frontendpriceyard manually deployed. Deployment
+dep-dbc7ji3rjlhs73b3s3f0 LIVE at exact5a60e3679ebd4b2d758bfa3333941b5fb6f6ed71.
+Fresh public read-only browser check passed: every public price preserved under
+one photo per commodity, desktop/mobile layout fits, latest graph code served,
+guest history gate and private401 session boundary intact. All writes blocked;
+normal activity/ping telemetry intercepted before transmission, no login or
+customer access attempted. Initial check incorrectly expected no attempted
+telemetry; corrected the harness to distinguish blocked attempts from writes
+sent, without changing application behavior. Backend remains LIVEce0ca70 at
+dep-dbc68a5g1s2s7396tnog; no backend deployment, settings change or migration.
+Evidence: batch-148-price-presentation-release.json. MiFi is sufficient for
+ordinary application use/deployment. 35/36 still complete; secure automatic
+backup remains paused while awaiting Supabase support. Existing backups,
+automatic recovery, alerts and production data remain preserved.
+
 Current155 OWNER-APPROVED PRICE PRESENTATION / LOCAL VERIFICATION PASSED
 (2026-10-21 WAT): owner approved reducing repeated commodity photographs and
 restoring useful history graphs while awaiting Supabase support. Current Prices
