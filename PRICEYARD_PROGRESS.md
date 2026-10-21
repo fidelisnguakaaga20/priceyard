@@ -25,6 +25,23 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current158 CHART USABILITY CORRECTION LIVE / RELEASE PASS
+(2026-10-21 WAT): approved13c9e3b4ab75cade0ea6d7d68cef1387c48da86c
+committed and atomic fast-forward pushed to master/development after157 build,
+14 focused checks and visual review. Both Render Auto-Deploy settings remained
+Off; only frontendpriceyard triggered. Exact deploydep-dbc886ss728c73eav8ag
+is LIVE. Read-only public browser confirmed the new labelled-axis/compact-summary/
+interaction code served in /assets/index-C5afWBLR.js, public price grouping and
+all options preserved, mobile/desktop fit, history guest gate and private401
+session boundary intact. All writes blocked (existing activity/ping intercepted),
+no account login/customer access. Private chart rendering and interaction were
+verified with synthetic records, not a production account. Backend remains
+ce0ca70 atdep-dbc68a5g1s2s7396tnog; no settings change, backend deploy or migration.
+Previous frontend5a60e36 deploydep-dbc7ji3rjlhs73b3s3f0 is retained for rollback.
+Evidence: batch-150-history-chart-release.json. Original design, records,
+measurements and business rules retained. 35/36 complete; only secure automatic
+backup verification remains paused awaiting Supabase support.
+
 Current157 OWNER-APPROVED CHART USABILITY FIX / VERIFIED FOR RELEASE
 (2026-10-21 WAT): owner rejected the oversized, poorly labelled charts and
 explicitly authorized implementation, commit, push and frontend deployment.
