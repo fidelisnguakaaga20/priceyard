@@ -25,3 +25,7 @@
   outline: 2px solid var(--color-text);
   outline-offset: 3px;
 }
+
+.history-view-graph { min-height: 44px; margin-top: 4px; }
+#history-chart-results { scroll-margin-top: calc(var(--priceyard-header-bottom, 180px) + 12px); }
+#history-chart-results:focus-visible { outline: 2px solid var(--color-link); outline-offset: 4px; border-radius: 16px; }

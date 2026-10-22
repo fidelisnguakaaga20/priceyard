@@ -266,7 +266,8 @@ html.easy-reading .confidence-badge, html.easy-reading .movement { font-weight: 
 .trend-plot { min-width: 0; border-radius: 8px; }
 .trend-plot:focus-visible { outline: 2px solid var(--color-link); outline-offset: 3px; }
 .trend-band { fill: var(--color-link); opacity: .15; stroke: none; }
-.trend-line { stroke: var(--color-link); stroke-width: 2.5; }
+.trend-line { stroke: var(--color-link); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+.trend-area { stroke: none; pointer-events: none; }
 .trend-dot { fill: var(--color-link); }
 .trend-dot-selected { stroke: var(--color-surface); stroke-width: 2; }
 .trend-range { stroke: var(--color-link); stroke-width: 2; }

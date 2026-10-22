@@ -15,6 +15,7 @@ import type { Commodity, Market, PriceUpdate } from "../types/api";
 import { confidenceClass, money, movementIcon } from "../utils";
 
 import { PRICE_TIME_LABEL, priceEpoch, shortPriceDate } from "../utils/priceTime";
+import { recordedPriceGroups } from "../utils/priceComparability";
 import "./history-controls.css";
 
 export function PriceHistoryPage() {
@@ -25,6 +26,8 @@ export function PriceHistoryPage() {
   const restoreRemembered = useRef(initialFilters.remembered);
   const lastQuery = useRef(searchParams.toString());
   const filtersRef = useRef<HTMLFormElement>(null);
+  const chartResultsRef = useRef<HTMLDivElement>(null);
+  const [revealVersion, setRevealVersion] = useState(0);
   const [items, setItems] = useState<PriceUpdate[]>([]);
   const [commodities, setCommodities] = useState<Commodity[]>([]);
   const [markets, setMarkets] = useState<Market[]>([]);
@@ -40,6 +43,7 @@ export function PriceHistoryPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [historyOrder, setHistoryOrder] = useState<"oldest" | "newest">("oldest");
+  const hasGraph = useMemo(() => recordedPriceGroups(items).some(group => group.items.length > 1), [items]);
   const orderedItems = useMemo(() => [...items].sort((a, b) => {
     const first = priceEpoch(a.update_date_time), second = priceEpoch(b.update_date_time);
     // Undated/ambiguous legacy records remain visible, after the dated records.
@@ -52,7 +56,7 @@ export function PriceHistoryPage() {
   activeAccess.current = { token, hasFullAccess };
 
   const load = async (selection = { commodity, market, timeOfDay },
-    catalogs = { commodities, markets }) => {
+    catalogs = { commodities, markets }, revealResults = false) => {
     const sequence = ++requestSequence.current;
     if (!token || !hasFullAccess) {
       setItems([]);
@@ -74,6 +78,7 @@ export function PriceHistoryPage() {
       setItems(data);
       setError("");
       rememberHistoryFilters(selection.commodity, selection.market, catalogs.commodities, catalogs.markets);
+      if (revealResults && data.length) setRevealVersion(version => version + 1);
     } catch (err) {
       if (isCurrent()) setError((err as Error).message);
     } finally {
@@ -119,9 +124,25 @@ export function PriceHistoryPage() {
 
   useEffect(() => { window.scrollTo({ top: 0, behavior: "auto" }); }, [searchParams]);
 
+  const showPriceGraph = () => {
+    const results = chartResultsRef.current;
+    if (!results) return;
+    results.focus({ preventScroll: true });
+    const header = document.querySelector(".site-header");
+    const headerBottom = header ? Math.max(0, header.getBoundingClientRect().height + (parseFloat(getComputedStyle(header).top) || 0)) : 0;
+    window.scrollTo({ top: Math.max(0, window.scrollY + results.getBoundingClientRect().top - headerBottom - 12),
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  };
+
+  useEffect(() => {
+    if (!revealVersion) return;
+    const frame = window.requestAnimationFrame(showPriceGraph);
+    return () => window.cancelAnimationFrame(frame);
+  }, [revealVersion]);
+
   const submit = (event: FormEvent) => {
     event.preventDefault();
-    void load();
+    void load({ commodity, market, timeOfDay }, { commodities, markets }, true);
   };
 
   const changeCommodity = (value: string) => {
@@ -136,6 +157,10 @@ export function PriceHistoryPage() {
       <h1>Price history</h1>
       <p>Review approved historical ranges, movement and same-day market timing.</p>
       <p className="muted">{PRICE_TIME_LABEL}</p>
+      {hasFullAccess && !loading && !error && items.length > 0 && <button type="button"
+        className="button button-small history-view-graph" aria-controls="history-chart-results" onClick={showPriceGraph}>
+        {hasGraph ? "View price graph" : "View recorded prices"}
+      </button>}
     </div>
 
     {authLoading ? <LoadingSpinner label="Checking price-history access…" /> : !hasFullAccess ? <PremiumGate><></></PremiumGate> : <>
@@ -148,7 +173,9 @@ export function PriceHistoryPage() {
       <BackToFilters filtersRef={filtersRef} enabled={hasFullAccess && !authLoading} />
 
       {loading ? <LoadingSpinner label="Loading price history…" /> : error ? <div className="status-box error">{error}</div> : <>
-        <PriceTrendChart items={items} />
+        <div id="history-chart-results" ref={chartResultsRef} role="region" aria-label="Price graph and recorded prices" tabIndex={-1}>
+          <PriceTrendChart items={items} />
+        </div>
         {items.length > 1 && <div className="history-list-toolbar">
           <label htmlFor="history-order">History order</label>
           <select id="history-order" value={historyOrder} aria-controls="history-records" onChange={event => setHistoryOrder(event.target.value as "oldest" | "newest")}>

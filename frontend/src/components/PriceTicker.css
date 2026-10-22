@@ -1,33 +1,35 @@
 .price-ticker.price-ticker-controls,
 .site-header .price-ticker.price-ticker-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 48px;
-  padding: 2px 8px 2px 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  padding: 4px 0 0;
 }
 
 .price-ticker-controls .price-ticker-viewport {
-  flex: 1 1 0;
+  width: 100%;
   min-width: 0;
   overflow: hidden;
 }
 
 .price-ticker-controls .price-ticker-toggle {
-  flex: 0 0 auto;
+  justify-self: end;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 44px;
-  min-height: 44px;
-  padding: 6px 10px;
-  border: 1px solid #a9c4ad;
-  border-radius: 8px;
-  background: #173d28;
-  color: white;
-  font-size: .78rem;
-  font-weight: 700;
+  gap: 4px;
+  min-width: 64px;
+  min-height: 24px;
+  margin: 0 8px 0 0;
+  padding: 2px 6px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #d7e8d8;
+  font-size: .75rem;
+  font-weight: 600;
   line-height: 1.25;
+  cursor: pointer;
 }
 
 .price-ticker-controls .price-ticker-toggle:hover {
@@ -36,7 +38,7 @@
 
 .price-ticker-controls .price-ticker-toggle:focus-visible {
   outline: 2px solid white;
-  outline-offset: -4px;
+  outline-offset: -2px;
 }
 
 .price-ticker.price-ticker-controls:hover .price-ticker-track {

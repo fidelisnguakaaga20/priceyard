@@ -98,6 +98,7 @@ function RecordedTrendChart({ items, complete }: { items: PriceUpdate[]; complet
     : Math.min(width < 480 ? 2 : width < 800 ? 4 : 5, Math.max(2, Math.floor((last.x - first.x) / 86_400_000) + 1));
   const xTicks = first.x === last.x ? [first.x] : Array.from({ length: tickCount }, (_, index) => first.x + index / (tickCount - 1) * (last.x - first.x));
   const linePath = points.map((point, index) => `${index ? "L" : "M"} ${scaleX(point.x).toFixed(1)} ${scaleY(point.y).toFixed(1)}`).join(" ");
+  const areaPath = `${linePath} L ${scaleX(last.x).toFixed(1)} ${bottom} L ${scaleX(first.x).toFixed(1)} ${bottom} Z`;
   const bandPoints = [...points.map((point) => `${scaleX(point.x)},${scaleY(point.high)}`),
     ...[...points].reverse().map((point) => `${scaleX(point.x)},${scaleY(point.low)}`)].join(" ");
   const selectIndex = (index: number) => setSelectedId(points[Math.max(0, Math.min(points.length - 1, index))].id);
@@ -113,10 +114,6 @@ function RecordedTrendChart({ items, complete }: { items: PriceUpdate[]; complet
 
   return <section className="history-price-series trend-chart">
     <SeriesHeading item={items[0]} count={items.length} />
-    <p className="trend-explanation">{join
-      ? "The line follows the average price, or the range midpoint when no average is recorded. Shading shows the recorded price range."
-      : complete ? "These records share the same time. A trend needs prices recorded at different times."
-        : "Some measurement or type details were not recorded. Each price is shown separately; the points are not joined."}</p>
     <div className="trend-axis-captions"><span>Price (₦)</span><span>{sameDay ? "Time (WAT)" : "Date (WAT)"}</span></div>
     <div ref={plotRef} className="trend-plot" role="group" tabIndex={0}
       aria-label={`${items[0].commodity.name} price chart. Use the Left and Right arrow keys to inspect records.`}
@@ -130,6 +127,10 @@ function RecordedTrendChart({ items, complete }: { items: PriceUpdate[]; complet
         onPointerMove={selectPointer} onPointerDown={selectPointer}>
         <title id={`${chartId}-title`}>{join ? "Price trend over time" : "Recorded prices over time"}</title>
         <desc id={`${chartId}-description`}>{items[0].commodity.name} at {items[0].market.name}. {points.length} records, from {shortPriceDate(first.date)} to {shortPriceDate(last.date)}. {join ? "Only matching recorded measurements and types are connected." : "Points are not connected and do not establish a comparable price trend."}</desc>
+        {join && <><defs><linearGradient id={`${chartId}-area`} x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="var(--color-link)" stopOpacity=".22" />
+          <stop offset="100%" stopColor="var(--color-link)" stopOpacity=".02" />
+        </linearGradient></defs><path className="trend-area" d={areaPath} fill={`url(#${chartId}-area)`} /></>}
         {yTicks.map((value, index) => <g key={index}>
           <line className="trend-grid-line" x1={left} x2={right} y1={scaleY(value)} y2={scaleY(value)} />
           <text className="trend-y-tick" x={left - 10} y={scaleY(value) + 4} textAnchor="end">{currencyTick.format(value)}</text>
@@ -161,6 +162,10 @@ function RecordedTrendChart({ items, complete }: { items: PriceUpdate[]; complet
         <button type="button" aria-label="Next recorded price" onClick={() => selectIndex(selectedIndex + 1)} disabled={selectedIndex === points.length - 1}>→</button>
       </div>
     </div>
+    <p className="trend-explanation">{join
+      ? "The line follows the recorded average, or the range midpoint when no average is recorded. The narrow band shows the low–high price range."
+      : complete ? "These records share the same time. A trend needs prices recorded at different times."
+        : "Some measurement or type details were not recorded. Each price is shown separately; the points are not joined."}</p>
     <p className="trend-help" id={`${chartId}-help`}>Tap or hover over the chart, or use the arrows, to see each recorded price.</p>
   </section>;
 }

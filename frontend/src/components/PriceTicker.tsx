@@ -26,11 +26,13 @@ export function PriceTicker({ items, savedAt = null }: { items: PriceUpdate[]; s
       <button
         type="button"
         className="price-ticker-toggle"
+        aria-label={scrollingPaused ? "Resume scrolling" : "Pause scrolling"}
         aria-pressed={scrollingPaused}
         title="Only pauses scrolling; prices still refresh."
         onClick={() => setScrollingPaused((paused) => !paused)}
       >
-        {scrollingPaused ? "Resume scrolling" : "Pause scrolling"}
+        <span aria-hidden="true">{scrollingPaused ? "▶" : "Ⅱ"}</span>
+        {scrollingPaused ? "Resume" : "Pause"}
       </button>
     </div></>
   );

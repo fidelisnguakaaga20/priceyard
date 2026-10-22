@@ -273,7 +273,7 @@ try {
           return {overflow: document.documentElement.scrollWidth > innerWidth + 1,
             width: box.width, height: box.height, left: box.left, right: box.right, viewport: innerWidth};
         });
-        assert.equal(state.overflow, false); assert.ok(state.width >= 44 && state.height >= 44);
+        assert.equal(state.overflow, false); assert.ok(state.width >= 64 && state.height >= 24);
         assert.ok(state.left >= 0 && state.right <= width + 1);
         geometry.push({width, easy, dark, control: 'ticker', ...state});
       }

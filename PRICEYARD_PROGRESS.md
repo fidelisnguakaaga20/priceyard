@@ -25,6 +25,34 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current163 OWNER-REPORTED GRAPH/TICKER/PRICE-ENTRY CORRECTIONS / LOCAL PASS
+(2026-10-22 WAT): resumed clean fa877ed; no completed audit, backup or migration
+repeated. Screenshot4256 shows the page above the end of mobile filters, not
+evidence that graphs were removed. Added View price graph shortcut (truthful View
+recorded prices for singleton histories) and successful explicit-search focus/
+scroll to results beneath the sticky header. Initial load/session refresh do not
+jump. Comparable series have a stronger green line/subtle area; recorded range
+band, separate measurements, incomplete points, single-record summaries, axes
+and keyboard/touch inspection remain. Pause/Resume is now a small64x24px visible
+control UNDER the full-width ticker, with full accessible labels and unchanged
+animation-only/reduced-motion behavior. Admin screenshot4257 is an evidence
+validation rejection, not proof of a save outage. Its exact hidden input mismatch
+cannot be determined from screenshots. Confirmed UI pitfall fixed: Prefill from
+last entry no longer copies the old Movement into a new observation; it keeps the
+editor's choice/default unknown. New hints and Review movement focus make recovery
+clear, retaining all draft values without silently changing a claim or weakening
+the approved backend safeguards. Actual synthetic422 rejection -> explicit
+unknown ->201 save verified; no customer records used. TypeScript/Vite production
+build +seven origin admission cases,8 focused usability checks and14 existing
+price/chart regressions passed serially; no external requests/page errors.
+Actual250px graph visibility verified on375x667 Easy reading, plus full-width
+ticker at320/375/1366 and both chart themes. Reviewed mobile screenshot. Local
+preview stopped. Evidence: batch-155-price-usability-corrections.json. Backend,
+APIs, database, measurements, policies, dependencies and production untouched.
+Current live frontend remains6c700c5/deploydep-dbct4rgm7kps73cruge0; these local
+corrections await explicit deployment approval before push/deploy. 35/36 complete;
+unchanged PY-35 backup transport safeguard awaits existing Supabase support reply.
+
 Current162 THREE CONVENIENCE CONTROLS LIVE / RELEASE PASS (2026-10-22 WAT):
 verified 6c700c5d9e7b67e50a406bb76f594ca725d28216 committed and atomic
 fast-forward pushed to master/development. Existing frontend priceyard is LIVE
