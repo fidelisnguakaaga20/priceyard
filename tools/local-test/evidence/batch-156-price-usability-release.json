@@ -1,0 +1,50 @@
+{
+  "status": "PASS",
+  "date": "2026-10-22",
+  "commit": "b41b7412d7deaf03965dbcb3d759d26637c47761",
+  "service": "priceyard",
+  "service_id": "srv-da6ddb2jnfac73e39490",
+  "deploy_id": "dep-dbd03ko473hc73ae1770",
+  "deploy_status": "live",
+  "published_refs": ["master", "codex/priceyard-original-preserved-20261016"],
+  "local_verification": "batch-155-price-usability-corrections.json",
+  "local_browser_checks_reused": 22,
+  "independent_scope_review": "PASS; no backend, dependency, deployment configuration, schema or policy changes",
+  "production_browser": {
+    "status": "PASS",
+    "app_asset": "/assets/index-C9fkKCg7.js",
+    "graph_ticker_and_price_entry_correction_code_served": true,
+    "ticker_control": {"width": 64, "height": 24, "below_animation": true, "full_width_animation": true},
+    "live_pause_resume_and_reduced_motion": true,
+    "all_public_price_options_preserved": true,
+    "one_photo_per_commodity": true,
+    "desktop_mobile_no_overflow": true,
+    "public_history_links_match_record_ids": true,
+    "compact_mobile_header_and_menu": true,
+    "guest_history_access_preserved": true,
+    "unauthenticated_session_private_401": true,
+    "write_requests_sent": 0,
+    "blocked_write_requests": [{"method": "POST", "path": "/api/activity/ping"}],
+    "external_requests": 0,
+    "login_or_customer_access_attempts": 0
+  },
+  "protected_workflow_verification": "Graph discovery and Admin movement-error recovery passed with isolated synthetic accounts; no production price creation or editing",
+  "both_services_auto_deploy": "off",
+  "backend_unchanged": {
+    "commit": "ce0ca7066e465c19b64498744c805b08e1eed03f",
+    "deploy_id": "dep-dbc68a5g1s2s7396tnog"
+  },
+  "rollback_target": {
+    "commit": "6c700c5d9e7b67e50a406bb76f594ca725d28216",
+    "deploy_id": "dep-dbct4rgm7kps73cruge0",
+    "method": "Restore retained frontend artifact; no database changes to reverse"
+  },
+  "production_settings_changed": false,
+  "database_migrations": false,
+  "production_records_changed": 0,
+  "new_services_or_dependencies": false,
+  "local_preview_stopped": true,
+  "checklist_completed": 35,
+  "checklist_remaining": 1,
+  "remaining_item": "Unchanged PY-35 secure automatic backup transport safeguard"
+}

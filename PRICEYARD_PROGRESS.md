@@ -25,6 +25,28 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current164 GRAPH/TICKER/PRICE-ENTRY CORRECTIONS LIVE / RELEASE PASS
+(2026-10-22 WAT): owner explicitly approved push/deploy. Verified clean b41b741
+and atomic fast-forward pushed master/development to
+b41b7412d7deaf03965dbcb3d759d26637c47761. Existing frontend priceyard is LIVE
+at that exact commit, deploydep-dbd03ko473hc73ae1770. Reused Current163 verified
+production build/seven origin cases,8 focused usability and14 retained chart
+checks; no repeat audits, backups, migrations or development. Read-only live
+browser PASS: correction code served in/assets/index-C9fkKCg7.js; actual64x24px
+control sits BELOW the full375px animation and pause/resume/reduced motion work.
+Public options/photos, stable history links, mobile Menu, guest gate and private
+401 session boundary remain intact. All writes blocked (existing activity ping
+intercepted); no login or customer access. Protected graph discovery and Admin
+422 -> Review movement -> explicit unknown ->201 were verified in synthetic local
+testing, not by changing production prices. Backend remainsce0ca70 at
+dep-dbc68a5g1s2s7396tnog; both services Auto-Deploy Off. No backend deployment,
+settings, database, policies, measurements or dependencies changed. Prior frontend
+6c700c5/deploydep-dbct4rgm7kps73cruge0 retained for compatible artifact rollback.
+Evidence: batch-156-price-usability-release.json. Local preview stopped. Chrome:
+hard-refresh, Price History > View price graph or Search history; small Pause
+under ticker; Admin Price updates > prefill/review Movement. 35/36 complete;
+unchanged PY-35 secure automatic backup transport awaits existing support reply.
+
 Current163 OWNER-REPORTED GRAPH/TICKER/PRICE-ENTRY CORRECTIONS / LOCAL PASS
 (2026-10-22 WAT): resumed clean fa877ed; no completed audit, backup or migration
 repeated. Screenshot4256 shows the page above the end of mobile filters, not
