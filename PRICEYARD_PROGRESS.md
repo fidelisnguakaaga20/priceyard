@@ -25,6 +25,32 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current167 ORIGINAL MANUAL ADMIN MOVEMENT LIVE / RELEASE PASS (2026-10-22 WAT):
+owner explicitly approved this backend and frontend restoration, resolving the
+Current166 automatic-review block. Both existing services deployed sequentially
+at97d004b784b3cc299bfb68e182090b8b57d5be77, whose backend/frontend trees exactly
+match approved fa49f534a7d19fb51b6711ea59c9ecbccc589571; the later commit changes
+documentation only. Backend priceyard-api deploydep-dbd1r0tg1s2s73esongg LIVE,
+then direct/api-proxied health200 healthy PASS, then frontend priceyard
+deploydep-dbd1se1srm7s73bbg620 LIVE. Reused Current165 six isolated backend test
+methods, production build/seven origin cases,8 workflow browser checks and
+private-source form checks; no repeated audit/backup/migration or production
+price write. Read-only live browser PASS: restored manual Admin form code served
+in/assets/index-BDuBD_7H.js; obsolete comparison instructions/Review movement
+absent; public prices/images/history links, chart/ticker controls, mobile Menu,
+guest gate and private401 session boundary preserved. All browser writes blocked
+(activity ping intercepted); no customer login/access or records changed. Actual
+manual up creation/approval/down correction and all four movement choices were
+verified with synthetic records locally; production request behavior inferred
+from identical deployed tested code, not tested by adding customer prices.
+Both Auto-Deploy settings remain Off; backend build pip install only, no
+migrations or configuration changes. Prior ce0ca70/backend and b41b741/frontend
+artifacts remain compatible for rollback. Evidence: batch-159-admin-restoration-
+release.json. Local preview stopped. Owner can resubmit the already-open draft
+with the desired movement; no need to force unknown or refresh away unsaved
+values. Refresh after saving to load the simplified form guidance. Other
+improvements/data retained;35/36 and backup-transport blocker unchanged.
+
 Current166 ORIGINAL ADMIN RESTORATION TESTED/PUSHED; DEPLOYMENT APPROVAL BLOCK
 (2026-10-22 WAT): verified fa49f534a7d19fb51b6711ea59c9ecbccc589571 committed
 and atomic fast-forward pushed master/development, both Render Auto-Deploy Off.
