@@ -1,0 +1,19 @@
+{
+  "status": "AWAITING_EXPLICIT_BACKEND_DEPLOYMENT_APPROVAL",
+  "date": "2026-10-22",
+  "restoration_commit": "fa49f534a7d19fb51b6711ea59c9ecbccc589571",
+  "tested": "batch-157-admin-manual-movement.json",
+  "pushed_refs": ["master", "codex/priceyard-original-preserved-20261016"],
+  "automatic_approval_review": "Rejected backend deployment because earlier explicit push/deploy approval covered the frontend release rather than this subsequent backend restoration",
+  "workaround_attempted": false,
+  "new_deployment_created": false,
+  "both_services_auto_deploy": "off",
+  "live_backend": {"commit": "ce0ca7066e465c19b64498744c805b08e1eed03f", "deploy_id": "dep-dbc68a5g1s2s7396tnog"},
+  "live_frontend": {"commit": "b41b7412d7deaf03965dbcb3d759d26637c47761", "deploy_id": "dep-dbd03ko473hc73ae1770"},
+  "production_records_changed": 0,
+  "production_settings_changed": false,
+  "migrations_run": false,
+  "pending_user_question": "Approve this specific backend and frontend manual Admin price-entry restoration?",
+  "next_after_approval": ["Deploy exactfa49f53 backend without migrations", "Verify backend health", "Deploy exactfa49f53 frontend", "Bounded read-only public verification"],
+  "repeat_completed_tests_or_backup": false
+}

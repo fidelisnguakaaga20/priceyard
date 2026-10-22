@@ -25,6 +25,22 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current166 ORIGINAL ADMIN RESTORATION TESTED/PUSHED; DEPLOYMENT APPROVAL BLOCK
+(2026-10-22 WAT): verified fa49f534a7d19fb51b6711ea59c9ecbccc589571 committed
+and atomic fast-forward pushed master/development, both Render Auto-Deploy Off.
+Automatic approval review rejected the attempted backend trigger: the owner's
+earlier explicit push/deploy approval covered the frontend correction, not this
+subsequent backend policy restoration. No deployment created; no workaround used.
+Read-only confirmation: backend stillce0ca70/dep-dbc68a5g1s2s7396tnog LIVE;
+frontend stillb41b741/dep-dbd03ko473hc73ae1770 LIVE. No customer/price/subscription
+data changed. A single explicit question now requests approval to deploy this
+specific tested backend plus matching frontend restoration, without migrations
+or historical rewrites. Wait for that answer; do not rerun tests or preparation.
+On approval deploy exactfa49f53 backend first, verify health, then frontend and
+perform bounded read-only public checks. All Current165 tests remain valid.
+Evidence: batch-158-admin-restoration-deployment-block.json. All source/work and
+backups preserved;35/36 completion and backup-transport blocker unchanged.
+
 Current165 ORIGINAL MANUAL ADMIN MOVEMENT RESTORED / VERIFIED FOR RELEASE
 (2026-10-22 WAT): owner requested the original price-entry behavior after another
 blocking error. Compared original76dbd27: Admin creation/correction/approval did
