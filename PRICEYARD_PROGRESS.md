@@ -25,6 +25,27 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current162 THREE CONVENIENCE CONTROLS LIVE / RELEASE PASS (2026-10-22 WAT):
+verified 6c700c5d9e7b67e50a406bb76f594ca725d28216 committed and atomic
+fast-forward pushed to master/development. Existing frontend priceyard is LIVE
+at that exact commit, deploydep-dbct4rgm7kps73cruge0. Reused Current161 production
+build/seven admission cases,11 convenience and9 navigation browser checks.
+Read-only live browser PASS: all three control implementations served in
+/assets/index-3endh_5T.js; Pause/Resume stops/resumes actual animation while
+focused and respects reduced motion, without changing the ticker records.
+All public price options/photos, stable View history links, compact mobile Menu,
+guest gate and private401 session boundary remain intact. Browser sent no writes
+(existing activity ping blocked), no login/customer access. Protected sort and
+remembered-search behavior verified with synthetic accounts only. Backend remains
+ce0ca70/deploydep-dbc68a5g1s2s7396tnog; no backend deploy, migrations, settings,
+records or business-rule changes. Both services Auto-Deploy Off; prior frontend
+a0cb706/deploydep-dbckl4vb9u1s73c0l530 retained for compatible artifact rollback.
+Local preview stopped. Evidence: batch-154-history-convenience-release.json.
+Chrome: hard-refresh the site; Price History > Search history > History order
+below the graph; revisit Price History to check remembered selections; use
+Pause/Resume scrolling on the green strip. 35/36 complete; unchanged PY-35 backup
+transport safeguard awaits the already-sent Supabase support response.
+
 Current161 THREE APPROVED CONVENIENCE CONTROLS / VERIFIED FOR RELEASE
 (2026-10-22 WAT): owner approved implementation, commit, push and deployment.
 History order offers Oldest first/Newest first for both table and mobile cards;

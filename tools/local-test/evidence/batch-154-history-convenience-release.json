@@ -1,0 +1,47 @@
+{
+  "status": "PASS",
+  "date": "2026-10-22",
+  "commit": "6c700c5d9e7b67e50a406bb76f594ca725d28216",
+  "service": "priceyard",
+  "service_id": "srv-da6ddb2jnfac73e39490",
+  "deploy_id": "dep-dbct4rgm7kps73cruge0",
+  "deploy_status": "live",
+  "published_refs": ["master", "codex/priceyard-original-preserved-20261016"],
+  "local_verification": "batch-153-history-convenience.json",
+  "production_browser": {
+    "status": "PASS",
+    "app_asset": "/assets/index-3endh_5T.js",
+    "all_three_convenience_features_served": true,
+    "live_pause_resume_and_reduced_motion": true,
+    "all_public_price_options_preserved": true,
+    "one_photo_per_commodity": true,
+    "desktop_mobile_no_overflow": true,
+    "public_history_links_match_record_ids": true,
+    "compact_mobile_header_and_menu": true,
+    "guest_history_access_preserved": true,
+    "unauthenticated_session_private_401": true,
+    "write_requests_sent": 0,
+    "blocked_write_requests": [{"method": "POST", "path": "/api/activity/ping"}],
+    "external_requests": 0,
+    "login_or_customer_access_attempts": 0
+  },
+  "protected_history_behavior": "Verified with isolated synthetic accounts, not production customer accounts",
+  "both_services_auto_deploy": "off",
+  "backend_unchanged": {
+    "commit": "ce0ca7066e465c19b64498744c805b08e1eed03f",
+    "deploy_id": "dep-dbc68a5g1s2s7396tnog"
+  },
+  "rollback_target": {
+    "commit": "a0cb706cd8abfeb2ed3e0c67e1c498629a462a89",
+    "deploy_id": "dep-dbckl4vb9u1s73c0l530",
+    "method": "Restore retained frontend build artifact; no database changes to reverse"
+  },
+  "production_settings_changed": false,
+  "database_migrations": false,
+  "customer_records_changed": false,
+  "new_services_or_dependencies": false,
+  "local_preview_stopped": true,
+  "checklist_completed": 35,
+  "checklist_remaining": 1,
+  "remaining_item": "Unchanged PY-35 secure automatic backup transport; awaiting existing Supabase support response"
+}
