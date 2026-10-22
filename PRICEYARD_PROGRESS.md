@@ -25,6 +25,27 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current161 THREE APPROVED CONVENIENCE CONTROLS / VERIFIED FOR RELEASE
+(2026-10-22 WAT): owner approved implementation, commit, push and deployment.
+History order offers Oldest first/Newest first for both table and mobile cards;
+charts retain chronological input and measurement safeguards. Explicit UTC/WAT
+instants determine order; unconfirmed dates remain visible at the end. Successful
+history searches remember only commodity/market catalog IDs on this device,
+fetch fresh prices on return, respect explicit View history links and survive
+renaming; removed IDs, malformed/blocked storage and failed searches fail safely.
+The visible Pause/Resume scrolling button controls animation only, preserving
+price refresh, hover pause and reduced motion. Resume works while focused.
+TypeScript/Vite production build and seven origin admission cases passed;
+11 focused convenience checks and nine existing navigation regressions passed
+serially with synthetic trial/Admin accounts and no external requests. Reviewed
+desktop/mobile screenshots; 320/375px controls fit Easy reading and both themes,
+44px targets; existing navigation verified through 1920px and short landscape.
+Local preview stopped. No backend, schema, records, policies or dependencies
+changed. Both Render services remain Auto-Deploy Off; frontend-only release next,
+retaining a0cb706/deploydep-dbckl4vb9u1s73c0l530 for rollback. Evidence:
+batch-153-history-convenience.json. 35/36 complete; PY-35 backup transport blocker
+remains unchanged. Do not repeat completed backups or provider diagnostics.
+
 Current160 THREE NAVIGATION IMPROVEMENTS LIVE / RELEASE PASS
 (2026-10-22 WAT): reviewed a0cb706cd8abfeb2ed3e0c67e1c498629a462a89 committed
 and atomic fast-forward pushed to master/development. Existing frontendpriceyard

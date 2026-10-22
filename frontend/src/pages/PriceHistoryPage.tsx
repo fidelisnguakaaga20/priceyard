@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { BackToFilters } from "../components/BackToFilters";
 import { Disclaimer, PRICE_DISCLAIMER } from "../components/Disclaimer";
@@ -9,24 +9,27 @@ import { useAuth } from "../context/AuthContext";
 import { useHistoricalCommodityMarketPairs } from "../hooks/useCommodityMarketPairs";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { apiFetch } from "../services/api";
-import { addIdentityFilter, identityLabel, identityValue, nameSelection, selectedIdentity, selectionFromQuery } from "../services/priceIdentity";
+import { addIdentityFilter, identityLabel, identityValue, selectedIdentity } from "../services/priceIdentity";
+import { initialHistoryFilters, rememberHistoryFilters, restoreHistoryFilters } from "../services/historyPreferences";
 import type { Commodity, Market, PriceUpdate } from "../types/api";
 import { confidenceClass, money, movementIcon } from "../utils";
 
-import { PRICE_TIME_LABEL, shortPriceDate } from "../utils/priceTime";
+import { PRICE_TIME_LABEL, priceEpoch, shortPriceDate } from "../utils/priceTime";
+import "./history-controls.css";
 
 export function PriceHistoryPage() {
   useDocumentTitle("Price History");
   const { token, hasFullAccess, loading: authLoading } = useAuth();
   const [searchParams] = useSearchParams();
+  const [initialFilters] = useState(() => initialHistoryFilters(searchParams));
+  const restoreRemembered = useRef(initialFilters.remembered);
   const lastQuery = useRef(searchParams.toString());
   const filtersRef = useRef<HTMLFormElement>(null);
   const [items, setItems] = useState<PriceUpdate[]>([]);
   const [commodities, setCommodities] = useState<Commodity[]>([]);
   const [markets, setMarkets] = useState<Market[]>([]);
-  const [commodity, setCommodity] = useState(() => searchParams.has("commodity_id") || searchParams.has("commodity")
-    ? selectionFromQuery(searchParams, "commodity") : nameSelection("Egusi"));
-  const [market, setMarket] = useState(() => selectionFromQuery(searchParams, "market"));
+  const [commodity, setCommodity] = useState(initialFilters.commodity);
+  const [market, setMarket] = useState(initialFilters.market);
   const commodityMarketPairs = useHistoricalCommodityMarketPairs(hasFullAccess ? token : null);
   const commodityLabel = identityLabel(commodity, commodities);
   const marketLabel = identityLabel(market, markets);
@@ -36,11 +39,20 @@ export function PriceHistoryPage() {
   const [timeOfDay, setTimeOfDay] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [historyOrder, setHistoryOrder] = useState<"oldest" | "newest">("oldest");
+  const orderedItems = useMemo(() => [...items].sort((a, b) => {
+    const first = priceEpoch(a.update_date_time), second = priceEpoch(b.update_date_time);
+    // Undated/ambiguous legacy records remain visible, after the dated records.
+    if (!Number.isFinite(first)) return Number.isFinite(second) ? 1 : 0;
+    if (!Number.isFinite(second)) return -1;
+    return (historyOrder === "oldest" ? 1 : -1) * (first - second || a.id - b.id);
+  }), [items, historyOrder]);
   const requestSequence = useRef(0);
   const activeAccess = useRef({ token, hasFullAccess });
   activeAccess.current = { token, hasFullAccess };
 
-  const load = async (selection = { commodity, market, timeOfDay }) => {
+  const load = async (selection = { commodity, market, timeOfDay },
+    catalogs = { commodities, markets }) => {
     const sequence = ++requestSequence.current;
     if (!token || !hasFullAccess) {
       setItems([]);
@@ -61,6 +73,7 @@ export function PriceHistoryPage() {
       if (!isCurrent()) return;
       setItems(data);
       setError("");
+      rememberHistoryFilters(selection.commodity, selection.market, catalogs.commodities, catalogs.markets);
     } catch (err) {
       if (isCurrent()) setError((err as Error).message);
     } finally {
@@ -73,11 +86,11 @@ export function PriceHistoryPage() {
     if (!authLoading && hasFullAccess) {
       const queryChanged = lastQuery.current !== searchParams.toString();
       lastQuery.current = searchParams.toString();
-      const requestedCommodity = queryChanged
-        ? searchParams.has("commodity_id") || searchParams.has("commodity")
-          ? selectionFromQuery(searchParams, "commodity") : nameSelection("Egusi")
-        : commodity;
-      const requestedMarket = queryChanged ? selectionFromQuery(searchParams, "market") : market;
+      const requested = queryChanged ? initialHistoryFilters(searchParams)
+        : { commodity, market, remembered: restoreRemembered.current };
+      restoreRemembered.current = requested.remembered;
+      const requestedCommodity = requested.commodity;
+      const requestedMarket = requested.market;
       const requestedTime = queryChanged ? "" : timeOfDay;
       setCommodity(requestedCommodity); setMarket(requestedMarket); setTimeOfDay(requestedTime);
       setLoading(true);
@@ -88,10 +101,15 @@ export function PriceHistoryPage() {
         if (!current) return;
         setCommodities(commodityItems);
         setMarkets(marketItems);
-        const chosenCommodity = selectedIdentity(requestedCommodity, commodityItems);
-        const chosenMarket = selectedIdentity(requestedMarket, marketItems);
+        const restored = requested.remembered
+          ? restoreHistoryFilters(requestedCommodity, requestedMarket, commodityItems, marketItems)
+          : { commodity: requestedCommodity, market: requestedMarket };
+        const chosenCommodity = selectedIdentity(restored.commodity, commodityItems);
+        const chosenMarket = selectedIdentity(restored.market, marketItems);
+        restoreRemembered.current = false;
         setCommodity(chosenCommodity); setMarket(chosenMarket);
-        void load({ commodity: chosenCommodity, market: chosenMarket, timeOfDay: requestedTime });
+        void load({ commodity: chosenCommodity, market: chosenMarket, timeOfDay: requestedTime },
+          { commodities: commodityItems, markets: marketItems });
       }).catch((err: Error) => { if (current) { setError(err.message); setLoading(false); } });
     } else if (!authLoading) {
       setItems([]); setError(""); setLoading(false);
@@ -131,10 +149,16 @@ export function PriceHistoryPage() {
 
       {loading ? <LoadingSpinner label="Loading price history…" /> : error ? <div className="status-box error">{error}</div> : <>
         <PriceTrendChart items={items} />
-        <div className="table-wrap history-table-view">
+        {items.length > 1 && <div className="history-list-toolbar">
+          <label htmlFor="history-order">History order</label>
+          <select id="history-order" value={historyOrder} aria-controls="history-records" onChange={event => setHistoryOrder(event.target.value as "oldest" | "newest")}>
+            <option value="oldest">Oldest first</option><option value="newest">Newest first</option>
+          </select>
+        </div>}
+        <div id="history-records"><div className="table-wrap history-table-view">
           <table>
             <thead><tr><th>Date/time</th><th>Commodity</th><th>Market</th><th>Range</th><th>Previous</th><th>Movement</th><th>Status</th><th>Meaning / action</th></tr></thead>
-            <tbody>{items.map((item) => <tr key={item.id}>
+            <tbody>{orderedItems.map((item) => <tr key={item.id}>
               <td>{shortPriceDate(item.update_date_time)}<small>{item.time_of_day || ""}</small></td>
               <td>{item.commodity.name}</td>
               <td>{item.market.name}</td>
@@ -147,7 +171,7 @@ export function PriceHistoryPage() {
           </table>
         </div>
         <div className="history-card-list">
-          {items.map((item) => <article className="card" key={item.id}>
+          {orderedItems.map((item) => <article className="card" key={item.id}>
             <div className="card-row"><div><span className="eyebrow">{item.market.name}</span><h3>{item.commodity.name}</h3></div><span className={`movement movement-${item.movement}`}>{movementIcon(item.movement)} {item.movement}</span></div>
             <p className="price-range">{money(item.price_low)} – {money(item.price_high)}</p>
             <p className="muted">Previous: {item.previous_price_low !== null ? `${money(item.previous_price_low)} – ${money(item.previous_price_high)}` : "Not confirmed"}</p>
@@ -157,6 +181,7 @@ export function PriceHistoryPage() {
             </div>
             <div className="guidance"><div><span>Possible Meaning</span><p>{item.possible_meaning || "No observation supplied."}</p></div><div><span>Suggested Action</span><strong>{item.suggested_action || "Watch"}</strong></div></div>
           </article>)}
+        </div>
         </div>
         {!items.length && <div className="status-box">No history records found{commodity ? ` for ${commodityLabel}` : ""}{market ? ` at ${marketLabel}` : ""}. Try a different market, commodity, or time of day.</div>}
       </>}

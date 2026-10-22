@@ -1,18 +1,19 @@
+import { useState } from "react";
 import type { PriceUpdate } from "../types/api";
 import { money, movementIcon } from "../utils";
 import { SavedPriceNotice } from "./SavedPriceNotice";
+import "./PriceTicker.css";
 
-/** A continuously-scrolling strip of live current prices, shown at the top of the
- * homepage. Purely decorative/redundant with the real price cards further down the
- * page, so it's hidden from screen readers and pauses on hover/focus for anyone who
- * wants to actually read it. */
+/** The repeated price track is decorative; its scrolling control remains
+ * available to keyboard and screen-reader users. Pausing never stops updates. */
 export function PriceTicker({ items, savedAt = null }: { items: PriceUpdate[]; savedAt?: string | null }) {
+  const [scrollingPaused, setScrollingPaused] = useState(false);
   if (!items.length) return null;
   const track = [...items, ...items];
 
   return (
-    <><SavedPriceNotice savedAt={savedAt} /><div className="price-ticker" aria-hidden="true">
-      <div className="price-ticker-track">
+    <><SavedPriceNotice savedAt={savedAt} /><div className="price-ticker price-ticker-controls" data-scrolling-paused={scrollingPaused}>
+      <div className="price-ticker-viewport" aria-hidden="true"><div className="price-ticker-track">
         {track.map((item, index) => (
           <span className="price-ticker-item" key={`${item.id}-${index}`}>
             {item.commodity.name}{" "}
@@ -21,7 +22,16 @@ export function PriceTicker({ items, savedAt = null }: { items: PriceUpdate[]; s
             <span className="price-ticker-market">{[item.unit, item.bag_size, item.commodity_type].filter(Boolean).join(" · ")} @ {item.market.name}</span>
           </span>
         ))}
-      </div>
+      </div></div>
+      <button
+        type="button"
+        className="price-ticker-toggle"
+        aria-pressed={scrollingPaused}
+        title="Only pauses scrolling; prices still refresh."
+        onClick={() => setScrollingPaused((paused) => !paused)}
+      >
+        {scrollingPaused ? "Resume scrolling" : "Pause scrolling"}
+      </button>
     </div></>
   );
 }

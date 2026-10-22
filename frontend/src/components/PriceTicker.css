@@ -1,0 +1,49 @@
+.price-ticker.price-ticker-controls,
+.site-header .price-ticker.price-ticker-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 2px 8px 2px 0;
+}
+
+.price-ticker-controls .price-ticker-viewport {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.price-ticker-controls .price-ticker-toggle {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 6px 10px;
+  border: 1px solid #a9c4ad;
+  border-radius: 8px;
+  background: #173d28;
+  color: white;
+  font-size: .78rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.price-ticker-controls .price-ticker-toggle:hover {
+  background: #214e34;
+}
+
+.price-ticker-controls .price-ticker-toggle:focus-visible {
+  outline: 2px solid white;
+  outline-offset: -4px;
+}
+
+.price-ticker.price-ticker-controls:hover .price-ticker-track {
+  animation-play-state: running;
+}
+
+.price-ticker.price-ticker-controls .price-ticker-viewport:hover .price-ticker-track,
+.price-ticker.price-ticker-controls[data-scrolling-paused="true"] .price-ticker-track {
+  animation-play-state: paused;
+}
