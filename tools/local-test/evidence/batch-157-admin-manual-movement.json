@@ -1,0 +1,29 @@
+{
+  "status": "PASS_LOCAL",
+  "date": "2026-10-22",
+  "base_commit": "d4ef94f",
+  "owner_request": "Restore original Admin price-entry behavior after repeated movement-blocking errors",
+  "original_comparison": "76dbd27 permitted manual Admin movement without historical comparison validation",
+  "restoration": [
+    "Admin create preserves selected up/down/stable/unknown without requiring prior comparable records",
+    "Admin-only correction and approval preserve the manual movement",
+    "Entered current/previous amounts and measurement strings are not rewritten",
+    "Removed obsolete Admin comparison instructions and Review movement panel"
+  ],
+  "retained_guards": ["Role authorization", "Reporter evidence restrictions", "Numeric/range validation", "Two distinct private source references for two-source confidence", "Source privacy", "Moderation and audit logging"],
+  "backend_tests": {"manual_admin_api_methods": 5, "retained_reporter_source_evidence_methods": 1, "failures": 0, "errors": 0, "runtime": "In-memory synthetic SQLite; external transports and credentials blocked"},
+  "frontend_build": {"typescript": "PASS", "vite_production": "PASS", "origin_admission_cases": 7},
+  "browser": {"workflow_checks": 8, "private_source_form_checks": "PASS", "manual_create_up_approve_correct_down": "PASS", "mobile_layout": "PASS", "external_requests": 0, "page_errors": 0, "production_connections": 0},
+  "screenshot_limit": "The exact submitted request causing the remaining unknown error cannot be established from the screenshot alone",
+  "production_records_changed": 0,
+  "historical_rewrites": false,
+  "schema_changes": false,
+  "new_dependencies_or_services": false,
+  "other_completed_improvements_preserved": true,
+  "local_preview_stopped": true,
+  "release_order": ["Backend without migrations", "Frontend", "Read-only live checks"],
+  "rollback": {"backend_commit": "ce0ca7066e465c19b64498744c805b08e1eed03f", "backend_deploy": "dep-dbc68a5g1s2s7396tnog", "frontend_commit": "b41b7412d7deaf03965dbcb3d759d26637c47761", "frontend_deploy": "dep-dbd03ko473hc73ae1770", "no_schema_reversal_required": true},
+  "checklist_completed": 35,
+  "checklist_remaining": 1,
+  "remaining_item": "Unchanged PY-35 secure automatic backup transport safeguard"
+}

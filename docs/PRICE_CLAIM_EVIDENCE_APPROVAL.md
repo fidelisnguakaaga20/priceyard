@@ -40,3 +40,12 @@ Real-world source independence/market accuracy still require human verification.
 Decision: owner answered "Approve evidence safeguards" on2026-10-18.
 Implement/test this scope locally; historical production editorial review and
 real-world source verification remain outside authorization under PY-35.
+
+Owner revision, 2026-10-22: after repeated movement-blocking errors, the owner
+requested the original Admin price-entry behavior. This supersedes the automatic
+movement-evidence requirement for Admin creation, correction and approval. Keep
+the Admin's selected up/down/stable/unknown and recorded amounts unchanged;
+do not force unknown or infer measurements. Reporter evidence restrictions,
+Admin-only correction/approval, numeric validation, moderation, audit logging,
+private-source protection and two-source confidence checks remain. No historical
+rewrite, schema change or production data operation is part of this restoration.

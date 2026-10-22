@@ -25,6 +25,31 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current165 ORIGINAL MANUAL ADMIN MOVEMENT RESTORED / VERIFIED FOR RELEASE
+(2026-10-22 WAT): owner requested the original price-entry behavior after another
+blocking error. Compared original76dbd27: Admin creation/correction/approval did
+not require a prior comparable record. Restored that manual choice for Admins
+only; up/down/stable/unknown are preserved without historical comparisons or
+forced unknown. Removed obsolete comparison instructions/Review movement panel.
+Retained all records, measurements, graphs, other completed work, Admin-only
+correction/approval, reporter restrictions, numeric/range validation, moderation,
+audit/privacy and separately approved two-source confidence check. No full app
+rollback, migration, dependency, service or production setting change. The exact
+reason the screenshot still showed an error after selecting unknown cannot be
+proven from the image; this restoration removes the Admin restriction rather
+than claiming a reproduced unknown-path defect. Five focused isolated API tests
+(all four movement choices through create/approve/correct and security guards),
+one retained reporter/source evidence test, production build/seven admission
+cases,8 browser workflows and private-source browser checks PASS serially.
+Browser verified actual manual up creation ->approval ->down correction with
+unchanged entered amounts; no production records used. Local preview stopped.
+Evidence: batch-157-admin-manual-movement.json. Both Render Auto-Deploy Off;
+backend build confirmed pip install only, without migrations. Release backend
+first, then frontend; rollback artifacts ce0ca70/dep-dbc68a5g1s2s7396tnog and
+b41b741/dep-dbd03ko473hc73ae1770 remain compatible because no schema changes.
+35/36 complete; backup transport issue unchanged. Owner policy override recorded
+in docs/PRICE_CLAIM_EVIDENCE_APPROVAL.md.
+
 Current164 GRAPH/TICKER/PRICE-ENTRY CORRECTIONS LIVE / RELEASE PASS
 (2026-10-22 WAT): owner explicitly approved push/deploy. Verified clean b41b741
 and atomic fast-forward pushed master/development to
@@ -1885,7 +1910,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 | PY-11 | Correct saved administrator price state | Complete in batch 10; actual create/approve/correct/outdated/reject/reload browser regression passed |
 | PY-12 | Accurate existing quantity/type/market comparisons | Complete for owner-approved current-record/history-chart safeguards in batch 37: separate recorded specifications, matching commodity/market/unit/size/type only, no inferred missing measurements; all historical rows preserved. Cost-reference quantity linkage remains separate PY-29 work |
 | PY-13 | Consistent Nigerian dates/times | Complete for approved local scope69: Nigerian WAT price displays, Admin/Reporter entry/correction and current/history/comparison/CSV day filters. Inclusive WAT midnight/exclusive next midnight, exact UTC instants and unchanged raw history verified backend/PG; Lagos/UTC forms and desktop/mobile displays pass. No guessed zone for ambiguous legacy values; actual historical review remains35. Earlier UTC trial parsing31 and paid UTC expiry unchanged. Approval: docs/NIGERIAN_PRICE_TIME_APPROVAL.md, owner discretion2026-10-18 |
-| PY-14 | Evidence-based movement/confidence | Approved application scope complete79: new/changed two-source claims require distinct private references; new movement and pending approval require preceding approved, nonoutdated comparable recorded evidence. Both endpoints determine up/down/stable; unsupported claims require existing unknown. Historical labels/records retained; private evidence stays private. No proof of independent humans or retrospective editorial review claimed. Scope: docs/PRICE_CLAIM_EVIDENCE_APPROVAL.md |
+| PY-14 | Owner-controlled Admin movement / source evidence | Complete with owner revision165 (2026-10-22): original manual Admin movement restored for create/correct/approve; no forced unknown or historical comparison gate. Reporter movement evidence, two distinct private references for two-source confidence, numeric validation, authorization and source privacy remain. Historical records untouched; no proof of independent humans or retrospective review claimed. Scope: docs/PRICE_CLAIM_EVIDENCE_APPROVAL.md |
 | PY-15 | Prices recover after failed loading | Complete in batch 1; before/after browser regression passed |
 | PY-16 | Correct filters and response ordering | Complete for identified current/history/navigation scope in batches 22/28: applied filters, overlap, URL navigation, stale history/error/metadata and access-role browser regressions verified |
 | PY-17 | Correct market-detail loading | Complete for identified loading races/combined-failure defect in batch 16; obsolete commodity/account responses ignored and independent successful sections retained |

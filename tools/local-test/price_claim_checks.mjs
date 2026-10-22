@@ -23,11 +23,11 @@ try{
  const missing=await submit(422);assert.ok(missing.detail.includes('two different references'));
  await form.getByRole('button',{name:/Show extra fields/}).click();await form.getByLabel('Source 1 (private)',{exact:true}).fill('SYNTHETIC-CLAIM-ONE');await form.getByLabel('Source 2 (private)',{exact:true}).fill('synthetic-claim-one');
  await submit(422);await form.getByLabel('Source 2 (private)',{exact:true}).fill('SYNTHETIC-CLAIM-TWO');
- await form.locator('[name=movement]').selectOption('up');const unsupported=await submit(422);assert.ok(unsupported.detail.includes('preceding comparable'));
+ await form.locator('[name=movement]').selectOption('up');const manual=await submit(201);assert.equal(manual.movement,'up');
  await form.locator('[name=movement]').selectOption('unknown');const saved=await submit(201);assert.equal(saved.movement,'unknown');assert.equal(saved.bag_size,'Unknown');
  const proof=await page.evaluate(async id=>{const session=await fetch('/api/auth/browser/session').then(r=>r.json());const headers={'X-PriceYard-CSRF':session.csrf_token,'X-PriceYard-Session':session.session_id};const approval=await fetch(`/api/price-updates/${id}/approve`,{method:'PATCH',headers});if(!approval.ok)throw Error('Synthetic approval failed');const pub=await(await fetch('/api/price-updates')).json();return pub.find(x=>x.id===id);},saved.id);
  assert.ok(proof);assert.equal(proof.confidence_level,'Verified by 2 sources');assert.equal('source_1' in proof,false);assert.equal('source_2' in proof,false);
  assert.equal(await page.getByLabel(/grade/i).count(),0);await page.setViewportSize({width:375,height:812});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));assert.equal(outside,0);
- const report={original_admin_form:true,missing_or_duplicate_private_references_rejected:true,unknown_measurements_cannot_support_up_claim:true,explicit_unknown_saves_and_approves:true,private_evidence_excluded_from_public_response:true,no_grade_or_measurement_fields_added:true,mobile_layout_preserved:true,external_requests:outside,production_connections:0};
+ const report={original_admin_form:true,missing_or_duplicate_private_references_rejected:true,owner_restored_manual_admin_movement:true,explicit_unknown_saves_and_approves:true,private_evidence_excluded_from_public_response:true,no_grade_or_measurement_fields_added:true,mobile_layout_preserved:true,external_requests:outside,production_connections:0};
  fs.writeFileSync(path.join(lab,'runtime/price-claim-checks.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report));
 }finally{await browser.close();}

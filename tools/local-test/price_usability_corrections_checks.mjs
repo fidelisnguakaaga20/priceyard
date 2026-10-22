@@ -188,26 +188,31 @@ try {
   await create.getByLabel('Average', {exact: true}).fill('150');
   await create.getByLabel('Update date/time', {exact: true}).fill('2026-10-22T12:00');
   await movement.selectOption('up');
-  const rejected = page.waitForResponse(response => response.url() === origin + '/api/price-updates'
+  const created = page.waitForResponse(response => response.url() === origin + '/api/price-updates'
     && response.request().method() === 'POST');
   await create.getByRole('button', {name: 'Create pending update', exact: true}).click();
-  assert.equal((await rejected).status(), 422);
-  const review = page.getByRole('button', {name: 'Review movement', exact: true});
-  await review.click();
-  assert.equal(await movement.evaluate(node => node === document.activeElement), true);
+  const createdResponse = await created;
+  assert.equal(createdResponse.status(), 201);
+  const saved = await createdResponse.json(); syntheticCreatedRecords++;
+  assert.equal(saved.movement, 'up'); assert.equal(Number(saved.price_low), 100);
+  await page.waitForFunction(id => document.querySelector('.admin-action-panel input')?.value === String(id), saved.id);
   assert.equal(await create.getByLabel('Low', {exact: true}).inputValue(), '100');
   assert.equal(await create.getByLabel('High', {exact: true}).inputValue(), '200');
-  const fieldBounds = await movement.boundingBox();
-  const headerBottom = await page.locator('.site-header').evaluate(node => node.getBoundingClientRect().bottom);
-  assert.ok(fieldBounds.y >= headerBottom + 12 && fieldBounds.y < 667);
-  await movement.selectOption('unknown');
-  const accepted = page.waitForResponse(response => response.url() === origin + '/api/price-updates'
-    && response.request().method() === 'POST');
-  await create.getByRole('button', {name: 'Create pending update', exact: true}).click();
-  const response = await accepted; assert.equal(response.status(), 201);
-  const saved = await response.json(); syntheticCreatedRecords++;
-  assert.equal(saved.movement, 'unknown'); assert.equal(Number(saved.price_low), 100);
-  checks.movement_rejection_retains_draft_and_review_focus_allows_unknown_save_without_weakening_validation = true;
+  const approval = page.waitForResponse(response => response.url() === `${origin}/api/price-updates/${saved.id}/approve`
+    && response.request().method() === 'PATCH');
+  await page.locator('.admin-action-panel').getByRole('button', {name: 'Approve', exact: true}).click();
+  const approved = await approval; assert.equal(approved.status(), 200);
+  assert.equal((await approved.json()).movement, 'up');
+  const correction = page.locator('form.admin-form').nth(1);
+  await correction.locator('[name=movement]').selectOption('down');
+  const corrected = page.waitForResponse(response => response.url() === `${origin}/api/price-updates/${saved.id}`
+    && response.request().method() === 'PATCH');
+  await correction.getByRole('button', {name: 'Save correction', exact: true}).click();
+  const changed = await corrected; assert.equal(changed.status(), 200);
+  const final = await changed.json(); assert.equal(final.movement, 'down'); assert.equal(final.status, 'approved');
+  assert.equal(Number(final.price_low), 100);
+  assert.equal(await page.getByRole('button', {name: 'Review movement', exact: true}).count(), 0);
+  checks.original_manual_admin_create_approve_and_correct_preserve_selected_movement_and_prices = true;
   assert.equal(outside, 0); assert.deepEqual(errors, []);
 } catch (error) {
   failure = error.stack || String(error);

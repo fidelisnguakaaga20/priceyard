@@ -20,8 +20,9 @@ def verify_claim_evidence(check, engine):
     now = datetime.now(timezone.utc)
     with Session(engine) as db:
         owner = User(full_name='Synthetic claim editor', email='claims@example.com', role='admin', password_hash='unused', referral_code='CLAIMS')
+        reporter = User(full_name='Synthetic claim reporter', email='claims-reporter@example.com', role='reporter', password_hash='unused', referral_code='CLAIMREPORTER')
         commodity, market = Commodity(name='Egusi'), Market(name='Kwali Market')
-        db.add_all([owner,commodity,market]); db.flush()
+        db.add_all([owner,reporter,commodity,market]); db.flush()
         common = dict(commodity_id=commodity.id,market_id=market.id,unit='recorded quantity one',
             bag_size='recorded size one',commodity_type='recorded type one',price_low=100,price_high=200,
             average_price=150,confidence_level='Low confidence',movement='unknown',suggested_action='Watch')
@@ -32,7 +33,7 @@ def verify_claim_evidence(check, engine):
             db.add(PriceUpdate(**{**common,**changes},created_by=owner.id,update_date_time=now-timedelta(hours=1)))
         legacy = PriceUpdate(**{**common,'movement':'up','bag_size':None,'confidence_level':'Verified by 2 sources'},
             status='pending',created_by=owner.id,update_date_time=now+timedelta(hours=1),source_1='SAME-PRIVATE',source_2='same-private')
-        db.add(legacy); db.commit(); owner_id,legacy_id=owner.id,legacy.id
+        db.add(legacy); db.commit(); owner_id,reporter_id,legacy_id=owner.id,reporter.id,legacy.id
         before=db.execute(select(PriceUpdate.__table__).order_by(PriceUpdate.id)).all()
     accepted=0; rejected=0
     for movement,low,high,valid in (('up',110,210,True),('down',90,190,True),('stable',100,200,True),
@@ -41,10 +42,10 @@ def verify_claim_evidence(check, engine):
             payload=PriceUpdateCreate(**{**common,'movement':movement,'price_low':low,'price_high':high,
                 'average_price':(low+high)/2,'update_date_time':now})
             if valid:
-                item=create_price_update(db,payload,db.get(User,owner_id),commit=False)
+                item=create_price_update(db,payload,db.get(User,reporter_id),commit=False)
                 check.assertEqual(item.movement,movement); accepted+=1
             else:
-                with check.assertRaises(HTTPException) as error:create_price_update(db,payload,db.get(User,owner_id),commit=False)
+                with check.assertRaises(HTTPException) as error:create_price_update(db,payload,db.get(User,reporter_id),commit=False)
                 check.assertEqual(error.exception.status_code,422); rejected+=1
             db.rollback()
     for changes in ({'bag_size':'Unknown'},{'commodity_type':None},{'unit':'recorded quantity two'},
@@ -53,7 +54,7 @@ def verify_claim_evidence(check, engine):
         with Session(engine) as db:
             payload=PriceUpdateCreate(**{**common,'movement':'up','price_low':110,'price_high':210,'average_price':160,
                                        'update_date_time':now,**changes})
-            with check.assertRaises(HTTPException):create_price_update(db,payload,db.get(User,owner_id),commit=False)
+            with check.assertRaises(HTTPException):create_price_update(db,payload,db.get(User,reporter_id),commit=False)
             db.rollback(); rejected+=1
     for a,b,valid in ((None,None,False),('PRIVATE-ONE',None,False),(' PRIVATE-ONE ','private-one',False),('PRIVATE-ONE','PRIVATE-TWO',True)):
         with Session(engine) as db:
