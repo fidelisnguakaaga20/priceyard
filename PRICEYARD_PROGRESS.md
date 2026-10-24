@@ -25,6 +25,28 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current169 ALL THREE FRONTEND POLISH CHANGES LIVE / RELEASE PASS (2026-10-24
+WAT): committed2f47f83111f51525a2ba2f9ea4ceb44675027aff and atomic fast-forward
+pushed master/development; both Render Auto-Deploy Off. Existing frontend
+priceyard deploydep-dbec0k3ncjis73dop060 LIVE at that exact source. No backend
+deployment: priceyard-api remains97d004b/dep-dbd1r0tg1s2s73esongg LIVE. Reused
+Current168 production build,7 origin cases and18 serial browser groups.
+Bounded read-only live browser PASS: word-only amber Pause/green Resume and
+actual animation/reduced-motion behavior, small control below ticker, compact
+80px desktop/56px mobile commodity introduction, all public price options and
+detail records retained, single commodity photos, history links/Menu/guest gate
+and private401 session preserved. New history periods/WAT filtering code served;
+protected interactive behavior verified locally with synthetic accounts, without
+production customer access. All browser writes blocked, including activity ping.
+No migrations, production records, service settings or business rules changed;
+manual Admin movement restoration preserved. Rollback remains the prior LIVE
+frontend artifact dep-dbd1se1srm7s73bbg620; no database/backend rollback required.
+Evidence: batch-161-period-and-polish-release.json includes Chrome proof steps.
+Open a new Chrome tab and Ctrl+Shift+R; check ticker colours, commodity prices
+higher on page, then authenticated Price History7/30/All buttons above graph.
+Empty recent periods are valid: All history retains older records.35/36 and
+paused automatic-backup transport safeguard unchanged; await Supabase support.
+
 Current168 THREE OWNER-APPROVED FRONTEND POLISH CHANGES VERIFIED (2026-10-24
 WAT): word-only Pause/Resume now use readable amber/green states in a small
 control below the full-width ticker. Commodity detail introduction is compact;

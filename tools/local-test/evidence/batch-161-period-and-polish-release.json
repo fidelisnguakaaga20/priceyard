@@ -1,0 +1,95 @@
+{
+  "status": "PASS",
+  "date": "2026-10-24",
+  "authorization": "Owner explicitly requested all three frontend improvements be implemented, committed, pushed and deployed",
+  "deployed_commit": "2f47f83111f51525a2ba2f9ea4ceb44675027aff",
+  "frontend": {
+    "service_id": "srv-da6ddb2jnfac73e39490",
+    "deploy_id": "dep-dbec0k3ncjis73dop060",
+    "status": "live",
+    "asset": "/assets/index-BCudA79o.js"
+  },
+  "backend": {
+    "service_id": "srv-da6d9gqjnfac73e2sbfg",
+    "deploy_id": "dep-dbd1r0tg1s2s73esongg",
+    "commit": "97d004b784b3cc299bfb68e182090b8b57d5be77",
+    "status": "live",
+    "redeployed": false
+  },
+  "local_evidence": "batch-160-period-and-polish.json",
+  "local_verification": "Production build,7 origin admission cases,10 focused and8 regression browser groups PASS; tested source matches committed frontend",
+  "public_browser": {
+    "status": "PASS",
+    "commit": "2f47f83111f51525a2ba2f9ea4ceb44675027aff",
+    "approved_application_source": "2f47f83111f51525a2ba2f9ea4ceb44675027aff",
+    "deploy": "dep-dbec0k3ncjis73dop060",
+    "public_grouped_prices_rendered": true,
+    "all_public_price_options_preserved": true,
+    "one_photo_per_commodity": true,
+    "desktop_mobile_no_overflow": true,
+    "restored_history_code_served": true,
+    "guest_history_access_preserved": true,
+    "unauthenticated_session_private_401": true,
+    "public_history_links_match_price_record_ids": true,
+    "mobile_compact_header_and_menu": true,
+    "all_three_navigation_features_served": true,
+    "all_three_convenience_features_served": true,
+    "live_pause_resume_and_reduced_motion": true,
+    "graph_ticker_and_price_entry_correction_code_served": true,
+    "small_control_below_full_width_animation": {
+      "width": 64,
+      "height": 24,
+      "below_animation": true,
+      "full_width_animation": true
+    },
+    "manual_admin_form_served": true,
+    "backend_deploy_id": "dep-dbd1r0tg1s2s73esongg",
+    "distinct_text_only_pause_resume_colours": true,
+    "history_period_code_and_wat_served": true,
+    "compact_commodity_intro": {
+      "desktop": {
+        "width": 80,
+        "height": 80
+      },
+      "mobile": {
+        "width": 56,
+        "height": 56
+      }
+    },
+    "all_commodity_detail_records_retained": true,
+    "app_asset": "/assets/index-BCudA79o.js",
+    "write_requests_sent": 0,
+    "blocked_write_requests": [
+      {
+        "method": "POST",
+        "path": "/api/activity/ping"
+      }
+    ],
+    "blocked_external_requests": 0,
+    "login_or_customer_access_attempts": 0,
+    "backend_deployment": false,
+    "database_migrations": false
+  },
+  "protected_history_limit": "Period interaction, WAT boundaries and synchronized graph/table/cards verified with synthetic authorized local accounts. Production history access was not bypassed and no customer login was attempted; matching built code verified live.",
+  "both_services_auto_deploy": "off",
+  "production_settings_changed": false,
+  "migrations_run": false,
+  "production_records_changed": 0,
+  "business_rules_changed": false,
+  "new_services_or_dependencies": false,
+  "local_preview_stopped": true,
+  "rollback": {
+    "frontend_deploy": "dep-dbd1se1srm7s73bbg620",
+    "backend_or_schema_rollback_required": false
+  },
+  "chrome_verification": [
+    "Open https://priceyard.onrender.com/prices in a new Chrome tab; Ctrl+Shift+R",
+    "Below ticker: amber Pause; click for green Resume; words only and scrolling changes",
+    "Click a commodity name: smaller image/title introduction and existing prices higher on the page",
+    "Sign in, open Price History, select commodity/market and Search history; try7 days/30 days/All history above graph; selected state, date range, graph and records change together",
+    "If no prices fall in a recent period, choose All history; original records remain available"
+  ],
+  "checklist_completed": 35,
+  "checklist_remaining": 1,
+  "remaining_item": "Unchanged PY-35 secure automatic backup transport safeguard; awaiting Supabase support; daily task remains paused"
+}
