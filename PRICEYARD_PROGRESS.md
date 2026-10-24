@@ -25,6 +25,28 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current168 THREE OWNER-APPROVED FRONTEND POLISH CHANGES VERIFIED (2026-10-24
+WAT): word-only Pause/Resume now use readable amber/green states in a small
+control below the full-width ticker. Commodity detail introduction is compact;
+existing prices, images, quantities and protected intelligence remain intact.
+History has7 days/30 days/All history buttons; Nigeria calendar-day boundaries
+and one date snapshot keep the chart, desktop table, mobile cards and interval
+label consistent. All history is the default and retains ambiguous-date legacy
+records; empty recent periods offer All history, without extra API requests.
+Production TypeScript/Vite build and7 origin admission cases PASS;10 focused
+synthetic browser groups and8 targeted existing browser regressions PASS
+serially.320/375/1366 layouts, Easy reading, both themes, keyboard, reduced
+motion, truthful measurement-separated graphs and existing manual Admin
+create/approve/correct PASS. The mobile graph remains visible below the sticky
+header after search. Tested source bytes match the release files. Preview
+stopped; no dependencies/backend/schema/business rules or production records
+changed. Owner explicitly approved commit/push/frontend deployment. Both Render
+Auto-Deploy Off confirmed; manually deploy frontend only and retain previous
+dep-dbd1se1srm7s73bbg620 for rollback. Backend remains97d004b/
+dep-dbd1r0tg1s2s73esongg. Evidence: batch-160-period-and-polish.json.35/36
+and paused automatic-backup transport safeguard remain unchanged; await the
+already-requested Supabase support reply without repeating backup diagnostics.
+
 Current167 ORIGINAL MANUAL ADMIN MOVEMENT LIVE / RELEASE PASS (2026-10-22 WAT):
 owner explicitly approved this backend and frontend restoration, resolving the
 Current166 automatic-review block. Both existing services deployed sequentially

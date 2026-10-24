@@ -31,7 +31,6 @@ export function PriceTicker({ items, savedAt = null }: { items: PriceUpdate[]; s
         title="Only pauses scrolling; prices still refresh."
         onClick={() => setScrollingPaused((paused) => !paused)}
       >
-        <span aria-hidden="true">{scrollingPaused ? "▶" : "Ⅱ"}</span>
         {scrollingPaused ? "Resume" : "Pause"}
       </button>
     </div></>

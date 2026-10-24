@@ -16,6 +16,7 @@ import { confidenceClass, money, movementIcon } from "../utils";
 
 import { PRICE_TIME_LABEL, priceEpoch, shortPriceDate } from "../utils/priceTime";
 import { recordedPriceGroups } from "../utils/priceComparability";
+import { historyInPeriod, historyPeriodDescription, type HistoryPeriod } from "../utils/historyPeriod";
 import "./history-controls.css";
 
 export function PriceHistoryPage() {
@@ -43,14 +44,20 @@ export function PriceHistoryPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [historyOrder, setHistoryOrder] = useState<"oldest" | "newest">("oldest");
-  const hasGraph = useMemo(() => recordedPriceGroups(items).some(group => group.items.length > 1), [items]);
-  const orderedItems = useMemo(() => [...items].sort((a, b) => {
+  const [historyPeriod, setHistoryPeriod] = useState<HistoryPeriod>("all");
+  const periodResult = useMemo(() => {
+    const now = Date.now();
+    return { items: historyInPeriod(items, historyPeriod, now), description: historyPeriodDescription(historyPeriod, now) };
+  }, [items, historyPeriod]);
+  const periodItems = periodResult.items;
+  const hasGraph = useMemo(() => recordedPriceGroups(periodItems).some(group => group.items.length > 1), [periodItems]);
+  const orderedItems = useMemo(() => [...periodItems].sort((a, b) => {
     const first = priceEpoch(a.update_date_time), second = priceEpoch(b.update_date_time);
     // Undated/ambiguous legacy records remain visible, after the dated records.
     if (!Number.isFinite(first)) return Number.isFinite(second) ? 1 : 0;
     if (!Number.isFinite(second)) return -1;
     return (historyOrder === "oldest" ? 1 : -1) * (first - second || a.id - b.id);
-  }), [items, historyOrder]);
+  }), [periodItems, historyOrder]);
   const requestSequence = useRef(0);
   const activeAccess = useRef({ token, hasFullAccess });
   activeAccess.current = { token, hasFullAccess };
@@ -174,9 +181,22 @@ export function PriceHistoryPage() {
 
       {loading ? <LoadingSpinner label="Loading price history…" /> : error ? <div className="status-box error">{error}</div> : <>
         <div id="history-chart-results" ref={chartResultsRef} role="region" aria-label="Price graph and recorded prices" tabIndex={-1}>
-          <PriceTrendChart items={items} />
+          {items.length > 0 && <div className="history-period-controls">
+            <div className="history-period-buttons" role="group" aria-label="History period">
+              {([["7", "7 days"], ["30", "30 days"], ["all", "All history"]] as const).map(([value, label]) =>
+                <button type="button" key={value} aria-pressed={historyPeriod === value} aria-controls="history-records"
+                  onClick={() => setHistoryPeriod(value)}>{label}</button>)}
+            </div>
+            <p className="muted history-period-description" aria-live="polite">{periodResult.description} · {periodItems.length} record{periodItems.length === 1 ? "" : "s"}</p>
+            {historyPeriod !== "all" && items.some(item => !Number.isFinite(priceEpoch(item.update_date_time))) &&
+              <p className="muted history-period-note">Records without a confirmed date are available in All history.</p>}
+          </div>}
+          <PriceTrendChart items={periodItems} />
+          {items.length > 0 && !periodItems.length && <div className="status-box history-period-empty" role="status">
+            No recorded prices in the last {historyPeriod} days. Choose All history to see the other dates.
+          </div>}
         </div>
-        {items.length > 1 && <div className="history-list-toolbar">
+        {periodItems.length > 1 && <div className="history-list-toolbar">
           <label htmlFor="history-order">History order</label>
           <select id="history-order" value={historyOrder} aria-controls="history-records" onChange={event => setHistoryOrder(event.target.value as "oldest" | "newest")}>
             <option value="oldest">Oldest first</option><option value="newest">Newest first</option>

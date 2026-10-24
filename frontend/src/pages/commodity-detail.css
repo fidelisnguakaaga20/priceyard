@@ -1,0 +1,56 @@
+/* Keep this introduction compact so the commodity's prices are easy to reach. */
+.commodity-detail-page.page-section {
+  padding-top: 24px;
+}
+
+.commodity-detail-page .commodity-page-intro {
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  max-width: none;
+  margin-bottom: 20px;
+}
+
+.commodity-detail-page .commodity-page-intro .commodity-image-detail {
+  width: 80px;
+  margin: 0;
+}
+
+.commodity-detail-page .commodity-intro-copy {
+  min-width: 0;
+}
+
+.commodity-detail-page .commodity-page-intro h1 {
+  margin: 4px 0 0;
+  font-size: clamp(1.75rem, 3.4vw, 2.7rem);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.commodity-detail-page .commodity-page-intro p {
+  margin: 6px 0 0;
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 640px) {
+  .commodity-detail-page.page-section {
+    padding-top: 20px;
+  }
+
+  .commodity-detail-page .commodity-page-intro {
+    grid-template-columns: 56px minmax(0, 1fr);
+    align-items: start;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .commodity-detail-page .commodity-page-intro .commodity-image-detail {
+    width: 56px;
+  }
+
+  .commodity-detail-page .commodity-page-intro h1 {
+    font-size: 1.75rem;
+  }
+}

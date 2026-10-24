@@ -15,6 +15,7 @@ import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { apiFetch, apiFetchWithProvenance } from "../services/api";
 import type { BuyingZone, CostBreakdown, Market, MarketSignal, PriceUpdate, QualitySignal, SellWatchWindow, StorageSuitability } from "../types/api";
 import { commodityTitleColor, confidenceClass, isWithinSeasonalMonths, money, movementIcon, priceShareContent, shortDate, whatsAppShareUrl } from "../utils";
+import "./commodity-detail.css";
 
 export function CommodityDetailPage() {
   const { commodityName = "" } = useParams();
@@ -101,10 +102,10 @@ export function CommodityDetailPage() {
     return () => { current = false; };
   }, [commodityId, user?.id, hasFullAccess, token, name]);
 
-  return <section className="page page-section">
-    <div className="page-title detail-title-row">
+  return <section className="page page-section commodity-detail-page">
+    <div className="page-title detail-title-row commodity-page-intro">
       <CommodityImage src={prices[0]?.commodity.image_url} alt={displayName} className="commodity-image-detail" />
-      <div><span className="eyebrow">Commodity intelligence</span><h1 style={{ color: commodityTitleColor(displayName) }}>{displayName}</h1><p>Current approved market records plus full-access intelligence where your subscription permits.</p></div>
+      <div className="commodity-intro-copy"><span className="eyebrow">Current market prices</span><h1 style={{ color: commodityTitleColor(displayName) }}>{displayName}</h1><p>Current prices by market and quantity.</p></div>
     </div>
     {(error || intelligenceError) && <div className="status-box error">{error || intelligenceError}</div>}
     {!loading && prices.length > 0 && <SavedPriceNotice savedAt={priceResult.savedAt} />}

@@ -1,0 +1,77 @@
+{
+  "status": "PASS_LOCAL",
+  "date": "2026-10-24",
+  "base_commit": "577b7393d8ac0da0d2b58ce26ce01f1840c814ef",
+  "scope": [
+    "Word-only amber Pause and green Resume below ticker",
+    "Compact commodity introduction with existing prices higher on the page",
+    "7 days, 30 days and All history for chart, desktop table and mobile cards"
+  ],
+  "authorization": "Owner explicitly requested implementation, commit, push and deployment of all three frontend changes",
+  "build": {
+    "typescript": "PASS",
+    "vite_production": "PASS",
+    "origin_admission_cases": 7
+  },
+  "focused_browser_checks": 10,
+  "focused_results": {
+    "guest_history_gate_remains_and_does_not_request_private_history": true,
+    "all_history_default_preserves_ambiguous_dates_and_invalid_prices_in_both_lists": true,
+    "seven_wat_calendar_days_include_start_and_today_but_exclude_previous_millisecond_and_tomorrow": true,
+    "thirty_day_boundary_and_unconfirmed_date_notice_filter_every_view_without_refetching": true,
+    "history_order_only_changes_lists_and_all_history_restores_original_records": true,
+    "empty_period_offers_all_history_recovery_without_losing_records_or_fetching": true,
+    "mobile_period_controls_fit_and_mobile_prices_match_chart_period": true,
+    "word_only_ticker_colors_keyboard_focus_pause_resume_and_reduced_motion_pass": true,
+    "compact_ticker_stays_below_full_width_animation_in_easy_reading_and_both_themes": true,
+    "compact_commodity_intro_brings_all_existing_price_cards_into_view_without_changing_records": true
+  },
+  "regression_browser_checks": 8,
+  "regression_results": {
+    "mobile_easy_reading_graph_shortcut_reveals_actual_plot_below_sticky_header": true,
+    "successful_explicit_search_focuses_and_reveals_graph_without_initial_load_jump": true,
+    "area_and_prominent_line_only_join_comparable_records_with_ranges_and_inspection_preserved": true,
+    "failed_search_keeps_filter_position_and_shows_error": true,
+    "singleton_keeps_honest_summary_and_does_not_promise_a_trend_graph": true,
+    "compact_ticker_control_sits_below_full_width_animation_and_pause_resume_remain_operable": true,
+    "prefill_keeps_unknown_default_and_preserves_an_explicit_movement_choice": true,
+    "original_manual_admin_create_approve_and_correct_preserve_selected_movement_and_prices": true
+  },
+  "period_semantics": "Nigeria WAT calendar days including today, midnight start inclusive and next-day midnight exclusive; explicit recorded dates only; All history retains every original row",
+  "date_consistency": "Range label and filtered records share one timestamp snapshot per data/period selection",
+  "mobile_plot_visible_pixels_after_search": 221.5,
+  "viewport_widths": [
+    320,
+    375,
+    1366
+  ],
+  "easy_reading_and_light_dark": "PASS",
+  "source_matches_tested_snapshot": true,
+  "source_sha256": {
+    "frontend/src/components/PriceTicker.tsx": "0358c427cc38e9bbf463cd4c03c60dd3ab4e938577aa207cd423cf9036611fcd",
+    "frontend/src/components/PriceTicker.css": "12ead865244dd64a32a6d1f90374be8ced046cbd0f095c74926addee9a41dc05",
+    "frontend/src/pages/CommodityDetailPage.tsx": "c85a1feb211a922549c7747405a8c56416e45887bf87ae72fd05b64af9b71614",
+    "frontend/src/pages/commodity-detail.css": "1a6f04b0029f0ce1ddfca1acaf1bdfac2e43f1a88ef5630717cba4a5be35852d",
+    "frontend/src/pages/PriceHistoryPage.tsx": "ad3f06be273481b0cffda4b2d25fc5842a57d47efdfed9834b8cf14c210b61d0",
+    "frontend/src/pages/history-controls.css": "3c0d9c4e97a1108bb16c2636194d5aac9a844708833f9155e6e7e1c3fbd14d47",
+    "frontend/src/utils/historyPeriod.ts": "99138601ce97f6098192f95b8c5beec784b15e48f98ebee1ebf76a90ef44a16e"
+  },
+  "external_browser_requests": 0,
+  "browser_page_errors": 0,
+  "synthetic_only": true,
+  "production_connections": 0,
+  "production_records_changed": 0,
+  "backend_changes": false,
+  "business_rule_changes": false,
+  "api_or_schema_changes": false,
+  "new_dependencies": false,
+  "local_preview_stopped": true,
+  "release_plan": "Atomic fast-forward push reviewed commit to master/development with both Auto-Deploy Off; manually deploy frontend only; bounded read-only public verification; retain previous LIVE frontend artifact for rollback",
+  "rollback_frontend_deploy": "dep-dbd1se1srm7s73bbg620",
+  "backend_remains": "97d004b784b3cc299bfb68e182090b8b57d5be77 / dep-dbd1r0tg1s2s73esongg",
+  "pushed": false,
+  "deployed": false,
+  "checklist_completed": 35,
+  "checklist_remaining": 1,
+  "remaining_item": "Unchanged PY-35 secure automatic backup transport safeguard; awaiting Supabase support, daily task remains paused"
+}
