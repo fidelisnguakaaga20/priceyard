@@ -25,6 +25,34 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current173 PROTECTED OWNER LIVE / EXACT-COMMIT RELEASE PASS (2026-10-25 WAT):
+owner-approved2604ccd07bcff0d024f92428ff728eff5bebdc2d committed and atomic
+fast-forward pushed master/development. Backend priceyard-api deployment
+dep-dbf4hirrjlhs73ffh9r0 LIVE, then direct/proxied health and fresh Owner schema
+PASS, then frontend priceyard deployment dep-dbf4igjrjlhs73ffkjf0 LIVE at the
+same reviewed source. Both Auto-Deploy remain Off; backend build installs
+requirements only, no migrations. Reused Current172 verification:12 Owner API,
+8 revocation,5 audit/rollback,3 PostgreSQL concurrency and8 real-cookie browser
+groups PASS; production build/seven admission cases PASS. No stale source:
+live new asset includes Owner controls/history note and matching backend schema
+includes read-only is_owner; previous UI/manual Admin price-entry retained.
+Permissions are derived from current DB state; old-token and queued-request
+tests confirm demoted/deactivated Admins cannot retain authority. Public prices,
+visible search and mobile layout PASS; anonymous profile/users remain401,
+private profile no-store. Live verification blocked all writes/activity ping;
+no production login, role changes, account deactivation, billing/history rewrites,
+provider settings, migrations or new services/dependencies. Founder confirmation
+is read-only: new Chrome tab /admin/users, Ctrl+Shift+R, Access: Owner, Owner
+badge and disabled role/Deactivate controls. Existing expired subscription may
+remain for history; Owner access explanation clarifies no renewal is needed.
+Only Owner appoints/manages Admins; other Admins keep permitted non-Admin work;
+all14 cards preserved. Actual protected workflows tested synthetically, not by
+changing live customers. Evidence: batch-165-owner-protection-release.json.
+Local preview/native server stopped. Prior frontend/backend artifacts retained;
+UI rollback should keep backend guards, while backend rollback removes them.
+35/36 and paused PY-35 encrypted-backup transport safeguard unchanged; await
+the existing Supabase support reply without repeating backup work.
+
 Current172 PROTECTED OWNER SAFEGUARDS VERIFIED / READY FOR APPROVED RELEASE
 (2026-10-25 WAT): owner explicitly requested founder protection, push/deploy and
 no stale permissions. Existing founder Admin is recognised as Owner using one

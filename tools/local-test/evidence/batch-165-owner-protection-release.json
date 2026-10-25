@@ -1,0 +1,112 @@
+{
+  "status": "PASS_DEPLOYED",
+  "date": "2026-10-25",
+  "authorization": "Owner explicitly approved protected founder authority, push and deployment, then requested completion with no staleness",
+  "deployed_commit": "2604ccd07bcff0d024f92428ff728eff5bebdc2d",
+  "backend": {
+    "service_id": "srv-da6d9gqjnfac73e2sbfg",
+    "deploy_id": "dep-dbf4hirrjlhs73ffh9r0",
+    "status": "live"
+  },
+  "frontend": {
+    "service_id": "srv-da6ddb2jnfac73e39490",
+    "deploy_id": "dep-dbf4igjrjlhs73ffkjf0",
+    "status": "live"
+  },
+  "release_sequence": [
+    "Atomic fast-forward push with both Auto-Deploy Off",
+    "Backend LIVE at exact approved commit",
+    "Direct/proxied API health and new Owner response schema PASS",
+    "Frontend LIVE at same commit",
+    "Fresh served asset/new schema and public access boundary PASS"
+  ],
+  "local_evidence": "batch-164-owner-protection.json",
+  "local_verification": {
+    "owner_api_methods": 12,
+    "revocation_regressions": 8,
+    "audit_rollback_regressions": 5,
+    "postgres_concurrency_cases": 3,
+    "browser_workflow_groups": 8,
+    "production_build": "PASS",
+    "origin_admission_cases": 7
+  },
+  "backend_read_only_verification": {
+    "status": "PASS",
+    "commit": "2604ccd07bcff0d024f92428ff728eff5bebdc2d",
+    "backend_deploy": "dep-dbf4hirrjlhs73ffh9r0",
+    "checks": [
+      {
+        "endpoint": "https://priceyard-api.onrender.com",
+        "health": "PASS",
+        "fresh_owner_response_schema": true,
+        "owner_is_not_a_writable_role_or_field": true
+      },
+      {
+        "endpoint": "https://priceyard.onrender.com/api",
+        "health": "PASS",
+        "fresh_owner_response_schema": true,
+        "owner_is_not_a_writable_role_or_field": true
+      }
+    ],
+    "requests": 4,
+    "writes": 0,
+    "credentials_used": false,
+    "customer_records_accessed": false
+  },
+  "frontend_read_only_verification": {
+    "status": "PASS",
+    "commit": "2604ccd07bcff0d024f92428ff728eff5bebdc2d",
+    "frontend_deploy": "dep-dbf4igjrjlhs73ffkjf0",
+    "checks": {
+      "asset": "/assets/index-DetSCWUI.js",
+      "owner_code": true,
+      "expired_history_note": true,
+      "previous_ui": true,
+      "manual_admin_form": true,
+      "fresh_backend_schema": true,
+      "anonymous_session": 401,
+      "private_session": true,
+      "anonymous_users": 401,
+      "public_cards": 3,
+      "public_options": 10
+    },
+    "write_requests_sent": 0,
+    "blocked_write_requests": [
+      {
+        "method": "POST",
+        "path": "/api/activity/ping"
+      }
+    ],
+    "blocked_external_requests": 0,
+    "customer_logins": 0,
+    "production_user_changes": 0,
+    "actual_owner_session_verification": "Founder Chrome confirmation required; no account impersonation or production role mutation attempted"
+  },
+  "staleness_proof": "Same live source commit on both services; served asset differs from old release and includes new Owner code; live proxied schema contains is_owner. Synthetic old-token and queued-request races prove permissions re-read current DB role/activity/session version.",
+  "protected_account_live_limit": "No production account impersonation, customer login, role edit, deactivation or subscription rewrite used for verification. Founder should confirm their read-only Owner badge in Chrome.",
+  "both_auto_deploy": "off",
+  "production_settings_changed": false,
+  "migrations_run": false,
+  "production_records_changed": 0,
+  "customer_access_or_credentials_requested": false,
+  "schema_changes": false,
+  "new_services_or_dependencies": false,
+  "subscription_payment_measurement_rules_preserved": true,
+  "all_fourteen_admin_cards_preserved": true,
+  "servers_stopped": "Local synthetic preview and PostgreSQL stopped after tests",
+  "rollback": {
+    "frontend_deploy": "dep-dbf09029lscs738boojg",
+    "backend_deploy": "dep-dbd1r0tg1s2s73esongg",
+    "limit": "Prefer frontend-only rollback retaining backend protection. Reverting backend removes new Owner safeguards; no data/schema reversal required."
+  },
+  "chrome_confirmation": [
+    "Open https://priceyard.onrender.com/admin/users in a new tab and press Ctrl+Shift+R; sign in with the founder account if prompted",
+    "Header should say Access: Owner",
+    "Founder row should show Owner / Protected Owner account; role and Deactivate controls must be disabled",
+    "Other Admin accounts remain manageable by Owner; do not change real roles just to test",
+    "Admin > Subscriptions: founder expired history can remain, with Owner access does not expire explanation; no renewal needed"
+  ],
+  "checklist_completed": 35,
+  "checklist_remaining": 1,
+  "remaining_item": "Unchanged PY-35 encrypted automatic-backup transport safeguard; await existing Supabase support reply; scheduled task remains paused"
+}
