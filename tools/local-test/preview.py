@@ -16,6 +16,7 @@ LAB = Path(__file__).resolve().parent
 sys.path.insert(0, str(LAB))
 import guard
 guard.isolate()
+os.environ["OWNER_EMAIL"] = "owner@example.com"  # Fabricated protected Owner only.
 
 isolation = json.loads((LAB / "runtime/isolation.json").read_text())
 if isolation != {"checks": 6, "failures": 0, "errors": 0, "dotenv_contents_opened": False, "production_contacts": 0}:
@@ -78,7 +79,7 @@ now = datetime.now(timezone.utc)
 with Session(engine) as db:
     users = {}
     demo_hash = hash_password("PriceYardDemo8!")
-    for name, role, access in (("free", "free_user", "free"), ("trial", "free_user", "trial"), ("paid", "paid_user", "active"), ("reporter", "reporter", "free"), ("admin", "admin", "free"), ("expired-reporter", "reporter", "trial_expired"), ("expired-paid-reporter", "reporter", "paid_expired"), ("reset", "free_user", "trial"), ("payment", "free_user", "free"), ("manual-paid", "paid_user", "manual_active"), ("value-paid", "paid_user", "active"), ("value-trial", "free_user", "trial"), ("verify", "free_user", "free"), ("referrer", "free_user", "trial"), ("google", "free_user", "trial")):
+    for name, role, access in (("free", "free_user", "free"), ("trial", "free_user", "trial"), ("paid", "paid_user", "active"), ("reporter", "reporter", "free"), ("admin", "admin", "free"), ("owner", "admin", "trial_expired"), ("expired-reporter", "reporter", "trial_expired"), ("expired-paid-reporter", "reporter", "paid_expired"), ("reset", "free_user", "trial"), ("payment", "free_user", "free"), ("manual-paid", "paid_user", "manual_active"), ("value-paid", "paid_user", "active"), ("value-trial", "free_user", "trial"), ("verify", "free_user", "free"), ("referrer", "free_user", "trial"), ("google", "free_user", "trial")):
         user = User(full_name=f"Test {name.title()}", email=f"{name}@example.com", password_hash=demo_hash, role=role, is_active=True, referral_code="TEST"+name.upper())
         if name == "trial":
             user.phone = "+2348000000001"  # Fabricated notification recipient only.

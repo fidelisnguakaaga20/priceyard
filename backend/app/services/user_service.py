@@ -5,7 +5,8 @@ from sqlalchemy.orm import Session
 from app.models.user import User
 from app.models.subscription import Subscription
 from app.schemas.user_schema import AdminUserUpdate
-from app.services.subscription_service import lock_subscription_state, update_subscription_status
+from app.services.owner_policy import authorize_user_update
+from app.services.subscription_service import apply_paid_expiry, apply_trial_expiry, lock_subscription_state, update_subscription_status
 
 
 def list_users(db: Session) -> list[User]:
@@ -38,9 +39,17 @@ def prepare_user_update(db: Session, user_id: int) -> tuple[User, Subscription |
     return lock_subscription_state(db, user_id)
 
 
-def update_user(db: Session, user: User, payload: AdminUserUpdate, *, commit: bool = True, prepared: bool = False) -> User:
+def update_user(
+    db: Session, user: User, payload: AdminUserUpdate, *, actor: User,
+    actor_auth_version: int | None = None, commit: bool = True, prepared: bool = False,
+) -> User:
+    actor_id = actor.id
+    captured_version = actor.auth_version if actor_auth_version is None else actor_auth_version
     if not prepared:
-        user, _ = prepare_user_update(db, user.id)
+        user, subscription = prepare_user_update(db, user.id)
+    else:
+        subscription = db.scalar(select(Subscription).where(Subscription.user_id == user.id))
+    authorize_user_update(db, user, payload, actor_id=actor_id, actor_auth_version=captured_version)
     would_deactivate = payload.is_active is False
     would_demote = payload.role is not None and payload.role != "admin"
     if (would_deactivate or would_demote) and _is_last_active_admin(db, user):
@@ -49,6 +58,11 @@ def update_user(db: Session, user: User, payload: AdminUserUpdate, *, commit: bo
             detail="Cannot deactivate or demote the last active admin account",
         )
 
+    # Policy checks precede every mutation, including subscription expiry cleanup.
+    if subscription is not None:
+        apply_trial_expiry(subscription)
+        apply_paid_expiry(subscription)
+
     if payload.is_active is not None:
         if user.is_active and payload.is_active is False:
             db.execute(update(User).where(User.id == user.id).values(auth_version=User.auth_version + 1))
@@ -56,7 +70,6 @@ def update_user(db: Session, user: User, payload: AdminUserUpdate, *, commit: bo
 
     if payload.role in {"paid_user", "free_user"}:
         # Avoid expiry helpers that commit independently and release the guard.
-        subscription = db.scalar(select(Subscription).where(Subscription.user_id == user.id))
         if subscription is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
         update_subscription_status(db, subscription, "active" if payload.role == "paid_user" else "free", commit=False)

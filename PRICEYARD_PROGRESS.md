@@ -25,6 +25,32 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current172 PROTECTED OWNER SAFEGUARDS VERIFIED / READY FOR APPROVED RELEASE
+(2026-10-25 WAT): owner explicitly requested founder protection, push/deploy and
+no stale permissions. Existing founder Admin is recognised as Owner using one
+unique configured email match plus active Admin status; new/free/ambiguous
+accounts cannot acquire Owner authority. Stored roles and records stay intact;
+is_owner is read-only derived metadata. Only Owner can appoint/manage Admins;
+nobody can demote/deactivate Owner, including self. Ordinary Admins retain normal
+non-Admin work and all14 original dashboard cards. Owner has full access despite
+expired subscription; expired billing history is explained without alteration.
+Current DB role/activity/session version is rechecked after existing transaction
+locks; stale tokens/queued demoted Admins cannot retain authority.12 synthetic
+API tests,8 login-revocation regressions,5 audit/rollback regressions,3 native
+PostgreSQL concurrency cases and8 real-cookie browser groups PASS. Native tests
+reuse pinned PostgreSQL18(12 connections/32MB buffers); no production database or
+records used. Production build and7 origin admission cases PASS; frontend source
+matches tested snapshot. Desktop/mobile protection, exact backend403/409 denials,
+Owner appointment/removal and ordinary Admin non-Admin operations verified.
+Preview and native server stopped. No schema/migrations, record rewrites, provider
+settings, dependencies/services or payment/subscription business-rule changes.
+Evidence: batch-164-owner-protection.json. Both Render Auto-Deploy Off confirmed;
+release backend guards first, then matching frontend, with public read-only
+verification. Previous frontend dep-dbf09029lscs738boojg/backend
+dep-dbd1r0tg1s2s73esongg retained. UI rollback should retain backend protection;
+backend rollback removes Owner guards and must be reported.35/36/PY-35 paused
+automatic-backup transport safeguard unchanged; await existing Supabase reply.
+
 Current171 FOUR SEARCH/READABILITY FIXES LIVE / RELEASE PASS (2026-10-25
 WAT): owner-approved01c8dde6edf98ccd9e6ab024d3f398a926500b2f committed and
 atomic fast-forward pushed master/development; frontend priceyard deployment

@@ -135,10 +135,11 @@ class LoginRevocationTests(unittest.TestCase):
             self.assertEqual(subscription.json()["status"], expected_status)
             self.assertIsNone(subscription.json()["end_date"])
 
-    def test_last_admin_rejection_keeps_account_and_credential_working(self):
+    def test_last_admin_owner_rejection_keeps_account_and_credential_working(self):
         admin_headers = {"Authorization": "Bearer "+create_access_token(user_id=self.admin_id)}
-        for payload in ({"is_active": False}, {"role": "free_user"}):
-            self.assertEqual(self.client.patch(f"/users/{self.admin_id}", headers=admin_headers, json=payload).status_code, 409)
+        with patch.object(get_settings(), "owner_email", "security-admin@example.com"):
+            for payload in ({"is_active": False}, {"role": "free_user"}):
+                self.assertEqual(self.client.patch(f"/users/{self.admin_id}", headers=admin_headers, json=payload).status_code, 409)
         profile = self.client.get("/auth/me", headers=admin_headers)
         self.assertEqual(profile.status_code, 200)
         self.assertEqual(profile.json()["role"], "admin")

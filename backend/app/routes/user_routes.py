@@ -6,7 +6,6 @@ from app.models.user import User
 from app.schemas.user_schema import AdminUserUpdate, UserResponse
 from app.services.audit_service import create_audit_log, snapshot_model
 from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, stream_admin_records
-from app.services.subscription_service import apply_paid_expiry, apply_trial_expiry
 from app.services.user_service import get_user, prepare_user_update, update_user
 from app.utils.permissions import require_roles
 
@@ -46,13 +45,15 @@ def edit_user(
     db: Session = Depends(get_db),
     admin: User = Depends(require_roles("admin")),
 ) -> User:
-    target, subscription = prepare_user_update(db, user_id)
-    old_user = snapshot_model(target)
-    old_subscription = snapshot_model(subscription) if subscription is not None else None
+    # Capture the authenticated session version before waiting for another Admin
+    # update. The service refreshes role/activity/version under the transaction lock.
+    actor_auth_version = admin.auth_version
     try:
-        if subscription is not None:
-            apply_trial_expiry(subscription); apply_paid_expiry(subscription)
-        target = update_user(db, target, payload, commit=False, prepared=True)
+        target, subscription = prepare_user_update(db, user_id)
+        old_user = snapshot_model(target)
+        old_subscription = snapshot_model(subscription) if subscription is not None else None
+        target = update_user(db, target, payload, actor=admin,
+                             actor_auth_version=actor_auth_version, commit=False, prepared=True)
         create_audit_log(
             db, actor=admin, action="user.update", table_name="users",
             record_id=target.id, old_value=old_user, new_value=snapshot_model(target), commit=False,

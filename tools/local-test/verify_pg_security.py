@@ -152,6 +152,12 @@ from app.utils.password import hash_password
 
 
 class PostgreSQLSecurityTests(unittest.TestCase):
+    def test_owner_demotion_blocks_already_authenticated_staff_after_transaction_lock(self):
+        spec = importlib.util.spec_from_file_location('local_owner_race', ROOT / 'backend/tests/test_owner_protection.py')
+        cases = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cases)
+        cases.verify_owner_demotion_blocks_already_authenticated_staff(self, self.engine)
+
     def test_single_subscription_get_rechecks_committed_paid_and_trial_renewals(self):
         spec = importlib.util.spec_from_file_location('local_single_expiry_race', ROOT / 'backend/tests/test_subscription_expiry_race.py')
         cases = importlib.util.module_from_spec(spec)
@@ -1265,7 +1271,7 @@ class PostgreSQLSecurityTests(unittest.TestCase):
                 user=db.get(User,user_id)
                 barrier.wait(timeout=15)
                 try:
-                    update_user(db,user,AdminUserUpdate(**payload));outcomes.append(200)
+                    update_user(db,user,AdminUserUpdate(**payload),actor=user);outcomes.append(200)
                 except HTTPException as error:
                     db.rollback();outcomes.append(error.status_code)
                 except BaseException as error:
@@ -1274,15 +1280,17 @@ class PostgreSQLSecurityTests(unittest.TestCase):
         for thread in threads:thread.start()
         for thread in threads:thread.join(25)
         self.assertFalse(any(thread.is_alive() for thread in threads))
-        self.assertCountEqual(outcomes,[200,409])
+        # Unconfigured/non-owner Admins cannot remove any Admin authority,
+        # including their own. The stronger Owner policy rejects both requests.
+        self.assertCountEqual(outcomes,[403,403])
         with Session(self.engine) as db:
             remaining=db.scalars(select(User).where(User.role=="admin",User.is_active.is_(True))).all()
-            self.assertEqual(len(remaining),1)
+            self.assertEqual(len(remaining),2)
 
-    def test_concurrent_last_admin_deactivation_is_prevented(self):
+    def test_concurrent_non_owner_admin_deactivation_is_prevented(self):
         self.admin_race({"is_active":False})
 
-    def test_concurrent_last_admin_demotion_keeps_one_admin(self):
+    def test_concurrent_non_owner_admin_demotion_keeps_both_admins(self):
         self.admin_race({"role":"free_user"})
 
     def payment_race(self, *, duplicate_transaction, distinct_purchases=False, verification=False):

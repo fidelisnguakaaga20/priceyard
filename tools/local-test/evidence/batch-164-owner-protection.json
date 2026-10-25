@@ -1,0 +1,140 @@
+{
+  "status": "PASS_LOCAL",
+  "date": "2026-10-25",
+  "base_commit": "b5727c3d506afadc7c34e7df51e395d77d94070a",
+  "authorization": "Owner explicitly requested founder protection, push and deployment; subsequent instruction confirms completion with no stale permissions",
+  "owner_identity": "Configured founder email resolves only to one existing active Admin; ambiguous, missing, free and newly registered accounts fail closed. No writable owner role or public grant.",
+  "identity_boundary": "Existing API cannot mutate email or delete User. Stored admin role and user/subscription records are preserved; only a derived read-only is_owner capability is exposed.",
+  "policy": [
+    "Only Owner may appoint or manage Admins",
+    "Owner cannot be demoted/deactivated by anyone, including self",
+    "Ordinary Admins retain permitted non-Admin management and all14 dashboard cards",
+    "Owner access remains full despite expired subscription; history is preserved without fake renewal"
+  ],
+  "staleness": "Permissions use current DB state; authenticated actor role/activity/auth_version rechecked after existing advisory/row locks. Existing tokens lose Admin authority immediately; queued demoted Admin request rejected.",
+  "backend_owner_tests": {
+    "tests_run": 12,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "duration_seconds": 1.5,
+    "pattern": "test_owner_protection.py",
+    "runtime": "in-process synthetic SQLite; TCP and DNS denied"
+  },
+  "login_revocation_regressions": {
+    "tests_run": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "duration_seconds": 2.44,
+    "pattern": "test_login_revocation.py",
+    "runtime": "in-process synthetic SQLite; TCP and DNS denied"
+  },
+  "transactional_audit_regressions": {
+    "tests_run": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "duration_seconds": 0.382,
+    "pattern": "test_admin_access_audit.py",
+    "runtime": "in-process synthetic SQLite; TCP and DNS denied"
+  },
+  "postgres_concurrency": {
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "seconds": 5.384,
+    "cluster_identity_verified": true,
+    "production_contacts": 0,
+    "cluster_profile": "postgres-paging-20261018",
+    "schemas_before": 26,
+    "schema_budget": 80,
+    "single_native_suite": true,
+    "selected_tests": [
+      "test_owner_demotion_blocks_already_authenticated_staff_after_transaction_lock",
+      "test_concurrent_non_owner_admin_deactivation_is_prevented",
+      "test_concurrent_non_owner_admin_demotion_keeps_both_admins"
+    ]
+  },
+  "postgres_runtime": "Existing pinned synthetic PostgreSQL18 cluster;12 connections/32MB shared buffers,3 bounded two-connection races; auto-stopped. Standard existing SQL/locks remain compatible with production PostgreSQL17; no production compatibility/migration rerun.",
+  "frontend_build": {
+    "typescript": "PASS",
+    "vite_production": "PASS",
+    "origin_admission_cases": 7
+  },
+  "browser": {
+    "passed": 8,
+    "checks": {
+      "owner_keeps_full_access_with_an_expired_subscription_using_real_cookie_login": true,
+      "owner_retains_all_fourteen_original_admin_dashboard_cards": true,
+      "owner_account_is_visibly_protected_in_desktop_and_mobile_controls": true,
+      "owner_can_appoint_and_remove_admins_and_manage_non_admin_roles_through_existing_ui": true,
+      "owner_subscription_history_is_preserved_and_explained_without_a_fake_renewal": true,
+      "other_admin_retains_dashboard_but_cannot_edit_owner_or_admins_in_either_layout": true,
+      "other_admin_can_still_manage_normal_non_admin_roles_and_active_status": true,
+      "actual_csrf_verified_api_denies_privilege_bypass_without_changing_owner_prices_or_user_records": true
+    },
+    "geometry": [
+      {
+        "control": "Owner row",
+        "viewportWidth": 1366,
+        "left": 24,
+        "right": 1342,
+        "overflow": false
+      },
+      {
+        "control": "Owner row",
+        "viewportWidth": 375,
+        "left": 12,
+        "right": 363,
+        "overflow": false
+      }
+    ],
+    "real_api_cookie_login": true,
+    "mocked_identity_responses": 0,
+    "external_page_requests": 0,
+    "page_errors": [],
+    "synthetic_only": true,
+    "production_connections": 0,
+    "production_records_changed": 0,
+    "successful_synthetic_user_changes": 7
+  },
+  "source_sha256": {
+    "backend/app/config.py": "42d6d84e6bd17ee674ac091e926e03673a44196be88adec085de94e73edbde49",
+    "backend/app/models/user.py": "a4fb4369d8746c1f917b27f39a4579e5c6d0286459dba6761cc4af0d9bccd326",
+    "backend/app/schemas/user_schema.py": "b6285084f213821f832a624494402a67953d41c85bce11a8932a1b265a3d5529",
+    "backend/app/services/owner_policy.py": "fa6f92c3ed1b3b3a282cbe000896b7a823da018e6662fd156bc57c4dc83b9c44",
+    "backend/app/services/user_service.py": "856ebf9ff36e81ba9ba2ca8a874635fc80958f28854b3e75c7d105c615f644cd",
+    "backend/app/routes/user_routes.py": "e89ad591595da9befdc3f1c1c0513d7c9fee1c3a6fc63ac5f75bd77600f6534a",
+    "frontend/src/types/api.ts": "dc4eb69780e2d1d794e17c817edbbae9809f9a1846c28ebc47250f4dd2f549b0",
+    "frontend/src/services/access.ts": "8526af8839062c1079920d0812000913bfd8610128d2236b32730059de0affb7",
+    "frontend/src/pages/admin/AdminUsersPage.tsx": "7b00bdc5ac109e0e28993108202df237800391e8536c3c42ef37f162efc40418",
+    "frontend/src/pages/admin/AdminSubscriptionsPage.tsx": "dc1bbfe4c1382d2dd92a03751bcbf1cb65672614ed72ef82deed10fc47d8e796",
+    "frontend/src/pages/admin/owner-permissions.css": "2877f4c7153fc68d44e09183581946318e8abb224f313d69816cf3ff0d513f4d"
+  },
+  "frontend_matches_tested_snapshot": true,
+  "no_production_writes_or_customer_login": true,
+  "production_records_changed": 0,
+  "schema_or_migration_changes": false,
+  "subscription_or_payment_rules_changed": false,
+  "new_dependencies_or_services": false,
+  "preview_and_native_server_stopped": true,
+  "release_order": [
+    "Backend Owner guards",
+    "Direct and proxied read-only health/schema checks",
+    "Matching frontend",
+    "Bounded public live checks",
+    "Founder confirms badge without changing records"
+  ],
+  "rollback": {
+    "frontend_deploy": "dep-dbf09029lscs738boojg",
+    "backend_deploy": "dep-dbd1r0tg1s2s73esongg",
+    "schema_reversal_required": false,
+    "security_limit": "Prefer frontend-only rollback while retaining Owner backend guards. Backend rollback removes new protection and must be reported, never silently treated as protected."
+  },
+  "pushed": false,
+  "deployed": false,
+  "checklist_completed": 35,
+  "checklist_remaining": 1,
+  "remaining_item": "Unchanged PY-35 automatic encrypted-backup transport safeguard; daily task paused pending existing Supabase support reply"
+}

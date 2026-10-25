@@ -1,6 +1,6 @@
 import type { Subscription, User } from "../types/api";
 
-export type AccessLabel = "Guest" | "Free" | "Trial" | "Active Paid" | "Admin";
+export type AccessLabel = "Guest" | "Free" | "Trial" | "Active Paid" | "Admin" | "Owner";
 
 export function accessExpiresAt(subscription: Subscription | null): number | null {
   if (subscription?.status === "trial") {
@@ -23,7 +23,7 @@ export function accessExpiresAt(subscription: Subscription | null): number | nul
 
 export function computeAccess(user: User | null, subscription: Subscription | null): { label: AccessLabel; full: boolean } {
   if (!user) return { label: "Guest", full: false };
-  if (user.role === "admin") return { label: "Admin", full: true };
+  if (user.role === "admin") return { label: user.is_owner === true ? "Owner" : "Admin", full: true };
   const expiry = accessExpiresAt(subscription);
   if (expiry === null || expiry > Date.now()) {
     if (subscription?.status === "trial") return { label: "Trial", full: true };

@@ -11,6 +11,7 @@ class UserResponse(BaseModel):
     phone: str | None
     role: str
     is_active: bool
+    is_owner: bool = False
     referred_by_id: int | None = None
     created_at: datetime
 

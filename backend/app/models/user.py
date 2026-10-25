@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, func, text
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, object_session, relationship
 
 from app.database import Base
 
@@ -25,6 +25,11 @@ if TYPE_CHECKING:
 
 class User(Base):
     __tablename__ = "users"
+
+    @property
+    def is_owner(self) -> bool:
+        from app.services.owner_policy import is_owner
+        return is_owner(object_session(self), self)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     full_name: Mapped[str] = mapped_column(String(150), nullable=False)
