@@ -25,6 +25,31 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current171 FOUR SEARCH/READABILITY FIXES LIVE / RELEASE PASS (2026-10-25
+WAT): owner-approved01c8dde6edf98ccd9e6ab024d3f398a926500b2f committed and
+atomic fast-forward pushed master/development; frontend priceyard deployment
+dep-dbf09029lscs738boojg LIVE at the exact reviewed commit. Both Auto-Deploy Off.
+Backend remains97d004b/dep-dbd1r0tg1s2s73esongg LIVE, without redeployment.
+Reused Current170 production build,7 origin admission cases,12 focused and10
+targeted regression browser groups. Read-only live public browser13 checks PASS:
+fresh welcome body/headings readable and dismissible in light/dark Easy reading;
+homepage labelled commodity/market search uses existing catalog requests and
+routes exact IDs to visible focused price filters; Search prices is visible
+outside Menu; menu primary text, stronger weight and keyboard focus readable;
+ticker duration56s, actual pause/resume and reduced motion work. Existing graph,
+history periods and manual Admin restoration code remain served. All writes,
+including activity ping, blocked; no login/customer records accessed. Duplicate
+names, unmatched-market empty results, first-visit focus guard, Admin menus and
+protected history boundaries were tested locally with synthetic accounts.
+No settings, migrations, dependencies/services, business rules or production
+records changed. Rollback artifact dep-dbec0k3ncjis73dop060 retained; no backend
+or database rollback required. Preview stopped. Evidence:
+batch-163-search-and-readability-release.json includes exact Chrome checks.
+Open home in a new tab and Ctrl+Shift+R; use Find prices and header Search prices,
+inspect Menu and slower ticker; Incognito(Ctrl+Shift+N) shows the welcome again.
+35/36 and paused automatic-backup transport safeguard unchanged; await the
+already-requested Supabase support reply without new backup diagnostics.
+
 Current170 FOUR OWNER-APPROVED SEARCH/READABILITY FIXES VERIFIED (2026-10-25
 WAT): ticker is half speed(56s instead of28s), with Pause/Resume and reduced
 motion retained. Added homepage commodity/market search reusing existing catalog

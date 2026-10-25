@@ -1,0 +1,111 @@
+{
+  "status": "PASS",
+  "date": "2026-10-25",
+  "authorization": "Owner explicitly requested all four frontend fixes, push and deployment",
+  "deployed_commit": "01c8dde6edf98ccd9e6ab024d3f398a926500b2f",
+  "frontend": {
+    "service_id": "srv-da6ddb2jnfac73e39490",
+    "deploy_id": "dep-dbf09029lscs738boojg",
+    "status": "live",
+    "asset": "/assets/index-AKK1SCxU.js"
+  },
+  "backend": {
+    "service_id": "srv-da6d9gqjnfac73e2sbfg",
+    "deploy_id": "dep-dbd1r0tg1s2s73esongg",
+    "commit": "97d004b784b3cc299bfb68e182090b8b57d5be77",
+    "status": "live",
+    "redeployed": false
+  },
+  "local_evidence": "batch-162-search-and-readability.json",
+  "local_verification": "Production build,7 origin admission cases,12 focused browser groups plus10 targeted layout/history regression groups PASS; no repeated backup/payment/migration audit",
+  "production_browser": {
+    "status": "PASS",
+    "commit": "01c8dde6edf98ccd9e6ab024d3f398a926500b2f",
+    "deploy": "dep-dbf09029lscs738boojg",
+    "date": "2026-10-25",
+    "checks": {
+      "light_fresh_welcome_readable_and_dismissible": true,
+      "light_homepage_search_has_labelled_fields_and_reuses_catalogues": true,
+      "existing_history_graph_periods_and_manual_admin_restoration_code_preserved": true,
+      "light_ticker_half_speed_pause_resume_and_reduced_motion": true,
+      "light_homepage_search_routes_stable_ids_to_focused_existing_filters": true,
+      "light_mobile_search_visible_and_menu_contrast_focus_pass": true,
+      "light_header_shortcut_opens_search_without_opening_menu": true,
+      "dark_fresh_welcome_readable_and_dismissible": true,
+      "dark_homepage_search_has_labelled_fields_and_reuses_catalogues": true,
+      "dark_ticker_half_speed_pause_resume_and_reduced_motion": true,
+      "dark_homepage_search_routes_stable_ids_to_focused_existing_filters": true,
+      "dark_mobile_search_visible_and_menu_contrast_focus_pass": true,
+      "dark_header_shortcut_opens_search_without_opening_menu": true
+    },
+    "passed": 13,
+    "app_asset": "/assets/index-AKK1SCxU.js",
+    "geometry": [
+      {
+        "theme": "light",
+        "welcome_body_contrast": 14.960891546258122,
+        "welcome_heading_contrast": 14.960891546258122
+      },
+      {
+        "theme": "light",
+        "filtered_public_rows": 0,
+        "focus_below_header": true
+      },
+      {
+        "theme": "dark",
+        "welcome_body_contrast": 13.934216941511227,
+        "welcome_heading_contrast": 13.934216941511227
+      },
+      {
+        "theme": "dark",
+        "filtered_public_rows": 0,
+        "focus_below_header": true
+      }
+    ],
+    "write_requests_sent": 0,
+    "blocked_write_requests": [
+      {
+        "method": "POST",
+        "path": "/api/activity/ping"
+      },
+      {
+        "method": "POST",
+        "path": "/api/activity/ping"
+      }
+    ],
+    "blocked_external_requests": 0,
+    "page_errors": [],
+    "login_or_customer_access_attempts": 0,
+    "backend_deployment": false,
+    "database_migrations": false,
+    "new_services": false,
+    "production_records_changed": 0,
+    "screenshots": [
+      "discovery-release-welcome-light.png",
+      "discovery-release-menu-dark-mobile.png"
+    ]
+  },
+  "protected_workflow_limit": "Live probe used public pages and public price filters only. Duplicate-name, empty-result, Admin-menu and protected-history behaviours verified with synthetic local accounts; no production login or customer-record access.",
+  "both_services_auto_deploy": "off",
+  "production_settings_changed": false,
+  "migrations_run": false,
+  "production_records_changed": 0,
+  "business_rules_changed": false,
+  "new_dependencies_or_services": false,
+  "local_preview_stopped": true,
+  "rollback": {
+    "frontend_deploy": "dep-dbec0k3ncjis73dop060",
+    "database_or_backend_rollback_needed": false
+  },
+  "chrome_verification": [
+    "Open https://priceyard.onrender.com in a new Chrome tab and press Ctrl+Shift+R",
+    "Observe slower price ticker; Pause and Resume still control movement",
+    "Homepage Find prices: choose Commodity and Market, then Search prices; selected filters are retained on the price results page",
+    "Header Search prices is available without opening Menu and opens the existing filters",
+    "Open Menu and check readable text in both light and dark modes",
+    "Open Chrome Incognito with Ctrl+Shift+N and visit the same address to verify the first-visit welcome text and Next/Back/Skip"
+  ],
+  "checklist_completed": 35,
+  "checklist_remaining": 1,
+  "remaining_item": "Unchanged PY-35 secure automatic backup transport safeguard; awaiting Supabase support; daily task remains paused"
+}
