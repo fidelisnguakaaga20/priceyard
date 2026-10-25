@@ -105,9 +105,9 @@ export function DashboardPage() {
   const showUpgrade = user.role !== "admin" && subscription?.status !== "active";
   return <section className="page page-section"><div className="page-title"><span className="eyebrow">User dashboard</span><h1>Welcome, {user.full_name}</h1><p>Your account and quick links to PriceYard tools.</p></div>
     {user.role !== "admin" && !onboardingDismissed && tourSeen && (
-      <article className="card onboarding-card">
+      <article className="card onboarding-card dashboard-onboarding-card">
         <div className="card-row">
-          <div><span className="eyebrow">New here?</span><h2>Get started with PriceYard</h2></div>
+          <div><span className="onboarding-heading">New here?</span><h2>Get started with PriceYard</h2></div>
           <button className="button button-small button-secondary" type="button" onClick={dismissOnboarding}>Dismiss</button>
         </div>
         <ul className="onboarding-list">

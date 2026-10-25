@@ -25,6 +25,31 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current170 FOUR OWNER-APPROVED SEARCH/READABILITY FIXES VERIFIED (2026-10-25
+WAT): ticker is half speed(56s instead of28s), with Pause/Resume and reduced
+motion retained. Added homepage commodity/market search reusing existing catalog
+requests, plus a visible header Search prices shortcut outside the collapsed
+Menu. Both lead to the existing stable-ID price filters; focus/scroll exposes
+filters below the sticky header, including same-page clicks. Explicit valid
+markets remain selected for empty combinations without inflating tracking counts.
+Fixed the shared welcome/dashboard dark-background style conflict; theme-matched
+primary text and clearer headings/buttons now work in both themes and Easy
+reading. Restored focus inside the welcome when Back removes its focused control.
+First-visit search links wait for welcome dismissal before moving focus to filters.
+Menu uses stronger primary text and clear focus while retaining active/CTA colours.
+Production TypeScript/Vite build and7 origin admission cases PASS;12 focused
+serial synthetic browser groups and10 existing history/commodity/ticker layout
+groups PASS.40 header combinations cover guest/Admin,320/375/1366/1441/1920,
+themes and Easy reading;144 contrast measurements PASS. Homepage loading/errors,
+duplicate-name IDs, empty results, keyboard, existing history periods/access and
+commodity records preserved. All9 frontend files match the tested snapshot.
+Preview stopped. No backend, dependencies, API/schema, business rules, services
+or production records changed. Owner approved commit/push/frontend deployment;
+both Auto-Deploy Off confirmed. Retain frontend dep-dbec0k3ncjis73dop060 for
+rollback; backend remains97d004b/dep-dbd1r0tg1s2s73esongg. Evidence:
+batch-162-search-and-readability.json.35/36 and paused automatic-backup transport
+safeguard unchanged; await the existing Supabase support reply.
+
 Current169 ALL THREE FRONTEND POLISH CHANGES LIVE / RELEASE PASS (2026-10-24
 WAT): committed2f47f83111f51525a2ba2f9ea4ceb44675027aff and atomic fast-forward
 pushed master/development; both Render Auto-Deploy Off. Existing frontend

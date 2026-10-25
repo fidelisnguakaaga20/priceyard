@@ -99,11 +99,14 @@ export function Layout() {
     <div className="app-shell">
       <header ref={headerRef} className="site-header">
         <div className="header-inner">
-          <Link to="/" className="brand" onClick={() => setOpen(false)}>
+          <Link to="/" className="brand" aria-label="PriceYard home" onClick={() => setOpen(false)}>
             <span className="brand-mark">PY</span>
             <span><strong>PriceYard</strong><small>Know the market before you buy or sell.</small></span>
           </Link>
-          <button ref={menuButton} className="menu-button" type="button" aria-label="Toggle navigation" aria-controls="priceyard-primary-navigation" aria-expanded={open} onClick={() => setOpen((value) => !value)} onKeyDown={event => { if (open && event.key === "Escape") { event.preventDefault(); setOpen(false); } }}>☰ Menu</button>
+          <div className="header-actions">
+            <Link to="/prices#price-search" className="header-search-link" onClick={() => setOpen(false)}>Search prices</Link>
+            <button ref={menuButton} className="menu-button" type="button" aria-label="Toggle navigation" aria-controls="priceyard-primary-navigation" aria-expanded={open} onClick={() => setOpen((value) => !value)} onKeyDown={event => { if (open && event.key === "Escape") { event.preventDefault(); setOpen(false); } }}>☰ Menu</button>
+          </div>
           <nav id="priceyard-primary-navigation" className={open ? "main-nav open" : "main-nav"} aria-label="Primary navigation" onKeyDown={event => { if (open && event.key === "Escape") { event.preventDefault(); setOpen(false); menuButton.current?.focus(); } }}>
             <div className="nav-primary">
               {navItems.map(([to, label]) => <NavLink key={to} to={to} onClick={() => setOpen(false)}>{label}</NavLink>)}

@@ -28,6 +28,14 @@ export function OnboardingTour() {
     };
   }, [dismissed]);
 
+  useEffect(() => {
+    // Back can remove the focused control on the first step. Keep keyboard
+    // focus inside the dialog so Tab and Escape continue to work.
+    if (!dismissed && dialog.current && !dialog.current.contains(document.activeElement)) {
+      dialog.current.querySelector<HTMLButtonElement>("button")?.focus();
+    }
+  }, [dismissed, step]);
+
   const finish = () => {
     setDismissed(true);
     try { localStorage.setItem(SEEN_KEY, "1"); } catch { /* ignore */ }
@@ -49,7 +57,7 @@ export function OnboardingTour() {
       else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
     }}>
       <div className="onboarding-card">
-        <span className="eyebrow">Welcome to PriceYard ({step + 1}/{STEPS.length})</span>
+        <h2 className="onboarding-heading">Welcome to PriceYard ({step + 1}/{STEPS.length})</h2>
         <p id="priceyard-onboarding-step" aria-live="polite">{STEPS[step]}</p>
         <div className="onboarding-actions">
           <button type="button" className="text-link text-link-button" onClick={finish}>Skip</button>

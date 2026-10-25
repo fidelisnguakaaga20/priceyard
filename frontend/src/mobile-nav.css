@@ -6,10 +6,31 @@
 /* Keep navigation and display preferences readable without letting the sticky
    header crowd out prices, especially with Easy reading enabled. */
 .site-header .header-inner {
-  width: min(1320px, calc(100% - 40px));
+  width: min(1480px, calc(100% - 40px));
   min-height: 64px;
-  gap: 16px;
+  gap: 12px;
 }
+
+.site-header .header-actions { display: flex; align-items: center; gap: 6px; flex: 0 0 auto; }
+.site-header .header-search-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  max-width: 96px;
+  padding: 7px 8px;
+  border: 1px solid #214e34;
+  border-radius: 8px;
+  background: #214e34;
+  color: #fff;
+  font-size: .82rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+}
+.site-header .header-search-link:hover { background: #173d28; }
+.site-header .header-search-link:focus-visible { outline: 2px solid var(--color-text); outline-offset: 3px; }
 
 .site-header .brand {
   flex-shrink: 0;
@@ -70,7 +91,7 @@
   line-height: 1.35;
 }
 
-@media (max-width: 1280px) {
+@media (max-width: 1440px) {
   .site-header .menu-button {
     display: block;
     min-height: 44px;
@@ -107,6 +128,10 @@
     justify-content: flex-start;
     text-align: left;
   }
+}
+
+@media (max-width: 360px) {
+  .site-header .brand > span:last-child { display: none; }
 }
 
 @media (max-width: 640px) {

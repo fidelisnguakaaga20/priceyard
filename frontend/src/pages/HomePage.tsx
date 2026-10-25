@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { CommodityImage } from "../components/CommodityImage";
 import { Disclaimer, PRICE_DISCLAIMER } from "../components/Disclaimer";
 import { LoadingSpinner } from "../components/LoadingSpinner";
+import { HomePriceSearch } from "../components/HomePriceSearch";
 import { PriceCard } from "../components/PriceCard";
 import { SavedPriceNotice } from "../components/SavedPriceNotice";
 import { NativeShareButton } from "../components/ShareButtons";
@@ -24,6 +25,10 @@ export function HomePage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [upcoming, setUpcoming] = useState<Commodity[]>([]);
+  const [searchCommodities, setSearchCommodities] = useState<Commodity[]>([]);
+  const [searchMarkets, setSearchMarkets] = useState<Market[]>([]);
+  const [searchCatalogsPending, setSearchCatalogsPending] = useState(2);
+  const [searchCatalogError, setSearchCatalogError] = useState(false);
   const [commodityCount, setCommodityCount] = useState<number | null>(null);
   const [marketCount, setMarketCount] = useState<number | null>(null);
   const [recordCount, setRecordCount] = useState<number | null>(null);
@@ -38,20 +43,26 @@ export function HomePage() {
   };
 
   useEffect(() => {
+    let current = true;
     loadPrices();
     apiFetch<Commodity[]>("/commodities")
       .then((items) => {
+        if (!current) return;
         setUpcoming(items.filter((item) => item.is_upcoming));
-        setCommodityCount(items.filter((item) => !item.is_upcoming).length);
+        const tracked = items.filter((item) => !item.is_upcoming);
+        setSearchCommodities(tracked);
+        setCommodityCount(tracked.length);
       })
-      .catch(() => undefined);
+      .catch(() => { if (current) setSearchCatalogError(true); })
+      .finally(() => { if (current) setSearchCatalogsPending((pending) => pending - 1); });
     apiFetch<Market[]>("/markets")
-      .then((items) => setMarketCount(items.length))
-      .catch(() => undefined);
+      .then((items) => { if (current) { setSearchMarkets(items); setMarketCount(items.length); } })
+      .catch(() => { if (current) setSearchCatalogError(true); })
+      .finally(() => { if (current) setSearchCatalogsPending((pending) => pending - 1); });
     apiFetch<Testimonial[]>("/testimonials")
       .then(setTestimonials)
       .catch(() => undefined);
-    return () => { priceRequest.current++; };
+    return () => { current = false; priceRequest.current++; };
   }, []);
 
   // Silently keep the homepage's prices current while it's open (ticker + "Today's
@@ -70,6 +81,8 @@ export function HomePage() {
           <span className="eyebrow">Market price information</span>
           <h1>Know the market before you buy or sell.</h1>
           <p>See today's and past prices, price changes, and real market updates for Egusi, Honey Beans and Palm oil.</p>
+          <HomePriceSearch commodities={searchCommodities} markets={searchMarkets}
+            loading={searchCatalogsPending > 0} error={searchCatalogError} />
           {!loading && prices[0] && (
             <div className="hero-price-preview">
               {!savedAt && <span className="eyebrow">Live now</span>}
