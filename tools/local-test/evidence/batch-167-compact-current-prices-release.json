@@ -1,0 +1,71 @@
+{
+  "status": "PASS",
+  "date_wat": "2026-10-26",
+  "release_commit": "776e0903197d66e025f341a9313df326900c5e91",
+  "frontend": {
+    "name": "priceyard",
+    "id": "srv-da6ddb2jnfac73e39490",
+    "url": "https://priceyard.onrender.com",
+    "deploy_id": "dep-dbfq31om7kps739epdug",
+    "status": "live",
+    "finished_at_utc": "2026-10-26T18:53:17.876377Z",
+    "auto_deploy": "off",
+    "build_command": "npm install && npm run build",
+    "settings_changed": false
+  },
+  "backend_preserved": {
+    "deploy_id": "dep-dbf4hirrjlhs73ffh9r0",
+    "commit": "2604ccd07bcff0d024f92428ff728eff5bebdc2d",
+    "status": "live",
+    "auto_deploy": "off",
+    "deployment_or_settings_changes": false
+  },
+  "local_evidence": "batch-166-compact-current-prices.json",
+  "live_public_browser": {
+    "status": "PASS",
+    "checks": {
+      "asset": "/assets/index-FcDOhDu6.js",
+      "public_record_options": 10,
+      "expected_summaries": 3,
+      "visible_summaries": 3,
+      "commodity_photos": 3,
+      "expected_commodities": 3,
+      "history_links": 3,
+      "old_history_label": false,
+      "newest_defaults": true,
+      "all_recorded_options_accessible": true,
+      "owner_code_preserved": true,
+      "history_periods_preserved": true,
+      "anonymous_session": 401,
+      "private_session": true
+    },
+    "selectors_exercised": 2,
+    "guest_history_gate": true,
+    "mobile_and_desktop_fit": true,
+    "write_requests_sent": 0,
+    "blocked_write_requests": [
+      {
+        "method": "POST",
+        "path": "/api/activity/ping"
+      }
+    ],
+    "external_requests": 0,
+    "customer_logins": 0,
+    "production_record_changes": 0
+  },
+  "rollback": "Previous frontend artifact dep-dbf4igjrjlhs73ffkjf0 remains the rollback target; keep backend Owner safeguards. No schema/data rollback needed.",
+  "chrome_confirmation": [
+    "Open /prices in a new Chrome tab and Ctrl+Shift+R.",
+    "Check one visible summary per commodity/market and choose Size / grade where offered.",
+    "Click View price history; matching commodity/market selected after normal sign-in/access checks."
+  ],
+  "preserved": "All10 public recorded options, history, source measurements/grades, notes, timestamps, verification, Owner security, subscriptions/payments and original Admin manual price entry.",
+  "not_performed": [
+    "Production login/role or customer writes",
+    "Backend deployment",
+    "Migrations",
+    "Provider/service changes",
+    "New dependencies or paid services"
+  ],
+  "checklist": "35/36 unchanged; paused PY-35 encrypted-backup transport still awaits existing Supabase support reply."
+}

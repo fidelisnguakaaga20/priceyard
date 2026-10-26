@@ -25,6 +25,27 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current175 COMPACT CURRENT PRICES LIVE / EXACT-COMMIT PASS (2026-10-26 WAT):
+owner-approved776e0903197d66e025f341a9313df326900c5e91 committed and atomic
+fast-forward pushed master/development. Existing frontend priceyard deployment
+dep-dbfq31om7kps739epdug LIVE. Fresh served asset index-FcDOhDu6.js verified:
+3 commodity photos,3 market summaries and3 View price history links; all10 public
+recorded size/type options accessible, newest defaults correct,2 selectors
+exercised with matching selected-record share IDs. Guest history access gate and
+stable commodity/market route IDs retained,375/1366 layouts fit; Owner/history
+period code preserved. Anonymous auth/me remains401/private-no-store. Public
+browser blocked all writes/activity ping and external requests, no production
+login/customer edits. Reuse Current1749 focused+14 presentation+9 navigation
+groups and production build/seven origin admission PASS. Backend remains LIVE
+at2604ccd/dep-dbf4hirrjlhs73ffh9r0; no backend deploy, settings, migrations,
+record/history changes, dependencies or new services. Both AutoDeployOff.
+Local synthetic preview stopped; source/build match verified. Roll back only
+frontend to dep-dbf4igjrjlhs73ffkjf0 if needed; retain Owner backend guards.
+Chrome: /prices,Ctrl+Shift+R,one summary per market,Size / grade selector where
+available,View price history retains selected commodity/market and access rules.
+Evidence: batch-167-compact-current-prices-release.json.35/36 and paused PY-35
+backup transport unchanged; await existing Supabase support reply.
+
 Current174 COMPACT CURRENT PRICES VERIFIED / APPROVED FRONTEND RELEASE
 (2026-10-26 WAT): owner requested the advised page simplification and deployment.
 Current Prices now shows one summary per commodity/market, newest recorded option
