@@ -38,19 +38,25 @@ try {
   await page.locator('.commodity-price-card').waitFor();
   assert.equal(await page.locator('.commodity-price-card').count(), 1);
   assert.equal(await page.locator('.commodity-price-card .commodity-image').count(), 1);
-  assert.equal(await page.locator('.price-option').count(), 3);
+  assert.equal(await page.locator('.price-option').count(), 2);
+  assert.equal(await page.locator('.price-option-select').count(), 1);
+  const rawOptions = await page.locator('.price-option-select option').evaluateAll(options => options.map(option => Number(option.value)));
+  assert.deepEqual(rawOptions.sort((a, b) => a - b), [101, 102]);
   for (const option of await page.locator('.price-option').all()) {
     assert.equal(await option.getByRole('link', {name: 'Share on WhatsApp', exact: true}).count(), 1);
     assert.equal(await option.getByRole('link', {name: /See what this price means/}).count(), 1);
     assert.equal(await option.getByRole('link', {name: /Log in to watch/}).count(), 1);
   }
+  assert.match(await page.locator('.price-option').nth(0).innerText(), /Recorded size two/);
+  await page.locator('.price-option-select').selectOption('101');
   assert.match(await page.locator('.price-option').nth(0).innerText(), /Recorded size one/);
-  assert.match(await page.locator('.price-option').nth(1).innerText(), /Recorded size two/);
-  assert.match(await page.locator('.price-option').nth(2).innerText(), /Synthetic second market/);
-  checks.one_photo_all_distinct_records_and_guest_actions = true;
+  await page.locator('.price-option-select').selectOption('102');
+  assert.match(await page.locator('.price-option').nth(0).innerText(), /Recorded size two/);
+  assert.match(await page.locator('.price-option').nth(1).innerText(), /Synthetic second market/);
+  checks.one_photo_compact_markets_all_variants_and_guest_actions = true;
   // Same commodity name with a different ID must never be collapsed.
   shownCurrent = [...current, price(104, {commodity_id: 9003, commodity: {...base.commodity, id: 9003}})];
-  await page.reload(); await page.locator('.price-option').nth(3).waitFor();
+  await page.reload(); await page.locator('.price-option').nth(2).waitFor();
   assert.equal(await page.locator('.commodity-price-card').count(), 2);
   checks.commodity_ids_not_names_control_grouping = true;
   await page.locator('.filter-bar select').nth(0).selectOption({label: base.commodity.name});
@@ -65,14 +71,14 @@ try {
   await page.getByLabel('Password', {exact: true}).fill('PriceYardDemo8!');
   await page.getByRole('button', {name: 'Log in', exact: true}).click();
   await page.waitForURL('**/dashboard');
-  await page.goto(origin + '/prices'); await page.locator('.price-option').nth(2).waitFor();
+  await page.goto(origin + '/prices'); await page.locator('.price-option').nth(1).waitFor();
   let watchedBody;
   await page.route(origin + '/api/watchlist', async route => {
     watchedBody = route.request().postDataJSON();
     await route.fulfill({status: 201, json: {id: 1}});
   });
-  await page.locator('.price-option').nth(2).getByRole('button', {name: /Watch this/}).click();
-  await page.locator('.price-option').nth(2).getByRole('button', {name: /Watching/}).waitFor();
+  await page.locator('.price-option').nth(1).getByRole('button', {name: /Watch this/}).click();
+  await page.locator('.price-option').nth(1).getByRole('button', {name: /Watching/}).waitFor();
   assert.deepEqual(watchedBody, {commodity_id: base.commodity_id, market_id: 9002});
   checks.watch_action_preserves_record_identity = true;
   // Complete pairs, a different size, and old records lacking specifications.
@@ -202,7 +208,7 @@ try {
     await page.setViewportSize({width, height: 900});
     await page.evaluate(theme => { localStorage.setItem('priceyard_dark_mode', theme === 'dark' ? '1' : '0');
       localStorage.setItem('priceyard_easy_reading', '1'); }, theme);
-    await page.goto(origin + '/prices'); await page.locator('.price-option').nth(2).waitFor();
+    await page.goto(origin + '/prices'); await page.locator('.price-option').nth(1).waitFor();
     assert.equal(await page.locator('.commodity-price-card .commodity-image').count(), 1);
     const cardsFit = await page.locator('.price-option').evaluateAll(nodes => nodes.every(node => node.scrollWidth <= node.clientWidth + 1));
     assert.equal(cardsFit, true, 'Grouped price contents must fit');
@@ -240,7 +246,7 @@ try {
   assert.equal(await page.locator('.trend-dot').count(), 26);
   await page.locator('.history-trends').screenshot({path: path.join(lab, 'runtime/price-history-restored-mobile.png')});
   await page.setViewportSize({width: 1366, height: 900});
-  await page.goto(origin + '/prices'); await page.locator('.price-option').nth(2).waitFor();
+  await page.goto(origin + '/prices'); await page.locator('.price-option').nth(1).waitFor();
   await page.screenshot({path: path.join(lab, 'runtime/grouped-commodity-prices.png'), fullPage: true});
   await page.goto(origin + '/history'); await page.locator('.history-single-price').waitFor();
   await page.locator('.history-trends').screenshot({path: path.join(lab, 'runtime/price-history-restored.png')});

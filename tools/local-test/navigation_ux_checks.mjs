@@ -82,7 +82,7 @@ try {
   });
   const historyPath = market => `/history?commodity_id=${commodity.id}&market_id=${market.id}`;
   await page.goto(origin + '/prices');
-  const links = page.locator('.price-option').getByRole('link', {name: 'View history', exact: true});
+  const links = page.locator('.price-option').getByRole('link', {name: 'View price history', exact: true});
   await links.nth(1).waitFor();
   assert.equal(await links.count(), 2);
   assert.equal(await links.nth(0).getAttribute('href'), historyPath(firstMarket));
@@ -97,7 +97,7 @@ try {
 
   await login('trial@example.com');
   await page.goto(origin + '/prices');
-  await page.locator('.price-option').nth(1).getByRole('link', {name: 'View history', exact: true}).click();
+  await page.locator('.price-option').nth(1).getByRole('link', {name: 'View price history', exact: true}).click();
   await page.locator('.history-table-view tbody tr').nth(31).waitFor();
   await chosen(0, commodity.id); await chosen(1, otherMarket.id);
   assert.equal(await page.locator('.history-filters select').nth(0).locator('option:checked').textContent(), commodity.name);
@@ -150,7 +150,9 @@ try {
   await page.screenshot({path: path.join(runtime, 'navigation-filters-desktop.png'), fullPage: false});
   checks.back_to_filters_visibility_reduced_motion_focus_and_sticky_offset = true;
 
-  await page.getByRole('button', {name: 'Log out', exact: true}).click();
+  const trialLogout = page.getByRole('button', {name: 'Log out', exact: true});
+  if (!await trialLogout.isVisible()) await page.locator('.menu-button').click();
+  await trialLogout.click();
   await login('admin@example.com');
   await page.goto(origin + historyPath(firstMarket));
   await page.locator('.history-filters').waitFor();

@@ -25,6 +25,28 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current174 COMPACT CURRENT PRICES VERIFIED / APPROVED FRONTEND RELEASE
+(2026-10-26 WAT): owner requested the advised page simplification and deployment.
+Current Prices now shows one summary per commodity/market, newest recorded option
+by timestamp/ID by default; raw size/type alternatives remain accessible in a
+small themed keyboard-operable selector. No guessed equivalent measurements,
+backend grouping changes or historical deletions. Status/date/measurement/notes,
+correct selected-record actions and stable-ID history route retained; label now
+View price history. Existing minute refresh updates untouched defaults, preserves
+explicit options while present, shows corrections and falls back if removed.
+No selection fetches or new dependencies. Production TypeScript/Vite build and7
+same-origin admission cases PASS;9 focused synthetic browser groups PASS,
+including guest history gate, full history, selected share/watch/report identity,
+375/1366 layouts, dark/light and Easy reading. Existing14 price-presentation
++and9 history-navigation groups PASS after aligning test expectations with the
++approved compact layout, new label and existing Menu logout. All frontend files match
+the built snapshot. Release only priceyard frontend, both AutoDeployOff confirmed;
+keep prior artifact dep-dbf4igjrjlhs73ffkjf0 for UI rollback. Backend Owner guards,
+records, subscriptions and original Admin entry remain intact; no migration,
+provider/settings change or new service. Evidence: batch-166-compact-current-prices.json.
+35/36 and paused PY-35 backup transport safeguard unchanged; await existing
+Supabase support reply without repeating completed backup work.
+
 Current173 PROTECTED OWNER LIVE / EXACT-COMMIT RELEASE PASS (2026-10-25 WAT):
 owner-approved2604ccd07bcff0d024f92428ff728eff5bebdc2d committed and atomic
 fast-forward pushed master/development. Backend priceyard-api deployment

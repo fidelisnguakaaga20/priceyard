@@ -1,0 +1,470 @@
+{
+  "status": "PASS",
+  "date_wat": "2026-10-26",
+  "authorization": "Owner requested all proposed Current Prices simplifications and deployment.",
+  "scope": "Frontend presentation only; one summary per commodity/market, newest default, recorded size/type selector and explicit View price history link.",
+  "selection": "Timestamp then ID; unknown/ambiguous instants last. Preserve explicit selection while present; update corrected record and fall back if removed. Untouched default follows newest arrival.",
+  "preserved": [
+    "All backend current-price specification groups and history records",
+    "Original recorded measurements, grades, notes, status and dates",
+    "Stable IDs for markets/commodities, history and selected-record actions",
+    "Existing refresh/Data saver, themes, keyboard, sharing, watch/report and history access rules",
+    "Owner safeguards, payments and subscriptions"
+  ],
+  "production_build": "TypeScript and Vite6.4.4 PASS;7 same-origin configuration admission cases PASS; existing dependencies only.",
+  "browser": {
+    "passed": 9,
+    "checks": {
+      "one_newest_summary_per_market_with_raw_alternatives_and_one_photo_per_commodity": true,
+      "distinct_commodity_and_market_ids_not_names_and_singleton_has_no_selector": true,
+      "explicit_history_label_routes_matching_ids_and_preserves_guest_access_gate": true,
+      "unselected_default_follows_newest_record_on_silent_refresh": true,
+      "keyboard_and_selected_price_details_share_and_history_follow_the_visible_choice": true,
+      "silent_refresh_updates_chosen_record_keeps_existing_choice_and_recovers_removed_choice": true,
+      "authenticated_watch_pair_and_flag_record_match_selection_without_leaking_previous_state": true,
+      "full_history_retains_all_current_and_older_records_in_table_and_mobile_cards": true,
+      "compact_prices_keyboard_mobile_and_both_themes_fit_with_easy_reading": true
+    },
+    "geometry": [
+      {
+        "width": 375,
+        "dark": true,
+        "color": "rgb(231, 236, 231)",
+        "background": "rgb(20, 28, 23)",
+        "documentFits": true,
+        "selectFits": true,
+        "summaryFits": true,
+        "easyReading": true,
+        "theme": "dark"
+      },
+      {
+        "width": 375,
+        "dark": false,
+        "color": "rgb(28, 42, 34)",
+        "background": "rgb(252, 253, 251)",
+        "documentFits": true,
+        "selectFits": true,
+        "summaryFits": true,
+        "easyReading": true,
+        "theme": "light"
+      },
+      {
+        "width": 1366,
+        "dark": true,
+        "color": "rgb(231, 236, 231)",
+        "background": "rgb(20, 28, 23)",
+        "documentFits": true,
+        "selectFits": true,
+        "summaryFits": true,
+        "easyReading": true,
+        "theme": "dark"
+      },
+      {
+        "width": 1366,
+        "dark": false,
+        "color": "rgb(28, 42, 34)",
+        "background": "rgb(252, 253, 251)",
+        "documentFits": true,
+        "selectFits": true,
+        "summaryFits": true,
+        "easyReading": true,
+        "theme": "light"
+      }
+    ],
+    "synthetic_only": true,
+    "production_connections": 0,
+    "provider_calls": 0,
+    "api_writes": "Only intercepted synthetic watch/flag responses; login uses guarded local account",
+    "external_page_requests": 0,
+    "current_requests": 23,
+    "history_requests": 1,
+    "browser_errors": [],
+    "failure": null
+  },
+  "frontend_source_sha256": {
+    "frontend/src/components/GroupedPriceCards.tsx": "4b16c39c684093764ff1ac4240261fda7ec95dae4ca7e95212f88c11cc9322d9",
+    "frontend/src/components/PriceCard.tsx": "acedd52eab84a8a541d1c50c1eeba6c7808f03e5d8e81ef7e944e6ae1359a88a",
+    "frontend/src/components/grouped-price-cards.css": "e7cdc66941dd294f82b200427c728486ed99fff0ff2af1bc0ce4b82182fd89f4"
+  },
+  "production_changes_planned": "Only existing frontend static site deployment; both services AutoDeployOff confirmed. No backend deployment, migrations, settings, credentials, records or new services.",
+  "previous_frontend_artifact": "dep-dbf4igjrjlhs73ffkjf0 at2604ccd07bcff0d024f92428ff728eff5bebdc2d",
+  "unchanged_checklist": "35/36; paused PY-35 automatic encrypted-backup transport still awaits existing Supabase support reply; no repeated backup work.",
+  "existing_price_presentation_regressions": {
+    "passed": 14,
+    "checks": {
+      "one_photo_compact_markets_all_variants_and_guest_actions": true,
+      "commodity_ids_not_names_control_grouping": true,
+      "filters_replace_grouped_results": true,
+      "watch_action_preserves_record_identity": true,
+      "matching_lines_separate_sizes_legacy_points_and_history_preserved": true,
+      "single_zero_price_uses_compact_dated_summary": true,
+      "invalid_prices_and_ambiguous_times_not_plotted_but_retained": true,
+      "readable_axes_grid_and_keyboard_chronological_selection": true,
+      "pointer_selection_shows_exact_record_details": true,
+      "mobile_tap_shows_exact_record_details": true,
+      "flat_matching_series_remains_readable": true,
+      "same_time_records_remain_separate_and_keyboard_accessible": true,
+      "same_day_prices_have_distinct_wat_time_ticks": true,
+      "mobile_easy_reading_and_theme_compatible_graphs": true
+    },
+    "geometry": [
+      {
+        "width": 375,
+        "theme": "dark",
+        "stroke": "rgb(107, 201, 143)",
+        "plot_height": 250
+      },
+      {
+        "width": 375,
+        "theme": "light",
+        "stroke": "rgb(33, 78, 52)",
+        "plot_height": 250
+      },
+      {
+        "width": 1366,
+        "theme": "dark",
+        "stroke": "rgb(107, 201, 143)",
+        "plot_height": 250
+      },
+      {
+        "width": 1366,
+        "theme": "light",
+        "stroke": "rgb(33, 78, 52)",
+        "plot_height": 250
+      }
+    ],
+    "external_page_requests": 0,
+    "production_connections": 0,
+    "synthetic_only": true,
+    "database_changes": 0
+  },
+  "existing_history_navigation_regressions": {
+    "passed": 9,
+    "checks": {
+      "stable_price_history_id_links_and_guest_access_gate": true,
+      "trial_history_preselects_renamed_records_by_exact_ids": true,
+      "browser_back_forward_updates_history_filter_ids": true,
+      "manual_filters_survive_session_refresh": true,
+      "back_to_filters_visibility_reduced_motion_focus_and_sticky_offset": true,
+      "admin_keeps_same_direct_history_navigation": true,
+      "compact_header_fits_six_widths_with_easy_reading_and_touch_controls": true,
+      "mobile_menu_preserves_admin_navigation_escape_and_focus": true,
+      "landscape_navigation_scroll_reaches_logout_without_clipping": true
+    },
+    "geometry": [
+      {
+        "width": 320,
+        "easy": false,
+        "overflow": false,
+        "headerHeight": 190.1875,
+        "controls": [
+          {
+            "width": 96,
+            "height": 44
+          },
+          {
+            "width": 96,
+            "height": 44
+          },
+          {
+            "width": 96,
+            "height": 44
+          }
+        ],
+        "navigationFits": true,
+        "mobileBrandMenuSameRow": true
+      },
+      {
+        "width": 320,
+        "easy": true,
+        "overflow": false,
+        "headerHeight": 198.125,
+        "controls": [
+          {
+            "width": 96,
+            "height": 45.96875
+          },
+          {
+            "width": 96,
+            "height": 45.96875
+          },
+          {
+            "width": 96,
+            "height": 45.96875
+          }
+        ],
+        "navigationFits": true,
+        "mobileBrandMenuSameRow": true
+      },
+      {
+        "width": 375,
+        "easy": false,
+        "overflow": false,
+        "headerHeight": 190.1875,
+        "controls": [
+          {
+            "width": 114.328125,
+            "height": 44
+          },
+          {
+            "width": 114.328125,
+            "height": 44
+          },
+          {
+            "width": 114.34375,
+            "height": 44
+          }
+        ],
+        "navigationFits": true,
+        "mobileBrandMenuSameRow": true
+      },
+      {
+        "width": 375,
+        "easy": true,
+        "overflow": false,
+        "headerHeight": 198.125,
+        "controls": [
+          {
+            "width": 114.328125,
+            "height": 45.96875
+          },
+          {
+            "width": 114.328125,
+            "height": 45.96875
+          },
+          {
+            "width": 114.34375,
+            "height": 45.96875
+          }
+        ],
+        "navigationFits": true,
+        "mobileBrandMenuSameRow": true
+      },
+      {
+        "width": 768,
+        "easy": false,
+        "overflow": false,
+        "headerHeight": 173.609375,
+        "controls": [
+          {
+            "width": 103.453125,
+            "height": 44
+          },
+          {
+            "width": 110.015625,
+            "height": 44
+          },
+          {
+            "width": 102.03125,
+            "height": 44
+          }
+        ],
+        "navigationFits": true,
+        "mobileBrandMenuSameRow": true
+      },
+      {
+        "width": 768,
+        "easy": true,
+        "overflow": false,
+        "headerHeight": 176.609375,
+        "controls": [
+          {
+            "width": 118.09375,
+            "height": 44
+          },
+          {
+            "width": 131.46875,
+            "height": 44
+          },
+          {
+            "width": 116.421875,
+            "height": 44
+          }
+        ],
+        "navigationFits": true,
+        "mobileBrandMenuSameRow": true
+      },
+      {
+        "width": 1280,
+        "easy": false,
+        "overflow": false,
+        "headerHeight": 173.609375,
+        "controls": [
+          {
+            "width": 103.453125,
+            "height": 44
+          },
+          {
+            "width": 110.015625,
+            "height": 44
+          },
+          {
+            "width": 102.03125,
+            "height": 44
+          }
+        ],
+        "navigationFits": true,
+        "mobileBrandMenuSameRow": true
+      },
+      {
+        "width": 1280,
+        "easy": true,
+        "overflow": false,
+        "headerHeight": 176.609375,
+        "controls": [
+          {
+            "width": 118.09375,
+            "height": 44
+          },
+          {
+            "width": 131.46875,
+            "height": 44
+          },
+          {
+            "width": 116.421875,
+            "height": 44
+          }
+        ],
+        "navigationFits": true,
+        "mobileBrandMenuSameRow": true
+      },
+      {
+        "width": 1281,
+        "easy": false,
+        "overflow": false,
+        "headerHeight": 173.609375,
+        "controls": [
+          {
+            "width": 103.453125,
+            "height": 44
+          },
+          {
+            "width": 110.015625,
+            "height": 44
+          },
+          {
+            "width": 102.03125,
+            "height": 44
+          }
+        ],
+        "navigationFits": true,
+        "mobileBrandMenuSameRow": true
+      },
+      {
+        "width": 1281,
+        "easy": true,
+        "overflow": false,
+        "headerHeight": 176.609375,
+        "controls": [
+          {
+            "width": 118.09375,
+            "height": 44
+          },
+          {
+            "width": 131.46875,
+            "height": 44
+          },
+          {
+            "width": 116.421875,
+            "height": 44
+          }
+        ],
+        "navigationFits": true,
+        "mobileBrandMenuSameRow": true
+      },
+      {
+        "width": 1366,
+        "easy": false,
+        "overflow": false,
+        "headerHeight": 173.609375,
+        "controls": [
+          {
+            "width": 103.453125,
+            "height": 44
+          },
+          {
+            "width": 110.015625,
+            "height": 44
+          },
+          {
+            "width": 102.03125,
+            "height": 44
+          }
+        ],
+        "navigationFits": true,
+        "mobileBrandMenuSameRow": true
+      },
+      {
+        "width": 1366,
+        "easy": true,
+        "overflow": false,
+        "headerHeight": 176.609375,
+        "controls": [
+          {
+            "width": 118.09375,
+            "height": 44
+          },
+          {
+            "width": 131.46875,
+            "height": 44
+          },
+          {
+            "width": 116.421875,
+            "height": 44
+          }
+        ],
+        "navigationFits": true,
+        "mobileBrandMenuSameRow": true
+      },
+      {
+        "width": 1920,
+        "easy": false,
+        "overflow": false,
+        "headerHeight": 173.609375,
+        "controls": [
+          {
+            "width": 103.453125,
+            "height": 44
+          },
+          {
+            "width": 110.015625,
+            "height": 44
+          },
+          {
+            "width": 102.03125,
+            "height": 44
+          }
+        ],
+        "navigationFits": true,
+        "mobileBrandMenuSameRow": true
+      },
+      {
+        "width": 1920,
+        "easy": true,
+        "overflow": false,
+        "headerHeight": 186.296875,
+        "controls": [
+          {
+            "width": 118.09375,
+            "height": 44
+          },
+          {
+            "width": 131.46875,
+            "height": 44
+          },
+          {
+            "width": 116.421875,
+            "height": 44
+          }
+        ],
+        "navigationFits": true,
+        "mobileBrandMenuSameRow": true
+      }
+    ],
+    "external_page_requests": 0,
+    "page_errors": [],
+    "synthetic_only": true,
+    "production_connections": 0,
+    "database_changes": 0
+  }
+}
