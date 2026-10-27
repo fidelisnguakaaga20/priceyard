@@ -1,0 +1,64 @@
+{
+  "status": "PASS",
+  "date_wat": "2026-10-27",
+  "authorization": "Owner approved publication by replying deploy to the reviewed intelligence-only frontend change.",
+  "release_commit": "7d291c05bf79b04e3a8c8a0f8c34f14d8ff7fc50",
+  "frontend": {
+    "id": "srv-da6ddb2jnfac73e39490",
+    "name": "priceyard",
+    "status": "live",
+    "deploy_id": "dep-dbfurghsrm7s73c0d0qg",
+    "finished_at_utc": "2026-10-27T00:20:51.597335Z",
+    "auto_deploy": "off",
+    "settings_changed": false
+  },
+  "backend_preserved": {
+    "deploy_id": "dep-dbf4hirrjlhs73ffh9r0",
+    "commit": "2604ccd07bcff0d024f92428ff728eff5bebdc2d",
+    "status": "live",
+    "auto_deploy": "off",
+    "deployment_or_settings_changes": false
+  },
+  "reused_local_evidence": "batch-168-intelligence-only-page.json",
+  "live_public_browser": {
+    "status": "PASS",
+    "release_commit": "7d291c05bf79b04e3a8c8a0f8c34f14d8ff7fc50",
+    "frontend_deploy": "dep-dbfurghsrm7s73c0d0qg",
+    "checks": {
+      "asset": "/assets/index-CyQRrErl.js",
+      "intelligence_only_code": true,
+      "owner_code_preserved": true,
+      "compact_current_prices_preserved": true,
+      "anonymous_session": 401,
+      "private_session": true
+    },
+    "commodity_pages_verified": 4,
+    "all_commodity_pages_intelligence_only_and_locked_for_guests": true,
+    "current_price_summaries_preserved": 3,
+    "private_intelligence_requests_sent": 0,
+    "commodity_filtered_price_requests_sent": 0,
+    "mobile_and_desktop_themes_readable": true,
+    "write_requests_sent": 0,
+    "blocked_write_requests": [
+      {
+        "method": "POST",
+        "path": "/api/activity/ping"
+      }
+    ],
+    "external_requests": 0,
+    "customer_logins": 0,
+    "production_record_changes": 0,
+    "full_access_content_verification": "Existing8synthetic profile checks and8focused page checks; no customer login attempted in production"
+  },
+  "rollback": "Previous frontend artifact dep-dbfq31om7kps739epdug at776e090 retained. No backend/schema/data rollback needed.",
+  "preserved": "Current Prices compact summaries and record options, Price History, six intelligence sections/access rules, Owner guards, records, subscriptions and original Admin manual price entry.",
+  "production_data_changes": 0,
+  "migrations": 0,
+  "new_resources": 0,
+  "chrome_confirmation": [
+    "Open Current Prices and click a commodity name or See what this price means; Ctrl+Shift+R.",
+    "Full-access intelligence appears directly below the compact commodity heading, without repeated price cards.",
+    "Guests/non-entitled accounts see a readable lock; existing full-access accounts see all six original sections."
+  ],
+  "checklist": "35/36 unchanged; PY-35 encrypted-backup transport still paused pending existing Supabase support reply."
+}

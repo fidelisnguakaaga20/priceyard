@@ -25,6 +25,27 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current177 INTELLIGENCE-ONLY COMMODITY PAGE LIVE / EXACT-COMMIT PASS
+(2026-10-27 WAT): owner explicitly replied deploy after reviewing Current176.
+7d291c05bf79b04e3a8c8a0f8c34f14d8ff7fc50 atomic fast-forward pushed to existing
+master/development; frontend priceyard deployment dep-dbfurghsrm7s73c0d0qg LIVE.
+Fresh public browser verifies all4 active catalog commodity pages lead to Full-access
+intelligence and the existing locked panel for guests, without repeated price,
+guidance/share/report cards. Guest requests no private intelligence endpoints or
+commodity-filtered prices. Desktop/mobile375 and both themes readable; new served
+asset/Owner safeguards code verified. Current Prices compact summaries and
+View price history links retained. Anonymous auth/me401/private-no-store.
+All production writes/activity ping and external requests blocked during check;
+no customer login, records/subscription edits, migrations, settings/providers,
+dependencies or resources. Backend unchanged LIVE2604ccd/dep-dbf4hirrjlhs73ffh9r0;
+both AutoDeployOff. Reused Current1768 detail checks,8 account profiles,10 layout/
+history groups and production build/seven same-origin admission PASS; no repeated
+local tests. Prior frontend artifact dep-dbfq31om7kps739epdug retained for rollback.
+Evidence: batch-169-intelligence-only-release.json. Chrome: click commodity name
+from /prices,Ctrl+Shift+R; Full-access intelligence first,guests locked/full-access
+accounts retain6 sections. No records deleted.35/36/PY-35 paused automatic-backup
+transport unchanged; await existing support reply without repeated backup work.
+
 Current176 INTELLIGENCE-ONLY COMMODITY PAGE / LOCAL PASS, NOT PUBLISHED
 (2026-10-27 WAT): owner requested removing unrelated repeated commodity-page
 content and retaining Full-access intelligence: signals, quality, storage and
