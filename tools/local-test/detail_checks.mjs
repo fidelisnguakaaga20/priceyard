@@ -20,37 +20,39 @@ async function fixture(trial=false) {
     await page.getByRole('heading',{name:'Welcome, Test Trial'}).waitFor();
   }
   if(!trial)await page.goto(origin);
-  const prices=await page.evaluate(()=>fetch('/api/price-updates?commodity=Egusi').then(r=>r.json()));
-  return {context,page,prices};
+  const commodities=await page.evaluate(()=>fetch('/api/commodities').then(r=>r.json()));
+  const commodity=commodities.find(item=>item.name==='Egusi');
+  assert.ok(commodity);
+  return {context,page,commodity};
 }
-async function navigate(page,name) {
-  await page.evaluate(name=>{history.pushState(null,'','/commodities/'+encodeURIComponent(name));dispatchEvent(new PopStateEvent('popstate'));},name);
+async function navigate(page,name,id) {
+  await page.evaluate(({name,id})=>{history.pushState(null,'','/commodities/'+encodeURIComponent(name)+(id?'?commodity_id='+id:''));dispatchEvent(new PopStateEvent('popstate'));},{name,id});
   await page.getByRole('heading',{name,exact:true}).waitFor();
 }
 async function settle(page) {await page.evaluate(()=>new Promise(resolve=>setTimeout(resolve,250)));}
 function deferred() {let resolve;const promise=new Promise(r=>resolve=r);return {promise,resolve};}
 try {
   {
-    const {context,page,prices}=await fixture(),ready=deferred(),release=deferred(),sent=deferred();
-    await context.route('**/api/price-updates?commodity=Egusi',async route=>{
+    const {context,page,commodity}=await fixture(),ready=deferred(),release=deferred(),sent=deferred();
+    await context.route('**/api/commodities/'+commodity.id,async route=>{
       ready.resolve();await release.promise;
-      await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(prices)});sent.resolve();
+      await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(commodity)});sent.resolve();
     });
-    await page.goto(origin+'/commodities/Egusi');await ready.promise;
+    await page.goto(origin+'/commodities/Egusi?commodity_id='+commodity.id);await ready.promise;
     await navigate(page,'Not-a-record');
-    await page.getByText('No current approved Not-a-record record is available.',{exact:true}).waitFor();
+    await page.getByText('No active Not-a-record commodity is available.',{exact:true}).waitFor();
     release.resolve();await sent.promise;await settle(page);
-    checks.late_price_does_not_replace_new_route=await page.locator('.detail-card').count()===0;
+    checks.late_commodity_does_not_replace_new_route=await page.locator('.intelligence-grid,.commodity-detail-page .locked-panel').count()===0;
     await context.close();
   }
   {
-    const {context,page}=await fixture(),ready=deferred(),release=deferred(),sent=deferred();
-    await context.route('**/api/price-updates?commodity=Not-a-record',async route=>{
+    const {context,page,commodity}=await fixture(),ready=deferred(),release=deferred(),sent=deferred();
+    await context.route('**/api/commodities',async route=>{
       ready.resolve();await release.promise;
       await route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({detail:'Synthetic superseded price error'})});sent.resolve();
     });
     await page.goto(origin+'/commodities/Not-a-record');await ready.promise;
-    await navigate(page,'Egusi');await page.locator('.detail-card').first().waitFor();
+    await navigate(page,'Egusi',commodity.id);await page.locator('.commodity-detail-page .locked-panel').waitFor();
     release.resolve();await sent.promise;await settle(page);
     checks.late_error_does_not_poison_new_route=!(await page.locator('body').innerText()).includes('Synthetic superseded price error');
     await context.close();
@@ -78,10 +80,57 @@ try {
     });
     await page.goto(origin+'/commodities/Egusi');await ready.promise;
     await navigate(page,'Not-a-record');
-    await page.getByText('No current approved Not-a-record record is available.',{exact:true}).waitFor();
+    await page.getByText('No active Not-a-record commodity is available.',{exact:true}).waitFor();
     release.resolve();await sent.promise;
-    await page.getByRole('heading',{name:'Market signals',exact:true}).waitFor();await settle(page);
+    await settle(page);
     checks.late_intelligence_does_not_follow_old_commodity=!(await page.locator('body').innerText()).includes('Synthetic old commodity signal');
+    await context.close();
+  }
+  {
+    const {context,page,commodity}=await fixture();
+    const privateRequests=[];
+    page.on('request',request=>{if(/\/api\/(market-signals|quality-signals|buying-zones|sell-watch-windows|storage-suitability|cost-breakdowns)/.test(request.url()))privateRequests.push(request.url());});
+    await page.goto(origin+'/commodities/Old-bookmark-name?commodity_id='+commodity.id);
+    await page.locator('.commodity-detail-page .locked-panel').waitFor();
+    await page.getByRole('heading',{name:'Signals, quality, storage and decision support',exact:true}).waitFor();
+    assert.equal(await page.locator('.commodity-detail-page .detail-card,.commodity-detail-page .guidance,.commodity-detail-page .card-actions').count(),0);
+    assert.equal(await page.getByRole('heading',{name:commodity.name,exact:true}).count(),1);
+    assert.equal(privateRequests.length,0);
+    for(const width of [375,1366])for(const dark of [true,false]){
+      await page.setViewportSize({width,height:900});
+      const toggle=page.getByRole('button',{name:/^Dark mode:/});
+      if(/On/.test(await toggle.innerText())!==dark)await toggle.click();
+      const layout=await page.locator('.commodity-detail-page .locked-panel').evaluate(node=>({
+        fits:document.documentElement.scrollWidth<=innerWidth+1,
+        color:getComputedStyle(node.querySelector('strong')).color,
+        background:getComputedStyle(node).backgroundColor,
+        foreground:getComputedStyle(document.documentElement).getPropertyValue('--color-text').trim(),
+      }));
+      assert.equal(layout.fits,true);assert.notEqual(layout.color,layout.background);
+      assert.equal(layout.color,dark?'rgb(231, 236, 231)':'rgb(28, 42, 34)');
+      await page.screenshot({path:path.join(lab,`runtime/intelligence-only-guest-${width}-${dark?'dark':'light'}.png`)});
+    }
+    checks.guest_intelligence_only_page_has_no_repeated_prices_or_private_requests_and_readable_themes=true;
+    await context.close();
+  }
+  {
+    const {context,page,commodity}=await fixture(true);
+    await context.route('**/api/commodities/'+commodity.id,route=>route.fulfill({json:{...commodity,name:'Synthetic commodity without current prices'}}));
+    await context.route('**/api/price-updates*',route=>route.fulfill({json:[]}));
+    await page.goto(origin+'/commodities/Any-name?commodity_id='+commodity.id);
+    await page.getByRole('heading',{name:'Cost breakdown',exact:true}).waitFor();
+    assert.equal(await page.locator('.intelligence-grid > article').count(),6);
+    assert.equal(await page.locator('.commodity-detail-page .detail-card').count(),0);
+    checks.entitled_users_keep_all_six_intelligence_sections_without_current_price_dependency=true;
+    await context.close();
+  }
+  {
+    const {context,page,commodity}=await fixture();
+    await context.route('**/api/commodities',route=>route.fulfill({json:[commodity,{...commodity,id:91001}]}));
+    await page.goto(origin+'/commodities/Egusi');
+    await page.getByText('Choose this commodity from Current Prices to view its intelligence.',{exact:true}).waitFor();
+    assert.equal(await page.locator('.intelligence-grid,.commodity-detail-page .locked-panel').count(),0);
+    checks.ambiguous_name_only_bookmarks_fail_closed_and_cannot_mix_commodities=true;
     await context.close();
   }
   assert.equal(external,0);

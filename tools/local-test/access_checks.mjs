@@ -45,13 +45,14 @@ try {
     assert.ok(!('source_1' in access.current[0]));
     await page.goto(origin+'/commodities/Egusi');
     await page.getByRole('heading',{name:'Egusi',exact:true}).waitFor();
-    await page.locator('.detail-card').first().waitFor();
+    await page.locator(entitled ? '.intelligence-grid' : '.commodity-detail-page .locked-panel').waitFor();
+    assert.equal(await page.locator('.commodity-detail-page .detail-card').count(),0);
     assert.equal(await page.getByText(/Grade:/).count(),0);
     if(entitled)await page.getByRole('heading',{name:'Quality readiness',exact:true}).waitFor();
     await page.goto(origin+'/history');
     await page.getByRole('heading',{name:'Price history',exact:true}).waitFor();
     if(entitled)await page.locator('.history-table-view tbody tr').first().waitFor();
-    result[name]={historical_status:access.statuses[0],alternate_routes_protected:true,original_current_cards:true,original_detail_page:true};
+    result[name]={historical_status:access.statuses[0],alternate_routes_protected:true,original_current_cards:true,intelligence_only_detail_page:true};
     await context.close();
   }
   const report={result,production_connections:0};

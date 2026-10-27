@@ -1,0 +1,387 @@
+{
+  "status": "PASS_LOCAL_NOT_DEPLOYED",
+  "date_wat": "2026-10-27",
+  "authorization": "Owner requested removing unrelated repeated commodity-page content and retaining full-access signals, quality, storage and decision support.",
+  "scope": "Frontend commodity intelligence page only; no production deployment is inferred from earlier Current Prices release approval.",
+  "changes": [
+    "Remove repeated public price/detail/guidance/share/report cards from commodity page only",
+    "Lead with Full-access intelligence and the existing six intelligence sections",
+    "Resolve active commodity directly from existing metadata API, preserving explicit IDs and rejecting ambiguous name bookmarks",
+    "Keep intelligence functional without a current price record",
+    "Use contextual gate copy and readable theme colors",
+    "Show loading until results belong to the current commodity/account context"
+  ],
+  "preserved": [
+    "All production records/history",
+    "Current Prices compact summaries and selected size/type options",
+    "Trial, paid, Admin/Owner and other existing access rules",
+    "Server-side permissions",
+    "All six original intelligence endpoints and contents",
+    "Payments, subscriptions and manual Admin movement"
+  ],
+  "production_build": "TypeScript/Vite6.4.4 PASS,7 same-origin admission cases PASS; existing dependencies only.",
+  "detail_checks": {
+    "checks": {
+      "late_commodity_does_not_replace_new_route": true,
+      "late_error_does_not_poison_new_route": true,
+      "one_failed_section_keeps_successful_sections": true,
+      "failed_section_shows_existing_error_box": true,
+      "late_intelligence_does_not_follow_old_commodity": true,
+      "guest_intelligence_only_page_has_no_repeated_prices_or_private_requests_and_readable_themes": true,
+      "entitled_users_keep_all_six_intelligence_sections_without_current_price_dependency": true,
+      "ambiguous_name_only_bookmarks_fail_closed_and_cannot_mix_commodities": true
+    },
+    "expected_original_bug": false,
+    "external_page_requests": 0,
+    "production_connections": 0,
+    "extra_commodities_or_markets_created": 0
+  },
+  "access_checks": {
+    "result": {
+      "guest": {
+        "historical_status": 401,
+        "alternate_routes_protected": true,
+        "original_current_cards": true,
+        "intelligence_only_detail_page": true
+      },
+      "free": {
+        "historical_status": 403,
+        "alternate_routes_protected": true,
+        "original_current_cards": true,
+        "intelligence_only_detail_page": true
+      },
+      "trial": {
+        "historical_status": 200,
+        "alternate_routes_protected": true,
+        "original_current_cards": true,
+        "intelligence_only_detail_page": true
+      },
+      "paid": {
+        "historical_status": 200,
+        "alternate_routes_protected": true,
+        "original_current_cards": true,
+        "intelligence_only_detail_page": true
+      },
+      "reporter": {
+        "historical_status": 403,
+        "alternate_routes_protected": true,
+        "original_current_cards": true,
+        "intelligence_only_detail_page": true
+      },
+      "admin": {
+        "historical_status": 200,
+        "alternate_routes_protected": true,
+        "original_current_cards": true,
+        "intelligence_only_detail_page": true
+      },
+      "expired-reporter": {
+        "historical_status": 403,
+        "alternate_routes_protected": true,
+        "original_current_cards": true,
+        "intelligence_only_detail_page": true
+      },
+      "expired-paid-reporter": {
+        "historical_status": 403,
+        "alternate_routes_protected": true,
+        "original_current_cards": true,
+        "intelligence_only_detail_page": true
+      }
+    },
+    "production_connections": 0
+  },
+  "layout_history_regressions": {
+    "passed": 10,
+    "checks": {
+      "guest_history_gate_remains_and_does_not_request_private_history": true,
+      "all_history_default_preserves_ambiguous_dates_and_invalid_prices_in_both_lists": true,
+      "seven_wat_calendar_days_include_start_and_today_but_exclude_previous_millisecond_and_tomorrow": true,
+      "thirty_day_boundary_and_unconfirmed_date_notice_filter_every_view_without_refetching": true,
+      "history_order_only_changes_lists_and_all_history_restores_original_records": true,
+      "empty_period_offers_all_history_recovery_without_losing_records_or_fetching": true,
+      "mobile_period_controls_fit_and_mobile_prices_match_chart_period": true,
+      "word_only_ticker_colors_keyboard_focus_pause_resume_and_reduced_motion_pass": true,
+      "compact_ticker_stays_below_full_width_animation_in_easy_reading_and_both_themes": true,
+      "compact_commodity_intro_brings_intelligence_first_without_repeated_price_cards": true
+    },
+    "geometry": [
+      {
+        "control": "period",
+        "width": 375,
+        "left": 12,
+        "right": 363,
+        "overflow": false,
+        "buttons": [
+          {
+            "width": 72.0625,
+            "height": 44
+          },
+          {
+            "width": 80.15625,
+            "height": 44
+          },
+          {
+            "width": 98.234375,
+            "height": 44
+          }
+        ]
+      },
+      {
+        "control": "ticker",
+        "viewportWidth": 320,
+        "easy": false,
+        "dark": false,
+        "left": 248,
+        "right": 312,
+        "width": 64,
+        "height": 24,
+        "top": 231.1875,
+        "trackBottom": 228.1875,
+        "trackWidth": 320,
+        "tickerWidth": 320,
+        "color": "rgb(246, 197, 107)",
+        "overflow": false
+      },
+      {
+        "control": "ticker",
+        "viewportWidth": 320,
+        "easy": false,
+        "dark": true,
+        "left": 248,
+        "right": 312,
+        "width": 64,
+        "height": 24,
+        "top": 231.1875,
+        "trackBottom": 228.1875,
+        "trackWidth": 320,
+        "tickerWidth": 320,
+        "color": "rgb(246, 197, 107)",
+        "overflow": false
+      },
+      {
+        "control": "ticker",
+        "viewportWidth": 320,
+        "easy": true,
+        "dark": false,
+        "left": 248,
+        "right": 312,
+        "width": 64,
+        "height": 24,
+        "top": 239.125,
+        "trackBottom": 236.125,
+        "trackWidth": 320,
+        "tickerWidth": 320,
+        "color": "rgb(246, 197, 107)",
+        "overflow": false
+      },
+      {
+        "control": "ticker",
+        "viewportWidth": 320,
+        "easy": true,
+        "dark": true,
+        "left": 248,
+        "right": 312,
+        "width": 64,
+        "height": 24,
+        "top": 239.125,
+        "trackBottom": 236.125,
+        "trackWidth": 320,
+        "tickerWidth": 320,
+        "color": "rgb(246, 197, 107)",
+        "overflow": false
+      },
+      {
+        "control": "ticker",
+        "viewportWidth": 375,
+        "easy": false,
+        "dark": false,
+        "left": 303,
+        "right": 367,
+        "width": 64,
+        "height": 24,
+        "top": 212.1875,
+        "trackBottom": 209.1875,
+        "trackWidth": 375,
+        "tickerWidth": 375,
+        "color": "rgb(246, 197, 107)",
+        "overflow": false
+      },
+      {
+        "control": "ticker",
+        "viewportWidth": 375,
+        "easy": false,
+        "dark": true,
+        "left": 303,
+        "right": 367,
+        "width": 64,
+        "height": 24,
+        "top": 212.1875,
+        "trackBottom": 209.1875,
+        "trackWidth": 375,
+        "tickerWidth": 375,
+        "color": "rgb(246, 197, 107)",
+        "overflow": false
+      },
+      {
+        "control": "ticker",
+        "viewportWidth": 375,
+        "easy": true,
+        "dark": false,
+        "left": 303,
+        "right": 367,
+        "width": 64,
+        "height": 24,
+        "top": 220.125,
+        "trackBottom": 217.125,
+        "trackWidth": 375,
+        "tickerWidth": 375,
+        "color": "rgb(246, 197, 107)",
+        "overflow": false
+      },
+      {
+        "control": "ticker",
+        "viewportWidth": 375,
+        "easy": true,
+        "dark": true,
+        "left": 303,
+        "right": 367,
+        "width": 64,
+        "height": 24,
+        "top": 220.125,
+        "trackBottom": 217.125,
+        "trackWidth": 375,
+        "tickerWidth": 375,
+        "color": "rgb(246, 197, 107)",
+        "overflow": false
+      },
+      {
+        "control": "ticker",
+        "viewportWidth": 1366,
+        "easy": false,
+        "dark": false,
+        "left": 1294,
+        "right": 1358,
+        "width": 64,
+        "height": 24,
+        "top": 176.609375,
+        "trackBottom": 173.609375,
+        "trackWidth": 1366,
+        "tickerWidth": 1366,
+        "color": "rgb(246, 197, 107)",
+        "overflow": false
+      },
+      {
+        "control": "ticker",
+        "viewportWidth": 1366,
+        "easy": false,
+        "dark": true,
+        "left": 1294,
+        "right": 1358,
+        "width": 64,
+        "height": 24,
+        "top": 176.609375,
+        "trackBottom": 173.609375,
+        "trackWidth": 1366,
+        "tickerWidth": 1366,
+        "color": "rgb(246, 197, 107)",
+        "overflow": false
+      },
+      {
+        "control": "ticker",
+        "viewportWidth": 1366,
+        "easy": true,
+        "dark": false,
+        "left": 1294,
+        "right": 1358,
+        "width": 64,
+        "height": 24,
+        "top": 179.609375,
+        "trackBottom": 176.609375,
+        "trackWidth": 1366,
+        "tickerWidth": 1366,
+        "color": "rgb(246, 197, 107)",
+        "overflow": false
+      },
+      {
+        "control": "ticker",
+        "viewportWidth": 1366,
+        "easy": true,
+        "dark": true,
+        "left": 1294,
+        "right": 1358,
+        "width": 64,
+        "height": 24,
+        "top": 179.609375,
+        "trackBottom": 176.609375,
+        "trackWidth": 1366,
+        "tickerWidth": 1366,
+        "color": "rgb(246, 197, 107)",
+        "overflow": false
+      },
+      {
+        "control": "commodity intro",
+        "viewportWidth": 375,
+        "easy": false,
+        "headerBottom": 240.1875,
+        "introHeight": 57.1875,
+        "imageWidth": 56,
+        "imageRight": 68,
+        "copyLeft": 80,
+        "cardTop": 486.375,
+        "overflow": false
+      },
+      {
+        "control": "commodity intro",
+        "viewportWidth": 375,
+        "easy": true,
+        "headerBottom": 248.125,
+        "introHeight": 67,
+        "imageWidth": 56,
+        "imageRight": 68,
+        "copyLeft": 80,
+        "cardTop": 572.125,
+        "overflow": false
+      },
+      {
+        "control": "commodity intro",
+        "viewportWidth": 1366,
+        "easy": false,
+        "headerBottom": 204.609375,
+        "introHeight": 80,
+        "imageWidth": 80,
+        "imageRight": 173,
+        "copyLeft": 189,
+        "cardTop": 436.609375,
+        "overflow": false
+      },
+      {
+        "control": "commodity intro",
+        "viewportWidth": 1366,
+        "easy": true,
+        "headerBottom": 207.609375,
+        "introHeight": 82.390625,
+        "imageWidth": 80,
+        "imageRight": 173,
+        "copyLeft": 189,
+        "cardTop": 453,
+        "overflow": false
+      }
+    ],
+    "history_requests": 3,
+    "external_page_requests": 0,
+    "page_errors": [],
+    "synthetic_only": true,
+    "production_connections": 0,
+    "database_changes": 0
+  },
+  "frontend_source_sha256": {
+    "frontend/src/pages/CommodityDetailPage.tsx": "f7124a6b38856d5c22e4ab9eccfad5be618cc7e2930603e55c3c3239461fa35b",
+    "frontend/src/pages/commodity-detail.css": "7608362ed3875fc3fd73a12954d1a9c448ebadf759e7fdf036c8e52d329b9d83",
+    "frontend/src/components/PremiumGate.tsx": "2653b7811897e33a4b212c17cfcfe24166c912d5510f34f2ec942017dfdda673"
+  },
+  "production_changes": 0,
+  "database_records_deleted": 0,
+  "migrations": 0,
+  "new_services_or_dependencies": 0,
+  "release_status": "Local verified change only. Publishing this separate commodity-page change requires explicit deployment approval.",
+  "unchanged_checklist": "35/36; PY-35 encrypted-backup transport remains paused pending existing Supabase support reply."
+}

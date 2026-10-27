@@ -25,6 +25,27 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current176 INTELLIGENCE-ONLY COMMODITY PAGE / LOCAL PASS, NOT PUBLISHED
+(2026-10-27 WAT): owner requested removing unrelated repeated commodity-page
+content and retaining Full-access intelligence: signals, quality, storage and
+decision support. Removed commodity-page public price/detail/guidance/share/report
+cards only; no records deleted. Existing6 intelligence sections, disclaimers,
+API permissions and subscription/role access unchanged. Commodity identity now
+uses existing active metadata endpoints with stable IDs and ambiguous-name guard,
+so intelligence does not depend on a current price record. Compact identity and
+intelligence heading lead directly to entitled contents or contextual lock;
+locked panel readable in both themes. Loading/results bound to current route
+and account context, preserving late-response rejection and independent partial
+failures.8 focused detail checks,8 account access profiles and10 existing
+layout/history groups PASS; production TypeScript/Vite and7 same-origin admission
+cases PASS. Changed source exactly matches test snapshot. Current Prices/history,
+Owner guards, records, subscriptions and business rules preserved. No backend,
+production, provider/settings, migrations, new services/dependencies or expenses.
+Synthetic preview stopped. Evidence: batch-168-intelligence-only-page.json.
+This separate commodity-page change is local only; prior deployment approval
+covered Current Prices. Ask for frontend publication approval with this reviewed
+result.35/36/PY-35 paused backup transport remains unchanged; await support reply.
+
 Current175 COMPACT CURRENT PRICES LIVE / EXACT-COMMIT PASS (2026-10-26 WAT):
 owner-approved776e0903197d66e025f341a9313df326900c5e91 committed and atomic
 fast-forward pushed master/development. Existing frontend priceyard deployment

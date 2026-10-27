@@ -254,10 +254,12 @@ try {
   checks.compact_ticker_stays_below_full_width_animation_in_easy_reading_and_both_themes = true;
 
   const detailPath = `/commodities/${encodeURIComponent(commodity.name)}?commodity_id=${commodity.id}`;
+  await page.route(url => url.origin === origin && url.pathname === `/api/commodities/${commodity.id}`,
+    route => route.fulfill({json: commodity}));
   await page.goto(origin + detailPath);
-  await page.locator('.commodity-detail-page .detail-grid > .detail-card').nth(1).waitFor();
-  assert.equal(await page.locator('.commodity-intro-copy p').innerText(), 'Current prices by market and quantity.');
-  assert.equal(await page.locator('.commodity-detail-page .detail-grid > .detail-card').count(), 2);
+  await page.locator('.commodity-detail-page .intelligence-grid > .card').nth(5).waitFor();
+  assert.equal((await page.locator('.commodity-intro-copy .eyebrow').textContent()).trim(), 'Full-access intelligence');
+  assert.equal(await page.locator('.commodity-detail-page .detail-card').count(), 0);
   for (const width of [375, 1366]) {
     await page.setViewportSize({width, height: width === 375 ? 667 : 900});
     for (const easy of [false, true]) {
@@ -268,7 +270,7 @@ try {
         const intro = node.querySelector('.commodity-page-intro').getBoundingClientRect();
         const image = node.querySelector('.commodity-image-detail').getBoundingClientRect();
         const copy = node.querySelector('.commodity-intro-copy').getBoundingClientRect();
-        const card = node.querySelector('.detail-card').getBoundingClientRect();
+        const card = node.querySelector('.intelligence-grid > .card').getBoundingClientRect();
         return {headerBottom: header.bottom, introHeight: intro.height, imageWidth: image.width,
           imageRight: image.right, copyLeft: copy.left, cardTop: card.top,
           overflow: document.documentElement.scrollWidth > innerWidth + 1};
@@ -276,13 +278,13 @@ try {
       assert.equal(state.overflow, false);
       assert.equal(Math.round(state.imageWidth), width === 375 ? 56 : 80);
       assert.ok(state.imageRight <= state.copyLeft);
-      assert.ok(state.cardTop - state.headerBottom <= (easy ? 320 : 280));
+      assert.ok(state.cardTop - state.headerBottom <= (easy ? 420 : 380));
       assert.ok(state.cardTop < (width === 375 ? 667 : 900));
       geometry.push({control: 'commodity intro', viewportWidth: width, easy, ...state});
     }
     await page.screenshot({path: path.join(runtime, `period-polish-commodity-${width}.png`), fullPage: false});
   }
-  checks.compact_commodity_intro_brings_all_existing_price_cards_into_view_without_changing_records = true;
+  checks.compact_commodity_intro_brings_intelligence_first_without_repeated_price_cards = true;
   assert.deepEqual(errors, []);
   assert.equal(outside, 0);
 } catch (error) {
