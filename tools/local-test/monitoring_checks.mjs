@@ -19,7 +19,7 @@ try{
  await page.goto(origin+'/prices');await page.locator('.price-card').first().waitFor();const normal=await probe();assert.deepEqual(normal,{health:200,prices:200,guest_history:401,public_sources_absent:true});
  await setOutage(true);const failed=await probe();assert.equal(failed.health,200);assert.equal(failed.prices,503);
  await page.reload();await page.locator('.status-box.error').waitFor();assert.equal(await page.locator('.price-card').count(),0);
- await setOutage(false);await page.getByRole('button',{name:'Apply',exact:true}).click();await page.locator('.price-card').first().waitFor();assert.equal(await page.locator('.status-box.error').count(),0);
+ await setOutage(false);await page.getByRole('button',{name:'Search prices',exact:true}).click();await page.locator('.price-card').first().waitFor();assert.equal(await page.locator('.status-box.error').count(),0);
  const recovered=await probe();assert.deepEqual(recovered,normal);assert.equal(outside,0);
  const report={local_monitoring_drill_passed:true,liveness_does_not_mask_failed_price_read:true,normal,failed,recovered,original_error_apply_recovery:true,live_monitor_or_alerts_enabled:false,external_requests:outside,production_connections:0};
  fs.writeFileSync(path.join(lab,'runtime/monitoring-checks.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report));

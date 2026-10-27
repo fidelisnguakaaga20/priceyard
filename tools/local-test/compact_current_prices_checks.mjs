@@ -111,6 +111,11 @@ try {
 
   await page.goto(origin + '/prices');
   await expectSelection(latest.id, latest.price_low);
+  await page.getByRole('heading', {name: 'Search commodity prices', exact: true}).waitFor();
+  assert.equal(await page.locator('#price-search').getByRole('button', {name: 'Search prices', exact: true}).isEnabled(), true);
+  assert.equal(await page.locator('#price-search select').nth(2).inputValue(), '');
+  assert.match(await page.locator('.header-search-link').innerText(), /Search\s+prices/);
+  checks.clear_search_heading_action_and_optional_movement_keep_existing_header_shortcut = true;
   assert.equal(await page.locator('.commodity-price-card').count(), 2);
   assert.equal(await page.locator('.commodity-price-card .commodity-image').count(), 2);
   assert.equal(await page.locator('.market-price-summary').count(), 3);
@@ -128,6 +133,34 @@ try {
     await selection().evaluate(node => [...node.labels].some(label => /Size \/ grade/.test(label.textContent))), true);
   checks.one_newest_summary_per_market_with_raw_alternatives_and_one_photo_per_commodity = true;
   checks.distinct_commodity_and_market_ids_not_names_and_singleton_has_no_selector = true;
+
+  // The old homepage sliced the first three records and repeated a commodity's
+  // photo, hiding a different commodity farther down the current response.
+  await page.goto(origin + '/');
+  await expectSelection(latest.id, latest.price_low);
+  assert.equal(await page.locator('.commodity-price-card').count(), 2);
+  assert.equal(await page.locator('.commodity-price-card .commodity-image').count(), 2);
+  assert.equal(await page.locator('.market-price-summary').count(), 3);
+  assert.equal(await selection().locator('option').count(), 5);
+  const homeIncoming = price(1099, {bag_size: 'New homepage size', update_date_time: '2026-06-19T10:00:00Z'});
+  currentRows = [...currentRows, homeIncoming];
+  await refresh();
+  await expectSelection(homeIncoming.id, homeIncoming.price_low);
+  await selection().selectOption(String(old.id));
+  await expectSelection(old.id, old.price_low);
+  assert.match(await shares(displayed()), /pu=1001/);
+  await refresh();
+  await expectSelection(old.id, old.price_low);
+  currentRows = currentRows.filter(item => item.id !== homeIncoming.id);
+  for (const width of [375, 1366]) {
+    await page.setViewportSize({width, height: 900});
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false);
+    await page.locator('.commodity-price-card').first().screenshot({path: path.join(lab, `runtime/grouped-homepage-${width}.png`)});
+  }
+  checks.homepage_groups_full_response_without_duplicate_photos_or_hiding_other_commodity_ids = true;
+  checks.homepage_options_share_and_refresh_follow_selected_record_and_fit_mobile = true;
+  await page.goto(origin + '/prices');
+  await expectSelection(latest.id);
 
   assert.equal(await page.getByRole('link', {name: 'View history', exact: true}).count(), 0);
   assert.equal(await page.locator('.price-option').getByRole('link', {name: 'View price history', exact: true}).count(), 3);

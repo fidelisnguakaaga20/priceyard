@@ -30,7 +30,7 @@ try{
  });
  assert.equal(result.rejection.status,413);assert.deepEqual(result.rejection.body,{detail:'Request body is too large'});
  assert.equal(result.preserved,true);assert.equal(result.maximum_screenshot_status,201);assert.equal(result.maximum_screenshot_unchanged,true);
- await page.goto(origin+'/prices');await page.locator('.price-card').first().waitFor();assert.ok(await page.getByRole('button',{name:'Apply',exact:true}).count());
+ await page.goto(origin+'/prices');await page.locator('.price-card').first().waitFor();assert.ok(await page.getByRole('button',{name:'Search prices',exact:true}).count());
  assert.equal(outside,0);
  const report={checks:{oversized_payment_body_rejected_before_provider:true,saved_prices_audits_payments_preserved:true,existing_two_mib_screenshot_accepted_unchanged:true,original_current_prices_screen:true},maximum_single_body_test_bytes:4*1024*1024+1,files_created_for_payloads:0,synthetic_preview_reseed_required:true,external_requests:outside,production_connections:0};
  fs.writeFileSync(path.join(lab,'runtime/request-bounds-checks.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report));

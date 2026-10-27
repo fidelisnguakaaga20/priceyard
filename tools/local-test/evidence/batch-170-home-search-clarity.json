@@ -1,0 +1,121 @@
+{
+  "status": "PASS",
+  "date_wat": "2026-10-27",
+  "authorization": "Owner requested all recommended homepage/search improvements and deployment.",
+  "scope": "Homepage shares existing grouped current-price cards and retains complete API response. Search heading is Search commodity prices; submit is Search prices. Existing header shortcut, Commodity/Market fields and optional Movement retained.",
+  "preserved": "All raw options and records, identities/measurements, latest defaults, selection refresh, history gate, intelligence-only pages, Owner/backend/payment/subscription rules. No API/query, schema, dependency or service changes.",
+  "production_build": "TypeScript/Vite6.4.4 and7 same-origin admission cases PASS; existing dependencies.",
+  "compact_home_and_search": {
+    "passed": 12,
+    "checks": {
+      "clear_search_heading_action_and_optional_movement_keep_existing_header_shortcut": true,
+      "one_newest_summary_per_market_with_raw_alternatives_and_one_photo_per_commodity": true,
+      "distinct_commodity_and_market_ids_not_names_and_singleton_has_no_selector": true,
+      "homepage_groups_full_response_without_duplicate_photos_or_hiding_other_commodity_ids": true,
+      "homepage_options_share_and_refresh_follow_selected_record_and_fit_mobile": true,
+      "explicit_history_label_routes_matching_ids_and_preserves_guest_access_gate": true,
+      "unselected_default_follows_newest_record_on_silent_refresh": true,
+      "keyboard_and_selected_price_details_share_and_history_follow_the_visible_choice": true,
+      "silent_refresh_updates_chosen_record_keeps_existing_choice_and_recovers_removed_choice": true,
+      "authenticated_watch_pair_and_flag_record_match_selection_without_leaking_previous_state": true,
+      "full_history_retains_all_current_and_older_records_in_table_and_mobile_cards": true,
+      "compact_prices_keyboard_mobile_and_both_themes_fit_with_easy_reading": true
+    },
+    "geometry": [
+      {
+        "width": 375,
+        "dark": true,
+        "color": "rgb(231, 236, 231)",
+        "background": "rgb(20, 28, 23)",
+        "documentFits": true,
+        "selectFits": true,
+        "summaryFits": true,
+        "easyReading": true,
+        "theme": "dark"
+      },
+      {
+        "width": 375,
+        "dark": false,
+        "color": "rgb(28, 42, 34)",
+        "background": "rgb(252, 253, 251)",
+        "documentFits": true,
+        "selectFits": true,
+        "summaryFits": true,
+        "easyReading": true,
+        "theme": "light"
+      },
+      {
+        "width": 1366,
+        "dark": true,
+        "color": "rgb(231, 236, 231)",
+        "background": "rgb(20, 28, 23)",
+        "documentFits": true,
+        "selectFits": true,
+        "summaryFits": true,
+        "easyReading": true,
+        "theme": "dark"
+      },
+      {
+        "width": 1366,
+        "dark": false,
+        "color": "rgb(28, 42, 34)",
+        "background": "rgb(252, 253, 251)",
+        "documentFits": true,
+        "selectFits": true,
+        "summaryFits": true,
+        "easyReading": true,
+        "theme": "light"
+      }
+    ],
+    "synthetic_only": true,
+    "production_connections": 0,
+    "provider_calls": 0,
+    "api_writes": "Only intercepted synthetic watch/flag responses; login uses guarded local account",
+    "external_page_requests": 0,
+    "current_requests": 31,
+    "history_requests": 1,
+    "browser_errors": [],
+    "failure": null
+  },
+  "filter_regressions": {
+    "checks": {
+      "older_refresh_cannot_replace_applied_filter": true,
+      "draft_filter_waits_for_apply": true,
+      "background_refresh_does_not_duplicate_foreground_request": true,
+      "foreground_loading_finishes": true
+    },
+    "expected_original_bug": false,
+    "external_page_requests": 0,
+    "production_connections": 0
+  },
+  "discovery_regressions": {
+    "passed": 12,
+    "checks": {
+      "welcome_readable_in_both_themes_and_easy_reading_without_the_shared_dark_card_conflict": true,
+      "welcome_keyboard_focus_trap_navigation_dismissal_and_focus_return_preserved": true,
+      "first_visit_hashed_search_waits_for_welcome_dismissal_before_focusing_filters": true,
+      "homepage_search_is_visible_outside_the_menu_and_reuses_existing_catalog_requests": true,
+      "homepage_search_uses_exact_ids_even_when_commodity_and_market_names_are_duplicates": true,
+      "explicit_valid_market_without_current_prices_stays_selected_with_an_honest_empty_result": true,
+      "header_search_reveals_and_focuses_filters_below_the_sticky_header_even_on_the_same_page": true,
+      "optional_homepage_filters_preserve_commodity_only_market_only_and_all_prices_navigation": true,
+      "loading_and_failed_catalogs_do_not_submit_partial_searches_and_offer_existing_prices_fallback": true,
+      "half_speed_ticker_preserves_pause_resume_and_reduced_motion": true,
+      "header_search_and_all_menu_text_fit_guest_admin_mobile_desktop_themes_and_easy_reading": true,
+      "public_price_search_does_not_bypass_history_access_or_change_original_records": true
+    },
+    "external_page_requests": 0,
+    "page_errors": [],
+    "synthetic_only": true,
+    "production_connections": 0,
+    "production_records_changed": 0,
+    "full_local_report": "runtime/discovery-readability-checks.json; measured40 layouts and144 contrast combinations."
+  },
+  "test_selector_maintenance": "Existing check scripts aligned with renamed Search prices button and existing grouped/intelligence-only layouts; unrelated suites not rerun.",
+  "frontend_source_sha256": {
+    "frontend/src/pages/HomePage.tsx": "624d74858947792b9bb0ce6f5b52e5a3347d597adcbd2512f15351114bc2e2b3",
+    "frontend/src/pages/PricesPage.tsx": "bbef95e8daf47160b4c38bf7500e965cda0f736f858a731a46a334f210d42688"
+  },
+  "release_plan": "Only existing frontend priceyard deployment; both services AutoDeployOff. Previous frontend dep-dbfurghsrm7s73c0d0qg retained. No backend deploy/settings or production data changes.",
+  "checklist": "35/36/PY-35 paused encrypted-backup transport unchanged; await existing Supabase support reply."
+}

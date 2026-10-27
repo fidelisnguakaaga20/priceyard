@@ -5,7 +5,7 @@ import { CommodityImage } from "../components/CommodityImage";
 import { Disclaimer, PRICE_DISCLAIMER } from "../components/Disclaimer";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { HomePriceSearch } from "../components/HomePriceSearch";
-import { PriceCard } from "../components/PriceCard";
+import { GroupedPriceCards } from "../components/GroupedPriceCards";
 import { SavedPriceNotice } from "../components/SavedPriceNotice";
 import { NativeShareButton } from "../components/ShareButtons";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
@@ -37,7 +37,7 @@ export function HomePage() {
   const loadPrices = (silent = false) => {
     const sequence = ++priceRequest.current;
     apiFetchWithProvenance<PriceUpdate[]>("/price-updates")
-      .then(({ data: items, savedAt }) => { if (sequence !== priceRequest.current) return; setPrices(items.slice(0, 3)); setSavedAt(savedAt); setRecordCount(items.length); setError(""); })
+      .then(({ data: items, savedAt }) => { if (sequence !== priceRequest.current) return; setPrices(items); setSavedAt(savedAt); setRecordCount(items.length); setError(""); })
       .catch((err: Error) => { if (sequence === priceRequest.current && !silent) setError(err.message); })
       .finally(() => { if (sequence === priceRequest.current && !silent) setLoading(false); });
   };
@@ -140,7 +140,7 @@ export function HomePage() {
       <section className="page section-block">
         <div className="section-heading"><div><span className="eyebrow">Latest market information</span><h2>Today's prices</h2></div><Link className="text-link" to="/prices">See all prices →</Link></div>
         {!loading && prices.length > 0 && <SavedPriceNotice savedAt={savedAt} />}
-        {loading ? <LoadingSpinner label="Loading approved prices…" /> : error ? <div className="status-box error">Could not load prices: {error}</div> : prices.length ? <div className="card-grid">{prices.map((item) => <PriceCard key={item.id} item={item} />)}</div> : <div className="status-box">No approved current price updates are available yet. Check back soon.</div>}
+        {loading ? <LoadingSpinner label="Loading approved prices…" /> : error ? <div className="status-box error">Could not load prices: {error}</div> : prices.length ? <GroupedPriceCards items={prices} /> : <div className="status-box">No approved current price updates are available yet. Check back soon.</div>}
       </section>
 
       {testimonials.length > 0 && (

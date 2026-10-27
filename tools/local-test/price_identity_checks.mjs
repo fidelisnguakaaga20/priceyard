@@ -35,15 +35,15 @@ try{
   const created=await api('/price-updates','POST',{commodity_id,market_id,unit:'1 bag',bag_size:'Unknown',price_low:311000,price_high:321000,average_price:316000,suggested_action:'Watch',confidence_level:'Low confidence',update_date_time:new Date(Date.now()-60000).toISOString()});
   assert.equal(created.status,201,JSON.stringify(created.body));assert.equal((await api('/price-updates/'+created.body.id+'/approve','PATCH')).status,200);
  }
- const current=await applyFilters('/prices',original,market,'Apply');assert.equal(current.length,1);assert.equal(await page.locator('.card-grid > article').count(),1);
+ const current=await applyFilters('/prices',original,market,'Search prices');assert.equal(current.length,1);assert.equal(await page.locator('.card-grid > article').count(),1);
  checks.current_exact_ids_exclude_prefix_and_same_named_market=true;
  const href=await page.getByRole('link',{name:/See what this price means/}).first().getAttribute('href');assert.equal(new URL(href,origin).searchParams.get('commodity_id'),String(original.id));
  const oldRows=await applyFilters('/history',original,market,'Search history');assert.equal(oldRows.length,historical.filter(row=>row.commodity_id===original.id&&row.market_id===market.id&&row.status==='approved').length);
  checks.history_exact_ids_preserve_all_matching_records=true;
- await applyFilters('/prices',original,duplicateMarket.body,'Apply');checks.same_named_market_can_be_selected_by_existing_id=true;
+ await applyFilters('/prices',original,duplicateMarket.body,'Search prices');checks.same_named_market_can_be_selected_by_existing_id=true;
  const renamed='Egusi renamed synthetic';assert.equal((await api('/commodities/'+original.id,'PATCH',{name:renamed})).status,200);
  await page.goto(origin+href);await page.getByRole('heading',{name:renamed,exact:true}).waitFor();
- const detail=(await api('/price-updates?commodity_id='+original.id)).body;assert.ok(detail.every(row=>row.commodity_id===original.id));assert.equal(await page.locator('.detail-grid > article').count(),detail.length);
+ const detail=(await api('/price-updates?commodity_id='+original.id)).body;assert.ok(detail.every(row=>row.commodity_id===original.id));await page.locator('.intelligence-grid > article').nth(5).waitFor();assert.equal(await page.locator('.detail-grid > article').count(),0);
  checks.pre_rename_link_retains_original_commodity_identity=true;
  assert.deepEqual((await api('/price-updates/admin/history')).body.filter(row=>historical.some(before=>before.id===row.id)).map(row=>({id:row.id,commodity_id:row.commodity_id,market_id:row.market_id,price_low:row.price_low,price_high:row.price_high})),historical.map(row=>({id:row.id,commodity_id:row.commodity_id,market_id:row.market_id,price_low:row.price_low,price_high:row.price_high})));
  checks.existing_price_rows_and_amounts_unchanged=true;

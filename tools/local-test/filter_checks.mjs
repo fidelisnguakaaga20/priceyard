@@ -38,7 +38,7 @@ try {
   let held=0;
   await context.route('**/api/price-updates',async route=>{if(++held===2)ready.resolve();await release.promise;await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(prices)});});
   await tick(page);await ready.promise;
-  await page.locator('.filter-bar select').nth(2).selectOption('down');await page.getByRole('button',{name:'Apply',exact:true}).click();
+  await page.locator('.filter-bar select').nth(2).selectOption('down');await page.getByRole('button',{name:'Search prices',exact:true}).click();
   await page.getByText(/No current prices found/).waitFor();release.resolve();await settled(page);
   checks.older_refresh_cannot_replace_applied_filter=await page.locator('.price-card').count()===0;
   await context.close();
@@ -46,17 +46,17 @@ try {
  {
   const {context,page}=await fixture();await page.locator('.filter-bar select').nth(2).selectOption('down');
   await tick(page);await settled(page);
-  checks.draft_filter_waits_for_apply=await page.locator('.price-card').count()===1;
+  checks.draft_filter_waits_for_apply=await page.locator('.price-option').count()===1;
   await context.close();
  }
  {
   const {context,page}=await fixture(),ready=deferred(),release=deferred();
   await context.route('**/api/price-updates?movement=down',async route=>{ready.resolve();await release.promise;await route.fulfill({status:200,contentType:'application/json',body:'[]'});});
-  await page.locator('.filter-bar select').nth(2).selectOption('down');await page.getByRole('button',{name:'Apply',exact:true}).click();await ready.promise;
+  await page.locator('.filter-bar select').nth(2).selectOption('down');await page.getByRole('button',{name:'Search prices',exact:true}).click();await ready.promise;
   await tick(page);const count=await page.evaluate(()=>window.__downStarted);
   release.resolve();await settled(page);
   checks.background_refresh_does_not_duplicate_foreground_request=count===1;
-  checks.foreground_loading_finishes=await page.getByRole('button',{name:'Apply',exact:true}).isEnabled();
+  checks.foreground_loading_finishes=await page.getByRole('button',{name:'Search prices',exact:true}).isEnabled();
   await context.close();
  }
  assert.equal(outside,0);

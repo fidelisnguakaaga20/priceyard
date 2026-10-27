@@ -25,6 +25,24 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current178 HOMEPAGE GROUPING AND SEARCH CLARITY / VERIFIED FOR APPROVED RELEASE
+(2026-10-27 WAT): owner requested all recommended UI refinements and deployment.
+Homepage uses existing GroupedPriceCards with the complete current response,
+removing first3-record slicing/repeated photos and keeping every recorded option
+accessible; stable commodity/market IDs and newest summary/default remain intact.
+Search heading now Search commodity prices; submit button Search prices. Existing
+header shortcut, Commodity/Market selectors and optional Movement unchanged.
+No new component, API call or business rule.12 focused home/current-price groups,
+4 filter-race cases and12 discovery/readability groups PASS;375/1366/themes and
+Home refresh/selection/share identity verified. Production TypeScript/Vite build
+and7 same-origin admission cases PASS; both changed pages exactly match snapshot.
+Existing check labels aligned; no unrelated audits/backups/tests. Only frontend
+release planned, both AutoDeployOff; previous frontend dep-dbfurghsrm7s73c0d0qg
+retained. Intelligence-only page, Owner backend guards, price history, payments,
+subscriptions and records preserved. No backend/settings/migrations/dependencies
+or new resources. Local synthetic preview stopped. Evidence:
+batch-170-home-search-clarity.json.35/36/PY-35 paused backup transport unchanged.
+
 Current177 INTELLIGENCE-ONLY COMMODITY PAGE LIVE / EXACT-COMMIT PASS
 (2026-10-27 WAT): owner explicitly replied deploy after reviewing Current176.
 7d291c05bf79b04e3a8c8a0f8c34f14d8ff7fc50 atomic fast-forward pushed to existing

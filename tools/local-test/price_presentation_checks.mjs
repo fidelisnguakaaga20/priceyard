@@ -61,7 +61,7 @@ try {
   checks.commodity_ids_not_names_control_grouping = true;
   await page.locator('.filter-bar select').nth(0).selectOption({label: base.commodity.name});
   shownCurrent = [current[1]];
-  await page.getByRole('button', {name: 'Apply', exact: true}).click();
+  await page.getByRole('button', {name: 'Search prices', exact: true}).click();
   await page.waitForFunction(() => document.querySelectorAll('.price-option').length === 1);
   assert.match(await page.locator('.price-option').innerText(), /Recorded size two/);
   checks.filters_replace_grouped_results = true;

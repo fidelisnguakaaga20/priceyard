@@ -139,12 +139,12 @@ export function PricesPage() {
   };
 
   return <section className="page page-section">
-    <div className="page-title"><span className="eyebrow">Latest approved records</span><h1>Prices</h1><p>Search current commodity price ranges by commodity, market and movement.</p></div>
+    <div className="page-title"><span className="eyebrow">Latest approved records</span><h1>Search commodity prices</h1><p>Search current commodity price ranges by commodity, market and movement.</p></div>
     <form id="price-search" ref={searchFormRef} className="filter-bar" role="search" aria-label="Search current prices" onSubmit={submit}>
       <label>Commodity<select value={selectedIdentity(commodity, commodities)} onChange={(e) => changeCommodity(e.target.value)}><option value="">Choose a commodity</option>{commodities.map((item) => <option value={identityValue(item.id)} key={item.id}>{item.name}</option>)}</select></label>
       <label>Market<select value={selectedIdentity(market, markets)} onChange={(e) => setMarket(e.target.value)}><option value="">Choose a market</option>{availableMarkets.map((item) => <option value={identityValue(item.id)} key={item.id}>{item.name}</option>)}</select>{commodity && trackedMarkets.length < markets.length && <small className="muted">{commodityLabel} is only tracked at {trackedMarkets.length} market{trackedMarkets.length === 1 ? "" : "s"} here.</small>}</label>
       <label>Movement<select value={movement} onChange={(e) => setMovement(e.target.value)}><option value="">Any movement</option><option value="up">Up</option><option value="down">Down</option><option value="stable">Stable</option><option value="unknown">Unknown</option></select></label>
-      <div className="filter-actions"><button className="button button-small" type="submit" disabled={loading}>{loading ? <ButtonSpinner label="Please wait…" /> : "Apply"}</button><button className="button button-ghost button-small" type="button" onClick={clear} disabled={loading}>Clear</button></div>
+      <div className="filter-actions"><button className="button button-small" type="submit" disabled={loading}>{loading ? <ButtonSpinner label="Please wait…" /> : "Search prices"}</button><button className="button button-ghost button-small" type="button" onClick={clear} disabled={loading}>Clear</button></div>
     </form>
     {error && <div className="status-box error">{error}</div>}
     {!loading && items.length > 0 && <SavedPriceNotice savedAt={savedAt} />}

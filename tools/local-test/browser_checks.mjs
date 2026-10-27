@@ -53,7 +53,7 @@ try {
   await page.locator('.price-card').first().waitFor();
   await page.locator('.filter-bar select').nth(0).selectOption({label:'Egusi'});
   await page.locator('.filter-bar select').nth(1).selectOption({label:'Kwali Market'});
-  await page.getByRole('button',{name:'Apply',exact:true}).click();
+  await page.getByRole('button',{name:'Search prices',exact:true}).click();
   await page.locator('.price-card').first().waitFor();
   result.original_price_filters = true;
   await login('trial@example.com');
