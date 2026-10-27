@@ -1,0 +1,72 @@
+{
+  "status": "PASS",
+  "date_wat": "2026-10-27",
+  "authorization": "Owner explicitly requested implementing all proposed homepage/search improvements and deployment.",
+  "release_commit": "2016b9e1984c634148f154bc9b70566225acf9ed",
+  "frontend": {
+    "id": "srv-da6ddb2jnfac73e39490",
+    "name": "priceyard",
+    "deploy_id": "dep-dbghp10u01pc73earq6g",
+    "status": "live",
+    "finished_at_utc": "2026-10-27T21:50:13.908345Z",
+    "auto_deploy": "off",
+    "settings_changed": false
+  },
+  "backend_preserved": {
+    "deploy_id": "dep-dbf4hirrjlhs73ffh9r0",
+    "commit": "2604ccd07bcff0d024f92428ff728eff5bebdc2d",
+    "status": "live",
+    "auto_deploy": "off",
+    "deployment_or_settings_changes": false
+  },
+  "local_evidence": "batch-170-home-search-clarity.json",
+  "live_public_browser": {
+    "status": "PASS",
+    "release_commit": "2016b9e1984c634148f154bc9b70566225acf9ed",
+    "frontend_deploy": "dep-dbghp10u01pc73earq6g",
+    "checks": {
+      "asset": "/assets/index-D5ZHi2fe.js",
+      "public_record_options": 10,
+      "expected_summaries": 3,
+      "visible_summaries": 3,
+      "commodity_photos": 3,
+      "expected_commodities": 3,
+      "history_links": 3,
+      "old_history_label": false,
+      "newest_defaults": true,
+      "all_recorded_options_accessible": true,
+      "intelligence_page_code_preserved": true,
+      "owner_code_preserved": true,
+      "history_periods_preserved": true,
+      "anonymous_session": 401,
+      "private_session": true,
+      "search_labels_live": true,
+      "search_submit_works": true,
+      "commodity_market_filters_visible": true,
+      "movement_optional": true
+    },
+    "selectors_exercised": 2,
+    "guest_history_gate": true,
+    "mobile_and_desktop_fit": true,
+    "write_requests_sent": 0,
+    "blocked_write_requests": [
+      {
+        "method": "POST",
+        "path": "/api/activity/ping"
+      }
+    ],
+    "external_requests": 0,
+    "customer_logins": 0,
+    "production_record_changes": 0
+  },
+  "preserved": "All public options and historical records, true units/grades, intelligence-only pages and access rules, Owner safeguards, subscriptions, payments and manual Admin price entry.",
+  "rollback": "Previous frontend artifact dep-dbfurghsrm7s73c0d0qg retained. No schema/data/backend rollback needed.",
+  "chrome": [
+    "Open homepage, Ctrl+Shift+R, scroll to Today\u2019s prices: one image/card per commodity, Size / grade choices where available.",
+    "Click header Search prices: Search commodity prices heading and Search prices submit; Commodity/Market visible and Movement optional."
+  ],
+  "production_record_changes": 0,
+  "migrations": 0,
+  "new_resources_or_dependencies": 0,
+  "checklist": "35/36/PY-35 backup transport still paused pending existing Supabase support reply."
+}

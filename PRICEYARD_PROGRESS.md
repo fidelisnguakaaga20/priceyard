@@ -25,6 +25,27 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current179 HOMEPAGE GROUPING AND SEARCH CLARITY LIVE / EXACT-COMMIT PASS
+(2026-10-27 WAT): approved2016b9e1984c634148f154bc9b70566225acf9ed atomic
+fast-forward pushed master/development; existing frontend priceyard deployment
+dep-dbghp10u01pc73earq6g LIVE. Fresh asset index-D5ZHi2fe.js verified publicly:
+homepage has3commodity cards/photos and3market summaries, all10recorded options
+accessible, correct newest defaults and selected-record shares. New Search
+commodity prices heading and Search prices submit work via existing header
+shortcut; Commodity/Market controls visible,Movement optional. Guest history
+gate, Owner/intelligence-only page code and period controls preserved; anonymous
+profile401/private-no-store.375/1366 views fit;2selectors exercised. Production
+writes/activity ping and external requests blocked; no customer login/record
+changes. Reused Current17812home/current groups,4filter races,12discovery groups
+and production build/seven same-origin admission PASS. Backend unchanged LIVE
+2604ccd/dep-dbf4hirrjlhs73ffh9r0;both AutoDeployOff. No settings/providers,
+migrations, services/dependencies or billing changes. Prior frontend artifact
+dep-dbfurghsrm7s73c0d0qg retained. Evidence:batch-171-home-search-release.json.
+Chrome:home,Ctrl+Shift+R,scroll to Today's prices;one commodity card/photo,
+Size / grade options. Header Search prices opens clearer heading and submit.
+35/36/PY-35 paused automatic-backup transport unchanged;await existing support
+reply without repeated backup work. Local synthetic preview stopped.
+
 Current178 HOMEPAGE GROUPING AND SEARCH CLARITY / VERIFIED FOR APPROVED RELEASE
 (2026-10-27 WAT): owner requested all recommended UI refinements and deployment.
 Homepage uses existing GroupedPriceCards with the complete current response,
