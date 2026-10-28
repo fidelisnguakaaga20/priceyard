@@ -1,0 +1,43 @@
+{
+  "status": "PASS",
+  "date_wat": "2026-10-28",
+  "release_commit": "b1ac37a63953049af77d4eceb8f2264652cadeff",
+  "frontend": {
+    "id": "srv-da6ddb2jnfac73e39490",
+    "name": "priceyard",
+    "deploy_id": "dep-dbgp4g6i0phs738kpv4g",
+    "status": "live",
+    "finished_at_utc": "2026-10-28T06:12:32.282831Z",
+    "auto_deploy": "off",
+    "settings_changed": false,
+    "served_asset": "/assets/index-CAA-4R3l.js"
+  },
+  "local_evidence": "batch-172-market-update-note.json",
+  "live_browser": {
+    "status": "PASS",
+    "home_and_current_prices": "Saved Honey Beans record67 is the default; one compact approved notice and actual report date displayed. No duplicated Notes or Possible Meaning exposure.",
+    "record_integrity": "Notes matches approved wording; original65000/70000 prices,1 bag/50kg,2026-10-27T10:13:00Z report and Possible Meaning preserved.",
+    "selection": "Choosing older record37 removes record67 notice; returning restores it on both Home and Current Prices.",
+    "layout": "375/1366,light/dark and Easy reading: notice text/date readable, no overflow. Mobile screenshot visually inspected.",
+    "preserved": "Owner protection present in served bundle; intelligence-only commodity guest gate retained.",
+    "freshness": "New asset differs from prior index-D5ZHi2fe.js and contains scoped notice/date code. Render LIVE commit matches approved release. Production build fingerprint differs from isolated local build settings; behavior verified against live saved Notes.",
+    "write_requests_sent": 0,
+    "blocked_activity_ping": true,
+    "external_requests": 0,
+    "customer_logins": 0,
+    "agent_production_record_changes": 0,
+    "browser_errors": 0
+  },
+  "owner_publication": "Owner saved the existing record67 Notes-only correction through their authenticated Admin form and replied SAVED; public GET confirmed.",
+  "backend_preserved": {
+    "deploy_id": "dep-dbf4hirrjlhs73ffh9r0",
+    "commit": "2604ccd07bcff0d024f92428ff728eff5bebdc2d",
+    "status": "live",
+    "deployment_or_settings_changes": false
+  },
+  "rollback": "Previous frontend dep-dbghp10u01pc73earq6g retained. No schema/backend change. Public Notes stays in original generic location if reverting frontend.",
+  "chrome": "Open /prices,Ctrl+Shift+R,choose Honey Beans and Search prices. Latest1 bag/50kg record displays Market update and Price report27 Oct2026,11:13am WAT. Also visible on Home. Other recorded option does not inherit this notice.",
+  "migrations": 0,
+  "new_resources_or_dependencies": 0,
+  "checklist": "35/36; PY-35 automatic backup transport still paused pending existing support reply."
+}

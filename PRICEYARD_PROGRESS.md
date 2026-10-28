@@ -25,6 +25,26 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current181 COMPACT HONEY BEANS MARKET UPDATE LIVE / EXACT-COMMIT PASS
+(2026-10-28 WAT): approved b1ac37a63953049af77d4eceb8f2264652cadeff atomic
+fast-forward pushed master/development; existing frontend dep-dbgp4g6i0phs738kpv4g
+LIVE2026-10-28T06:12:32.282831Z. New served index-CAA-4R3l.js and actual notice
+verified in public GET-only browser on Home and Current Prices. Owner-saved
+record67 public Notes shown once with Price report27 Oct2026,11:13am WAT;
+prices65000/70000,1 bag/50kg,original report timestamp/Possible Meaning preserved.
+Switching to older record37 removes notice;return restores it.375/1366/light/dark
+and Easy reading fit/readable; mobile screenshot inspected. Intelligence-only
+guest gate and Owner code preserved. Production write/activity ping and outside
+requests blocked;no customer login or agent record writes.13focused groups and
+production build/seven admission cases PASS. Backend2604ccd/dep-dbf4hirrjlhs73ffh9r0
+unchanged LIVE; frontend AutoDeployOff; no settings/migrations/resources/dependencies
+or subscription/payment changes. Prior frontend dep-dbghp10u01pc73earq6g retained.
+Evidence:batch-173-market-update-release.json. Local synthetic preview stopped.
+Chrome:/prices,Ctrl+Shift+R,select Honey Beans,Search prices;latest1 bag/50kg
+has Market update above price;also Home. No old-stock claim hardcoded or copied
+into future reports: Owner maintains existing public Notes as stock changes.
+35/36/PY-35 paused automatic-backup transport unchanged;await existing support reply.
+
 Current180 COMPACT PUBLIC MARKET UPDATE / VERIFIED FOR APPROVED RELEASE
 (2026-10-28 WAT): owner authorized the proposed merged Honey Beans notice and
 frontend deployment. Shared Home/Current Prices card displays one compact notice
