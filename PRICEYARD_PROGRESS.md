@@ -25,6 +25,23 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current180 COMPACT PUBLIC MARKET UPDATE / VERIFIED FOR APPROVED RELEASE
+(2026-10-28 WAT): owner authorized the proposed merged Honey Beans notice and
+frontend deployment. Shared Home/Current Prices card displays one compact notice
+only for existing public Notes explicitly prefixed Market update; no hardcoded
+stock claim or automatic Possible Meaning exposure. Selected record's actual
+Price report date shown, not a fabricated verification date. Ordinary notes
+unchanged/no duplication.13 focused groups and production TS/Vite/seven same-origin
+admission PASS.375/1366/both themes/Easy reading: notice body/date contrast >13:1,
+no overflow. Owner saved Notes-only on record67 through existing Admin correction
+form and replied SAVED; public GET confirms notice while prices65000/70000,
+unit1 bag/50kg,report2026-10-27T10:13:00Z and original Possible Meaning preserved.
+Agent sent no production writes. Frontend-only release; existing services remain
+AutoDeployOff; prior frontend dep-dbghp10u01pc73earq6g retained. Backend2604ccd/
+dep-dbf4hirrjlhs73ffh9r0 unchanged. No migrations/settings/resources/dependencies,
+subscription/payment rules or unrelated changes. Evidence:batch-172-market-update-note.json.
+35/36/PY-35 paused automatic-backup transport unchanged.
+
 Current179 HOMEPAGE GROUPING AND SEARCH CLARITY LIVE / EXACT-COMMIT PASS
 (2026-10-27 WAT): approved2016b9e1984c634148f154bc9b70566225acf9ed atomic
 fast-forward pushed master/development; existing frontend priceyard deployment

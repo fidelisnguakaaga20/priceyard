@@ -1,0 +1,32 @@
+{
+  "status": "PASS",
+  "date_wat": "2026-10-28",
+  "authorization": "Owner requested implementation and deployment after reviewing the proposed restored/merged Honey Beans notice.",
+  "scope": "One compact Market update on shared Home/Current Prices cards, only from an explicitly prefixed existing public Notes field. No hardcoded stock claim or copied Possible Meaning. Price report date is the selected record's timestamp, never a fabricated verification date. Ordinary notes remain in their existing location; no duplication.",
+  "production_build": "TypeScript, Vite 6.4.4 and seven same-origin admission cases PASS. Final assets index-aolfPNVD.js and index-z_GPRk3p.css.",
+  "focused_browser_checks": {
+    "passed": 13,
+    "notice": "Explicit public note, recorded report timestamp, no duplicate note/private guidance, correct selected-record behavior.",
+    "preserved": "Home/current grouping, all raw options, latest defaults, refresh/selection, sharing/watch/report identity, guest history gate and full history.",
+    "layout": "375/1366 widths, both themes, Easy reading enabled: no overflow; notice body and date contrast exceed 13:1.",
+    "production_connections": 0,
+    "provider_calls": 0,
+    "browser_errors": 0
+  },
+  "public_data_verification": {
+    "record_id": 67,
+    "commodity_id": 8,
+    "market_id": 3,
+    "notes": "Market update: Previous-season Honey Beans stocks are running low. Small quantities of new-season beans are starting to arrive.",
+    "saved_by": "Owner through existing authenticated Admin correction form; user replied SAVED; public GET confirmed.",
+    "preserved_price_low": "65000.00",
+    "preserved_price_high": "70000.00",
+    "preserved_unit": "1 bag",
+    "preserved_bag_size": "50kg",
+    "preserved_report_timestamp": "2026-10-27T10:13:00Z",
+    "preserved_possible_meaning": "Old stocks of honey Beans is gradually finishing",
+    "agent_production_writes": 0
+  },
+  "release_plan": "Only existing frontend priceyard; AutoDeployOff. Previous LIVE frontend dep-dbghp10u01pc73earq6g retained. Backend unchanged at 2604ccd/dep-dbf4hirrjlhs73ffh9r0. No migrations, settings, services, dependencies, payments or subscription changes.",
+  "checklist": "35/36; PY-35 automatic backup transport still paused pending existing support reply."
+}

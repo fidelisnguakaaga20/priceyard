@@ -94,7 +94,8 @@ try {
   const tieLow = price(1003, {bag_size: '50L container', update_date_time: '2026-06-15T10:00:00Z'});
   const unconfirmed = price(1004, {bag_size: null, commodity_type: null, update_date_time: 'Unconfirmed date'});
   const latest = price(1005, {unit: 'Litre', bag_size: '25L jerrican',
-    commodity_type: 'Highest recorded grade', update_date_time: '2026-06-15T10:00:00Z'});
+    commodity_type: 'Highest recorded grade', update_date_time: '2026-06-15T10:00:00Z',
+    notes: 'Market update: Fabricated stock notice for this recorded option.', possible_meaning: 'Do not publish this guidance as a public notice'});
   // Matching names must never collapse distinct saved IDs.
   const anotherMarket = price(1010, {market_id: 9002, market: {...base.market, id: 9002}});
   const anotherCommodity = price(1020, {commodity_id: 9003, commodity: {...base.commodity, id: 9003}});
@@ -133,6 +134,20 @@ try {
     await selection().evaluate(node => [...node.labels].some(label => /Size \/ grade/.test(label.textContent))), true);
   checks.one_newest_summary_per_market_with_raw_alternatives_and_one_photo_per_commodity = true;
   checks.distinct_commodity_and_market_ids_not_names_and_singleton_has_no_selector = true;
+  const notice = () => displayed().getByRole('complementary', {name: 'Market update', exact: true});
+  assert.equal(await notice().count(), 1);
+  assert.match(await notice().innerText(), /Fabricated stock notice for this recorded option/);
+  assert.equal(await notice().locator('time').getAttribute('datetime'), latest.update_date_time);
+  assert.match(await notice().locator('time').innerText(), /WAT/);
+  assert.equal((await displayed().innerText()).includes(latest.possible_meaning), false);
+  assert.equal(await displayed().locator('.price-card-note').count(), 0);
+  await selection().selectOption(String(newer.id));
+  await expectSelection(newer.id);
+  assert.equal(await notice().count(), 0);
+  assert.match(await displayed().locator('.price-card-note').innerText(), /Fabricated note 1002/);
+  await selection().selectOption(String(latest.id));
+  await expectSelection(latest.id);
+  checks.explicit_public_market_note_uses_record_report_date_without_duplicate_note_or_guidance = true;
 
   // The old homepage sliced the first three records and repeated a commodity's
   // photo, hiding a different commodity farther down the current response.
@@ -292,6 +307,27 @@ try {
     assert.equal(layout.theme, dark ? 'dark' : 'light');
     assert.notEqual(layout.color, layout.background);
     assert.notEqual(layout.color, 'rgba(0, 0, 0, 0)');
+    await selection().selectOption(String(latest.id));
+    const noteLayout = await notice().evaluate(node => {
+      const luminance = color => {
+        const channels = color.match(/[\d.]+/g).slice(0, 3).map(value => {
+          const channel = Number(value) / 255;
+          return channel <= .04045 ? channel / 12.92 : ((channel + .055) / 1.055) ** 2.4;
+        });
+        return channels[0] * .2126 + channels[1] * .7152 + channels[2] * .0722;
+      };
+      const background = luminance(getComputedStyle(node).backgroundColor);
+      const contrast = element => {
+        const foreground = luminance(getComputedStyle(element).color);
+        return (Math.max(foreground, background) + .05) / (Math.min(foreground, background) + .05);
+      };
+      return {bodyContrast: contrast(node), dateContrast: contrast(node.querySelector('.market-update-date')),
+        fits: node.scrollWidth <= node.clientWidth + 1};
+    });
+    assert.ok(noteLayout.bodyContrast >= 4.5);
+    assert.ok(noteLayout.dateContrast >= 4.5);
+    assert.equal(noteLayout.fits, true);
+    Object.assign(layout, {marketUpdate: noteLayout});
     geometry.push({width, dark, ...layout});
     if (dark) await page.locator('.commodity-price-card').first().screenshot({
       path: path.join(lab, `runtime/compact-current-prices-${width}.png`)});
