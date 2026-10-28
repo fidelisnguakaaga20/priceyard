@@ -1,0 +1,38 @@
+{
+  "status": "PASS",
+  "date_wat": "2026-10-28",
+  "release_commit": "06ad1219e2dcbe0a83e66364274a6ac0d18ad1fa",
+  "frontend": {
+    "id": "srv-da6ddb2jnfac73e39490",
+    "deploy_id": "dep-dbh5h6etlv9c73fpvdeg",
+    "status": "live",
+    "finished_at_utc": "2026-10-28T20:18:54.889983Z",
+    "served_asset": "/assets/index-BSPFzw5u.js",
+    "auto_deploy": "off",
+    "settings_changed": false
+  },
+  "local_evidence": "batch-174-alert-insights-labels.json",
+  "live_public_browser": {
+    "status": "PASS",
+    "home_and_current_prices": "All three cards have Market insights and Log in for price alerts links; previous labels absent. View price history retained.",
+    "insights_navigation": "Clicked actual card link; correct commodity ID route, Market insights heading, short explanation, matching browser title and existing guest subscription gate verified.",
+    "alerts": "Get price alerts/Alerts on in fresh served bundle. Existing isolated browser verified correct watchlist payload and successful state; no real customer watchlist changed.",
+    "layout": "375/1366 and both themes fit. New explanation uses readable foreground color. Existing Honey Beans notice, recorded price/date and original Possible Meaning preserved.",
+    "write_requests_sent": 0,
+    "blocked_activity_ping": true,
+    "external_requests": 0,
+    "customer_logins": 0,
+    "production_record_changes": 0
+  },
+  "backend_preserved": {
+    "deploy_id": "dep-dbf4hirrjlhs73ffh9r0",
+    "commit": "2604ccd07bcff0d024f92428ff728eff5bebdc2d",
+    "status": "live",
+    "deployment_or_settings_changes": false
+  },
+  "rollback": "Previous frontend dep-dbgp4g6i0phs738kpv4g retained; no data/schema changes.",
+  "chrome": "Open /prices,Ctrl+Shift+R. Sign in to see Get price alerts; successful existing watchlist action shows Alerts on. Market insights opens the commodity page with Understand price changes, quality and storage. View price history remains alongside it.",
+  "migrations": 0,
+  "new_resources_or_dependencies": 0,
+  "checklist": "35/36; PY-35 automatic backup transport still paused pending existing support reply."
+}

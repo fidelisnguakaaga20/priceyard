@@ -25,6 +25,26 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current183 CLEARER ALERTS AND MARKET INSIGHTS LIVE / EXACT-COMMIT PASS
+(2026-10-28 WAT): approved06ad1219e2dcbe0a83e66364274a6ac0d18ad1fa atomic
+fast-forward pushed master/development;frontend dep-dbh5h6etlv9c73fpvdeg LIVE
+2026-10-28T20:18:54.889983Z. Fresh asset index-BSPFzw5u.js confirmed; public
+GET-only browser verifies Home/Current Prices Market insights and Log in for
+price alerts links, actual card navigation to correct commodity ID, heading,
+browser title and Understand price changes, quality and storage explanation.
+Guest gate preserved;375/1366/light/dark fit and explanation readable. Alert
+button/success labels present in served asset; existing synthetic check confirms
+same watchlist payload and Alerts on state, without customer writes. Honey Beans
+notice,prices/report date/Possible Meaning preserved.13compact groups,8detail
+checks and production build/seven admission PASS. No customer logins or writes;
+activity ping/outside requests blocked. Backend2604ccd/dep-dbf4hirrjlhs73ffh9r0
+unchanged LIVE. Frontend AutoDeployOff; previous dep-dbgp4g6i0phs738kpv4g retained.
+No migrations/settings/resources/dependencies or subscription/payment changes.
+Local preview stopped. Evidence:batch-175-alert-insights-release.json.
+Chrome:/prices,Ctrl+Shift+R;sign in for Get price alerts;successful action Alerts on.
+Click Market insights for explanation;View price history unchanged alongside it.
+35/36/PY-35 paused automatic-backup transport unchanged;await existing support reply.
+
 Current182 CLEARER ALERTS AND INSIGHTS LABELS / VERIFIED FOR APPROVED RELEASE
 (2026-10-28 WAT): owner requested Get price alerts and Market insights wording,
 explanation, push and deploy. Price cards now Get price alerts/Alerts on; guests
