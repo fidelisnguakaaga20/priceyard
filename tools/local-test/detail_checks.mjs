@@ -92,7 +92,8 @@ try {
     page.on('request',request=>{if(/\/api\/(market-signals|quality-signals|buying-zones|sell-watch-windows|storage-suitability|cost-breakdowns)/.test(request.url()))privateRequests.push(request.url());});
     await page.goto(origin+'/commodities/Old-bookmark-name?commodity_id='+commodity.id);
     await page.locator('.commodity-detail-page .locked-panel').waitFor();
-    await page.getByRole('heading',{name:'Signals, quality, storage and decision support',exact:true}).waitFor();
+    await page.getByRole('heading',{name:'Market insights',exact:true}).waitFor();
+    await page.getByText('Understand price changes, quality and storage.',{exact:true}).waitFor();
     assert.equal(await page.locator('.commodity-detail-page .detail-card,.commodity-detail-page .guidance,.commodity-detail-page .card-actions').count(),0);
     assert.equal(await page.getByRole('heading',{name:commodity.name,exact:true}).count(),1);
     assert.equal(privateRequests.length,0);
@@ -128,7 +129,7 @@ try {
     const {context,page,commodity}=await fixture();
     await context.route('**/api/commodities',route=>route.fulfill({json:[commodity,{...commodity,id:91001}]}));
     await page.goto(origin+'/commodities/Egusi');
-    await page.getByText('Choose this commodity from Current Prices to view its intelligence.',{exact:true}).waitFor();
+    await page.getByText('Choose this commodity from Current Prices to view its market insights.',{exact:true}).waitFor();
     assert.equal(await page.locator('.intelligence-grid,.commodity-detail-page .locked-panel').count(),0);
     checks.ambiguous_name_only_bookmarks_fail_closed_and_cannot_mix_commodities=true;
     await context.close();

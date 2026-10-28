@@ -21,7 +21,7 @@ async function login(name){
 try{
  const trial=await login('trial');await trial.goto(origin+'/prices');await trial.locator('.price-card').first().waitFor();
  const watched=trial.waitForResponse(r=>r.url()===origin+'/api/watchlist'&&r.request().method()==='POST');
- await trial.getByRole('button',{name:/Watch this/}).click();assert.equal((await watched).status(),201);
+ await trial.getByRole('button',{name:/Get price alerts/}).click();assert.equal((await watched).status(),201);
  admin=await login('admin');
  assert.equal(await admin.evaluate(async()=> (await fetch('/__test__/alerts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({enabled:true})})).status),200);
  await admin.goto(origin+'/admin/prices');await admin.getByRole('heading',{name:'Price updates',exact:true}).waitFor();

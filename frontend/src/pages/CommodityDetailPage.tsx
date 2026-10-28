@@ -22,7 +22,7 @@ export function CommodityDetailPage() {
   const [commodityResult, setCommodityResult] = useState<{ scope: string; item: Commodity | null }>({ scope: "", item: null });
   const commodity = commodityResult.scope === scope ? commodityResult.item : null;
   const displayName = commodity?.name || name;
-  useDocumentTitle(displayName ? `${displayName} intelligence` : "Commodity intelligence");
+  useDocumentTitle(displayName ? `${displayName} market insights` : "Market insights");
   const [signals, setSignals] = useState<MarketSignal[]>([]);
   const [quality, setQuality] = useState<QualitySignal[]>([]);
   const [zones, setZones] = useState<BuyingZone[]>([]);
@@ -48,7 +48,7 @@ export function CommodityDetailPage() {
       const items = (await apiFetch<Commodity[]>("/commodities"))
         .filter((item) => item.name.toLowerCase() === name.toLowerCase());
       // An old name-only bookmark cannot choose between legacy duplicate IDs.
-      if (items.length > 1) throw new Error("Choose this commodity from Current Prices to view its intelligence.");
+      if (items.length > 1) throw new Error("Choose this commodity from Current Prices to view its market insights.");
       return items[0] || null;
     };
     loadCommodity().then((item) => { if (current) setCommodityResult({ scope, item }); })
@@ -105,13 +105,13 @@ export function CommodityDetailPage() {
   return <section className="page page-section commodity-detail-page">
     <div className="page-title detail-title-row commodity-page-intro">
       <CommodityImage src={commodity?.image_url} alt={displayName} className="commodity-image-detail" />
-      <div className="commodity-intro-copy"><span className="eyebrow">Full-access intelligence</span><h1 style={{ color: commodityTitleColor(displayName) }}>{displayName}</h1></div>
+      <div className="commodity-intro-copy"><span className="eyebrow">Full-access insights</span><h1 style={{ color: commodityTitleColor(displayName) }}>{displayName}</h1><p>Understand price changes, quality and storage.</p></div>
     </div>
     {(error || intelligenceError) && <div className="status-box error">{error || intelligenceError}</div>}
-    {loading ? <LoadingSpinner label={`Loading ${name} intelligence…`} /> : commodity ? <>
-    <div className="section-heading"><h2>Signals, quality, storage and decision support</h2></div>
-    <PremiumGate description={user ? "Full access is required to view this commodity’s intelligence. Check your trial or subscription below." : "Sign in or register to check your trial or subscription access to this commodity’s intelligence."}>
-      {intelligenceLoading || !intelligenceReady ? <LoadingSpinner label="Loading full market intelligence…" /> : <div className="intelligence-grid">
+    {loading ? <LoadingSpinner label={`Loading ${name} market insights…`} /> : commodity ? <>
+    <div className="section-heading"><h2>Market insights</h2></div>
+    <PremiumGate description={user ? "Full access is required to view this commodity’s market insights. Check your trial or subscription below." : "Sign in or register to check your trial or subscription access to this commodity’s market insights."}>
+      {intelligenceLoading || !intelligenceReady ? <LoadingSpinner label="Loading full market insights…" /> : <div className="intelligence-grid">
         <article className="card"><h3>Market signals</h3>{signals.length ? signals.map((x) => <div className="stack-item" key={x.id}><span className="eyebrow">{marketLabel(x.market_id)}</span><strong>{x.signal_type}</strong><p>{x.signal_description}</p>{x.possible_meaning && <small>{x.possible_meaning}</small>}</div>) : <p className="muted">No linked market signals currently available.</p>}<Disclaimer>{MARKET_DISCLAIMER}</Disclaimer></article>
         <article className="card"><h3>Quality readiness</h3>{quality.length ? quality.map((x) => <div className="stack-item" key={x.id}><span className="eyebrow">{marketLabel(x.market_id)}</span><strong>{x.quality_status || "Quality observation"}</strong><p>Moisture: {x.moisture_status || "—"} · Storage readiness: {x.storage_readiness || "—"}</p>{x.risk_note && <small>{x.risk_note}</small>}</div>) : <p className="muted">No quality observation currently available.</p>}</article>
         <article className="card"><h3>Buying zone</h3>{zones.length ? zones.map((x) => { const today = new Date().toISOString().slice(0, 10); const outOfSeason = x.valid_from && x.valid_to && (today < x.valid_from || today > x.valid_to); return <div className="stack-item" key={x.id}><span className="eyebrow">{marketLabel(x.market_id)}</span><strong>{money(x.price_low)} – {money(x.price_high)}</strong><p>{x.reason}</p><small>Confidence: {x.confidence}</small>{outOfSeason && <small className="season-note">Not currently in season — active {shortDate(x.valid_from)} to {shortDate(x.valid_to)}</small>}</div>; }) : <p className="muted">No buying-zone observation currently available.</p>}</article>

@@ -37,7 +37,7 @@ try{
  }
  const current=await applyFilters('/prices',original,market,'Search prices');assert.equal(current.length,1);assert.equal(await page.locator('.card-grid > article').count(),1);
  checks.current_exact_ids_exclude_prefix_and_same_named_market=true;
- const href=await page.getByRole('link',{name:/See what this price means/}).first().getAttribute('href');assert.equal(new URL(href,origin).searchParams.get('commodity_id'),String(original.id));
+ const href=await page.getByRole('link',{name:'Market insights',exact:true}).first().getAttribute('href');assert.equal(new URL(href,origin).searchParams.get('commodity_id'),String(original.id));
  const oldRows=await applyFilters('/history',original,market,'Search history');assert.equal(oldRows.length,historical.filter(row=>row.commodity_id===original.id&&row.market_id===market.id&&row.status==='approved').length);
  checks.history_exact_ids_preserve_all_matching_records=true;
  await applyFilters('/prices',original,duplicateMarket.body,'Search prices');checks.same_named_market_can_be_selected_by_existing_id=true;

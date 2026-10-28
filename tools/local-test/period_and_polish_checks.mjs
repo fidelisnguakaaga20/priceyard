@@ -258,7 +258,7 @@ try {
     route => route.fulfill({json: commodity}));
   await page.goto(origin + detailPath);
   await page.locator('.commodity-detail-page .intelligence-grid > .card').nth(5).waitFor();
-  assert.equal((await page.locator('.commodity-intro-copy .eyebrow').textContent()).trim(), 'Full-access intelligence');
+  assert.equal((await page.locator('.commodity-intro-copy .eyebrow').textContent()).trim(), 'Full-access insights');
   assert.equal(await page.locator('.commodity-detail-page .detail-card').count(), 0);
   for (const width of [375, 1366]) {
     await page.setViewportSize({width, height: width === 375 ? 667 : 900});

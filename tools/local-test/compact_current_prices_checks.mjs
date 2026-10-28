@@ -255,21 +255,21 @@ try {
     await route.fulfill({status: 201, json: {id: 1}});
   });
   await selection().selectOption(String(newer.id));
-  await displayed().getByRole('button', {name: /Watch this/}).click();
-  await displayed().getByRole('button', {name: /Watching/}).waitFor();
+  await displayed().getByRole('button', {name: /Get price alerts/}).click();
+  await displayed().getByRole('button', {name: /Alerts on/}).waitFor();
   assert.deepEqual(watchedBody, {commodity_id: base.commodity_id, market_id: base.market_id});
   await displayed().getByRole('button', {name: /Report wrong price/}).click();
   await displayed().getByRole('button', {name: /Reported/}).waitFor();
   assert.equal(flaggedId, newer.id);
   await selection().selectOption(String(latest.id));
-  assert.equal(await displayed().getByRole('button', {name: /Watch this/}).isEnabled(), true);
+  assert.equal(await displayed().getByRole('button', {name: /Get price alerts/}).isEnabled(), true);
   assert.equal(await displayed().getByRole('button', {name: /Report wrong price/}).isEnabled(), true);
   const secondMarket = page.locator('.market-price-summary').filter({has:
     page.locator(`a[href="/history?commodity_id=${base.commodity_id}&market_id=9002"]`)});
   assert.equal(await secondMarket.count(), 1);
   assert.match(await shares(secondMarket), /pu=1010/);
-  await secondMarket.getByRole('button', {name: /Watch this/}).click();
-  await secondMarket.getByRole('button', {name: /Watching/}).waitFor();
+  await secondMarket.getByRole('button', {name: /Get price alerts/}).click();
+  await secondMarket.getByRole('button', {name: /Alerts on/}).waitFor();
   assert.deepEqual(watchedBody, {commodity_id: base.commodity_id, market_id: 9002});
   checks.authenticated_watch_pair_and_flag_record_match_selection_without_leaking_previous_state = true;
 

@@ -1,0 +1,18 @@
+{
+  "status": "PASS",
+  "date_wat": "2026-10-28",
+  "authorization": "Owner explicitly requested Get price alerts, Market insights, the short destination explanation, push and deployment.",
+  "scope": "Presentation only: Get price alerts/Alerts on; guest Log in for price alerts; Market insights link and page heading; Full-access insights label, consistent page/loading/access wording, and Understand price changes, quality and storage. Existing View price history unchanged.",
+  "production_build": "TypeScript/Vite6.4.4 plus seven same-origin admission cases PASS.",
+  "existing_focused_suites": {
+    "compact_home_current_prices": "13 groups PASS including selected commodity/market watchlist POST and Alerts on success state, record identity, refresh, market notice, history and mobile/themes.",
+    "commodity_detail": "Eight checks PASS including explanation, guest gate, six full-access sections, request/error isolation, ambiguous identity and375/1366/both themes.",
+    "production_connections": 0,
+    "provider_calls": 0,
+    "external_requests": 0
+  },
+  "visual_review": "Guest375 light-mode insights screenshot inspected; short explanation wraps cleanly and remains readable.",
+  "preserved": "All routes, API calls/payloads, watchlist behavior, sharing, notes/prices/dates, history, Owner protection and subscription rules. Other existing test selectors aligned with new labels; no new feature or backend changes.",
+  "release_plan": "Existing frontend only; AutoDeployOff. Previous frontend dep-dbgp4g6i0phs738kpv4g retained. Backend2604ccd/dep-dbf4hirrjlhs73ffh9r0 unchanged. No services/settings/migrations/dependencies/data changes.",
+  "checklist": "35/36; PY-35 automatic backup transport remains paused pending existing support reply."
+}

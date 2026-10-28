@@ -25,6 +25,21 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current182 CLEARER ALERTS AND INSIGHTS LABELS / VERIFIED FOR APPROVED RELEASE
+(2026-10-28 WAT): owner requested Get price alerts and Market insights wording,
+explanation, push and deploy. Price cards now Get price alerts/Alerts on; guests
+Log in for price alerts. Market insights link/page heading, Full-access insights
+and consistent page/access/loading wording; short explanation Understand price
+changes, quality and storage. View price history unchanged. Presentation only;
+same routes/API/watchlist action, access rules and all6 full-access sections.
+Production TS/Vite/seven admission PASS; existing13compact groups and8detail
+checks PASS; mobile375/desktop1366/both themes; screenshot visually inspected.
+Other existing check selectors aligned; no new tests/feature/backend changes.
+Local preview stopped. Frontend-only release planned; previous dep-dbgp4g6i0phs738kpv4g
+retained;AutoDeployOff. No records/prices/Notes/dates/subscriptions/migrations,
+settings/resources/dependencies or backend changes. Evidence:batch-174-alert-insights-labels.json.
+35/36/PY-35 paused automatic-backup transport unchanged.
+
 Current181 COMPACT HONEY BEANS MARKET UPDATE LIVE / EXACT-COMMIT PASS
 (2026-10-28 WAT): approved b1ac37a63953049af77d4eceb8f2264652cadeff atomic
 fast-forward pushed master/development; existing frontend dep-dbgp4g6i0phs738kpv4g

@@ -44,7 +44,7 @@ try {
   assert.deepEqual(rawOptions.sort((a, b) => a - b), [101, 102]);
   for (const option of await page.locator('.price-option').all()) {
     assert.equal(await option.getByRole('link', {name: 'Share on WhatsApp', exact: true}).count(), 1);
-    assert.equal(await option.getByRole('link', {name: /See what this price means/}).count(), 1);
+    assert.equal(await option.getByRole('link', {name: 'Market insights', exact: true}).count(), 1);
     assert.equal(await option.getByRole('link', {name: /Log in to watch/}).count(), 1);
   }
   assert.match(await page.locator('.price-option').nth(0).innerText(), /Recorded size two/);
@@ -77,8 +77,8 @@ try {
     watchedBody = route.request().postDataJSON();
     await route.fulfill({status: 201, json: {id: 1}});
   });
-  await page.locator('.price-option').nth(1).getByRole('button', {name: /Watch this/}).click();
-  await page.locator('.price-option').nth(1).getByRole('button', {name: /Watching/}).waitFor();
+  await page.locator('.price-option').nth(1).getByRole('button', {name: /Get price alerts/}).click();
+  await page.locator('.price-option').nth(1).getByRole('button', {name: /Alerts on/}).waitFor();
   assert.deepEqual(watchedBody, {commodity_id: base.commodity_id, market_id: 9002});
   checks.watch_action_preserves_record_identity = true;
   // Complete pairs, a different size, and old records lacking specifications.
