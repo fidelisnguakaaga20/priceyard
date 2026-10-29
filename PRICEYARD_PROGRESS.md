@@ -25,6 +25,21 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current184 HOME SEARCH CHOOSE LABELS AND REGISTERED MARKETS / VERIFIED FOR RELEASE
+(2026-10-29 WAT): owner screenshot request: Home Choose a commodity/Choose a market
+and only the chosen commodity's registered markets. Home reuses existing approved
+price response, matches IDs, filters market choices and clears incompatible market
+on commodity change/refreshed data. Submission uses only a valid displayed market.
+Waits for catalogues/prices; failed/empty registrations cannot offer guessed pairs.
+No extra requests or changes to Current Prices/Admin forms, history, data/Notes,
+prices/dates, alerts, subscriptions or permissions. Production TS/Vite/seven admission
+PASS;15discovery groups incl new filtered market/selection/error cases and13existing
+compact Home/current groups PASS. No production connections/writes/providers;
+mobile/themes/layout checks PASS. Local preview stopped. Frontend-only release;
+AutoDeployOff; previous dep-dbh5h6etlv9c73fpvdeg retained; backend2604ccd unchanged.
+Evidence:batch-176-home-registered-markets.json. No migrations/settings/resources/
+dependencies.35/36/PY-35 paused automatic-backup transport unchanged.
+
 Current183 CLEARER ALERTS AND MARKET INSIGHTS LIVE / EXACT-COMMIT PASS
 (2026-10-28 WAT): approved06ad1219e2dcbe0a83e66364274a6ac0d18ad1fa atomic
 fast-forward pushed master/development;frontend dep-dbh5h6etlv9c73fpvdeg LIVE

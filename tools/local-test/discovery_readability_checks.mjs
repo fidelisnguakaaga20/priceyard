@@ -159,6 +159,8 @@ try {
   }
   await page.route(url => url.origin === origin && url.pathname === '/api/price-updates', route => {
     const query = new URL(route.request().url()).searchParams; priceQueries.push(query.toString());
+    if (catalogMode === 'failed-prices') return route.fulfill({status: 503, json: {detail: 'Synthetic unavailable price registrations'}});
+    if (catalogMode === 'empty-prices') return route.fulfill({json: []});
     return route.fulfill({json: rows.filter(row => (!query.has('commodity_id') || String(row.commodity_id) === query.get('commodity_id'))
       && (!query.has('market_id') || String(row.market_id) === query.get('market_id')))});
   });
@@ -176,7 +178,16 @@ try {
   assert.equal(await nav.isVisible(), false); assert.equal(await shortcut().isVisible(), true);
   checks.homepage_search_is_visible_outside_the_menu_and_reuses_existing_catalog_requests = true;
 
+  assert.equal(await home().locator('select').nth(0).locator('option').first().innerText(), 'Choose a commodity');
+  assert.equal(await home().locator('select').nth(1).locator('option').first().innerText(), 'Choose a market');
+  await home().locator('select').nth(0).selectOption(`id:${commodities[0].id}`);
+  assert.deepEqual(await home().locator('select').nth(1).locator('option').evaluateAll(nodes => nodes.map(n => n.value)), ['', `id:${markets[0].id}`]);
+  await home().locator('select').nth(1).selectOption(`id:${markets[0].id}`);
   await home().locator('select').nth(0).selectOption(`id:${commodities[1].id}`);
+  assert.equal(await home().locator('select').nth(1).inputValue(), '');
+  assert.deepEqual(await home().locator('select').nth(1).locator('option').evaluateAll(nodes => nodes.map(n => n.value)), ['', `id:${markets[1].id}`]);
+  checks.homepage_choose_labels_and_registered_markets_match_exact_commodity_ids = true;
+  checks.homepage_changing_commodity_clears_incompatible_market_even_with_duplicate_names = true;
   await home().locator('select').nth(1).selectOption(`id:${markets[1].id}`);
   await home().getByRole('button', {name: 'Search prices', exact: true}).click();
   await page.waitForURL(origin + `/prices?commodity_id=${commodities[1].id}&market_id=${markets[1].id}#price-search`);
@@ -188,14 +199,9 @@ try {
     && new URLSearchParams(query).get('market_id') === String(markets[1].id)));
   checks.homepage_search_uses_exact_ids_even_when_commodity_and_market_names_are_duplicates = true;
 
-  // A valid catalogued market without a current price must stay selected rather
-  // than disappearing when the current commodity/market pair list arrives.
-  await page.goto(origin + '/');
-  await page.waitForFunction(() => { const button = document.querySelector('.home-price-search button[type=submit]'); return button && !button.disabled; });
-  await home().locator('select').nth(0).selectOption(`id:${commodities[0].id}`);
-  await home().locator('select').nth(1).selectOption(`id:${markets[2].id}`);
-  await home().getByRole('button', {name: 'Search prices', exact: true}).click();
-  await page.waitForURL(origin + `/prices?commodity_id=${commodities[0].id}&market_id=${markets[2].id}#price-search`);
+  // Preserve existing explicit bookmarks with honest empty results. The Home
+  // dropdown itself no longer offers unrelated market combinations.
+  await page.goto(origin + `/prices?commodity_id=${commodities[0].id}&market_id=${markets[2].id}#price-search`);
   await expectSearchFocus();
   const emptyResult = page.locator('.status-box').filter({hasText: 'No current prices found'});
   await emptyResult.waitFor();
@@ -243,6 +249,17 @@ try {
   catalogMode = 'normal';
   await shortcut().click(); await expectSearchFocus();
   checks.loading_and_failed_catalogs_do_not_submit_partial_searches_and_offer_existing_prices_fallback = true;
+
+  catalogMode = 'failed-prices'; await page.goto(origin + '/');
+  await page.waitForFunction(() => document.querySelector('.home-search-status')?.textContent.includes('could not be loaded'));
+  assert.equal(await home().getByRole('button', {name: 'Search prices', exact: true}).isDisabled(), true);
+  catalogMode = 'empty-prices'; await page.goto(origin + '/');
+  await page.waitForFunction(() => { const button = document.querySelector('.home-price-search button[type=submit]'); return button && !button.disabled; });
+  await home().locator('select').nth(0).selectOption(`id:${commodities[0].id}`);
+  assert.equal(await home().locator('select').nth(1).locator('option').count(), 1);
+  await home().getByText('No registered markets for this commodity yet.', {exact: true}).waitFor();
+  checks.homepage_missing_price_registrations_cannot_offer_unrelated_markets = true;
+  catalogMode = 'normal';
 
   await page.goto(origin + '/prices'); await page.locator('.price-option').first().waitFor();
   const ticker = page.locator('.price-ticker-track');

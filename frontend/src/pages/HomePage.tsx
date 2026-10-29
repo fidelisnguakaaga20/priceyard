@@ -81,8 +81,8 @@ export function HomePage() {
           <span className="eyebrow">Market price information</span>
           <h1>Know the market before you buy or sell.</h1>
           <p>See today's and past prices, price changes, and real market updates for Egusi, Honey Beans and Palm oil.</p>
-          <HomePriceSearch commodities={searchCommodities} markets={searchMarkets}
-            loading={searchCatalogsPending > 0} error={searchCatalogError} />
+          <HomePriceSearch commodities={searchCommodities} markets={searchMarkets} prices={prices}
+            loading={searchCatalogsPending > 0 || loading} error={searchCatalogError || !!error} />
           {!loading && prices[0] && (
             <div className="hero-price-preview">
               {!savedAt && <span className="eyebrow">Live now</span>}

@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "date_wat": "2026-10-29",
+  "authorization": "Owner requested Home search Choose placeholders and markets restricted to the selected commodity, matching the Current Prices example; continuing the authorized frontend correction/deployment workflow.",
+  "scope": "Home search now says Choose a commodity / Choose a market and uses the existing Home current approved price response to list only registered markets for a chosen commodity. Saved IDs prevent duplicate-name collisions. Incompatible selection clears on commodity change or refreshed data; only a valid displayed market is submitted.",
+  "data_readiness": "Search waits for catalogues and existing prices. Failed price loading uses existing fallback instead of offering guessed pairs; successful empty registration list offers no unrelated markets and explains the empty list. No new requests/endpoints.",
+  "production_build": "TypeScript/Vite6.4.4 and seven same-origin admission cases PASS.",
+  "focused_browser": {
+    "discovery": "15 groups PASS including new placeholder/ID-market filtering, incompatible market reset, duplicate labels, missing/empty registrations and existing navigation/focus/access checks.",
+    "home_current_prices": "13 groups PASS including grouped prices, selected record refresh, Honey Beans notice, alerts and history.",
+    "production_connections": 0,
+    "external_requests": 0,
+    "page_errors": 0,
+    "layout": "Existing discovery40 layout and144 contrast checks plus375/1366/light/dark price-card checks PASS."
+  },
+  "preserved": "Current Prices existing form/filter routes, optional unselected filters, explicit bookmarked empty results, Admin registration and all other workflows. No data/price/Notes/subscription/permission changes.",
+  "release_plan": "Existing frontend only, AutoDeployOff; previous dep-dbh5h6etlv9c73fpvdeg retained. Backend2604ccd/dep-dbf4hirrjlhs73ffh9r0 unchanged; no settings, migrations, dependencies or new resources.",
+  "checklist": "35/36; PY-35 automatic backup transport paused pending existing support reply."
+}
