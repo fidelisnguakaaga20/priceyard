@@ -1,0 +1,38 @@
+{
+  "status": "PASS",
+  "date_wat": "2026-10-29",
+  "release_commit": "94f24f5b532497b56903ee68aa9c648ac35559c4",
+  "frontend": {
+    "id": "srv-da6ddb2jnfac73e39490",
+    "deploy_id": "dep-dbhfp6e7bikc73eh94lg",
+    "status": "live",
+    "finished_at_utc": "2026-10-29T07:58:37.456341Z",
+    "served_asset": "/assets/index-B3nATnED.js",
+    "auto_deploy": "off",
+    "settings_changed": false
+  },
+  "local_evidence": "batch-176-home-registered-markets.json",
+  "live_browser": {
+    "status": "PASS",
+    "placeholders": "Choose a commodity / Choose a market confirmed on Home.",
+    "registered_market_lists": "All three tracked commodities checked against fresh public approved price IDs and market catalogue; unrelated markets absent after choosing a commodity.",
+    "selection": "Switching commodity clears incompatible market. Clearing commodity restores all-market choice. Actual Search prices navigation preserves exact commodity/market IDs and existing Market insights links.",
+    "layout": "375/1366 and both themes fit; selected Honey Beans mobile form screenshot inspected.",
+    "write_requests_sent": 0,
+    "blocked_activity_ping": true,
+    "external_requests": 0,
+    "customer_logins": 0,
+    "production_record_changes": 0
+  },
+  "backend_preserved": {
+    "deploy_id": "dep-dbf4hirrjlhs73ffh9r0",
+    "commit": "2604ccd07bcff0d024f92428ff728eff5bebdc2d",
+    "status": "live",
+    "deployment_or_settings_changes": false
+  },
+  "rollback": "Previous frontend dep-dbh5h6etlv9c73fpvdeg retained; no data/schema change.",
+  "chrome": "Open Home,Ctrl+Shift+R. Find prices now says Choose a commodity and Choose a market. Select Honey Beans to see its registered market only; switch commodity to see the list change and incompatible market clear. Search prices opens the correct pair.",
+  "migrations": 0,
+  "new_resources_or_dependencies": 0,
+  "checklist": "35/36; PY-35 automatic backup transport paused pending existing support reply."
+}

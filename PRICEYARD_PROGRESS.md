@@ -25,6 +25,24 @@ scope is inferred from that approval. Production migrations remain forbidden.
 
 ## Status and next step
 
+Current185 HOME REGISTERED-MARKET SEARCH LIVE / EXACT-COMMIT PASS
+(2026-10-29 WAT):94f24f5b532497b56903ee68aa9c648ac35559c4 atomic fast-forward
+pushed master/development;frontend dep-dbhfp6e7bikc73eh94lg LIVE07:58:37Z.
+Fresh served index-B3nATnED.js; public GET-only browser confirms Home Choose
+placeholders and all3commodity market lists against fresh saved IDs, incompatible
+selection reset, all-market list restored when commodity cleared, exact selected
+pair navigation to Current Prices and preserved Market insights links.375/1366/
+light/dark fit;mobile Honey Beans form inspected.15discovery and13compact groups
+plus production build/seven admission PASS. No customer login/record writes;
+activity ping/outside requests blocked. Backend2604ccd/dep-dbf4hirrjlhs73ffh9r0
+unchanged LIVE. Frontend AutoDeployOff; prior dep-dbh5h6etlv9c73fpvdeg retained.
+No migrations/settings/resources/dependencies, prices/Notes/dates, alerts/access/
+subscription changes. Local preview stopped. Evidence:batch-177-home-markets-release.json.
+Chrome:Home,Ctrl+Shift+R,Find prices;Choose a commodity/Choose a market;select
+Honey Beans for only its registered market;change commodity to update choices
+and clear incompatible market;Search prices opens exact pair.35/36/PY-35 paused
+automatic-backup transport unchanged;await existing support reply.
+
 Current184 HOME SEARCH CHOOSE LABELS AND REGISTERED MARKETS / VERIFIED FOR RELEASE
 (2026-10-29 WAT): owner screenshot request: Home Choose a commodity/Choose a market
 and only the chosen commodity's registered markets. Home reuses existing approved
