@@ -136,7 +136,7 @@ class RenderRoutingContractTests(unittest.TestCase):
                 self.assertIn("application/json", response.headers["content-type"])
                 self.assertEqual(browser.get("/api/https://untrusted.example.invalid/health").status_code, 404)
                 self.assertEqual(browser.get("/api/health?target=https://untrusted.example.invalid").json(),
-                                 {"status": "healthy"})
+                                 {"status": "healthy", "deployed_commit": "unknown"})
 
             origin = {"Origin": FRONT}
             with self.subTest(contract="login_secure_cookie_reload_session_and_csrf"):
