@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import _rate_limit_exceeded_handler
@@ -82,4 +84,8 @@ app.include_router(share_router)
 
 @app.get("/health")
 def health_check() -> dict[str, str]:
-    return {"status": "healthy"}
+    return {
+        "status": "healthy",
+        # Render sets this automatically at build time; absent outside Render.
+        "deployed_commit": os.environ.get("RENDER_GIT_COMMIT", "unknown"),
+    }
