@@ -22,3 +22,46 @@ jobs:
 
       - name: Run synthetic backend test harness
         run: python -I -B tools/local-test/guard.py
+
+  deploy-backend:
+    name: Deploy backend (only if tests passed)
+    needs: guard
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render deploy
+        run: |
+          if [ -z "${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}" ]; then
+            echo "RENDER_BACKEND_DEPLOY_HOOK secret not set - skipping deploy trigger."
+            exit 0
+          fi
+          curl -fsS -X POST "${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}"
+
+      - name: Wait for the new commit to go live
+        if: ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK != '' }}
+        run: |
+          echo "Waiting for https://priceyard-api.onrender.com/health to report ${{ github.sha }}"
+          for i in $(seq 1 60); do
+            body="$(curl -fsS https://priceyard-api.onrender.com/health || true)"
+            echo "attempt $i: $body"
+            if echo "$body" | grep -q "${{ github.sha }}"; then
+              echo "Confirmed live."
+              exit 0
+            fi
+            sleep 15
+          done
+          echo "::error::Backend did not report the new commit as deployed within 15 minutes."
+          exit 1
+
+  deploy-frontend:
+    name: Deploy frontend
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render deploy
+        run: |
+          if [ -z "${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK }}" ]; then
+            echo "RENDER_FRONTEND_DEPLOY_HOOK secret not set - skipping deploy trigger."
+            exit 0
+          fi
+          curl -fsS -X POST "${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK }}"
