@@ -30,15 +30,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Render deploy
+        env:
+          HOOK: ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}
         run: |
-          if [ -z "${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}" ]; then
+          if [ -z "$HOOK" ]; then
             echo "RENDER_BACKEND_DEPLOY_HOOK secret not set - skipping deploy trigger."
             exit 0
           fi
-          curl -fsS -X POST "${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}"
+          curl -fsS -X POST "$HOOK"
 
       - name: Wait for the new commit to go live
-        if: ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK != '' }}
+        env:
+          HOOK: ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}
+        if: env.HOOK != ''
         run: |
           echo "Waiting for https://priceyard-api.onrender.com/health to report ${{ github.sha }}"
           for i in $(seq 1 60); do
@@ -59,9 +63,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Render deploy
+        env:
+          HOOK: ${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK }}
         run: |
-          if [ -z "${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK }}" ]; then
+          if [ -z "$HOOK" ]; then
             echo "RENDER_FRONTEND_DEPLOY_HOOK secret not set - skipping deploy trigger."
             exit 0
           fi
-          curl -fsS -X POST "${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK }}"
+          curl -fsS -X POST "$HOOK"
