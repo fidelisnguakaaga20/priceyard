@@ -92,8 +92,12 @@ export function CommodityDetailPage() {
       if (sellWindows.status === "fulfilled") setSellWatch(sellWindows.value.filter((item) => item.commodity_id === commodityId));
       if (storageItems.status === "fulfilled") setStorage(storageItems.value.filter((item) => item.commodity_id === commodityId));
       if (costItems.status === "fulfilled") setCosts(costItems.value.filter((item) => item.commodity_id === commodityId));
-      const failure = results.find((result) => result.status === "rejected");
-      if (failure?.status === "rejected") setIntelligenceError(failure.reason instanceof Error ? failure.reason.message : String(failure.reason));
+      // One section failing (often a cold-start blip) shouldn't block the others --
+      // each already shows its own "no data" state. Only surface a banner, in plain
+      // language rather than the raw fetch error, if every section failed together.
+      if (results.every((result) => result.status === "rejected")) {
+        setIntelligenceError("Market insights could not load right now. Please refresh the page.");
+      }
     }).catch((err: Error) => { if (current) setIntelligenceError(err.message); })
       .finally(() => { if (current) {
         setIntelligenceLoading(false);

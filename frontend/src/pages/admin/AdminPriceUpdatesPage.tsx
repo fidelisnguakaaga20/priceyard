@@ -92,7 +92,7 @@ export function AdminPriceUpdatesPage() {
     const addNumber = (field: string) => { const value = String(f.get(field) || "").trim(); if (value !== "") payload[field] = Number(value); };
     const addString = (field: string) => { const value = String(f.get(field) || "").trim(); if (value !== "") payload[field] = value; };
 
-    ["price_low", "price_high", "average_price", "previous_price_low", "previous_price_high"].forEach(addNumber);
+    ["commodity_id", "market_id", "price_low", "price_high", "average_price", "previous_price_low", "previous_price_high"].forEach(addNumber);
     ["unit", "bag_size", "market_day", "time_of_day", "movement", "confidence_level", "source_type", "possible_meaning", "suggested_action", "notes"].forEach(addString);
     const dateTime = String(f.get("update_date_time") || "").trim();
     if (dateTime) payload.update_date_time = priceInputToUtc(dateTime);
@@ -131,6 +131,8 @@ export function AdminPriceUpdatesPage() {
       <p className="muted">{PRICE_TIME_LABEL}</p>
       <p className="muted">Uses the Record ID above. Enter only the fields that need correction; blank fields stay unchanged. Saving does not change pending/approved/rejected status.</p>
       <div className="form-grid">
+        <label>Commodity<select name="commodity_id" defaultValue="" disabled={optionsLoading}><option value="">No change</option>{commodities.map((x) => <option value={x.id} key={x.id}>{x.name}</option>)}</select></label>
+        <label>Market<select name="market_id" defaultValue="" disabled={optionsLoading}><option value="">No change</option>{markets.map((x) => <option value={x.id} key={x.id}>{x.name}</option>)}</select></label>
         <label>Number of bags<input name="unit" placeholder="No change" /></label>
         <label>Bag size (kg)<input name="bag_size" placeholder="No change" /></label>
         <label>Low<input name="price_low" type="number" min="0" step="0.01" placeholder="No change" /></label>
