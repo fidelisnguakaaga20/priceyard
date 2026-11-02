@@ -1,5 +1,6 @@
 import { AdminPagination, useAdminPagedList } from "./adminPaging";
 import { FormEvent, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useAdminEditForm } from "./useAdminEditForm";
 import { apiFetch } from "../../services/api";
 import { StaleBadge } from "../../components/StaleBadge";
@@ -12,7 +13,8 @@ export function AdminMarketSignalsPage() {
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const [busy, setBusy] = useState(false);
-    const editor = useAdminEditForm(data, loading, setError, { path: "/market-signals", token });
+    const [searchParams] = useSearchParams();
+    const editor = useAdminEditForm(data, loading, setError, { path: "/market-signals", token }, searchParams.get("id") ?? undefined);
     async function submit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
         if (!token || busy || !editor.canSubmit())
@@ -126,7 +128,8 @@ export function AdminQualitySignalsPage() {
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const [busy, setBusy] = useState(false);
-    const editor = useAdminEditForm(data, loading, setError, { path: "/quality-signals", token });
+    const [searchParams] = useSearchParams();
+    const editor = useAdminEditForm(data, loading, setError, { path: "/quality-signals", token }, searchParams.get("id") ?? undefined);
     async function submit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
         if (!token || busy || !editor.canSubmit())

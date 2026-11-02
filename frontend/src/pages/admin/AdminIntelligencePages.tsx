@@ -1,4 +1,5 @@
 import { FormEvent, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { apiFetch } from "../../services/api";
 import { StaleBadge } from "../../components/StaleBadge";
 import type { BuyingZone, CostBreakdown, SellWatchWindow, StorageSuitability } from "../../types/api";
@@ -10,7 +11,8 @@ export function AdminBuyingZonesPage() {
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const [busy, setBusy] = useState(false);
-    const editor = useAdminEditForm(r.data, r.loading, setError, { path: "/buying-zones", token: r.token });
+    const [searchParams] = useSearchParams();
+    const editor = useAdminEditForm(r.data, r.loading, setError, { path: "/buying-zones", token: r.token }, searchParams.get("id") ?? undefined);
     async function save(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
         if (!r.token || busy || !editor.canSubmit())
@@ -101,7 +103,8 @@ export function AdminSellWatchPage() {
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const [busy, setBusy] = useState(false);
-    const editor = useAdminEditForm(r.data, r.loading, setError, { path: "/sell-watch-windows", token: r.token });
+    const [searchParams] = useSearchParams();
+    const editor = useAdminEditForm(r.data, r.loading, setError, { path: "/sell-watch-windows", token: r.token }, searchParams.get("id") ?? undefined);
     async function save(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
         if (!r.token || busy || !editor.canSubmit())
@@ -184,7 +187,8 @@ export function AdminStoragePage() {
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const [busy, setBusy] = useState(false);
-    const editor = useAdminEditForm(r.data, r.loading, setError, { path: "/storage-suitability", token: r.token });
+    const [searchParams] = useSearchParams();
+    const editor = useAdminEditForm(r.data, r.loading, setError, { path: "/storage-suitability", token: r.token }, searchParams.get("id") ?? undefined);
     async function save(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
         if (!r.token || busy || !editor.canSubmit())
@@ -285,7 +289,8 @@ export function AdminCostBreakdownPage() {
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const [busy, setBusy] = useState(false);
-    const editor = useAdminEditForm(r.data, r.loading, setError, { path: "/cost-breakdowns", token: r.token });
+    const [searchParams] = useSearchParams();
+    const editor = useAdminEditForm(r.data, r.loading, setError, { path: "/cost-breakdowns", token: r.token }, searchParams.get("id") ?? undefined);
     async function save(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
         if (!r.token || busy || !editor.canSubmit())

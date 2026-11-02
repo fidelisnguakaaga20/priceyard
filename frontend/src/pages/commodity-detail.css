@@ -78,6 +78,23 @@
 .market-insights-grid .insight-card-costs { --insight-accent: #7c3aed; }
 .market-insights-grid .insight-card-costs h3 { color: #7c3aed; }
 
+/* The market-name eyebrow and the status word right after it (e.g. "Scarcity",
+   "Good") previously ran together with no gap -- "BEANS MARKET AUTA BALEFIGood".
+   Putting the eyebrow (and an admin Edit shortcut) on their own row fixes it. */
+.market-insights-grid .stack-item-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.market-insights-grid .insight-edit-link {
+  font-size: .78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 @media (max-width: 640px) {
   .commodity-detail-page.page-section {
     padding-top: 20px;

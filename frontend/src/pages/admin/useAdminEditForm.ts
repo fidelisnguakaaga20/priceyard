@@ -7,10 +7,23 @@ const loadingRecord = "Wait for the selected record to load.";
 
 /** Populate existing controls; an optional paged-list lookup uses the existing ID endpoint. */
 export function useAdminEditForm<T extends { id: number }>(data: T[], loading: boolean, setError: (message: string) => void,
-  lookup?: { path: string; token: string | null }) {
+  lookup?: { path: string; token: string | null }, initialId?: string) {
   const formRef = useRef<HTMLFormElement>(null);
   const [editId, setEditId] = useState("");
   const loadedId = useRef<string | null>(null);
+
+  // Lets a page link straight into "edit record N" (e.g. from an Edit button
+  // elsewhere in the app) instead of requiring the id to be typed by hand.
+  useEffect(() => {
+    if (!initialId) return;
+    const input = formRef.current?.elements.namedItem("id");
+    if (!(input instanceof HTMLInputElement) || input.value) return;
+    input.value = initialId;
+    input.setCustomValidity(loadingRecord);
+    setEditId(initialId);
+    // Only ever applies the id this hook mounted with.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function onIdChange(event: ChangeEvent<HTMLInputElement>) {
     const input = event.currentTarget;
