@@ -63,6 +63,15 @@ export function relativeTime(value: string | null | undefined, formatDate = shor
   return formatDate(value);
 }
 
+/** Turns a raw stored value like "storage_ready" or "scarcity" into "Storage ready" /
+ * "Scarcity" for display -- admin-entered free text isn't guaranteed to already be
+ * sentence case, and several insight fields were leaking the raw form to users. */
+export function humanize(value: string | null | undefined): string {
+  if (!value) return "";
+  const spaced = value.replace(/_/g, " ").trim();
+  return spaced.charAt(0).toUpperCase() + spaced.slice(1);
+}
+
 export function movementIcon(movement: string): string {
   if (movement === "up") return "▲";
   if (movement === "down") return "▼";
