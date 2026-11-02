@@ -10,10 +10,15 @@ export function PriceTicker({ items, savedAt = null }: { items: PriceUpdate[]; s
   const [scrollingPaused, setScrollingPaused] = useState(false);
   if (!items.length) return null;
   const track = [...items, ...items];
+  // The scroll distance is one full pass over `items` (the track is doubled only
+  // for a seamless loop), so duration must scale with the count or a short list
+  // -- like the last-7-days ticker -- crawls across the same fixed-length pass.
+  // 56s/11 reproduces the original pace from before that filter existed.
+  const duration = Math.max(20, items.length * (56 / 11));
 
   return (
     <><SavedPriceNotice savedAt={savedAt} /><div className="price-ticker price-ticker-controls" data-scrolling-paused={scrollingPaused}>
-      <div className="price-ticker-viewport" aria-hidden="true"><div className="price-ticker-track">
+      <div className="price-ticker-viewport" aria-hidden="true"><div className="price-ticker-track" style={{ animationDuration: `${duration}s` }}>
         {track.map((item, index) => (
           <span className="price-ticker-item" key={`${item.id}-${index}`}>
             {item.commodity.name}{" "}

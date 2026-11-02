@@ -72,7 +72,7 @@ export function PriceCard({ item, compact = false }: { item: PriceUpdate; compac
       </div>
       {item.notes && !hasMarketUpdate && <p className="price-card-note"><strong>Note from PriceYard:</strong> {item.notes}</p>}
       <div className="card-actions">
-        <Link className="text-link-cta" to={commodityLink(item.commodity)}>Market insights</Link>
+        <Link className="text-link-cta" to={commodityLink(item.commodity)}>See Market insights</Link>
         <Link className="text-link" to={priceHistoryLink(item)}>View price history</Link>
         <a className="text-link" href={whatsAppShareUrl(item)} target="_blank" rel="noopener noreferrer">Share on WhatsApp</a>
         <NativeShareButton content={priceShareContent(item)} />
