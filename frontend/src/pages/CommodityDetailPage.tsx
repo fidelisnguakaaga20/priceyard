@@ -29,6 +29,9 @@ export function CommodityDetailPage() {
   const [sellWatch, setSellWatch] = useState<SellWatchWindow[]>([]);
   const [storage, setStorage] = useState<StorageSuitability[]>([]);
   const [costs, setCosts] = useState<CostBreakdown[]>([]);
+  // Tracks which insight sections failed to load (vs. genuinely have nothing
+  // entered) so the two cases never show the same "No X available" message.
+  const [failedSections, setFailedSections] = useState<Set<string>>(new Set());
   const [markets, setMarkets] = useState<Market[]>([]);
   const [error, setError] = useState("");
   const [intelligenceError, setIntelligenceError] = useState("");
@@ -69,6 +72,7 @@ export function CommodityDetailPage() {
     let current = true;
     // Clear data belonging to an old commodity/account before another load.
     setSignals([]); setQuality([]); setZones([]); setSellWatch([]); setStorage([]); setCosts([]);
+    setFailedSections(new Set());
     setIntelligenceContext(null);
     setIntelligenceError("");
     if (!commodityId || !user || !hasFullAccess || !token) {
@@ -92,6 +96,8 @@ export function CommodityDetailPage() {
       if (sellWindows.status === "fulfilled") setSellWatch(sellWindows.value.filter((item) => item.commodity_id === commodityId));
       if (storageItems.status === "fulfilled") setStorage(storageItems.value.filter((item) => item.commodity_id === commodityId));
       if (costItems.status === "fulfilled") setCosts(costItems.value.filter((item) => item.commodity_id === commodityId));
+      const sectionNames = ["signals", "quality", "zones", "sellWatch", "storage", "costs"] as const;
+      setFailedSections(new Set(sectionNames.filter((_, i) => results[i].status === "rejected")));
       // One section failing (often a cold-start blip) shouldn't block the others --
       // each already shows its own "no data" state. Only surface a banner, in plain
       // language rather than the raw fetch error, if every section failed together.
@@ -116,11 +122,11 @@ export function CommodityDetailPage() {
     <div className="section-heading"><h2>Market insights</h2></div>
     <PremiumGate description={user ? "Full access needed to see this commodity’s market insights. Check your trial or subscription below." : "Sign in or register free to see this commodity’s market insights."}>
       {intelligenceLoading || !intelligenceReady ? <LoadingSpinner label="Loading full market insights…" /> : <div className="intelligence-grid">
-        <article className="card"><h3>Market signals</h3>{signals.length ? signals.map((x) => <div className="stack-item" key={x.id}><span className="eyebrow">{marketLabel(x.market_id)}</span><strong>{x.signal_type}</strong><p>{x.signal_description}</p>{x.possible_meaning && <small>{x.possible_meaning}</small>}</div>) : <p className="muted">No linked market signals currently available.</p>}<Disclaimer>{MARKET_DISCLAIMER}</Disclaimer></article>
-        <article className="card"><h3>Quality readiness</h3>{quality.length ? quality.map((x) => <div className="stack-item" key={x.id}><span className="eyebrow">{marketLabel(x.market_id)}</span><strong>{x.quality_status || "Quality observation"}</strong><p>Moisture: {x.moisture_status || "—"} · Storage readiness: {x.storage_readiness || "—"}</p>{x.risk_note && <small>{x.risk_note}</small>}</div>) : <p className="muted">No quality observation currently available.</p>}</article>
-        <article className="card"><h3>Buying zone</h3>{zones.length ? zones.map((x) => { const today = new Date().toISOString().slice(0, 10); const outOfSeason = x.valid_from && x.valid_to && (today < x.valid_from || today > x.valid_to); return <div className="stack-item" key={x.id}><span className="eyebrow">{marketLabel(x.market_id)}</span><strong>{money(x.price_low)} – {money(x.price_high)}</strong><p>{x.reason}</p><small>Confidence: {x.confidence}</small>{outOfSeason && <small className="season-note">Not currently in season — active {shortDate(x.valid_from)} to {shortDate(x.valid_to)}</small>}</div>; }) : <p className="muted">No buying-zone observation currently available.</p>}</article>
-        <article className="card"><h3>Sell-watch window</h3>{sellWatch.length ? sellWatch.map((x) => { const inSeason = isWithinSeasonalMonths(x.start_period, x.end_period); return <div className="stack-item" key={x.id}><span className="eyebrow">{marketLabel(x.market_id)}</span><strong>{x.start_period}{x.end_period ? ` – ${x.end_period}` : ""}</strong><p>{x.observation}</p><small>Confidence: {x.confidence}</small>{inSeason === false && <small className="season-note">Not currently in season</small>}</div>; }) : <p className="muted">No sell-watch observation currently available.</p>}</article>
-        <article className="card"><h3>Storage suitability</h3>{storage.length ? storage.map((x) => <div className="stack-item" key={x.id}><span className="eyebrow">{marketLabel(x.market_id)}</span><strong>{x.suitability_status.replace(/_/g, " ")}</strong><p>{x.summary || x.quality_storage_notes || "No summary supplied."}</p><small>Spoilage risk: {x.spoilage_risk || "—"} · Buyer availability: {x.buyer_availability || "—"}</small></div>) : <p className="muted">No storage-suitability observation currently available.</p>}<Disclaimer>{STORAGE_DISCLAIMER}</Disclaimer></article>
+        <article className="card"><h3>Market signals</h3>{signals.length ? signals.map((x) => <div className="stack-item" key={x.id}><span className="eyebrow">{marketLabel(x.market_id)}</span><strong>{x.signal_type}</strong><p>{x.signal_description}</p>{x.possible_meaning && <small>{x.possible_meaning}</small>}</div>) : <p className="muted">{failedSections.has("signals") ? "Could not load market signals right now -- try refreshing." : "No linked market signals currently available."}</p>}<Disclaimer>{MARKET_DISCLAIMER}</Disclaimer></article>
+        <article className="card"><h3>Quality readiness</h3>{quality.length ? quality.map((x) => <div className="stack-item" key={x.id}><span className="eyebrow">{marketLabel(x.market_id)}</span><strong>{x.quality_status || "Quality observation"}</strong><p>Moisture: {x.moisture_status || "—"} · Storage readiness: {x.storage_readiness || "—"}</p>{x.risk_note && <small>{x.risk_note}</small>}</div>) : <p className="muted">{failedSections.has("quality") ? "Could not load quality readiness right now -- try refreshing." : "No quality observation currently available."}</p>}</article>
+        <article className="card"><h3>Buying zone</h3>{zones.length ? zones.map((x) => { const today = new Date().toISOString().slice(0, 10); const outOfSeason = x.valid_from && x.valid_to && (today < x.valid_from || today > x.valid_to); return <div className="stack-item" key={x.id}><span className="eyebrow">{marketLabel(x.market_id)}</span><strong>{money(x.price_low)} – {money(x.price_high)}</strong><p>{x.reason}</p><small>Confidence: {x.confidence}</small>{outOfSeason && <small className="season-note">Not currently in season — active {shortDate(x.valid_from)} to {shortDate(x.valid_to)}</small>}</div>; }) : <p className="muted">{failedSections.has("zones") ? "Could not load buying zone right now -- try refreshing." : "No buying-zone observation currently available."}</p>}</article>
+        <article className="card"><h3>Sell-watch window</h3>{sellWatch.length ? sellWatch.map((x) => { const inSeason = isWithinSeasonalMonths(x.start_period, x.end_period); return <div className="stack-item" key={x.id}><span className="eyebrow">{marketLabel(x.market_id)}</span><strong>{x.start_period}{x.end_period ? ` – ${x.end_period}` : ""}</strong><p>{x.observation}</p><small>Confidence: {x.confidence}</small>{inSeason === false && <small className="season-note">Not currently in season</small>}</div>; }) : <p className="muted">{failedSections.has("sellWatch") ? "Could not load sell-watch window right now -- try refreshing." : "No sell-watch observation currently available."}</p>}</article>
+        <article className="card"><h3>Storage suitability</h3>{storage.length ? storage.map((x) => <div className="stack-item" key={x.id}><span className="eyebrow">{marketLabel(x.market_id)}</span><strong>{x.suitability_status.replace(/_/g, " ")}</strong><p>{x.summary || x.quality_storage_notes || "No summary supplied."}</p><small>Spoilage risk: {x.spoilage_risk || "—"} · Buyer availability: {x.buyer_availability || "—"}</small></div>) : <p className="muted">{failedSections.has("storage") ? "Could not load storage suitability right now -- try refreshing." : "No storage-suitability observation currently available."}</p>}<Disclaimer>{STORAGE_DISCLAIMER}</Disclaimer></article>
         <article className="card"><h3>Cost breakdown</h3>{costs.length ? costs.map((x) => {
           return <div className="stack-item" key={x.id}>
             <span className="eyebrow">{marketLabel(x.market_id)}</span>
@@ -129,7 +135,7 @@ export function CommodityDetailPage() {
             <p>Purchase reference: {money(x.purchase_price_reference)} · Additional costs: {money(x.total_additional_cost)}</p>
             <small>Transport {money(x.transport)} · Warehouse {money(x.warehouse)} · Market charges {money(x.market_charges)}</small>
           </div>;
-        }) : <p className="muted">No cost breakdown currently available for this commodity.</p>}</article>
+        }) : <p className="muted">{failedSections.has("costs") ? "Could not load cost breakdown right now -- try refreshing." : "No cost breakdown currently available for this commodity."}</p>}</article>
       </div>}
     </PremiumGate>
     </> : !error && <div className="status-box">No active {name} commodity is available.</div>}
