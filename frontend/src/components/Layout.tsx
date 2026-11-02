@@ -15,6 +15,7 @@ import { daysUntil, WHATSAPP_COMMUNITY_URL } from "../utils";
 
 const VISIT_PING_KEY = "py_visit_pinged";
 const TICKER_REFRESH_MS = 60_000;
+const TICKER_MAX_AGE_DAYS = 7;
 // Admin needs focus for data entry, and Login/Register are deliberately minimal --
 // everywhere else a trader is actually browsing gets the live ticker.
 const TICKER_HIDDEN_PREFIXES = ["/admin", "/login", "/register"];
@@ -60,7 +61,12 @@ export function Layout() {
     const loadTicker = () => {
       const request = ++sequence;
       void apiFetchWithProvenance<PriceUpdate[]>("/price-updates").then(({ data, savedAt }) => {
-        if (current && request === sequence) { setTickerPrices(data); setTickerSavedAt(savedAt); }
+        if (!current || request !== sequence) return;
+        // The ticker should read as "what's moving now" -- older current-but-stale
+        // entries belong on the full Current Prices page, not the scrolling strip.
+        const cutoff = Date.now() - TICKER_MAX_AGE_DAYS * 24 * 60 * 60 * 1000;
+        setTickerPrices(data.filter((item) => new Date(item.update_date_time).getTime() >= cutoff));
+        setTickerSavedAt(savedAt);
       }).catch(() => {});
     };
     loadTicker();
