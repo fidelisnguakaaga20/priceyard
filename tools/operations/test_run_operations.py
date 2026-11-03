@@ -248,6 +248,18 @@ class MainTests(unittest.TestCase):
         self.assertEqual([call[1] for call in client.calls],
                          [ops.FRONTEND + "/api/health", ops.API + "/health", ops.FRONTEND + "/login"])
 
+    def test_health_accepts_reported_commit_but_not_other_shapes(self):
+        live = {"status": "healthy", "deployed_commit": "631fbfef654af6ad35f3d168a72874da2e6efb7b"}
+        client = FakeClient(jsons=[live, live], requests=[(200, headers("text/html"), b"PriceYard")])
+        with redirect_stdout(io.StringIO()):
+            self.assertEqual(ops.main({"OPS_MODE": "health-only"}, client), 0)
+        for bad in ({"status": "degraded", "deployed_commit": "abc"}, {"status": "healthy", "extra": "x"},
+                    {"status": "healthy", "deployed_commit": 1}, ["healthy"]):
+            client = FakeClient(jsons=[bad, bad], requests=[(200, headers("text/html"), b"PriceYard")])
+            with redirect_stderr(io.StringIO()) as error:
+                self.assertEqual(ops.main({"OPS_MODE": "health-only"}, client), 1)
+            self.assertIn("health response did not pass", error.getvalue())
+
     def test_failed_recovery_step_exposes_only_constant_output_flag(self):
         with tempfile.TemporaryDirectory() as temp:
             path, output = Path(temp) / "checkpoint.json", Path(temp) / "outputs"

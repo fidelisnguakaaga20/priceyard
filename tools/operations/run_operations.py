@@ -182,7 +182,10 @@ def check_health(client):
     # The first same-origin request also permits a sleeping Free backend to start.
     for origin, timeout in ((FRONTEND + "/api", 65), (API, 20)):
         health = client.json(origin + "/health", timeout=timeout)
-        if health != {"status": "healthy"}:
+        # /health may also report the live commit; any other shape still fails.
+        if (not isinstance(health, dict) or health.get("status") != "healthy"
+                or not set(health) <= {"status", "deployed_commit"}
+                or not isinstance(health.get("deployed_commit", ""), str)):
             raise SafeFailure("Application health response did not pass.")
     _, headers, body = client.request(FRONTEND + "/login", timeout=20)
     if headers.get_content_type() != "text/html" or b"priceyard" not in body.lower():
