@@ -264,7 +264,7 @@ try {
   await page.goto(origin + '/prices'); await page.locator('.price-option').first().waitFor();
   const ticker = page.locator('.price-ticker-track');
   await page.emulateMedia({reducedMotion: 'no-preference'}); await page.mouse.move(0, 650);
-  assert.equal(await ticker.evaluate(node => getComputedStyle(node).animationDuration), '56s');
+  assert.equal(await ticker.evaluate(node => getComputedStyle(node).animationDuration), '45s');
   const pause = page.getByRole('button', {name: 'Pause scrolling', exact: true});
   await pause.click(); assert.equal(await ticker.evaluate(node => getComputedStyle(node).animationPlayState), 'paused');
   const before = await ticker.evaluate(node => getComputedStyle(node).transform);
