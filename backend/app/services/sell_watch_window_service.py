@@ -69,3 +69,8 @@ def update_sell_watch_window(
         setattr(window, field, value)
     db.commit() if commit else db.flush()
     return window
+
+
+def delete_sell_watch_window(db: Session, window: SellWatchWindow, *, commit: bool = True) -> None:
+    db.delete(window)
+    db.commit() if commit else db.flush()

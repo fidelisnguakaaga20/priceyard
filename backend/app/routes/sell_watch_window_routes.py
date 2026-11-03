@@ -15,6 +15,7 @@ from app.schemas.sell_watch_window_schema import (
 )
 from app.services.sell_watch_window_service import (
     create_sell_watch_window,
+    delete_sell_watch_window,
     get_sell_watch_window,
     update_sell_watch_window,
 )
@@ -76,3 +77,16 @@ def edit_window(
     item = update_sell_watch_window(db, item, payload, commit=False)
     save_audited_resource(db, item, current_admin, "sell_watch_window.edit", old_value=old_value)
     return item
+
+
+@router.delete("/{window_id}", status_code=status.HTTP_204_NO_CONTENT)
+def remove_window(
+    window_id: int,
+    db: Session = Depends(get_db),
+    current_admin: User = Depends(require_roles("admin")),
+) -> Response:
+    item = get_sell_watch_window(db, window_id, lock=True)
+    old_value = snapshot_model(item)
+    delete_sell_watch_window(db, item, commit=False)
+    save_audited_resource(db, item, current_admin, "sell_watch_window.delete", old_value=old_value, deleted=True)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

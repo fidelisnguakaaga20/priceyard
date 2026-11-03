@@ -128,6 +128,30 @@ class PlanningAuditTests(unittest.TestCase):
             self.assertIsNotNone(db.get(model, item_id))
 
 
+    def test_sell_watch_window_delete(self):
+        resource = RESOURCES[1]
+        created = self.client.post("/sell-watch-windows", json=self.payload(resource), headers=self.headers)
+        url = f'/sell-watch-windows/{created.json()["id"]}'
+        self.assertEqual(self.client.delete(url, headers=self.customer_headers).status_code, 403)
+        self.assertEqual(self.client.delete(url, headers=self.headers).status_code, 204)
+        self.assertEqual(self.client.delete(url, headers=self.headers).status_code, 404)
+        with Session(self.engine) as db:
+            self.assertIsNone(db.get(SellWatchWindow, created.json()["id"]))
+            logs = db.scalars(select(AuditLog).where(AuditLog.table_name == "sell_watch_windows").order_by(AuditLog.id)).all()
+            self.assertEqual([row.action for row in logs], ["sell_watch_window.create", "sell_watch_window.delete"])
+            self.assertEqual(logs[1].old_value, logs[0].new_value)
+            self.assertIsNone(logs[1].new_value)
+            self.assertEqual(len(db.scalars(select(PriceUpdate)).all()), 1)
+
+    def test_sell_watch_window_delete_failure_keeps_record(self):
+        created = self.client.post("/sell-watch-windows", json=self.payload(RESOURCES[1]), headers=self.headers)
+        before = self.state()
+        with patch("app.services.audit_service.create_audit_log", side_effect=RuntimeError("Synthetic audit failure")):
+            response = self.client.delete(f'/sell-watch-windows/{created.json()["id"]}', headers=self.headers)
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(self.state(), before)
+
+
 def attach_test(resource, operation):
     def test(self):
         getattr(self, operation)(resource)
