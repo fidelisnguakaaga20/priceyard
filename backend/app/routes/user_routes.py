@@ -5,7 +5,7 @@ from app.database import get_db
 from app.models.user import User
 from app.schemas.user_schema import AdminUserUpdate, UserResponse
 from app.services.audit_service import create_audit_log, snapshot_model
-from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, stream_admin_records
+from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, release_for_stream, stream_admin_records
 from app.services.user_service import get_user, prepare_user_update, update_user
 from app.utils.permissions import require_roles
 
@@ -17,7 +17,7 @@ def get_users(
     db: Session = Depends(get_db),
     _: User = Depends(require_roles("admin")),
 ) -> Response:
-    return AdminJSONResponse(stream_admin_records(db.get_bind(), User, UserResponse, order=(("id", False),)))
+    return AdminJSONResponse(stream_admin_records(release_for_stream(db), User, UserResponse, order=(("id", False),)))
 
 
 @router.get("/page", response_model=AdminRecordPage[UserResponse])

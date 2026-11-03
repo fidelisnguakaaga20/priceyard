@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.services.audit_service import save_audited_resource, snapshot_model
-from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, stream_admin_records
+from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, release_for_stream, stream_admin_records
 from app.models.storage_suitability import StorageSuitability
 from app.models.user import User
 from app.schemas.storage_suitability_schema import (
@@ -30,7 +30,7 @@ def get_items(
     commodity_id: Annotated[int | None, Query(gt=0)] = None,
 ) -> Response:
     conditions = (StorageSuitability.commodity_id == commodity_id,) if commodity_id is not None else ()
-    return AdminJSONResponse(stream_admin_records(db.get_bind(), StorageSuitability, StorageSuitabilityResponse,
+    return AdminJSONResponse(stream_admin_records(release_for_stream(db), StorageSuitability, StorageSuitabilityResponse,
         order=(("created_at", True), ("id", True)), where=conditions))
 
 

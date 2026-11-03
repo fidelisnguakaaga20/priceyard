@@ -8,7 +8,7 @@ from app.models.faq_item import FAQItem
 from app.models.user import User
 from app.schemas.faq_schema import FAQAdminResponse, FAQCreate, FAQPublicResponse, FAQUpdate
 from app.services.audit_service import create_audit_log, snapshot_model
-from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, stream_admin_records
+from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, release_for_stream, stream_admin_records
 from app.services.faq_service import (
     create_faq,
     delete_faq,
@@ -34,7 +34,7 @@ def _save_faq_audit(db: Session, admin: User, action: str, record_id: int, *, ol
 
 @router.get("", response_model=list[FAQPublicResponse])
 def get_published_items(db: Session = Depends(get_db)) -> Response:
-    return AdminJSONResponse(stream_admin_records(db.get_bind(), FAQItem, FAQPublicResponse,
+    return AdminJSONResponse(stream_admin_records(release_for_stream(db), FAQItem, FAQPublicResponse,
         order=(("category", False), ("id", False)), where=(FAQItem.is_published.is_(True),)), private=False)
 
 
@@ -43,7 +43,7 @@ def get_admin_items(
     db: Session = Depends(get_db),
     _: User = Depends(require_roles("admin")),
 ) -> Response:
-    return AdminJSONResponse(stream_admin_records(db.get_bind(), FAQItem, FAQAdminResponse,
+    return AdminJSONResponse(stream_admin_records(release_for_stream(db), FAQItem, FAQAdminResponse,
         order=(("category", False), ("id", False))))
 
 

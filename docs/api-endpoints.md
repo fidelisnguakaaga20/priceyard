@@ -159,7 +159,7 @@ from declarations for traceability; follow the linked handler for all checks.
 | DELETE | `/quality-signals/{signal_id}` | `require_roles('admin')` | [remove_signal](../backend/app/routes/quality_signal_routes.py#L79) |
 | GET | `/quality-signals/{signal_id}` | `require_full_access` | [get_signal](../backend/app/routes/quality_signal_routes.py#L45) |
 | PATCH | `/quality-signals/{signal_id}` | `require_roles('admin')` | [edit_signal](../backend/app/routes/quality_signal_routes.py#L65) |
-| GET | `/reports/prices.csv` | `require_roles('admin')` | [export_price_report_csv](../backend/app/routes/report_export_routes.py#L33) |
+| GET | `/reports/prices.csv` | `require_roles('admin')` | [export_price_report_csv](../backend/app/routes/report_export_routes.py#L34) |
 | GET | `/sell-watch-windows` | `require_full_access` | [get_windows](../backend/app/routes/sell_watch_window_routes.py#L28) |
 | POST | `/sell-watch-windows` | `require_roles('admin')` | [add_window](../backend/app/routes/sell_watch_window_routes.py#L58) |
 | GET | `/sell-watch-windows/admin/page` | `require_roles('admin')` | [get_admin_windows_page](../backend/app/routes/sell_watch_window_routes.py#L39) |

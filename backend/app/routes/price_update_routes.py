@@ -20,7 +20,7 @@ from app.schemas.price_update_schema import (
     TimeOfDay,
 )
 from app.services.audit_service import create_audit_log, snapshot_model
-from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, stream_admin_records
+from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, release_for_stream, stream_admin_records
 from app.services.price_flag_service import flag_price_update, flagged_price_page, stream_flagged_prices, resolve_flags
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
@@ -118,7 +118,7 @@ def get_price_history(
     _current_user: User = Depends(require_full_access),
 ) -> Response:
     return AdminJSONResponse(stream_price_history(
-        db.get_bind(),
+        release_for_stream(db),
         commodity_search=commodity,
         market_search=market,
         commodity_id=commodity_id, market_id=market_id,
@@ -158,7 +158,7 @@ def get_admin_price_history(
     db: Session = Depends(get_db),
     _admin: User = Depends(require_roles("admin")),
 ) -> Response:
-    return AdminJSONResponse(stream_admin_records(db.get_bind(), PriceUpdate, PriceUpdateAdminResponse,
+    return AdminJSONResponse(stream_admin_records(release_for_stream(db), PriceUpdate, PriceUpdateAdminResponse,
         order=(("update_date_time", True), ("id", True)), related=("commodity", "market")))
 
 
@@ -190,7 +190,7 @@ def get_flagged_price_updates(
     db: Session = Depends(get_db),
     _admin: User = Depends(require_roles("admin")),
 ) -> Response:
-    return AdminJSONResponse(stream_flagged_prices(db.get_bind()))
+    return AdminJSONResponse(stream_flagged_prices(release_for_stream(db)))
 
 
 @router.get("/admin/flagged/page", response_model=AdminRecordPage[FlaggedPriceSummary])

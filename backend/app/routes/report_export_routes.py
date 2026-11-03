@@ -8,6 +8,7 @@ from starlette.responses import StreamingResponse
 
 from app.database import get_db
 from app.models.user import User
+from app.services.admin_list_service import release_for_stream
 from app.services.report_export_service import stream_price_report_csv
 from app.utils.permissions import require_roles
 
@@ -39,7 +40,7 @@ def export_price_report_csv(
     _current_admin: User = Depends(require_roles("admin")),
 ) -> Response:
     content = stream_price_report_csv(
-        db.get_bind(),
+        release_for_stream(db),
         commodity_search=commodity,
         market_search=market,
         date_from=date_from,

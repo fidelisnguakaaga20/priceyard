@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.services.audit_service import save_audited_resource, snapshot_model
-from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, stream_admin_records
+from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, release_for_stream, stream_admin_records
 from app.models.buying_zone import BuyingZone
 from app.models.user import User
 from app.schemas.buying_zone_schema import BuyingZoneCreate, BuyingZoneResponse, BuyingZoneUpdate
@@ -26,7 +26,7 @@ def get_zones(
     commodity_id: Annotated[int | None, Query(gt=0)] = None,
 ) -> Response:
     conditions = (BuyingZone.commodity_id == commodity_id,) if commodity_id is not None else ()
-    return AdminJSONResponse(stream_admin_records(db.get_bind(), BuyingZone, BuyingZoneResponse,
+    return AdminJSONResponse(stream_admin_records(release_for_stream(db), BuyingZone, BuyingZoneResponse,
         order=(("created_at", True), ("id", True)), where=conditions))
 
 

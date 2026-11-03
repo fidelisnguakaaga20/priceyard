@@ -7,7 +7,7 @@ from app.models.subscription import Subscription
 from app.models.user import User
 from app.schemas.subscription_schema import SubscriptionResponse, SubscriptionStatusUpdate
 from app.services.audit_service import create_audit_log, snapshot_model
-from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, stream_admin_records
+from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, release_for_stream, stream_admin_records
 from app.services.subscription_service import (
     get_subscription_for_user,
     lock_subscription_state,
@@ -34,7 +34,7 @@ def get_subscriptions(
     _: User = Depends(require_roles("admin")),
 ) -> Response:
     expire_subscriptions_for_listing(db)
-    return AdminJSONResponse(stream_admin_records(db.get_bind(), Subscription, SubscriptionResponse,
+    return AdminJSONResponse(stream_admin_records(release_for_stream(db), Subscription, SubscriptionResponse,
         order=(("id", False),)))
 
 

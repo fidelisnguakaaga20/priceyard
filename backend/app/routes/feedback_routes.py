@@ -14,7 +14,7 @@ from app.schemas.feedback_schema import (
     TestimonialResponse,
 )
 from app.services.audit_service import create_audit_log, snapshot_model
-from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, stream_admin_records
+from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, release_for_stream, stream_admin_records
 from app.services.feedback_service import (
     create_feedback,
     delete_feedback,
@@ -73,7 +73,7 @@ def get_feedback_list(
     _admin: User = Depends(require_roles("admin")),
 ) -> Response:
     conditions = (Feedback.rating == rating,) if rating is not None else ()
-    return AdminJSONResponse(stream_admin_records(db.get_bind(), Feedback, FeedbackResponse,
+    return AdminJSONResponse(stream_admin_records(release_for_stream(db), Feedback, FeedbackResponse,
         order=(("created_at", True), ("id", True)), where=conditions))
 
 

@@ -39,6 +39,17 @@ def admin_record_page(db: Session, model, schema: type[T], *, offset: int, order
                            total=rows[0][1], offset=offset)
 
 
+def release_for_stream(db: Session) -> Engine:
+    """Free the request session's pooled connection before a stream opens its own.
+
+    Otherwise each streamed request holds two connections at once, and a few
+    parallel requests (e.g. the six Market insights sections) exhaust the pool.
+    """
+    engine = db.get_bind()
+    db.close()
+    return engine
+
+
 def stream_admin_records(engine: Engine, model, schema: type[T], *, order, where=(), related=()) -> Iterator[str]:
     statement = select(model).where(*where).options(*(joinedload(getattr(model, name)) for name in related)).order_by(*_ordering(model, order)).execution_options(yield_per=100)
     return stream_schema_records(engine, statement, schema)
