@@ -135,7 +135,7 @@ export function CommodityDetailPage() {
           return <div className="stack-item" key={x.id}>
             <div className="stack-item-head"><span className="eyebrow">{marketLabel(x.market_id)}</span>{editLink("costs", x.id)}</div>
             <CostCalculator breakdown={x} />
-            <p className="cost-reference-label">Reference breakdown (Unit not recorded)</p>
+            <p className="cost-reference-label">Reference breakdown</p>
             <p>Purchase reference: {money(x.purchase_price_reference)} · Additional costs: {money(x.total_additional_cost)}</p>
             <small>Transport {money(x.transport)} · Warehouse {money(x.warehouse)} · Market charges {money(x.market_charges)}</small>
           </div>;
