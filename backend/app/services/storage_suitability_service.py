@@ -95,3 +95,8 @@ def update_storage_suitability(
         setattr(item, field, value)
     db.commit() if commit else db.flush()
     return item
+
+
+def delete_storage_suitability(db: Session, item: StorageSuitability, *, commit: bool = True) -> None:
+    db.delete(item)
+    db.commit() if commit else db.flush()

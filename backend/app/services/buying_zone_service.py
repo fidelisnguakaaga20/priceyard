@@ -99,3 +99,8 @@ def update_buying_zone(db: Session, zone: BuyingZone, payload: BuyingZoneUpdate,
         setattr(zone, field, value)
     db.commit() if commit else db.flush()
     return zone
+
+
+def delete_buying_zone(db: Session, zone: BuyingZone, *, commit: bool = True) -> None:
+    db.delete(zone)
+    db.commit() if commit else db.flush()

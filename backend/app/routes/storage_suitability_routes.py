@@ -15,6 +15,7 @@ from app.schemas.storage_suitability_schema import (
 )
 from app.services.storage_suitability_service import (
     create_storage_suitability,
+    delete_storage_suitability,
     get_storage_suitability,
     update_storage_suitability,
 )
@@ -76,3 +77,16 @@ def edit_item(
     item = update_storage_suitability(db, item, payload, commit=False)
     save_audited_resource(db, item, current_admin, "storage_suitability.edit", old_value=old_value)
     return item
+
+
+@router.delete("/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
+def remove_item(
+    item_id: int,
+    db: Session = Depends(get_db),
+    current_admin: User = Depends(require_roles("admin")),
+) -> Response:
+    item = get_storage_suitability(db, item_id, lock=True)
+    old_value = snapshot_model(item)
+    delete_storage_suitability(db, item, commit=False)
+    save_audited_resource(db, item, current_admin, "storage_suitability.delete", old_value=old_value, deleted=True)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

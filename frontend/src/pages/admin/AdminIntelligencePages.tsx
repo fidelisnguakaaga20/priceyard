@@ -46,6 +46,25 @@ export function AdminBuyingZonesPage() {
             setBusy(false);
         }
     }
+    async function remove(id: number) {
+        if (!r.token || busy || !confirm("Delete this buying zone?"))
+            return;
+        setBusy(true);
+        try {
+            await apiFetch(`/buying-zones/${id}`, {
+                method: "DELETE"
+            }, r.token);
+            setMessage("Buying zone deleted.");
+            setError("");
+            await r.reload();
+        }
+        catch (err) {
+            setError(errorText(err));
+        }
+        finally {
+            setBusy(false);
+        }
+    }
     return <div>
     <h2>Buying zones
     </h2>
@@ -93,6 +112,10 @@ export function AdminBuyingZonesPage() {
             </small>
             <br />
             <StaleBadge updatedAt={x.updated_at}/>
+            <div className="button-row">
+            <AdminActionButton className="button button-small button-danger" busy={busy} onClick={() => void remove(x.id)}>Delete
+            </AdminActionButton>
+            </div>
             </article>)}
         </div>}
     <AdminPagination page={r} label="Buying zones"/>
@@ -247,6 +270,25 @@ export function AdminStoragePage() {
             setBusy(false);
         }
     }
+    async function remove(id: number) {
+        if (!r.token || busy || !confirm("Delete this storage suitability entry?"))
+            return;
+        setBusy(true);
+        try {
+            await apiFetch(`/storage-suitability/${id}`, {
+                method: "DELETE"
+            }, r.token);
+            setMessage("Storage suitability deleted.");
+            setError("");
+            await r.reload();
+        }
+        catch (err) {
+            setError(errorText(err));
+        }
+        finally {
+            setBusy(false);
+        }
+    }
     return <div>
     <h2>Storage suitability
     </h2>
@@ -302,6 +344,10 @@ export function AdminStoragePage() {
             </small>
             <br />
             <StaleBadge updatedAt={x.updated_at}/>
+            <div className="button-row">
+            <AdminActionButton className="button button-small button-danger" busy={busy} onClick={() => void remove(x.id)}>Delete
+            </AdminActionButton>
+            </div>
             </article>)}
         </div>}
     <AdminPagination page={r} label="Storage suitability"/>

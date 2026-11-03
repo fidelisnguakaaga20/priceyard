@@ -11,6 +11,7 @@ from app.models.user import User
 from app.schemas.buying_zone_schema import BuyingZoneCreate, BuyingZoneResponse, BuyingZoneUpdate
 from app.services.buying_zone_service import (
     create_buying_zone,
+    delete_buying_zone,
     get_buying_zone,
     update_buying_zone,
 )
@@ -72,3 +73,16 @@ def edit_zone(
     item = update_buying_zone(db, item, payload, commit=False)
     save_audited_resource(db, item, current_admin, "buying_zone.edit", old_value=old_value)
     return item
+
+
+@router.delete("/{zone_id}", status_code=status.HTTP_204_NO_CONTENT)
+def remove_zone(
+    zone_id: int,
+    db: Session = Depends(get_db),
+    current_admin: User = Depends(require_roles("admin")),
+) -> Response:
+    item = get_buying_zone(db, zone_id, lock=True)
+    old_value = snapshot_model(item)
+    delete_buying_zone(db, item, commit=False)
+    save_audited_resource(db, item, current_admin, "buying_zone.delete", old_value=old_value, deleted=True)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
