@@ -12,9 +12,8 @@ export function CostCalculator({ breakdown }: { breakdown: CostBreakdown }) {
 
   return (
     <div className="cost-calculator">
-      <h4>💰 Cost Calculator</h4>
-      <p className="muted">Unit not recorded. Confirm the unit for this cost reference before using this estimate.</p>
-      <p className="muted">Enter how many reference units you're buying to see your total cost.</p>
+      <h4>💰 Use calculator</h4>
+      <p className="muted">Enter how many unit bags you're buying to see your total cost.</p>
       <div className="form-stack">
         <label>How many are you buying?
           <input type="number" min="0" step="1" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
