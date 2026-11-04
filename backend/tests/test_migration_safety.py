@@ -50,6 +50,6 @@ class MigrationSafetyTests(unittest.TestCase):
         with self.engine.begin() as connection:
             self.seed(connection)
             before = connection.execute(text("SELECT * FROM legacy_records")).all()
-            for revision in ("0021_feedback_screenshot", "0022_login_revocation"):
+            for revision in ("0021_feedback_screenshot", "0022_login_revocation", "0023_cost_breakdown_items"):
                 assert_safe_migration_start(connection, (revision,))
                 self.assertEqual(connection.execute(text("SELECT * FROM legacy_records")).all(), before)

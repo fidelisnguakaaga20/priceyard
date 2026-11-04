@@ -32,8 +32,14 @@ def _validate_market(db: Session, market_id: int) -> None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Market not found")
 
 
-def _calculate_totals(values: dict[str, Decimal]) -> tuple[Decimal, Decimal]:
+def _stored_items(items) -> list[dict[str, str]]:
+    """JSON-safe admin-named cost lines, amounts kept as exact 2-place strings."""
+    return [{"name": item["name"], "amount": f"{Decimal(str(item['amount'])):.2f}"} for item in items]
+
+
+def _calculate_totals(values: dict, items: list[dict[str, str]]) -> tuple[Decimal, Decimal]:
     additional = sum((values.get(field, _ZERO) for field in _COST_FIELDS), _ZERO)
+    additional += sum((Decimal(item["amount"]) for item in items), _ZERO)
     total = values["purchase_price_reference"] + additional
     if additional > _MAX_TOTAL or total > _MAX_TOTAL:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Calculated cost total exceeds the existing storage limit")
@@ -44,7 +50,8 @@ def create_cost_breakdown(db: Session, payload: CostBreakdownCreate, *, commit: 
     _validate_commodity(db, payload.commodity_id)
     _validate_market(db, payload.market_id)
     values = payload.model_dump()
-    additional, total = _calculate_totals(values)
+    values["cost_items"] = _stored_items(values["cost_items"])
+    additional, total = _calculate_totals(values, values["cost_items"])
     item = CostBreakdown(
         **values,
         total_additional_cost=additional,
@@ -104,7 +111,9 @@ def update_cost_breakdown(
     values["purchase_price_reference"] = changes.get(
         "purchase_price_reference", item.purchase_price_reference
     )
-    additional, total = _calculate_totals(values)
+    if "cost_items" in changes:
+        changes["cost_items"] = _stored_items(changes["cost_items"])
+    additional, total = _calculate_totals(values, changes.get("cost_items", item.cost_items or []))
 
     for field, value in changes.items():
         setattr(item, field, value)

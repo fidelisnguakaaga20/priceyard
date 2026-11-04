@@ -2,7 +2,7 @@
 from sqlalchemy import inspect, text
 from sqlalchemy.engine import Connection
 
-REVIEWED_BASELINES = frozenset({"0021_feedback_screenshot", "0022_login_revocation"})
+REVIEWED_BASELINES = frozenset({"0021_feedback_screenshot", "0022_login_revocation", "0023_cost_breakdown_items"})
 
 
 def assert_safe_migration_start(connection: Connection, current_heads: tuple[str, ...]) -> None:

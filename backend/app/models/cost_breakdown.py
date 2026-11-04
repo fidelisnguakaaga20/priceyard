@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from datetime import datetime
 from decimal import Decimal
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
-from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Numeric, func
+from sqlalchemy import JSON, CheckConstraint, DateTime, ForeignKey, Numeric, func, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -44,6 +44,8 @@ class CostBreakdown(Base):
     market_charges: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False, default=Decimal("0.00"))
     loading_offloading: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False, default=Decimal("0.00"))
     other_costs: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False, default=Decimal("0.00"))
+    # Admin-named cost lines ({"name": ..., "amount": "0.00"}); they add to the fixed columns above.
+    cost_items: Mapped[list[dict[str, Any]]] = mapped_column(JSON, nullable=False, default=list, server_default=text("'[]'"))
     total_additional_cost: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False)
     purchase_price_reference: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False)
     total_estimated_landing_storage_cost: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False)
