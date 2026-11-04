@@ -26,7 +26,7 @@ import { AdminExportPage } from "./pages/admin/AdminExportPage";
 import { AdminFAQPage } from "./pages/admin/AdminFAQPage";
 import { AdminFeedbackPage } from "./pages/admin/AdminFeedbackPage";
 import { AdminFlaggedPricesPage } from "./pages/admin/AdminFlaggedPricesPage";
-import { AdminBuyingZonesPage, AdminCostBreakdownPage, AdminSellWatchPage, AdminStoragePage } from "./pages/admin/AdminIntelligencePages";
+import { AdminBuyingZonesPage, AdminCostBreakdownPage, AdminSellWatchPage } from "./pages/admin/AdminIntelligencePages";
 import { AdminMarketsPage } from "./pages/admin/AdminMarketsPage";
 import { AdminPriceUpdatesPage } from "./pages/admin/AdminPriceUpdatesPage";
 import { AdminMarketSignalsPage, AdminQualitySignalsPage } from "./pages/admin/AdminSignalsPage";
@@ -65,7 +65,6 @@ export default function App() {
           <Route path="quality-signals" element={<AdminQualitySignalsPage />} />
           <Route path="buying-zones" element={<AdminBuyingZonesPage />} />
           <Route path="sell-watch" element={<AdminSellWatchPage />} />
-          <Route path="storage" element={<AdminStoragePage />} />
           <Route path="costs" element={<AdminCostBreakdownPage />} />
           <Route path="faq" element={<AdminFAQPage />} />
           <Route path="subscriptions" element={<AdminSubscriptionsPage />} />
