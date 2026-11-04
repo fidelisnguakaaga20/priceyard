@@ -2,7 +2,7 @@ import { FormEvent, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { apiFetch } from "../../services/api";
 import { StaleBadge } from "../../components/StaleBadge";
-import type { BuyingZone, CostBreakdown, SellWatchWindow, StorageSuitability } from "../../types/api";
+import type { BuyingZone, CostBreakdown, CostItem, SellWatchWindow, StorageSuitability } from "../../types/api";
 import { useAdminEditForm } from "./useAdminEditForm";
 import { AdminPagination, useAdminPagedList } from "./adminPaging";
 import { AdminActionButton, AdminLoading, AdminStatus, errorText, optionalNumber } from "./adminUtils";
@@ -353,28 +353,45 @@ export function AdminStoragePage() {
     <AdminPagination page={r} label="Storage suitability"/>
     </div>;
 }
+const COST_ITEM_SUGGESTIONS = ["Transport", "Sack", "Chemical", "Warehouse", "Security", "Market charges", "Loading/offloading", "Labour", "Other costs"];
 export function AdminCostBreakdownPage() {
     const r = useAdminPagedList<CostBreakdown>("/cost-breakdowns/admin/page");
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const [busy, setBusy] = useState(false);
     const [searchParams] = useSearchParams();
-    const editor = useAdminEditForm(r.data, r.loading, setError, { path: "/cost-breakdowns", token: r.token }, searchParams.get("id") ?? undefined);
+    // Each cost line is named by the admin (e.g. Sack, Chemical, Transport).
+    const [rows, setRows] = useState<{ key: number; name: string; amount: string }[]>([{ key: 0, name: "", amount: "" }]);
+    const [nextKey, setNextKey] = useState(1);
+    function fillRows(items: CostItem[]) {
+        const filled = items.map((item, index) => ({ key: nextKey + index, name: item.name, amount: String(item.amount) }));
+        setRows(filled.length ? filled : [{ key: nextKey, name: "", amount: "" }]);
+        setNextKey(nextKey + Math.max(filled.length, 1));
+    }
+    const editor = useAdminEditForm(r.data, r.loading, setError, { path: "/cost-breakdowns", token: r.token }, searchParams.get("id") ?? undefined,
+        (record) => fillRows(record?.cost_items ?? []));
+    function addRow() {
+        setRows([...rows, { key: nextKey, name: "", amount: "" }]);
+        setNextKey(nextKey + 1);
+    }
+    function changeRow(key: number, field: "name" | "amount", value: string) {
+        setRows(rows.map((row) => row.key === key ? { ...row, [field]: value } : row));
+    }
     async function save(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
         if (!r.token || busy || !editor.canSubmit())
             return;
         const f = new FormData(e.currentTarget);
         const id = String(f.get("id") || "").trim();
+        const filled = rows.filter((row) => row.name.trim() || row.amount.trim());
+        if (filled.some((row) => !row.name.trim())) {
+            setError("Give every cost a name, or clear its amount.");
+            return;
+        }
         const payload = {
             commodity_id: Number(f.get("commodity_id")),
             market_id: Number(f.get("market_id")),
-            transport: Number(f.get("transport") || 0),
-            warehouse: Number(f.get("warehouse") || 0),
-            security: Number(f.get("security") || 0),
-            market_charges: Number(f.get("market_charges") || 0),
-            loading_offloading: Number(f.get("loading_offloading") || 0),
-            other_costs: Number(f.get("other_costs") || 0),
+            cost_items: filled.map((row) => ({ name: row.name.trim(), amount: row.amount.trim() || "0" })),
             purchase_price_reference: Number(f.get("purchase_price_reference"))
         };
         setBusy(true);
@@ -413,7 +430,6 @@ export function AdminCostBreakdownPage() {
             setBusy(false);
         }
     }
-    const costs = [["transport", "Transport"], ["warehouse", "Warehouse"], ["security", "Security"], ["market_charges", "Market charges"], ["loading_offloading", "Loading/offloading"], ["other_costs", "Other costs"], ["purchase_price_reference", "Purchase price reference"]] as const;
     return <div>
     <h2>Cost breakdown
     </h2>
@@ -430,10 +446,30 @@ export function AdminCostBreakdownPage() {
     </label>
     <label>Market ID
     <input name="market_id" type="number" min="1" required defaultValue={searchParams.get("market_id") ?? undefined}/>
-    </label>{costs.map(([name, label]) => <label key={name}>{label}
-        <input name={name} type="number" min="0" step="0.01" defaultValue="0" required={name === "purchase_price_reference"}/>
-        </label>)}
+    </label>
+    <label>Purchase price reference
+    <input name="purchase_price_reference" type="number" min="0" step="0.01" defaultValue="0" required/>
+    </label>
     </div>
+    <fieldset className="form-stack">
+    <legend>Costs: pick an item from the list or type your own</legend>
+    {rows.map((row) => <div className="form-grid" key={row.key}>
+        <label>Item name
+        <input value={row.name} maxLength={100} list="cost-item-suggestions" placeholder="Pick from the list or type your own" onChange={(e) => changeRow(row.key, "name", e.target.value)}/>
+        </label>
+        <label>Amount (₦)
+        <input value={row.amount} type="number" min="0" step="0.01" placeholder="0" onChange={(e) => changeRow(row.key, "amount", e.target.value)}/>
+        </label>
+        <div className="button-row">
+        <button type="button" className="button button-small button-danger" onClick={() => setRows(rows.length > 1 ? rows.filter((x) => x.key !== row.key) : [{ key: nextKey, name: "", amount: "" }])}>Remove</button>
+        </div>
+        </div>)}
+    {/* Suggestions only: any other name can still be typed. */}
+    <datalist id="cost-item-suggestions">{COST_ITEM_SUGGESTIONS.map((name) => <option key={name} value={name}/>)}</datalist>
+    <div className="button-row">
+    <button type="button" className="button button-secondary button-small" onClick={addRow}>+ Add another item</button>
+    </div>
+    </fieldset>
     <AdminActionButton className="button" busy={busy}>Save cost breakdown
     </AdminActionButton>
     </form>{r.loading ? <AdminLoading label="Loading cost breakdowns…"/> : <div className="admin-card-list">{r.data.map((x) => <article className="card" key={x.id}>

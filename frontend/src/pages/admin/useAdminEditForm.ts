@@ -7,8 +7,11 @@ const loadingRecord = "Wait for the selected record to load.";
 
 /** Populate existing controls; an optional paged-list lookup uses the existing ID endpoint. */
 export function useAdminEditForm<T extends { id: number }>(data: T[], loading: boolean, setError: (message: string) => void,
-  lookup?: { path: string; token: string | null }, initialId?: string) {
+  lookup?: { path: string; token: string | null }, initialId?: string, onPopulate?: (record: T | null) => void) {
   const formRef = useRef<HTMLFormElement>(null);
+  // Lets a form fill controls the generic name-matching below cannot (e.g. a list of rows).
+  const onPopulateRef = useRef(onPopulate);
+  onPopulateRef.current = onPopulate;
   const [editId, setEditId] = useState("");
   const loadedId = useRef<string | null>(null);
 
@@ -34,6 +37,7 @@ export function useAdminEditForm<T extends { id: number }>(data: T[], loading: b
     loadedId.current = null;
     setError("");
     setEditId(id);
+    onPopulateRef.current?.(null);
   }
 
   useEffect(() => {
@@ -55,6 +59,7 @@ export function useAdminEditForm<T extends { id: number }>(data: T[], loading: b
         }
       }
       loadedId.current = editId;
+      onPopulateRef.current?.(record);
       idInput.setCustomValidity("");
       setError("");
     }
