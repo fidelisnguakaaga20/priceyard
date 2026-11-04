@@ -95,6 +95,10 @@
   white-space: nowrap;
 }
 
+.market-insights-grid .insight-add-link {
+  margin-left: auto;
+}
+
 @media (max-width: 640px) {
   .commodity-detail-page.page-section {
     padding-top: 20px;
