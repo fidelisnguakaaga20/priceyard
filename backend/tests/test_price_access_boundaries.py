@@ -15,6 +15,7 @@ from app.models.quality_signal import QualitySignal
 from app.models.subscription import Subscription
 from app.models.user import User
 from app.security import create_access_token
+from app.services.price_time_service import NIGERIA_TIME
 
 
 class PriceAccessBoundaryTests(unittest.TestCase):
@@ -22,8 +23,8 @@ class PriceAccessBoundaryTests(unittest.TestCase):
         self.engine = create_engine("sqlite+pysqlite:///:memory:")
         Base.metadata.create_all(self.engine)
         now = datetime.now(timezone.utc)
-        self.old_date = (now - timedelta(days=2)).date().isoformat()
-        self.current_date = now.date().isoformat()
+        self.old_date = (now - timedelta(days=2)).astimezone(NIGERIA_TIME).date().isoformat()
+        self.current_date = now.astimezone(NIGERIA_TIME).date().isoformat()
         self.headers = {"guest": {}}
         with Session(self.engine) as db:
             for name, role, access in (

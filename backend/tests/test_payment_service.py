@@ -3,7 +3,7 @@ import hmac
 import json
 import os
 import unittest
-from datetime import date, timedelta
+from datetime import datetime, timedelta, timezone
 
 os.environ.setdefault("FRONTEND_URL", "https://priceyard.onrender.com")
 
@@ -102,7 +102,7 @@ class PaymentServiceTests(unittest.TestCase):
         subscription = self.user.subscription
         subscription.status = "active"
         subscription.plan_name = "paid_monthly"
-        subscription.end_date = date.today() - timedelta(days=1)
+        subscription.end_date = datetime.now(timezone.utc).date() - timedelta(days=1)
         self.user.role = "paid_user"
         self.db.commit()
 
