@@ -78,7 +78,7 @@ export function AdminBuyingZonesPage() {
     <input name="commodity_id" type="number" min="1" required defaultValue={searchParams.get("commodity_id") ?? undefined}/>
     </label>
     <label>Market ID
-    <input name="market_id" type="number" min="1" required/>
+    <input name="market_id" type="number" min="1" required defaultValue={searchParams.get("market_id") ?? undefined}/>
     </label>
     <label>Low
     <input name="price_low" type="number" min="0" step="0.01" required/>
@@ -191,7 +191,7 @@ export function AdminSellWatchPage() {
     <input name="commodity_id" type="number" min="1" required defaultValue={searchParams.get("commodity_id") ?? undefined}/>
     </label>
     <label>Market ID
-    <input name="market_id" type="number" min="1" required/>
+    <input name="market_id" type="number" min="1" required defaultValue={searchParams.get("market_id") ?? undefined}/>
     </label>
     <label>Start period
     <input name="start_period" required/>
@@ -302,7 +302,7 @@ export function AdminStoragePage() {
     <input name="commodity_id" type="number" min="1" required defaultValue={searchParams.get("commodity_id") ?? undefined}/>
     </label>
     <label>Market ID
-    <input name="market_id" type="number" min="1" required/>
+    <input name="market_id" type="number" min="1" required defaultValue={searchParams.get("market_id") ?? undefined}/>
     </label>
     <label>Price update ID
     <input name="price_update_id" type="number" min="1"/>
@@ -429,7 +429,7 @@ export function AdminCostBreakdownPage() {
     <input name="commodity_id" type="number" min="1" required defaultValue={searchParams.get("commodity_id") ?? undefined}/>
     </label>
     <label>Market ID
-    <input name="market_id" type="number" min="1" required/>
+    <input name="market_id" type="number" min="1" required defaultValue={searchParams.get("market_id") ?? undefined}/>
     </label>{costs.map(([name, label]) => <label key={name}>{label}
         <input name={name} type="number" min="0" step="0.01" defaultValue="0" required={name === "purchase_price_reference"}/>
         </label>)}

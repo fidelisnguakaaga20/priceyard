@@ -8,7 +8,7 @@ import { PremiumGate } from "../components/PremiumGate";
 import { useAuth } from "../context/AuthContext";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { apiFetch } from "../services/api";
-import type { BuyingZone, Commodity, CostBreakdown, Market, MarketSignal, QualitySignal, SellWatchWindow, StorageSuitability } from "../types/api";
+import type { BuyingZone, Commodity, CostBreakdown, Market, MarketSignal, PriceUpdate, QualitySignal, SellWatchWindow, StorageSuitability } from "../types/api";
 import { commodityTitleColor, humanize, money, shortDate } from "../utils";
 import "./commodity-detail.css";
 
@@ -45,7 +45,7 @@ export function CommodityDetailPage() {
   const editLink = (adminPath: string, id: number) => user?.role === "admin"
     ? <Link className="text-link insight-edit-link" to={`/admin/${adminPath}?id=${id}`}>Edit</Link> : null;
   const addLink = (adminPath: string) => user?.role === "admin"
-    ? <Link className="text-link insight-edit-link insight-add-link" to={`/admin/${adminPath}?commodity_id=${commodity?.id ?? ""}`}>+ Add</Link> : null;
+    ? <Link className="text-link insight-edit-link insight-add-link" to={`/admin/${adminPath}?commodity_id=${commodity?.id ?? ""}${latestMarketId ? `&market_id=${latestMarketId}` : ""}`}>+ Add</Link> : null;
   const marketLabel = (marketId: number) => marketMap.get(marketId) || `Market #${marketId}`;
 
   useEffect(() => {
@@ -73,6 +73,20 @@ export function CommodityDetailPage() {
   }, []);
 
   const commodityId = commodity?.id;
+
+  // "+ Add" pre-selects the market of this commodity's most recent price.
+  const [latestMarketId, setLatestMarketId] = useState<number | null>(null);
+  useEffect(() => {
+    let current = true;
+    setLatestMarketId(null);
+    if (!commodityId || user?.role !== "admin") return;
+    apiFetch<PriceUpdate[]>(`/price-updates?commodity_id=${commodityId}`).then((items) => {
+      const latest = items.filter((item) => item.commodity_id === commodityId)
+        .sort((a, b) => new Date(b.update_date_time).getTime() - new Date(a.update_date_time).getTime())[0];
+      if (current && latest) setLatestMarketId(latest.market_id);
+    }).catch(() => undefined);
+    return () => { current = false; };
+  }, [commodityId, user?.role]);
 
   useEffect(() => {
     let current = true;
