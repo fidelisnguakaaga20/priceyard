@@ -7,6 +7,7 @@ export function CostCalculator({ breakdown }: { breakdown: CostBreakdown }) {
   const safeQuantity = Math.max(0, Number(quantity) || 0);
 
   const purchaseTotal = Number(breakdown.purchase_price_reference) * safeQuantity;
+  const grandTotal = Number(breakdown.total_estimated_landing_storage_cost) * safeQuantity;
 
   return (
     <div className="cost-calculator">
@@ -20,6 +21,8 @@ export function CostCalculator({ breakdown }: { breakdown: CostBreakdown }) {
       <dl className="data-list compact">
         <div><dt>Purchase cost</dt><dd>{money(purchaseTotal)}</dd></div>
       </dl>
+      {breakdown.cost_items?.length ? <p className="cost-items-line">{breakdown.cost_items.map((item) => `${item.name} ${money(item.amount)}`).join(" · ")}</p> : null}
+      <div className="cost-total"><span>Estimated Total cost</span><strong>{money(grandTotal)}</strong></div>
     </div>
   );
 }
