@@ -48,7 +48,7 @@ try {
     await page.locator(entitled ? '.intelligence-grid' : '.commodity-detail-page .locked-panel').waitFor();
     assert.equal(await page.locator('.commodity-detail-page .detail-card').count(),0);
     assert.equal(await page.getByText(/Grade:/).count(),0);
-    if(entitled)await page.getByRole('heading',{name:'Quality readiness',exact:true}).waitFor();
+    if(entitled)await page.getByRole('heading',{name:'How to identify good Egusi for storage',exact:true}).waitFor();
     await page.goto(origin+'/history');
     await page.getByRole('heading',{name:'Price history',exact:true}).waitFor();
     if(entitled)await page.locator('.history-table-view tbody tr').first().waitFor();
