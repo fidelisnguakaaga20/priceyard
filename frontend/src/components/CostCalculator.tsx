@@ -21,7 +21,7 @@ export function CostCalculator({ breakdown }: { breakdown: CostBreakdown }) {
       <dl className="data-list compact">
         <div><dt>Purchase cost</dt><dd>{money(purchaseTotal)}</dd></div>
       </dl>
-      {breakdown.cost_items?.length ? <p className="cost-items-line">{breakdown.cost_items.map((item) => `${item.name} ${money(item.amount)}`).join(" · ")}</p> : null}
+      {breakdown.cost_items?.length ? <p className="cost-items-line">{breakdown.cost_items.map((item) => `${item.name} ${money(Number(item.amount) * safeQuantity)}`).join(" · ")}</p> : null}
       <div className="cost-total"><span>Estimated Total cost</span><strong>{money(grandTotal)}</strong></div>
     </div>
   );
