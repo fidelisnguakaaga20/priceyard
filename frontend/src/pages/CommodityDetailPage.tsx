@@ -153,7 +153,7 @@ export function CommodityDetailPage() {
             <CostCalculator breakdown={x} />
             <p className="cost-reference-label">Reference breakdown</p>
             <p>Purchase reference: {money(x.purchase_price_reference)} · Additional costs: {money(x.total_additional_cost)}</p>
-            {x.cost_items?.length ? <small>{x.cost_items.map((item) => `${item.name} ${money(item.amount)}`).join(" · ")}</small> : null}
+            <small>Transport {money(x.transport)} · Warehouse {money(x.warehouse)} · Market charges {money(x.market_charges)}</small>
           </div>;
         }) : <p className="muted">{failedSections.has("costs") ? "Could not load cost breakdown right now -- try refreshing." : "No cost breakdown currently available for this commodity."}</p>}</article>
       </div>}

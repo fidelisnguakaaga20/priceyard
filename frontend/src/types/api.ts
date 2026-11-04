@@ -168,8 +168,6 @@ export type StorageSuitability = {
   disclaimer: string;
 };
 
-export type CostItem = { name: string; amount: string | number };
-
 export type CostBreakdown = {
   id: number;
   commodity_id: number;
@@ -180,7 +178,6 @@ export type CostBreakdown = {
   market_charges: string | number;
   loading_offloading: string | number;
   other_costs: string | number;
-  cost_items: CostItem[];
   total_additional_cost: string | number;
   purchase_price_reference: string | number;
   total_estimated_landing_storage_cost: string | number;
