@@ -151,8 +151,6 @@ export function CommodityDetailPage() {
           return <div className="stack-item" key={x.id}>
             <div className="stack-item-head"><span className="eyebrow">{marketLabel(x.market_id)}</span>{editLink("costs", x.id)}</div>
             <CostCalculator breakdown={x} />
-            <p className="cost-reference-label">Reference breakdown</p>
-            <p>Purchase reference: {money(x.purchase_price_reference)} · Additional costs: {money(x.total_additional_cost)}</p>
             {x.cost_items?.length ? <small>{x.cost_items.map((item) => `${item.name} ${money(item.amount)}`).join(" · ")}</small> : null}
           </div>;
         }) : <p className="muted">{failedSections.has("costs") ? "Could not load cost breakdown right now -- try refreshing." : "No cost breakdown currently available for this commodity."}</p>}</article>

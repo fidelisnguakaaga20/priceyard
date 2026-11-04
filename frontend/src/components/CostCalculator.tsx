@@ -7,13 +7,11 @@ export function CostCalculator({ breakdown }: { breakdown: CostBreakdown }) {
   const safeQuantity = Math.max(0, Number(quantity) || 0);
 
   const purchaseTotal = Number(breakdown.purchase_price_reference) * safeQuantity;
-  const additionalTotal = Number(breakdown.total_additional_cost) * safeQuantity;
-  const grandTotal = Number(breakdown.total_estimated_landing_storage_cost) * safeQuantity;
 
   return (
     <div className="cost-calculator">
       <h4>💰 Use calculator</h4>
-      <p className="muted">Enter how many unit bags you're buying to see your total cost.</p>
+      <p className="muted">Enter how many units you're buying to see your total cost.</p>
       <div className="form-stack">
         <label>How many are you buying?
           <input type="number" min="0" step="1" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
@@ -21,8 +19,6 @@ export function CostCalculator({ breakdown }: { breakdown: CostBreakdown }) {
       </div>
       <dl className="data-list compact">
         <div><dt>Purchase cost</dt><dd>{money(purchaseTotal)}</dd></div>
-        <div><dt>Additional costs (transport, storage, etc.)</dt><dd>{money(additionalTotal)}</dd></div>
-        <div><dt>Estimated total</dt><dd><strong>{money(grandTotal)}</strong></dd></div>
       </dl>
     </div>
   );

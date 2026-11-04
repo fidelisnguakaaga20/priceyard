@@ -36,7 +36,7 @@ try {
   const listener=response=>{const url=new URL(response.url());if(watch.has(url.pathname)&&response.request().method()==='GET')pending.push(response.json().then(rows=>captures.push({endpoint:url.pathname,scope:url.searchParams.get('commodity_id'),rows,status:response.status()})));};
   page.on('response',listener);
   await page.goto(origin+'/commodities/Egusi');await page.getByText(marker+' Egusi market',{exact:true}).waitFor();await page.getByText(marker+' Egusi quality',{exact:true}).waitFor();
-  await page.getByRole('heading',{name:'Cost breakdown',exact:true}).locator('..').getByText("Enter how many unit bags you're buying to see your total cost.",{exact:true}).waitFor();
+  await page.getByRole('heading',{name:'Cost breakdown',exact:true}).locator('..').getByText("Enter how many units you're buying to see your total cost.",{exact:true}).waitFor();
   const calculator=page.getByRole('heading',{name:'Cost breakdown',exact:true}).locator('..').locator('.cost-calculator').first();
   assert.match(await calculator.innerText(),/210,200/);await calculator.getByRole('spinbutton').fill('2');assert.match(await calculator.innerText(),/420,400/);await calculator.getByRole('spinbutton').fill('1');
   await Promise.all(pending);page.off('response',listener);

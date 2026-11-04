@@ -25,7 +25,7 @@ try{
  }
  await trial.page.goto(origin+'/commodities/'+encodeURIComponent(price.commodity.name));const calculator=trial.page.locator('.cost-calculator');await calculator.waitFor();
  if(expectOld)await calculator.getByText("Priced per 1 bag. Enter how many you're buying to see your total cost.",{exact:true}).waitFor();
- else{await calculator.getByText("Enter how many unit bags you're buying to see your total cost.",{exact:true}).waitFor();assert.ok(!(await calculator.innerText()).includes('Priced per 1 bag'));}
+ else{await calculator.getByText("Enter how many units you're buying to see your total cost.",{exact:true}).waitFor();assert.ok(!(await calculator.innerText()).includes('Priced per 1 bag'));}
  await calculator.getByLabel('How many are you buying?',{exact:true}).fill('2');await calculator.locator('dd').filter({hasText:'420,400'}).waitFor();
  assert.ok((await calculator.innerText()).includes('420,000'));assert.ok((await calculator.innerText()).includes('400'));
  assert.deepEqual((await api(admin.page,'/cost-breakdowns/'+id)).body,persisted);
