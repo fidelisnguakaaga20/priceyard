@@ -45,7 +45,7 @@ export function CommodityDetailPage() {
   const editLink = (adminPath: string, id: number) => user?.role === "admin"
     ? <Link className="text-link insight-edit-link" to={`/admin/${adminPath}?id=${id}`}>Edit</Link> : null;
   const addLink = (adminPath: string) => user?.role === "admin"
-    ? <Link className="text-link insight-edit-link insight-add-link" to={`/admin/${adminPath}`}>+ Add</Link> : null;
+    ? <Link className="text-link insight-edit-link insight-add-link" to={`/admin/${adminPath}?commodity_id=${commodity?.id ?? ""}`}>+ Add</Link> : null;
   const marketLabel = (marketId: number) => marketMap.get(marketId) || `Market #${marketId}`;
 
   useEffect(() => {

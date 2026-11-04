@@ -75,7 +75,7 @@ export function AdminBuyingZonesPage() {
     <input name="id" type="number" min="1" onChange={editor.onIdChange}/>
     </label>
     <label>Commodity ID
-    <input name="commodity_id" type="number" min="1" required/>
+    <input name="commodity_id" type="number" min="1" required defaultValue={searchParams.get("commodity_id") ?? undefined}/>
     </label>
     <label>Market ID
     <input name="market_id" type="number" min="1" required/>
@@ -188,7 +188,7 @@ export function AdminSellWatchPage() {
     <input name="id" type="number" min="1" onChange={editor.onIdChange}/>
     </label>
     <label>Commodity ID
-    <input name="commodity_id" type="number" min="1" required/>
+    <input name="commodity_id" type="number" min="1" required defaultValue={searchParams.get("commodity_id") ?? undefined}/>
     </label>
     <label>Market ID
     <input name="market_id" type="number" min="1" required/>
@@ -299,7 +299,7 @@ export function AdminStoragePage() {
     <input name="id" type="number" min="1" onChange={editor.onIdChange}/>
     </label>
     <label>Commodity ID
-    <input name="commodity_id" type="number" min="1" required/>
+    <input name="commodity_id" type="number" min="1" required defaultValue={searchParams.get("commodity_id") ?? undefined}/>
     </label>
     <label>Market ID
     <input name="market_id" type="number" min="1" required/>
@@ -426,7 +426,7 @@ export function AdminCostBreakdownPage() {
     <input name="id" type="number" min="1" onChange={editor.onIdChange}/>
     </label>
     <label>Commodity ID
-    <input name="commodity_id" type="number" min="1" required/>
+    <input name="commodity_id" type="number" min="1" required defaultValue={searchParams.get("commodity_id") ?? undefined}/>
     </label>
     <label>Market ID
     <input name="market_id" type="number" min="1" required/>

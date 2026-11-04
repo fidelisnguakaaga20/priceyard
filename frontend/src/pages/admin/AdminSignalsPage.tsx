@@ -75,7 +75,7 @@ export function AdminMarketSignalsPage() {
     <input name="id" type="number" min="1" onChange={editor.onIdChange}/>
     </label>
     <label>Commodity ID
-    <input name="commodity_id" type="number" min="1" required/>
+    <input name="commodity_id" type="number" min="1" required defaultValue={searchParams.get("commodity_id") ?? undefined}/>
     </label>
     <label>Market ID
     <input name="market_id" type="number" min="1" required/>
@@ -190,7 +190,7 @@ export function AdminQualitySignalsPage() {
     <input name="id" type="number" min="1" onChange={editor.onIdChange}/>
     </label>
     <label>Commodity ID
-    <input name="commodity_id" type="number" min="1" required/>
+    <input name="commodity_id" type="number" min="1" required defaultValue={searchParams.get("commodity_id") ?? undefined}/>
     </label>
     <label>Market ID
     <input name="market_id" type="number" min="1" required/>
