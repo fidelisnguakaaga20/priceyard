@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { CommodityImage } from "./CommodityImage";
 import { PriceCard } from "./PriceCard";
 import type { PriceUpdate } from "../types/api";
-import { commodityTitleColor } from "../utils";
+import { commodityBorderColor, commodityTitleColor } from "../utils";
 import { priceEpoch, shortPriceDate } from "../utils/priceTime";
 import "./grouped-price-cards.css";
 
@@ -62,7 +62,7 @@ export function GroupedPriceCards({ items }: { items: PriceUpdate[] }) {
         options.push(item);
         markets.set(item.market_id, options);
       }
-      return <article className="card price-card commodity-price-card" key={commodityId} aria-labelledby={headingId}>
+      return <article className="card price-card commodity-price-card" key={commodityId} aria-labelledby={headingId} style={{ "--commodity-border": commodityBorderColor(commodity.name) } as React.CSSProperties}>
         <CommodityImage src={commodity.image_url} alt={commodity.name} />
         <h2 id={headingId} style={{ color: commodityTitleColor(commodity.name) }}>{commodity.name}</h2>
         <div className="price-options">

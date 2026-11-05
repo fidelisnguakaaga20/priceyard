@@ -135,6 +135,24 @@ const COMMODITY_TITLE_COLOR: Record<string, string> = {
   "palm oil": "#c2570c",
 };
 
+// Bold, distinct border colour per commodity card. Known commodities are fixed;
+// any new commodity gets a stable colour from the palette based on its name.
+const COMMODITY_BORDER_COLOR: Record<string, string> = {
+  soybeans: "#22c55e",
+  "honey beans": "#f59e0b",
+  "palm oil": "#ef4444",
+  egusi: "#3b82f6",
+};
+const COMMODITY_BORDER_PALETTE = ["#a855f7", "#14b8a6", "#ec4899", "#0ea5e9", "#84cc16", "#eab308", "#6366f1", "#f43f5e", "#06b6d4", "#d946ef"];
+
+export function commodityBorderColor(name: string): string {
+  const key = name.trim().toLowerCase();
+  if (COMMODITY_BORDER_COLOR[key]) return COMMODITY_BORDER_COLOR[key];
+  let hash = 0;
+  for (const char of key) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+  return COMMODITY_BORDER_PALETTE[hash % COMMODITY_BORDER_PALETTE.length];
+}
+
 export function commodityTitleColor(name: string): string | undefined {
   return COMMODITY_TITLE_COLOR[name.trim().toLowerCase()];
 }
