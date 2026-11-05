@@ -48,8 +48,12 @@
 /* Market insights: a colored accent per insight type, so the six cards read
    as a distinct, premium section rather than six identical gray boxes. */
 .market-insights-grid .insight-card {
-  border-top: 4px solid var(--insight-accent, var(--color-border-strong));
   transition: box-shadow .2s ease, transform .2s ease;
+}
+
+/* Bold border all round in each card's own accent colour (beats Easy reading's width). */
+html .market-insights-grid .card.insight-card {
+  border: 3px solid var(--insight-accent, var(--color-border-strong));
 }
 
 .market-insights-grid .insight-card:hover {
