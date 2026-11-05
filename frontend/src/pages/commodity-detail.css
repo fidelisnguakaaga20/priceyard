@@ -99,6 +99,28 @@
   margin-left: auto;
 }
 
+/* Last-updated tag (Nigeria time), tinted with each card's accent colour. */
+.market-insights-grid .insight-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  min-width: 0;
+}
+
+.market-insights-grid .insight-updated {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: .76rem;
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--insight-accent, var(--color-text-muted));
+  background: color-mix(in srgb, var(--insight-accent, #64748b) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--insight-accent, #64748b) 40%, transparent);
+}
+
 @media (max-width: 640px) {
   .commodity-detail-page.page-section {
     padding-top: 20px;
