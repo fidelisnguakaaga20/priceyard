@@ -104,6 +104,12 @@ export function Layout() {
     navigate("/", { replace: true });
   };
 
+  const displayToggles = <>
+    <button type="button" className={dataSaver ? "toggle-pill on" : "toggle-pill"} aria-pressed={dataSaver} onClick={toggleDataSaver}>Data saver: {dataSaver ? "On" : "Off"}</button>
+    <button type="button" className={easyReading ? "toggle-pill on" : "toggle-pill"} aria-pressed={easyReading} onClick={toggleEasyReading}>Easy reading: {easyReading ? "On" : "Off"}</button>
+    <button type="button" className={darkMode ? "toggle-pill on" : "toggle-pill"} aria-pressed={darkMode} onClick={toggleDarkMode}>Dark mode: {darkMode ? "On" : "Off"}</button>
+  </>;
+
   return (
     <div className="app-shell">
       <header ref={headerRef} className="site-header">
@@ -134,15 +140,13 @@ export function Layout() {
                 <NavLink className="nav-cta" to="/login" onClick={() => setOpen(false)}>Log in</NavLink>
               )}
             </div>
+            {/* Phone only: display settings live in the menu to keep the top bar short. */}
+            <div className="nav-display-toggles">{displayToggles}</div>
           </nav>
         </div>
         <div className="access-strip">
           <span className="access-identity"><span>Access: <strong>{accessLabel}</strong></span>{user && <span>{user.full_name}</span>}</span>
-          <span className="display-toggles">
-            <button type="button" className={dataSaver ? "toggle-pill on" : "toggle-pill"} aria-pressed={dataSaver} onClick={toggleDataSaver}>Data saver: {dataSaver ? "On" : "Off"}</button>
-            <button type="button" className={easyReading ? "toggle-pill on" : "toggle-pill"} aria-pressed={easyReading} onClick={toggleEasyReading}>Easy reading: {easyReading ? "On" : "Off"}</button>
-            <button type="button" className={darkMode ? "toggle-pill on" : "toggle-pill"} aria-pressed={darkMode} onClick={toggleDarkMode}>Dark mode: {darkMode ? "On" : "Off"}</button>
-          </span>
+          <span className="display-toggles">{displayToggles}</span>
         </div>
         {showTicker && <PriceTicker items={tickerPrices} savedAt={tickerSavedAt} />}
       </header>

@@ -197,7 +197,43 @@
     padding-inline: 14px;
     font-size: .82rem;
   }
+
+  /* Phone only: display settings move into the menu; access shows on one short line. */
+  .site-header .access-strip .display-toggles { display: none; }
+  .site-header .access-strip { padding: 3px 12px; }
+  .site-header .access-identity {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .site-header .access-identity > span + span::before { content: " · "; }
+
+  .site-header .main-nav .nav-display-toggles {
+    display: grid;
+    gap: 6px;
+    margin-top: 8px;
+    padding-top: 10px;
+    border-top: 1px solid var(--color-border);
+  }
+  .site-header .nav-display-toggles .toggle-pill {
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--color-text);
+    font-size: .88rem;
+    text-align: left;
+  }
+  .site-header .nav-display-toggles .toggle-pill.on {
+    background: var(--color-surface-subtle);
+    border-color: var(--color-link);
+  }
 }
+
+/* Laptop/tablet keep the buttons on the bar, so the menu copy stays hidden. */
+.site-header .nav-display-toggles { display: none; }
 
 @media (min-width: 1281px) and (max-width: 1500px) {
   html.easy-reading .site-header .brand small {
