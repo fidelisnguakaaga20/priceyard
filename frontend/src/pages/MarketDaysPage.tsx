@@ -5,6 +5,7 @@ import { LoadingSpinner } from "../components/LoadingSpinner";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { apiFetch } from "../services/api";
 import type { Market } from "../types/api";
+import { marketBorderColor } from "../utils";
 
 export function MarketDaysPage() {
   useDocumentTitle("Market Days");
@@ -12,5 +13,5 @@ export function MarketDaysPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   useEffect(() => { apiFetch<Market[]>("/markets").then(setMarkets).catch((err: Error) => setError(err.message)).finally(() => setLoading(false)); }, []);
-  return <section className="page page-section"><div className="page-title"><span className="eyebrow">Market-day calendar</span><h1>Known market days</h1><p>Only market days already verified in PriceYard are shown as confirmed.</p></div>{loading ? <LoadingSpinner label="Loading market days…" /> : error ? <div className="status-box error">{error}</div> : <div className="market-day-grid">{markets.filter((x) => x.is_active).map((market) => <article className="card" key={market.id}><CommodityImage src={market.image_url} alt={market.name} /><span className="eyebrow">{market.state || "Nigeria"}</span><h2>{market.name}</h2><p className="market-day-value">{market.market_day || (market.description ? "Rotating schedule" : "Not yet verified")}</p>{market.description && <p className="muted">{market.description}</p>}<Link className="text-link-cta" to={`/prices?market=${encodeURIComponent(market.name)}`}>See current prices at {market.name} →</Link></article>)}</div>}</section>;
+  return <section className="page page-section"><div className="page-title"><span className="eyebrow">Market-day calendar</span><h1>Known market days</h1><p>Only market days already verified in PriceYard are shown as confirmed.</p></div>{loading ? <LoadingSpinner label="Loading market days…" /> : error ? <div className="status-box error">{error}</div> : <div className="market-day-grid">{markets.filter((x) => x.is_active).map((market) => <article className="card market-day-card" key={market.id} style={{ "--market-border": marketBorderColor(market.id, markets.map((m) => m.id)) } as React.CSSProperties}><CommodityImage src={market.image_url} alt={market.name} /><span className="eyebrow">{market.state || "Nigeria"}</span><h2>{market.name}</h2><p className="market-day-value">{market.market_day || (market.description ? "Rotating schedule" : "Not yet verified")}</p>{market.description && <p className="muted">{market.description}</p>}<Link className="text-link-cta" to={`/prices?market=${encodeURIComponent(market.name)}`}>See current prices at {market.name} →</Link></article>)}</div>}</section>;
 }

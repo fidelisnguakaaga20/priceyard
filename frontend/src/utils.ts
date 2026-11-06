@@ -153,6 +153,16 @@ export function commodityBorderColor(name: string): string {
   return COMMODITY_BORDER_PALETTE[hash % COMMODITY_BORDER_PALETTE.length];
 }
 
+// Bold border colour per market card. Avoids the commodity colours (green,
+// orange, red, blue). Colours go in turn by the order markets were added (id),
+// so existing markets keep their colour when new ones are added.
+const MARKET_BORDER_PALETTE = ["#a855f7", "#14b8a6", "#ec4899", "#06b6d4", "#d946ef", "#8b5cf6", "#2dd4bf", "#f472b6"];
+
+export function marketBorderColor(marketId: number, allMarketIds: number[]): string {
+  const order = [...allMarketIds].sort((a, b) => a - b).indexOf(marketId);
+  return MARKET_BORDER_PALETTE[Math.max(order, 0) % MARKET_BORDER_PALETTE.length];
+}
+
 export function commodityTitleColor(name: string): string | undefined {
   return COMMODITY_TITLE_COLOR[name.trim().toLowerCase()];
 }
