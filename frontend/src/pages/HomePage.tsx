@@ -97,16 +97,7 @@ export function HomePage() {
             <Link className="button" to="/prices">Check prices</Link>
             <Link className="button button-secondary" to="/market-days">See market days</Link>
           </div>
-        </div>
-        <div className="hero-panel">
-          <strong>PriceYard starts focused.</strong>
-          <ul>
-            <li>PriceYard covers Egusi, Honey Beans, Palm oil</li>
-            <li>Abuja/FCT, Kwali, Nasarawa, Benue</li>
-            <li>Real price range, not one fixed number</li>
-            <li>How sure we are about the price, and when it was last checked</li>
-          </ul>
-          <a className="text-link" href={WHATSAPP_COMMUNITY_URL} target="_blank" rel="noopener noreferrer">Join our free WhatsApp updates →</a>
+          <a className="text-link hero-whatsapp-link" href={WHATSAPP_COMMUNITY_URL} target="_blank" rel="noopener noreferrer">Join our free WhatsApp updates →</a>
         </div>
       </section>
 
