@@ -180,6 +180,7 @@ html .market-day-grid .card.market-day-card { border: 3px solid var(--market-bor
 @media (max-width: 640px) {
   .history-table-view { display: none; }
   .history-card-list { display: grid; gap: 16px; }
+  html .history-card-list .card { border: 3px solid var(--commodity-border, var(--color-border-strong)); }
 }
 
 /* Stage 38b mobile-friendly admin tables */

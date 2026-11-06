@@ -12,7 +12,7 @@ import { apiFetch } from "../services/api";
 import { addIdentityFilter, identityLabel, identityValue, selectedIdentity } from "../services/priceIdentity";
 import { initialHistoryFilters, rememberHistoryFilters, restoreHistoryFilters } from "../services/historyPreferences";
 import type { Commodity, Market, PriceUpdate } from "../types/api";
-import { confidenceClass, money, movementIcon } from "../utils";
+import { commodityBorderColor, confidenceClass, money, movementIcon } from "../utils";
 
 import { PRICE_TIME_LABEL, priceEpoch, shortPriceDate } from "../utils/priceTime";
 import { recordedPriceGroups } from "../utils/priceComparability";
@@ -218,7 +218,7 @@ export function PriceHistoryPage() {
           </table>
         </div>
         <div className="history-card-list">
-          {orderedItems.map((item) => <article className="card" key={item.id}>
+          {orderedItems.map((item) => <article className="card" key={item.id} style={{ "--commodity-border": commodityBorderColor(item.commodity.name) } as React.CSSProperties}>
             <div className="card-row"><div><span className="eyebrow">{item.market.name}</span><h3>{item.commodity.name}</h3></div><span className={`movement movement-${item.movement}`}>{movementIcon(item.movement)} {item.movement}</span></div>
             <p className="price-range">{money(item.price_low)} – {money(item.price_high)}</p>
             <p className="muted">Previous: {item.previous_price_low !== null ? `${money(item.previous_price_low)} – ${money(item.previous_price_high)}` : "Not confirmed"}</p>
