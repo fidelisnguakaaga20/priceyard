@@ -323,6 +323,7 @@ html .market-day-grid .card.market-day-card { border: 3px solid var(--market-bor
 
 /* Home: the hero no longer has a side panel, so the copy uses the full width. */
 .hero { grid-template-columns: 1fr; }
+.hero-copy { max-width: 740px; min-width: 0; }
 .hero-whatsapp-link { display: inline-block; margin-top: 16px; }
 
 /* Home on phones only: smaller headline and tighter spacing so less scrolling. */
