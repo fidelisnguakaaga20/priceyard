@@ -5,7 +5,7 @@ import { priceEpoch } from "./priceTime";
 const unknownValues = new Set(["", "unknown", "not known", "not specified", "not confirmed", "not available", "not provided", "n/a", "na", "none", "unspecified", "—", "-", "?"]);
 const normalized = (value: string | null | undefined) => (value ?? "").trim().toLowerCase();
 
-export type RecordedPriceGroup = { items: PriceUpdate[]; comparable: boolean };
+export type RecordedPriceGroup = { items: PriceUpdate[]; comparable: boolean; sizeKnown: boolean };
 
 /** Keep recorded prices visible without treating missing specifications as equal. */
 export function recordedPriceGroups(items: PriceUpdate[]): RecordedPriceGroup[] {
@@ -21,7 +21,8 @@ export function recordedPriceGroups(items: PriceUpdate[]): RecordedPriceGroup[] 
     const comparable = specifications.every((value) => !unknownValues.has(value));
     const key = JSON.stringify([item.commodity_id, item.market_id,
       ...specifications.map((value) => unknownValues.has(value) ? null : value)]);
-    const group = groups.get(key) ?? { items: [], comparable };
+    const sizeKnown = specifications.slice(0, 2).every((value) => !unknownValues.has(value));
+    const group = groups.get(key) ?? { items: [], comparable, sizeKnown };
     group.items.push(item); groups.set(key, group);
   }
   return [...groups.values()].map((group) => ({ ...group, items: [...group.items].sort((a, b) =>

@@ -91,11 +91,11 @@ try {
   assert.equal(await page.locator('.trend-chart').count(), 3);
   assert.equal(await page.locator('.trend-line').count(), 2);
   assert.equal(await page.locator('.trend-dot').count(), 6);
-  assert.equal(await page.locator('.trend-range').count(), 6);
+  assert.equal(await page.locator('.trend-range').count(), 2);
   const legacy = page.locator('.history-price-series').filter({hasText: 'Size not recorded'});
   assert.equal(await legacy.locator('.trend-line').count(), 0);
   assert.equal(await legacy.locator('.trend-dot').count(), 2);
-  await legacy.getByText(/points are not joined/).waitFor();
+  assert.equal(await legacy.locator('.trend-range').count(), 2);
   assert.equal(await page.getByRole('img', {name: /Price trend over time/}).count(), 2);
   checks.matching_lines_separate_sizes_legacy_points_and_history_preserved = true;
   // A lone saved price is a concise summary, never an oversized empty plot.

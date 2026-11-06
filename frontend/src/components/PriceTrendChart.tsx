@@ -26,7 +26,7 @@ export function PriceTrendChart({ items }: { items: PriceUpdate[] }) {
   const groups = recordedPriceGroups(items);
   const plotted = groups.reduce((count, group) => count + group.items.length, 0);
   return <div className="history-trends">
-    {groups.map(({ items: group, comparable }) => group.length === 1
+    {groups.map(({ items: group, comparable, sizeKnown }) => group.length === 1
       ? <section key={group[0].id} className="history-price-series history-single-price" style={{ "--commodity-border": commodityBorderColor(group[0].commodity.name) } as React.CSSProperties}>
         <SeriesHeading item={group[0]} count={1} />
         <div className="single-price-details">
@@ -35,7 +35,7 @@ export function PriceTrendChart({ items }: { items: PriceUpdate[] }) {
         </div>
         <p className="trend-explanation">One price recorded; no trend available yet.</p>
       </section>
-      : <RecordedTrendChart key={group[0].id} items={group} complete={comparable} />)}
+      : <RecordedTrendChart key={group[0].id} items={group} complete={comparable} sizeKnown={sizeKnown} />)}
     {plotted < items.length && <p className="muted">Some records have an invalid price or an unconfirmed date/time and cannot be plotted. They remain in the history below.</p>}
   </div>;
 }
@@ -46,7 +46,7 @@ function niceStep(value: number): number {
   return (fraction <= 1 ? 1 : fraction <= 2 ? 2 : fraction <= 5 ? 5 : 10) * power;
 }
 
-function RecordedTrendChart({ items, complete }: { items: PriceUpdate[]; complete: boolean }) {
+function RecordedTrendChart({ items, complete, sizeKnown }: { items: PriceUpdate[]; complete: boolean; sizeKnown: boolean }) {
   const chartId = useId();
   const plotRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(640);
@@ -73,7 +73,9 @@ function RecordedTrendChart({ items, complete }: { items: PriceUpdate[]; complet
     timeZone: "Africa/Lagos", hour: "numeric", minute: "2-digit",
     ...(last.x - first.x < 60_000 ? { second: "2-digit" as const } : {}),
   });
-  const join = complete && first.x < last.x;
+  // Join prices for the same commodity, market, unit and bag size even when the
+  // type was not recorded (owner-approved); different sizes stay on separate charts.
+  const join = sizeKnown && first.x < last.x;
   const selectedIndex = Math.max(0, selectedId === null ? points.length - 1 : points.findIndex((point) => point.id === selectedId));
   const selected = points[selectedIndex];
   let rawMin = Infinity, rawMax = -Infinity;
@@ -126,7 +128,7 @@ function RecordedTrendChart({ items, complete }: { items: PriceUpdate[]; complet
       <svg viewBox={`0 0 ${width} ${HEIGHT}`} role="img" aria-labelledby={`${chartId}-title ${chartId}-description`}
         onPointerMove={selectPointer} onPointerDown={selectPointer}>
         <title id={`${chartId}-title`}>{join ? "Price trend over time" : "Recorded prices over time"}</title>
-        <desc id={`${chartId}-description`}>{items[0].commodity.name} at {items[0].market.name}. {points.length} records, from {shortPriceDate(first.date)} to {shortPriceDate(last.date)}. {join ? "Only matching recorded measurements and types are connected." : "Points are not connected and do not establish a comparable price trend."}</desc>
+        <desc id={`${chartId}-description`}>{items[0].commodity.name} at {items[0].market.name}. {points.length} records, from {shortPriceDate(first.date)} to {shortPriceDate(last.date)}. {join ? (complete ? "Only matching recorded measurements and types are connected." : "Prices with the same unit and bag size are connected; the type was not recorded.") : "Points are not connected and do not establish a comparable price trend."}</desc>
         {join && <><defs><linearGradient id={`${chartId}-area`} x1="0%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" stopColor="var(--color-link)" stopOpacity=".22" />
           <stop offset="100%" stopColor="var(--color-link)" stopOpacity=".02" />
@@ -146,7 +148,7 @@ function RecordedTrendChart({ items, complete }: { items: PriceUpdate[]; complet
         <line className="trend-cursor" x1={scaleX(selected.x)} x2={scaleX(selected.x)} y1={TOP} y2={bottom} />
         {points.map((point) => <g key={point.id}>
           <title>{shortPriceDate(point.date)}: {money(point.low)} – {money(point.high)}</title>
-          <line className="trend-range" x1={scaleX(point.x)} x2={scaleX(point.x)} y1={scaleY(point.low)} y2={scaleY(point.high)} />
+          {!join && <line className="trend-range" x1={scaleX(point.x)} x2={scaleX(point.x)} y1={scaleY(point.low)} y2={scaleY(point.high)} />}
           <circle className={`trend-dot${point.id === selected.id ? " trend-dot-selected" : ""}`} cx={scaleX(point.x)} cy={scaleY(point.y)} r={point.id === selected.id ? 5 : 3} />
         </g>)}
       </svg>
@@ -162,10 +164,9 @@ function RecordedTrendChart({ items, complete }: { items: PriceUpdate[]; complet
         <button type="button" aria-label="Next recorded price" onClick={() => selectIndex(selectedIndex + 1)} disabled={selectedIndex === points.length - 1}>→</button>
       </div>
     </div>
-    <p className="trend-explanation">{join
-      ? "The line follows the recorded average, or the range midpoint when no average is recorded. The narrow band shows the low–high price range."
-      : complete ? "These records share the same time. A trend needs prices recorded at different times."
-        : "Some measurement or type details were not recorded. Each price is shown separately; the points are not joined."}</p>
+    {join
+      ? <p className="trend-explanation">The line tracks the average price; the shaded band shows the low–high price range.</p>
+      : sizeKnown && <p className="trend-explanation">These records share the same time. A trend needs prices recorded at different times.</p>}
     <p className="trend-help" id={`${chartId}-help`}>Tap or hover over the chart, or use the arrows, to see each recorded price.</p>
   </section>;
 }
