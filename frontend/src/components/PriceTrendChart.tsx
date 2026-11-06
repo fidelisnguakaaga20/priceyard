@@ -1,6 +1,6 @@
 import { useId, useLayoutEffect, useRef, useState } from "react";
 import type { PriceUpdate } from "../types/api";
-import { money } from "../utils";
+import { commodityBorderColor, money } from "../utils";
 import { priceEpoch, shortPriceDate } from "../utils/priceTime";
 import { recordedPriceGroups } from "../utils/priceComparability";
 
@@ -27,7 +27,7 @@ export function PriceTrendChart({ items }: { items: PriceUpdate[] }) {
   const plotted = groups.reduce((count, group) => count + group.items.length, 0);
   return <div className="history-trends">
     {groups.map(({ items: group, comparable }) => group.length === 1
-      ? <section key={group[0].id} className="history-price-series history-single-price">
+      ? <section key={group[0].id} className="history-price-series history-single-price" style={{ "--commodity-border": commodityBorderColor(group[0].commodity.name) } as React.CSSProperties}>
         <SeriesHeading item={group[0]} count={1} />
         <div className="single-price-details">
           <strong>{money(group[0].price_low)} – {money(group[0].price_high)}</strong>
@@ -112,7 +112,7 @@ function RecordedTrendChart({ items, complete }: { items: PriceUpdate[]; complet
     selectIndex(nearest);
   };
 
-  return <section className="history-price-series trend-chart">
+  return <section className="history-price-series trend-chart" style={{ "--commodity-border": commodityBorderColor(items[0].commodity.name) } as React.CSSProperties}>
     <SeriesHeading item={items[0]} count={items.length} />
     <div className="trend-axis-captions"><span>Price (₦)</span><span>{sameDay ? "Time (WAT)" : "Date (WAT)"}</span></div>
     <div ref={plotRef} className="trend-plot" role="group" tabIndex={0}

@@ -266,6 +266,7 @@ html .market-day-grid .card.market-day-card { border: 3px solid var(--market-bor
 .season-note { display: block; margin-top: 6px; color: #d99a2b; font-weight: 700; }
 .history-trends { display: grid; gap: 18px; margin-bottom: 24px; min-width: 0; }
 .trend-chart, .history-single-price { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px; padding: 20px; min-width: 0; box-shadow: 0 8px 30px var(--color-card-shadow); }
+.history-trends .history-price-series { border: 3px solid var(--commodity-border, var(--color-border)); }
 .trend-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; }
 .trend-heading > div { min-width: 0; }
 .trend-heading h2 { margin: 0; font-size: 1.15rem; color: var(--color-text); overflow-wrap: anywhere; }
