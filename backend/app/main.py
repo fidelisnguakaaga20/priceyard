@@ -1,9 +1,10 @@
 import os
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 
 from app.config import get_settings
 from app.rate_limit import limiter
@@ -80,6 +81,21 @@ app.include_router(testimonials_router)
 app.include_router(watchlist_router)
 app.include_router(payment_router)
 app.include_router(share_router)
+
+
+@app.get("/diagnostics/client-address", include_in_schema=False)
+def client_address(request: Request) -> dict[str, str | None]:
+    """TEMPORARY (owner-approved audit item 4): show the caller only their own address
+    as this server sees it, to learn how Render forwards visitor addresses. Remove after."""
+    headers = request.headers
+    return {
+        "client_host": request.client.host if request.client else None,
+        "limiter_key": get_remote_address(request),
+        "x_forwarded_for": headers.get("x-forwarded-for"),
+        "cf_connecting_ip": headers.get("cf-connecting-ip"),
+        "true_client_ip": headers.get("true-client-ip"),
+        "x_real_ip": headers.get("x-real-ip"),
+    }
 
 
 @app.get("/health")
