@@ -337,3 +337,22 @@ html .market-day-grid .card.market-day-card { border: 3px solid var(--market-bor
   .stats-strip { padding: 8px 0; gap: 8px 20px; }
   .section-block { padding: 20px 0; }
 }
+
+/* FAQ: Nigeria-time updated date (public) and admin-only Edit/Delete beside each question. */
+.faq-item { position: relative; }
+.faq-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.faq-updated { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 999px; font-size: .76rem; font-weight: 700; white-space: nowrap; color: var(--color-link); background: color-mix(in srgb, var(--color-link) 12%, transparent); border: 1px solid color-mix(in srgb, var(--color-link) 35%, transparent); }
+.faq-item-admin details { padding-right: 210px; }
+.faq-admin-actions { position: absolute; top: 10px; right: 12px; display: flex; gap: 6px; }
+.faq-action { display: inline-flex; align-items: center; justify-content: center; min-height: 38px; min-width: 44px; padding: 6px 12px; border: 1px solid var(--color-border-strong); border-radius: 9px; background: var(--color-surface-subtle); color: var(--color-link); font-weight: 700; font-size: .86rem; cursor: pointer; }
+.faq-action:hover:not(:disabled) { background: var(--color-hover-surface); }
+.faq-action-delete { border-color: #9b4038; color: #c15b52; }
+.faq-action:disabled { opacity: .55; cursor: not-allowed; }
+.faq-item > .status-box { margin: 6px 0 0; }
+.faq-edit-form { background: var(--color-surface); border: 2px solid var(--color-link); border-radius: 12px; padding: 16px 18px; }
+.faq-edit-buttons { display: flex; flex-wrap: wrap; gap: 10px; }
+@media (max-width: 640px) {
+  .faq-item-admin details { padding-right: 112px; }
+  .faq-admin-actions { top: 8px; right: 8px; gap: 4px; }
+  .faq-action-label { display: none; }
+}
