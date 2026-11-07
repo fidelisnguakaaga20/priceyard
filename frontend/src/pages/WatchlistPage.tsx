@@ -9,7 +9,7 @@ import { useCommodityMarketPairs } from "../hooks/useCommodityMarketPairs";
 import { useToast } from "../context/ToastContext";
 import { apiFetch, apiFetchWithProvenance } from "../services/api";
 import type { Commodity, Market, PriceUpdate, TargetDirection, WatchlistItem } from "../types/api";
-import { money, movementIcon } from "../utils";
+import { commodityBorderColor, money, movementIcon } from "../utils";
 
 const FEEDBACK_PROMPT_KEY = "priceyard_feedback_prompted";
 
@@ -191,8 +191,8 @@ export function WatchlistPage() {
     }
   };
 
-  return <section className="page page-section">
-    <div className="page-title"><span className="eyebrow">Your saved interests</span><h1>Watchlist</h1><p>Save a product, a market, or both — we'll alert you by email (and by phone, if enabled below) whenever a new price is approved for it. Set a target price if you only want to hear about it once it actually reaches a number you care about.</p></div>
+  return <section className="page page-section watchlist-page">
+    <div className="page-title"><span className="eyebrow">Your saved interests</span><h1>Watchlist</h1><p>Save a product or market. We'll alert you by email (or phone, if enabled) when a new price is approved — or only when it reaches your target price.</p></div>
     <PushAlertPrompt />
     {showFeedbackPrompt && (
       <div className="feedback-prompt">
@@ -216,9 +216,12 @@ export function WatchlistPage() {
       <div className="watchlist-grid">{items.map((item) => {
         const match = findPriceFor(item);
         const reached = isTargetReached(item, match);
-        return <article className="card" key={item.id}>
-          <span className="eyebrow">Saved item</span>
-          <h3>{item.commodity_id ? commodityMap.get(item.commodity_id) || `Commodity #${item.commodity_id}` : "All commodities"}</h3>
+        const commodityName = item.commodity_id ? commodityMap.get(item.commodity_id) : undefined;
+        // Same per-commodity border colour as Home, See all prices and Price history; "All commodities" uses PriceYard green.
+        const borderColor = commodityName ? commodityBorderColor(commodityName) : "var(--color-link)";
+        return <article className="card watchlist-card" key={item.id} style={{ "--commodity-border": borderColor } as React.CSSProperties}>
+          <span className="eyebrow watchlist-saved-label">Saved item</span>
+          <h3>{item.commodity_id ? commodityName || `Commodity #${item.commodity_id}` : "All commodities"}</h3>
           <p className="muted">{item.market_id ? marketMap.get(item.market_id) || `Market #${item.market_id}` : "No market restriction"}</p>
           {item.target_price && (reached ? <p className="target-reached-badge">✅ Target reached!</p> : <p className="muted">🎯 Alert when {item.target_direction === "at_or_above" ? "≥" : "≤"} {money(item.target_price)}</p>)}
           {match ? (
