@@ -57,8 +57,29 @@ jobs:
           echo "::error::Backend did not report the new commit as deployed within 15 minutes."
           exit 1
 
+  frontend-build:
+    name: Website build check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install website dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build website (type check and bundle)
+        working-directory: frontend
+        run: npm run build
+
   deploy-frontend:
-    name: Deploy frontend
+    name: Deploy frontend (only if tests and build passed)
+    needs: [guard, frontend-build]
     if: github.ref == 'refs/heads/master' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:

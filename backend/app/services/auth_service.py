@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 from app.config import get_settings
 from app.models.user import User
 from app.models.subscription import Subscription
+from app.services import login_throttle
 from app.services.audit_service import create_audit_log, snapshot_model
 from app.services.subscription_service import apply_referral_reward, build_trial_subscription
 from app.schemas.auth_schema import RegisterRequest
@@ -128,9 +129,20 @@ def register_user(db: Session, payload: RegisterRequest) -> User:
 
 def authenticate_user(db: Session, *, email: str, password: str) -> User:
     normalized_email = normalize_email(email)
+    # Checked before the password, so a paused account cannot keep guessing.
+    wait = login_throttle.seconds_locked(normalized_email)
+    if wait:
+        minutes = max(1, (wait + 59) // 60)
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"Too many wrong passwords for this account. Please wait {minutes} minute{'s' if minutes != 1 else ''} and try again, or reset your password.",
+            headers={"Retry-After": str(wait)},
+        )
     user = db.scalar(select(User).where(func.lower(User.email) == normalized_email))
 
     if user is None or not verify_password(password, user.password_hash):
+        # Unknown emails count too, so the response never reveals which emails exist.
+        login_throttle.record_failure(normalized_email)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password",
@@ -143,6 +155,7 @@ def authenticate_user(db: Session, *, email: str, password: str) -> User:
             detail="User account is inactive",
         )
 
+    login_throttle.clear(normalized_email)
     return user
 
 

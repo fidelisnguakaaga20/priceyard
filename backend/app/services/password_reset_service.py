@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from app.config import get_settings
 from app.models.password_reset_token import PasswordResetToken
 from app.models.user import User
+from app.services import login_throttle
 from app.services.auth_service import normalize_email
 from app.services.email_service import send_password_reset_email
 from app.utils.password import hash_password
@@ -117,4 +118,8 @@ def reset_password(db: Session, *, token: str, new_password: str) -> str:
         .values(used_at=now)
     )
     db.commit()
+    # A fresh password ends any wrong-password pause, so "reset your password" really helps.
+    email = db.scalar(select(User.email).where(User.id == record.user_id))
+    if email:
+        login_throttle.clear(normalize_email(email))
     return "Password reset successful. You can now log in."
