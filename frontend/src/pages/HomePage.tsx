@@ -149,13 +149,7 @@ export function HomePage() {
         </section>
       )}
 
-      <section className="page section-block three-column">
-        <article className="info-tile"><span>01</span><h3>Compare prices</h3><p>See current and previous ranges without pretending every market transaction has one exact price.</p></article>
-        <article className="info-tile"><span>02</span><h3>Read our market notes</h3><p>Possible Meaning and Suggested Action stay observational and are never presented as guaranteed trading instructions.</p></article>
-        <article className="info-tile"><span>03</span><h3>Check how sure we are</h3><p>Use source confidence, market timing and freshness before making a major buying, selling or storage decision.</p></article>
-      </section>
-
-      <section className="page section-block"><Disclaimer>{PRICE_DISCLAIMER}</Disclaimer></section>
+      <section className="page section-block home-disclaimer"><Disclaimer>{PRICE_DISCLAIMER}</Disclaimer></section>
     </>
   );
 }

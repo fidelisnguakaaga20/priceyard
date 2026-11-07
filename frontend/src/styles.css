@@ -334,8 +334,13 @@ html .market-day-grid .card.market-day-card { border: 3px solid var(--market-bor
   .hero-price-preview { padding: 12px 14px; margin-bottom: 16px; }
   .hero-price-preview .price-range { font-size: 1.25rem; }
   .hero-whatsapp-link { margin-top: 12px; }
-  .stats-strip { padding: 8px 0; gap: 8px 20px; }
-  .section-block { padding: 20px 0; }
+  /* padding-block only, so the 12px phone side margin from .page is kept. */
+  .stats-strip { padding-block: 8px; gap: 8px 20px; }
+  .section-block { padding-block: 20px; }
+  .section-heading { margin-bottom: 14px; }
+  .section-heading h2 { font-size: 1.6rem; line-height: 1.15; }
+  .home-disclaimer.section-block { padding-top: 4px; }
+  .home-disclaimer .disclaimer { margin-top: 0; padding: 12px 14px; font-size: .8rem; line-height: 1.5; }
 }
 
 /* FAQ: Nigeria-time updated date (public) and admin-only Edit/Delete beside each question. */
