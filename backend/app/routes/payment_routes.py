@@ -9,7 +9,7 @@ from app.models.user import User
 from app.schemas.payment_schema import PaymentInitiateRequest, PaymentInitiateResponse, PaymentResponse
 from app.services.payment_service import handle_webhook_event, initiate_payment, verify_recorded_payment, verify_webhook_signature
 from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, release_for_stream, stream_admin_records
-from app.rate_limit import limiter
+from app.rate_limit import client_address, limiter
 from app.utils.permissions import get_current_user, require_roles
 
 router = APIRouter(prefix="/payments", tags=["payments"])
@@ -22,7 +22,7 @@ def _verification_user(request: Request, user: User = Depends(get_current_user))
 
 def _verification_key(request: Request) -> str:
     # Keep customers behind the same mobile/carrier NAT from sharing one quota.
-    return f"{request.client.host if request.client else 'unknown'}:{request.state.payment_verification_user_id}"
+    return f"{client_address(request)}:{request.state.payment_verification_user_id}"
 
 
 @router.post("/{reference}/verify", response_model=PaymentResponse)
