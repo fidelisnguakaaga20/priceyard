@@ -1,14 +1,17 @@
-fastapi>=0.116,<1.0
-uvicorn[standard]>=0.35,<1.0
-pydantic-settings>=2.10,<3.0
-SQLAlchemy>=2.0,<3.0
-alembic>=1.18,<2.0
-psycopg[binary]>=3.2,<4.0
-bcrypt>=4.2,<6.0
-PyJWT>=2.10,<3.0
-cryptography>=50.0.2,<51.0
-email-validator>=2.2,<3.0
-google-auth>=2.35,<3.0
-requests>=2.32,<3.0
-slowapi>=0.1.9,<0.2
-pywebpush>=2.5,<3.0
+# Exact versions: the same set the automatic tests installed and passed with (2026-11-07).
+# Upgrade on purpose: change a version here, push, and let the tests prove it before deploy.
+-c constraints.txt
+fastapi==0.162.2
+uvicorn[standard]==0.54.0
+pydantic-settings==2.16.2
+SQLAlchemy==2.1.8
+alembic==1.20.1
+psycopg[binary]==3.3.8
+bcrypt==5.0.0
+PyJWT==2.15.1
+cryptography==50.0.2
+email-validator==2.3.0
+google-auth==2.62.1
+requests==2.34.2
+slowapi==0.1.10
+pywebpush==2.5.0

@@ -1,4 +1,5 @@
 import os
+import platform
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -89,3 +90,9 @@ def health_check() -> dict[str, str]:
         # Render sets this automatically at build time; absent outside Render.
         "deployed_commit": os.environ.get("RENDER_GIT_COMMIT", "unknown"),
     }
+
+
+@app.get("/diagnostics/runtime", include_in_schema=False)
+def runtime_version() -> dict[str, str]:
+    """TEMPORARY (owner-approved audit item 5): learn which Python version Render runs. Remove after."""
+    return {"python": platform.python_version()}
