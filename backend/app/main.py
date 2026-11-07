@@ -11,6 +11,7 @@ from app.rate_limit import limiter
 from app.request_bounds import RequestBoundsMiddleware
 from app.services.browser_session_service import allowed_browser_origins, BrowserSessionCacheMiddleware
 from app.routes.activity_routes import router as activity_router
+from app.routes.alert_test_routes import router as alert_test_router
 from app.routes.admin_summary_routes import router as admin_summary_router
 from app.routes.audit_log_routes import router as audit_log_router
 from app.routes.auth_routes import router as auth_router
@@ -86,6 +87,7 @@ app.include_router(testimonials_router)
 app.include_router(watchlist_router)
 app.include_router(payment_router)
 app.include_router(share_router)
+app.include_router(alert_test_router)  # TEMPORARY: remove after the test alert email is confirmed
 
 
 @app.get("/health")

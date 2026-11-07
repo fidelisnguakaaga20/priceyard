@@ -58,7 +58,7 @@ jobs:
           exit 1
 
   frontend-build:
-    name: Website build check
+    name: Website build and page checks
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -77,8 +77,20 @@ jobs:
         working-directory: frontend
         run: npm run build
 
+      - name: Install website page-check tools
+        working-directory: frontend/tests/smoke
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Check every page on phone and desktop (fake data, no network)
+        working-directory: frontend
+        run: |
+          npx vite preview --host 127.0.0.1 --port 4322 --strictPort > preview.log 2>&1 &
+          SMOKE_BASE_URL=http://127.0.0.1:4322 node tests/smoke/smoke.mjs
+
   deploy-frontend:
-    name: Deploy frontend (only if tests and build passed)
+    name: Deploy frontend (only if tests, build and page checks passed)
     needs: [guard, frontend-build]
     if: github.ref == 'refs/heads/master' && github.event_name == 'push'
     runs-on: ubuntu-latest
