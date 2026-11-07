@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from datetime import datetime, timezone
 
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -7,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.user import User
-from app.security import decode_access_claims
+from app.security import decode_access_claims, login_lifetime_minutes
 from app.services.login_revocation_service import is_revoked
 from app.services.subscription_service import get_subscription_for_user, has_full_access
 from app.services.browser_session_service import browser_token, validate_browser_request
@@ -65,6 +66,13 @@ def get_current_user(
 
     if claims.get("auth_version", 0) != user.auth_version or is_revoked(db, credentials.credentials):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token", headers={"WWW-Authenticate": "Bearer"})
+
+    # Admin logins last at most 7 days, including ones issued before this rule
+    # existed or before the account was made an admin.
+    if user.role == "admin":
+        issued_at = claims.get("iat")
+        if type(issued_at) not in (int, float) or datetime.now(timezone.utc).timestamp() - issued_at > login_lifetime_minutes("admin") * 60:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token", headers={"WWW-Authenticate": "Bearer"})
 
     return user
 

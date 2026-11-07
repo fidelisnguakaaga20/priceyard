@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     # Developer API pages (/docs, /redoc, /openapi.json) stay off unless explicitly enabled,
     # e.g. API_DOCS_ENABLED=true in a local backend/.env. Never enable on the live server.
     api_docs_enabled: bool = False
+    # Error alerts (audit item 10). Empty = off. Set SENTRY_DSN on the live server only.
+    sentry_dsn: str | None = None
     database_url: str | None = None
     jwt_secret: str | None = None
     jwt_algorithm: str = "HS256"
@@ -19,6 +21,9 @@ class Settings(BaseSettings):
     # Protected existing founder account; never a public registration grant.
     owner_email: str = "fidelisnguakaaga20@gmail.com"
     access_token_expire_minutes: int = 129_600  # 90 days -- users stay logged in until they explicitly log out
+    # Admin logins are shorter (owner-approved audit item 12): a lost or stolen admin
+    # device stops working within 7 days. Also enforced for older admin logins.
+    admin_access_token_expire_minutes: int = 10_080  # 7 days
     cors_origins: str = ""
     frontend_url: str = "http://127.0.0.1:5173"
     password_reset_expire_minutes: int = 15

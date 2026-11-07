@@ -14,13 +14,20 @@ def _jwt_secret() -> str:
     return secret
 
 
-def create_access_token(*, user_id: int, auth_version: int = 0) -> str:
+def login_lifetime_minutes(role: str | None) -> int:
+    settings = get_settings()
+    if role == "admin":
+        return settings.admin_access_token_expire_minutes
+    return settings.access_token_expire_minutes
+
+
+def create_access_token(*, user_id: int, auth_version: int = 0, role: str | None = None) -> str:
     settings = get_settings()
     now = datetime.now(timezone.utc)
     payload = {
         "sub": str(user_id),
         "iat": now,
-        "exp": now + timedelta(minutes=settings.access_token_expire_minutes),
+        "exp": now + timedelta(minutes=login_lifetime_minutes(role)),
         "auth_version": auth_version,
         "jti": secrets.token_urlsafe(24),
     }

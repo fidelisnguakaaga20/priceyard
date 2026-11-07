@@ -6,6 +6,7 @@ from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
 from app.config import get_settings
+from app.error_reporting import init_error_reporting
 from app.rate_limit import limiter
 from app.request_bounds import RequestBoundsMiddleware
 from app.services.browser_session_service import allowed_browser_origins, BrowserSessionCacheMiddleware
@@ -35,6 +36,7 @@ from app.routes.user_routes import router as user_router
 from app.routes.watchlist_routes import router as watchlist_router
 
 settings = get_settings()
+init_error_reporting(settings)
 
 app = FastAPI(
     title=settings.app_name,

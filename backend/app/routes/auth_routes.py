@@ -40,14 +40,14 @@ def register(request: Request, payload: RegisterRequest, db: Session = Depends(g
 @limiter.shared_limit("5/minute", scope="password-login")
 def login(request: Request, payload: LoginRequest, db: Session = Depends(get_db)) -> TokenResponse:
     user = authenticate_user(db, email=str(payload.email), password=payload.password)
-    return TokenResponse(access_token=create_access_token(user_id=user.id, auth_version=user.auth_version))
+    return TokenResponse(access_token=create_access_token(user_id=user.id, auth_version=user.auth_version, role=user.role))
 
 
 @router.post("/google", response_model=TokenResponse)
 @limiter.shared_limit("5/minute", scope="google-login")
 def login_with_google(request: Request, payload: GoogleLoginRequest, db: Session = Depends(get_db)) -> TokenResponse:
     user = authenticate_or_create_google_user(db, payload.id_token)
-    return TokenResponse(access_token=create_access_token(user_id=user.id, auth_version=user.auth_version))
+    return TokenResponse(access_token=create_access_token(user_id=user.id, auth_version=user.auth_version, role=user.role))
 
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
@@ -84,7 +84,7 @@ def browser_login(request: Request, response: Response, payload: BrowserLoginReq
     require_browser_origin(request)
     user = authenticate_user(db, email=str(payload.email), password=payload.password)
     _replace_browser_session(db, request)
-    return set_browser_session(response, request, create_access_token(user_id=user.id, auth_version=user.auth_version), remember=payload.remember)
+    return set_browser_session(response, request, create_access_token(user_id=user.id, auth_version=user.auth_version, role=user.role), remember=payload.remember)
 
 
 @router.post('/browser/google', response_model=BrowserSessionResponse)
@@ -93,7 +93,7 @@ def browser_google(request: Request, response: Response, payload: BrowserGoogleL
     require_browser_origin(request)
     user = authenticate_or_create_google_user(db, payload.id_token)
     _replace_browser_session(db, request)
-    return set_browser_session(response, request, create_access_token(user_id=user.id, auth_version=user.auth_version), remember=payload.remember)
+    return set_browser_session(response, request, create_access_token(user_id=user.id, auth_version=user.auth_version, role=user.role), remember=payload.remember)
 
 
 @router.get('/browser/session', response_model=BrowserSessionResponse)
