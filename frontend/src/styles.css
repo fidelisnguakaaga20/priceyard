@@ -371,3 +371,6 @@ html .watchlist-grid .card.watchlist-card { border: 3px solid var(--commodity-bo
   .watchlist-grid .watchlist-card .price-range { font-size: 1.3rem; margin: 8px 0 4px; }
   .watchlist-grid .watchlist-card .mini-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 10px 0 12px; }
 }
+
+/* Prices and Price history now have two filters (Movement / Time of day removed): no empty gap on laptops. */
+@media (min-width: 901px) { .filter-bar.filter-bar-two { grid-template-columns: repeat(2, minmax(0, 1fr)) auto; } }

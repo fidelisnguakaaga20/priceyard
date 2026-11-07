@@ -40,7 +40,6 @@ export function PriceHistoryPage() {
   const availableMarkets = commodityLabel && commodityMarketPairs.has(commodityLabel)
     ? markets.filter((item) => commodityMarketPairs.get(commodityLabel)!.has(item.name))
     : markets;
-  const [timeOfDay, setTimeOfDay] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [historyOrder, setHistoryOrder] = useState<"oldest" | "newest">("oldest");
@@ -62,7 +61,7 @@ export function PriceHistoryPage() {
   const activeAccess = useRef({ token, hasFullAccess });
   activeAccess.current = { token, hasFullAccess };
 
-  const load = async (selection = { commodity, market, timeOfDay },
+  const load = async (selection = { commodity, market },
     catalogs = { commodities, markets }, revealResults = false) => {
     const sequence = ++requestSequence.current;
     if (!token || !hasFullAccess) {
@@ -77,7 +76,6 @@ export function PriceHistoryPage() {
     const query = new URLSearchParams();
     addIdentityFilter(query, "commodity", selectedIdentity(selection.commodity, commodities));
     addIdentityFilter(query, "market", selectedIdentity(selection.market, markets));
-    if (selection.timeOfDay) query.set("time_of_day", selection.timeOfDay);
 
     try {
       const data = await apiFetch<PriceUpdate[]>(`/price-updates/history?${query}`, {}, token);
@@ -103,8 +101,7 @@ export function PriceHistoryPage() {
       restoreRemembered.current = requested.remembered;
       const requestedCommodity = requested.commodity;
       const requestedMarket = requested.market;
-      const requestedTime = queryChanged ? "" : timeOfDay;
-      setCommodity(requestedCommodity); setMarket(requestedMarket); setTimeOfDay(requestedTime);
+      setCommodity(requestedCommodity); setMarket(requestedMarket);
       setLoading(true);
       void Promise.all([
         apiFetch<Commodity[]>("/commodities"),
@@ -120,7 +117,7 @@ export function PriceHistoryPage() {
         const chosenMarket = selectedIdentity(restored.market, marketItems);
         restoreRemembered.current = false;
         setCommodity(chosenCommodity); setMarket(chosenMarket);
-        void load({ commodity: chosenCommodity, market: chosenMarket, timeOfDay: requestedTime },
+        void load({ commodity: chosenCommodity, market: chosenMarket },
           { commodities: commodityItems, markets: marketItems });
       }).catch((err: Error) => { if (current) { setError(err.message); setLoading(false); } });
     } else if (!authLoading) {
@@ -149,7 +146,7 @@ export function PriceHistoryPage() {
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
-    void load({ commodity, market, timeOfDay }, { commodities, markets }, true);
+    void load({ commodity, market }, { commodities, markets }, true);
   };
 
   const changeCommodity = (value: string) => {
@@ -171,10 +168,9 @@ export function PriceHistoryPage() {
     </div>
 
     {authLoading ? <LoadingSpinner label="Checking price-history access…" /> : !hasFullAccess ? <PremiumGate><></></PremiumGate> : <>
-      <form ref={filtersRef} className="filter-bar history-filters" onSubmit={submit}>
+      <form ref={filtersRef} className="filter-bar filter-bar-two history-filters" onSubmit={submit}>
         <label>Commodity<select value={selectedIdentity(commodity, commodities)} onChange={(e) => changeCommodity(e.target.value)}><option value="">Choose a commodity</option>{commodities.map((item) => <option value={identityValue(item.id)} key={item.id}>{item.name}</option>)}</select></label>
         <label>Market<select value={selectedIdentity(market, markets)} onChange={(e) => setMarket(e.target.value)}><option value="">Choose a market</option>{availableMarkets.map((item) => <option value={identityValue(item.id)} key={item.id}>{item.name}</option>)}</select>{commodity && availableMarkets.length < markets.length && <small className="muted">{commodityLabel} is only tracked at {availableMarkets.length} market{availableMarkets.length === 1 ? "" : "s"} here.</small>}</label>
-        <label>Time of day<select value={timeOfDay} onChange={(e) => setTimeOfDay(e.target.value)}><option value="">Any time</option><option>morning</option><option>afternoon</option><option>evening</option><option>closing</option></select></label>
         <div className="filter-actions"><button className="button button-small" disabled={loading}>{loading ? <ButtonSpinner label="Please wait…" /> : "Search history"}</button></div>
       </form>
       <BackToFilters filtersRef={filtersRef} enabled={hasFullAccess && !authLoading} />

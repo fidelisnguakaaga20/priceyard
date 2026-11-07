@@ -13,7 +13,7 @@ import { addIdentityFilter, identityLabel, identityValue, selectedIdentity, sele
 import type { Commodity, Market, PriceUpdate } from "../types/api";
 
 const AUTO_REFRESH_MS = 60_000;
-type PriceFilters = { commodity?: string; market?: string; movement?: string };
+type PriceFilters = { commodity?: string; market?: string };
 
 export function PricesPage() {
   const { dataSaver } = usePreferences();
@@ -39,7 +39,6 @@ export function PricesPage() {
   // The empty result should be clear, without silently changing the filter.
   const availableMarkets = selectedMarket && !trackedMarkets.some((item) => item.id === selectedMarket.id)
     ? [...trackedMarkets, selectedMarket] : trackedMarkets;
-  const [movement, setMovement] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [filtersLoading, setFiltersLoading] = useState(true);
@@ -58,7 +57,6 @@ export function PricesPage() {
     const query = new URLSearchParams();
     addIdentityFilter(query, "commodity", params?.commodity);
     addIdentityFilter(query, "market", params?.market);
-    if (params?.movement) query.set("movement", params.movement);
     try {
       const { data, savedAt } = await apiFetchWithProvenance<PriceUpdate[]>(`/price-updates${query.size ? `?${query}` : ""}`);
       if (sequence !== requestSequence.current) return;
@@ -78,7 +76,7 @@ export function PricesPage() {
   useEffect(() => {
     const commodity = selectionFromQuery(searchParams, "commodity");
     const market = selectionFromQuery(searchParams, "market");
-    setCommodity(commodity); setMarket(market); setMovement("");
+    setCommodity(commodity); setMarket(market);
     void load({ commodity, market });
     return () => { requestSequence.current++; foregroundPending.current = false; };
   }, [searchParams]);
@@ -130,8 +128,8 @@ export function PricesPage() {
     };
   }, [location.hash, location.key, loading, filtersLoading]);
 
-  const submit = (event: FormEvent) => { event.preventDefault(); void load({ commodity: selectedIdentity(commodity, commodities), market: selectedIdentity(market, markets), movement }); };
-  const clear = () => { setCommodity(""); setMarket(""); setMovement(""); void load(); };
+  const submit = (event: FormEvent) => { event.preventDefault(); void load({ commodity: selectedIdentity(commodity, commodities), market: selectedIdentity(market, markets) }); };
+  const clear = () => { setCommodity(""); setMarket(""); void load(); };
   const changeCommodity = (value: string) => {
     setCommodity(value);
     const label = identityLabel(value, commodities);
@@ -139,11 +137,10 @@ export function PricesPage() {
   };
 
   return <section className="page page-section">
-    <div className="page-title"><span className="eyebrow">Latest approved records</span><h1>Search commodity prices</h1><p>Search current commodity price ranges by commodity, market and movement.</p></div>
-    <form id="price-search" ref={searchFormRef} className="filter-bar" role="search" aria-label="Search current prices" onSubmit={submit}>
+    <div className="page-title"><span className="eyebrow">Latest approved records</span><h1>Search commodity prices</h1><p>Search current commodity price ranges by commodity and market.</p></div>
+    <form id="price-search" ref={searchFormRef} className="filter-bar filter-bar-two" role="search" aria-label="Search current prices" onSubmit={submit}>
       <label>Commodity<select value={selectedIdentity(commodity, commodities)} onChange={(e) => changeCommodity(e.target.value)}><option value="">Choose a commodity</option>{commodities.map((item) => <option value={identityValue(item.id)} key={item.id}>{item.name}</option>)}</select></label>
       <label>Market<select value={selectedIdentity(market, markets)} onChange={(e) => setMarket(e.target.value)}><option value="">Choose a market</option>{availableMarkets.map((item) => <option value={identityValue(item.id)} key={item.id}>{item.name}</option>)}</select>{commodity && trackedMarkets.length < markets.length && <small className="muted">{commodityLabel} is only tracked at {trackedMarkets.length} market{trackedMarkets.length === 1 ? "" : "s"} here.</small>}</label>
-      <label>Movement<select value={movement} onChange={(e) => setMovement(e.target.value)}><option value="">Any movement</option><option value="up">Up</option><option value="down">Down</option><option value="stable">Stable</option><option value="unknown">Unknown</option></select></label>
       <div className="filter-actions"><button className="button button-small" type="submit" disabled={loading}>{loading ? <ButtonSpinner label="Please wait…" /> : "Search prices"}</button><button className="button button-ghost button-small" type="button" onClick={clear} disabled={loading}>Clear</button></div>
     </form>
     {error && <div className="status-box error">{error}</div>}
