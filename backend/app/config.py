@@ -9,6 +9,9 @@ class Settings(BaseSettings):
     app_name: str = "PriceYard API"
     app_env: str = "development"
     debug: bool = False
+    # Developer API pages (/docs, /redoc, /openapi.json) stay off unless explicitly enabled,
+    # e.g. API_DOCS_ENABLED=true in a local backend/.env. Never enable on the live server.
+    api_docs_enabled: bool = False
     database_url: str | None = None
     jwt_secret: str | None = None
     jwt_algorithm: str = "HS256"

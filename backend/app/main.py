@@ -39,6 +39,10 @@ settings = get_settings()
 app = FastAPI(
     title=settings.app_name,
     debug=settings.debug,
+    # Hide the developer API map on the live server (owner-approved audit item 6).
+    docs_url="/docs" if settings.api_docs_enabled else None,
+    redoc_url="/redoc" if settings.api_docs_enabled else None,
+    openapi_url="/openapi.json" if settings.api_docs_enabled else None,
 )
 
 app.state.limiter = limiter
