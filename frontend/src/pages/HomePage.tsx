@@ -12,7 +12,15 @@ import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { usePreferences } from "../context/PreferencesContext";
 import { apiFetch, apiFetchWithProvenance } from "../services/api";
 import type { Commodity, Market, PriceUpdate, Testimonial } from "../types/api";
-import { comingSoonShareContent, comingSoonShareUrl, dateOnly, money, priceShareContent, whatsAppShareUrl, WHATSAPP_COMMUNITY_URL } from "../utils";
+import {
+  comingSoonShareContent,
+  comingSoonShareUrl,
+  dateOnly,
+  money,
+  priceShareContent,
+  whatsAppShareUrl,
+  WHATSAPP_COMMUNITY_URL,
+} from "../utils";
 
 const AUTO_REFRESH_MS = 60_000;
 
@@ -37,9 +45,19 @@ export function HomePage() {
   const loadPrices = (silent = false) => {
     const sequence = ++priceRequest.current;
     apiFetchWithProvenance<PriceUpdate[]>("/price-updates")
-      .then(({ data: items, savedAt }) => { if (sequence !== priceRequest.current) return; setPrices(items); setSavedAt(savedAt); setRecordCount(items.length); setError(""); })
-      .catch((err: Error) => { if (sequence === priceRequest.current && !silent) setError(err.message); })
-      .finally(() => { if (sequence === priceRequest.current && !silent) setLoading(false); });
+      .then(({ data: items, savedAt }) => {
+        if (sequence !== priceRequest.current) return;
+        setPrices(items);
+        setSavedAt(savedAt);
+        setRecordCount(items.length);
+        setError("");
+      })
+      .catch((err: Error) => {
+        if (sequence === priceRequest.current && !silent) setError(err.message);
+      })
+      .finally(() => {
+        if (sequence === priceRequest.current && !silent) setLoading(false);
+      });
   };
 
   useEffect(() => {
@@ -53,16 +71,32 @@ export function HomePage() {
         setSearchCommodities(tracked);
         setCommodityCount(tracked.length);
       })
-      .catch(() => { if (current) setSearchCatalogError(true); })
-      .finally(() => { if (current) setSearchCatalogsPending((pending) => pending - 1); });
+      .catch(() => {
+        if (current) setSearchCatalogError(true);
+      })
+      .finally(() => {
+        if (current) setSearchCatalogsPending((pending) => pending - 1);
+      });
     apiFetch<Market[]>("/markets")
-      .then((items) => { if (current) { setSearchMarkets(items); setMarketCount(items.length); } })
-      .catch(() => { if (current) setSearchCatalogError(true); })
-      .finally(() => { if (current) setSearchCatalogsPending((pending) => pending - 1); });
+      .then((items) => {
+        if (current) {
+          setSearchMarkets(items);
+          setMarketCount(items.length);
+        }
+      })
+      .catch(() => {
+        if (current) setSearchCatalogError(true);
+      })
+      .finally(() => {
+        if (current) setSearchCatalogsPending((pending) => pending - 1);
+      });
     apiFetch<Testimonial[]>("/testimonials")
       .then(setTestimonials)
       .catch(() => undefined);
-    return () => { current = false; priceRequest.current++; };
+    return () => {
+      current = false;
+      priceRequest.current++;
+    };
   }, []);
 
   // Silently keep the homepage's prices current while it's open (ticker + "Today's
@@ -80,38 +114,73 @@ export function HomePage() {
         <div className="hero-copy">
           <span className="eyebrow">Market price information</span>
           <h1>Know the market before you buy or sell.</h1>
-          <p>See today's and past prices, price changes, and real market updates for Egusi, Honey Beans and Palm oil.</p>
-          <HomePriceSearch commodities={searchCommodities} markets={searchMarkets} prices={prices}
-            loading={searchCatalogsPending > 0 || loading} error={searchCatalogError || !!error} />
+          <p>
+            See today's and past prices, price changes, and real market updates for Egusi, Honey Beans and Palm oil.
+          </p>
+          <HomePriceSearch
+            commodities={searchCommodities}
+            markets={searchMarkets}
+            prices={prices}
+            loading={searchCatalogsPending > 0 || loading}
+            error={searchCatalogError || !!error}
+          />
           {!loading && prices[0] && (
             <div className="hero-price-preview">
               {!savedAt && <span className="eyebrow">Live now</span>}
               <SavedPriceNotice savedAt={savedAt} />
-              <p className="price-range">{prices[0].commodity.name}: {money(prices[0].price_low)} – {money(prices[0].price_high)}</p>
-              <span className="muted">{prices[0].market.name} · updated {relativePriceTime(prices[0].update_date_time)}</span>
-              <a className="text-link" href={whatsAppShareUrl(prices[0])} target="_blank" rel="noopener noreferrer">Share on WhatsApp →</a>
+              <p className="price-range">
+                {prices[0].commodity.name}: {money(prices[0].price_low)} – {money(prices[0].price_high)}
+              </p>
+              <span className="muted">
+                {prices[0].market.name} · updated {relativePriceTime(prices[0].update_date_time)}
+              </span>
+              <a className="text-link" href={whatsAppShareUrl(prices[0])} target="_blank" rel="noopener noreferrer">
+                Share on WhatsApp →
+              </a>
               <NativeShareButton content={priceShareContent(prices[0])} />
             </div>
           )}
           <div className="button-row">
-            <Link className="button" to="/prices">Check prices</Link>
-            <Link className="button button-secondary" to="/market-days">See market days</Link>
+            <Link className="button" to="/prices">
+              Check prices
+            </Link>
+            <Link className="button button-secondary" to="/market-days">
+              See market days
+            </Link>
           </div>
-          <a className="text-link hero-whatsapp-link" href={WHATSAPP_COMMUNITY_URL} target="_blank" rel="noopener noreferrer">Join our free WhatsApp updates →</a>
+          <a
+            className="text-link hero-whatsapp-link"
+            href={WHATSAPP_COMMUNITY_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Join our free WhatsApp updates →
+          </a>
         </div>
       </section>
 
       {commodityCount !== null && marketCount !== null && recordCount !== null && (
         <div className="page stats-strip">
-          <span><strong>{commodityCount}</strong> product{commodityCount === 1 ? "" : "s"} tracked</span>
-          <span><strong>{marketCount}</strong> market{marketCount === 1 ? "" : "s"} covered</span>
-          <span><strong>{recordCount}</strong> confirmed price{recordCount === 1 ? "" : "s"}</span>
+          <span>
+            <strong>{commodityCount}</strong> product{commodityCount === 1 ? "" : "s"} tracked
+          </span>
+          <span>
+            <strong>{marketCount}</strong> market{marketCount === 1 ? "" : "s"} covered
+          </span>
+          <span>
+            <strong>{recordCount}</strong> confirmed price{recordCount === 1 ? "" : "s"}
+          </span>
         </div>
       )}
 
       {upcoming.length > 0 && (
         <section className="page section-block">
-          <div className="section-heading"><div><span className="eyebrow">Coming soon</span><h2>New products coming soon</h2></div></div>
+          <div className="section-heading">
+            <div>
+              <span className="eyebrow">Coming soon</span>
+              <h2>New products coming soon</h2>
+            </div>
+          </div>
           <div className="card-grid">
             {upcoming.map((item) => (
               <article className="card" key={item.id}>
@@ -119,8 +188,14 @@ export function HomePage() {
                 <span className="eyebrow">Coming soon</span>
                 <h3>{item.name}</h3>
                 {item.description && <p className="muted">{item.description}</p>}
-                {item.expected_available_date && <p className="muted"><strong>Expected:</strong> {dateOnly(item.expected_available_date)}</p>}
-                <a className="text-link" href={comingSoonShareUrl(item)} target="_blank" rel="noopener noreferrer">Tell a friend on WhatsApp →</a>
+                {item.expected_available_date && (
+                  <p className="muted">
+                    <strong>Expected:</strong> {dateOnly(item.expected_available_date)}
+                  </p>
+                )}
+                <a className="text-link" href={comingSoonShareUrl(item)} target="_blank" rel="noopener noreferrer">
+                  Tell a friend on WhatsApp →
+                </a>
                 <NativeShareButton content={comingSoonShareContent(item)} />
               </article>
             ))}
@@ -129,18 +204,42 @@ export function HomePage() {
       )}
 
       <section className="page section-block">
-        <div className="section-heading"><div><span className="eyebrow">Latest market information</span><h2>Today's prices</h2></div><Link className="text-link" to="/prices">See all prices →</Link></div>
+        <div className="section-heading">
+          <div>
+            <span className="eyebrow">Latest market information</span>
+            <h2>Today's prices</h2>
+          </div>
+          <Link className="text-link" to="/prices">
+            See all prices →
+          </Link>
+        </div>
         {!loading && prices.length > 0 && <SavedPriceNotice savedAt={savedAt} />}
-        {loading ? <LoadingSpinner label="Loading approved prices…" /> : error ? <div className="status-box error">Could not load prices: {error}</div> : prices.length ? <GroupedPriceCards items={prices} /> : <div className="status-box">No approved current price updates are available yet. Check back soon.</div>}
+        {loading ? (
+          <LoadingSpinner label="Loading approved prices…" />
+        ) : error ? (
+          <div className="status-box error">Could not load prices: {error}</div>
+        ) : prices.length ? (
+          <GroupedPriceCards items={prices} />
+        ) : (
+          <div className="status-box">No approved current price updates are available yet. Check back soon.</div>
+        )}
       </section>
 
       {testimonials.length > 0 && (
         <section className="page section-block">
-          <div className="section-heading"><div><span className="eyebrow">From real users</span><h2>What traders are saying</h2></div></div>
+          <div className="section-heading">
+            <div>
+              <span className="eyebrow">From real users</span>
+              <h2>What traders are saying</h2>
+            </div>
+          </div>
           <div className="card-grid">
             {testimonials.map((item) => (
               <article className="card testimonial-card" key={item.id}>
-                <span className="testimonial-stars" aria-label={`${item.rating} out of 5 stars`}>{"★".repeat(item.rating)}{"☆".repeat(5 - item.rating)}</span>
+                <span className="testimonial-stars" aria-label={`${item.rating} out of 5 stars`}>
+                  {"★".repeat(item.rating)}
+                  {"☆".repeat(5 - item.rating)}
+                </span>
                 <p>&ldquo;{item.quote}&rdquo;</p>
                 <strong>— {item.display_name}</strong>
               </article>
@@ -149,7 +248,9 @@ export function HomePage() {
         </section>
       )}
 
-      <section className="page section-block home-disclaimer"><Disclaimer>{PRICE_DISCLAIMER}</Disclaimer></section>
+      <section className="page section-block home-disclaimer">
+        <Disclaimer>{PRICE_DISCLAIMER}</Disclaimer>
+      </section>
     </>
   );
 }

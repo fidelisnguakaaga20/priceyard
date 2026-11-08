@@ -42,7 +42,8 @@ export function WatchlistPage() {
     pendingRead.current?.abort();
     const controller = new AbortController();
     pendingRead.current = controller;
-    const current = () => !controller.signal.aborted && version === readVersion.current && activeToken.current === token;
+    const current = () =>
+      !controller.signal.aborted && version === readVersion.current && activeToken.current === token;
     if (showLoader) setLoading(true);
     try {
       const [watchlistItems, commodityItems, marketItems, priceItems] = await Promise.all([
@@ -96,13 +97,19 @@ export function WatchlistPage() {
     if (items.length < 2) return;
     try {
       if (localStorage.getItem(FEEDBACK_PROMPT_KEY) === "1") return;
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     setShowFeedbackPrompt(true);
   }, [items.length]);
 
   const dismissFeedbackPrompt = () => {
     setShowFeedbackPrompt(false);
-    try { localStorage.setItem(FEEDBACK_PROMPT_KEY, "1"); } catch { /* ignore */ }
+    try {
+      localStorage.setItem(FEEDBACK_PROMPT_KEY, "1");
+    } catch {
+      /* ignore */
+    }
   };
 
   const commodityMap = useMemo(() => new Map(commodities.map((x) => [x.id, x.name])), [commodities]);
@@ -126,15 +133,21 @@ export function WatchlistPage() {
 
   const selectedCommodityName = commodityId ? commodityMap.get(Number(commodityId)) : undefined;
   const activeMarkets = markets.filter((x) => x.is_active);
-  const availableMarkets = selectedCommodityName && commodityMarketPairs.has(selectedCommodityName)
-    ? activeMarkets.filter((x) => commodityMarketPairs.get(selectedCommodityName)!.has(x.name))
-    : activeMarkets;
+  const availableMarkets =
+    selectedCommodityName && commodityMarketPairs.has(selectedCommodityName)
+      ? activeMarkets.filter((x) => commodityMarketPairs.get(selectedCommodityName)!.has(x.name))
+      : activeMarkets;
 
   const changeCommodity = (value: string) => {
     setCommodityId(value);
     const name = value ? commodityMap.get(Number(value)) : undefined;
     const currentMarketName = marketId ? marketMap.get(Number(marketId)) : undefined;
-    if (currentMarketName && name && commodityMarketPairs.has(name) && !commodityMarketPairs.get(name)!.has(currentMarketName)) {
+    if (
+      currentMarketName &&
+      name &&
+      commodityMarketPairs.has(name) &&
+      !commodityMarketPairs.get(name)!.has(currentMarketName)
+    ) {
       setMarketId("");
     }
   };
@@ -147,15 +160,19 @@ export function WatchlistPage() {
     }
     setSaving(true);
     try {
-      await apiFetch("/watchlist", {
-        method: "POST",
-        body: JSON.stringify({
-          commodity_id: commodityId ? Number(commodityId) : null,
-          market_id: marketId ? Number(marketId) : null,
-          target_price: targetPrice ? Number(targetPrice) : null,
-          target_direction: targetPrice ? targetDirection : null,
-        }),
-      }, token);
+      await apiFetch(
+        "/watchlist",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            commodity_id: commodityId ? Number(commodityId) : null,
+            market_id: marketId ? Number(marketId) : null,
+            target_price: targetPrice ? Number(targetPrice) : null,
+            target_direction: targetPrice ? targetDirection : null,
+          }),
+        },
+        token,
+      );
       if (activeToken.current !== token) return;
       setCommodityId("");
       setMarketId("");
@@ -191,55 +208,162 @@ export function WatchlistPage() {
     }
   };
 
-  return <section className="page page-section watchlist-page">
-    <div className="page-title"><span className="eyebrow">Your saved interests</span><h1>Watchlist</h1><p>Save a product or market. We'll alert you by email (or phone, if enabled) when a new price is approved — or only when it reaches your target price.</p></div>
-    <PushAlertPrompt />
-    {showFeedbackPrompt && (
-      <div className="feedback-prompt">
-        <span>Enjoying PriceYard so far? We'd love to hear from you.</span>
-        <div className="feedback-prompt-actions">
-          <Link className="button button-small" to="/feedback" onClick={dismissFeedbackPrompt}>Leave feedback</Link>
-          <button type="button" className="text-link text-link-button" onClick={dismissFeedbackPrompt}>Not now</button>
-        </div>
+  return (
+    <section className="page page-section watchlist-page">
+      <div className="page-title">
+        <span className="eyebrow">Your saved interests</span>
+        <h1>Watchlist</h1>
+        <p>
+          Save a product or market. We'll alert you by email (or phone, if enabled) when a new price is approved — or
+          only when it reaches your target price.
+        </p>
       </div>
-    )}
-    <form className="filter-bar" onSubmit={submit}>
-      <label>Commodity<select value={commodityId} onChange={(e) => changeCommodity(e.target.value)}><option value="">Choose a commodity</option>{commodities.filter((x) => x.is_active).map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</select></label>
-      <label>Market<select value={marketId} onChange={(e) => setMarketId(e.target.value)}><option value="">Choose a market</option>{availableMarkets.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</select>{selectedCommodityName && availableMarkets.length < activeMarkets.length && <small className="muted">{selectedCommodityName} is only tracked at {availableMarkets.length} market{availableMarkets.length === 1 ? "" : "s"} here.</small>}</label>
-      <label>Only alert me at a price (optional)<input type="number" min="0" step="1" placeholder="e.g. 200000" value={targetPrice} onChange={(e) => setTargetPrice(e.target.value)} /></label>
-      {targetPrice && <label>Direction<select value={targetDirection} onChange={(e) => setTargetDirection(e.target.value as TargetDirection)}><option value="at_or_below">Drops to or below this</option><option value="at_or_above">Rises to or above this</option></select></label>}
-      <div className="filter-actions"><button className="button button-small" disabled={saving || loading}>{saving ? <ButtonSpinner label="Please wait…" /> : "Save item"}</button></div>
-    </form>
-    {error && <div className="status-box error">{error}</div>}
-    {!loading && items.some(item => findPriceFor(item)) && <SavedPriceNotice savedAt={savedAt} />}
-    {loading ? <LoadingSpinner label="Loading your watchlist…" /> : <>
-      <div className="watchlist-grid">{items.map((item) => {
-        const match = findPriceFor(item);
-        const reached = isTargetReached(item, match);
-        const commodityName = item.commodity_id ? commodityMap.get(item.commodity_id) : undefined;
-        // Same per-commodity border colour as Home, See all prices and Price history; "All commodities" uses PriceYard green.
-        const borderColor = commodityName ? commodityBorderColor(commodityName) : "var(--color-link)";
-        return <article className="card watchlist-card" key={item.id} style={{ "--commodity-border": borderColor } as React.CSSProperties}>
-          <span className="eyebrow watchlist-saved-label">Saved item</span>
-          <h3>{item.commodity_id ? commodityName || `Commodity #${item.commodity_id}` : "All commodities"}</h3>
-          <p className="muted">{item.market_id ? marketMap.get(item.market_id) || `Market #${item.market_id}` : "No market restriction"}</p>
-          {item.target_price && (reached ? <p className="target-reached-badge">✅ Target reached!</p> : <p className="muted">🎯 Alert when {item.target_direction === "at_or_above" ? "≥" : "≤"} {money(item.target_price)}</p>)}
-          {match ? (
-            <>
-              <p className="price-range">{money(match.price_low)} – {money(match.price_high)}</p>
-              <div className="mini-grid">
-                <span><strong>Movement</strong><span className={`movement movement-${match.movement}`}>{movementIcon(match.movement)} {match.movement}</span></span>
-                <span><strong>Updated</strong><span className={priceAgingClass(match.update_date_time)}>{relativePriceTime(match.update_date_time)}</span></span>
-              </div>
-            </>
-          ) : (
-            <p className="muted">No current price yet.</p>
+      <PushAlertPrompt />
+      {showFeedbackPrompt && (
+        <div className="feedback-prompt">
+          <span>Enjoying PriceYard so far? We'd love to hear from you.</span>
+          <div className="feedback-prompt-actions">
+            <Link className="button button-small" to="/feedback" onClick={dismissFeedbackPrompt}>
+              Leave feedback
+            </Link>
+            <button type="button" className="text-link text-link-button" onClick={dismissFeedbackPrompt}>
+              Not now
+            </button>
+          </div>
+        </div>
+      )}
+      <form className="filter-bar" onSubmit={submit}>
+        <label>
+          Commodity
+          <select value={commodityId} onChange={(e) => changeCommodity(e.target.value)}>
+            <option value="">Choose a commodity</option>
+            {commodities
+              .filter((x) => x.is_active)
+              .map((x) => (
+                <option key={x.id} value={x.id}>
+                  {x.name}
+                </option>
+              ))}
+          </select>
+        </label>
+        <label>
+          Market
+          <select value={marketId} onChange={(e) => setMarketId(e.target.value)}>
+            <option value="">Choose a market</option>
+            {availableMarkets.map((x) => (
+              <option key={x.id} value={x.id}>
+                {x.name}
+              </option>
+            ))}
+          </select>
+          {selectedCommodityName && availableMarkets.length < activeMarkets.length && (
+            <small className="muted">
+              {selectedCommodityName} is only tracked at {availableMarkets.length} market
+              {availableMarkets.length === 1 ? "" : "s"} here.
+            </small>
           )}
-          <button className="button button-danger button-small" disabled={removingId !== null} onClick={() => void remove(item.id)}>{removingId === item.id ? <ButtonSpinner label="Please wait…" /> : "Remove"}</button>
-        </article>;
-      })}</div>
-      {!items.length && !error && <div className="status-box">Your watchlist is empty. Save a commodity or market above to keep an eye on it here.</div>}
-    </>}
-  </section>;
+        </label>
+        <label>
+          Only alert me at a price (optional)
+          <input
+            type="number"
+            min="0"
+            step="1"
+            placeholder="e.g. 200000"
+            value={targetPrice}
+            onChange={(e) => setTargetPrice(e.target.value)}
+          />
+        </label>
+        {targetPrice && (
+          <label>
+            Direction
+            <select value={targetDirection} onChange={(e) => setTargetDirection(e.target.value as TargetDirection)}>
+              <option value="at_or_below">Drops to or below this</option>
+              <option value="at_or_above">Rises to or above this</option>
+            </select>
+          </label>
+        )}
+        <div className="filter-actions">
+          <button className="button button-small" disabled={saving || loading}>
+            {saving ? <ButtonSpinner label="Please wait…" /> : "Save item"}
+          </button>
+        </div>
+      </form>
+      {error && <div className="status-box error">{error}</div>}
+      {!loading && items.some((item) => findPriceFor(item)) && <SavedPriceNotice savedAt={savedAt} />}
+      {loading ? (
+        <LoadingSpinner label="Loading your watchlist…" />
+      ) : (
+        <>
+          <div className="watchlist-grid">
+            {items.map((item) => {
+              const match = findPriceFor(item);
+              const reached = isTargetReached(item, match);
+              const commodityName = item.commodity_id ? commodityMap.get(item.commodity_id) : undefined;
+              // Same per-commodity border colour as Home, See all prices and Price history; "All commodities" uses PriceYard green.
+              const borderColor = commodityName ? commodityBorderColor(commodityName) : "var(--color-link)";
+              return (
+                <article
+                  className="card watchlist-card"
+                  key={item.id}
+                  style={{ "--commodity-border": borderColor } as React.CSSProperties}
+                >
+                  <span className="eyebrow watchlist-saved-label">Saved item</span>
+                  <h3>{item.commodity_id ? commodityName || `Commodity #${item.commodity_id}` : "All commodities"}</h3>
+                  <p className="muted">
+                    {item.market_id
+                      ? marketMap.get(item.market_id) || `Market #${item.market_id}`
+                      : "No market restriction"}
+                  </p>
+                  {item.target_price &&
+                    (reached ? (
+                      <p className="target-reached-badge">✅ Target reached!</p>
+                    ) : (
+                      <p className="muted">
+                        🎯 Alert when {item.target_direction === "at_or_above" ? "≥" : "≤"} {money(item.target_price)}
+                      </p>
+                    ))}
+                  {match ? (
+                    <>
+                      <p className="price-range">
+                        {money(match.price_low)} – {money(match.price_high)}
+                      </p>
+                      <div className="mini-grid">
+                        <span>
+                          <strong>Movement</strong>
+                          <span className={`movement movement-${match.movement}`}>
+                            {movementIcon(match.movement)} {match.movement}
+                          </span>
+                        </span>
+                        <span>
+                          <strong>Updated</strong>
+                          <span className={priceAgingClass(match.update_date_time)}>
+                            {relativePriceTime(match.update_date_time)}
+                          </span>
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    <p className="muted">No current price yet.</p>
+                  )}
+                  <button
+                    className="button button-danger button-small"
+                    disabled={removingId !== null}
+                    onClick={() => void remove(item.id)}
+                  >
+                    {removingId === item.id ? <ButtonSpinner label="Please wait…" /> : "Remove"}
+                  </button>
+                </article>
+              );
+            })}
+          </div>
+          {!items.length && !error && (
+            <div className="status-box">
+              Your watchlist is empty. Save a commodity or market above to keep an eye on it here.
+            </div>
+          )}
+        </>
+      )}
+    </section>
+  );
 }
-
