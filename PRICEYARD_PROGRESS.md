@@ -1128,7 +1128,7 @@ alone evidence of an outage or a separate proven launch defect. Existing hosted
 candidate/compatible rollback/migration cutover and operational acceptance remain
 unverified; do not declare PY-35 complete or deploy. Record35/36 and preserve all
 provider/backup/migration/Google passes. Current production settings preserved.
-Evidence:tools/local-test/evidence/batch-133-render-configuration.json. Stop at
+Evidence:archive/local-test/evidence/batch-133-render-configuration.json. Stop at
 confirmed incompatibility before any production modification; resolve transport
 in the reviewed release proposal, with separate production approval.
 
@@ -1157,7 +1157,7 @@ claimed if a compatible same-origin route already exists. No custom domain neede
 Next read-only owner action: Render priceyard frontend's VITE_API_URL public URL
 and existing /api Redirects/Rewrites rule or absent; no keys or settings changes.
 Render MCP tools absent in this session; do not repeat plugin/billing/Google tests.
-Evidence:tools/local-test/evidence/batch-132-render-contract.json.35/36 remains;
+Evidence:archive/local-test/evidence/batch-132-render-contract.json.35/36 remains;
 production start/routing/health/configuration and existing rollback/operations
 gates still block deployment approval. All previous passed work preserved.
 
@@ -1187,7 +1187,7 @@ Google local end-to-end, public HTTPS sessions, actual received reset email and
 genuine Paystack TEST payment/webhook/replay now pass. Actual Render candidate
 artifact/proxy/monitoring/scheduler and release/rollback/cutover approval remain
 open existing PY-35 gates;35/36 complete, no push/merge/deploy/production migration.
-Evidence:tools/local-test/evidence/batch-131-local-google.json. Do not repeat these
+Evidence:archive/local-test/evidence/batch-131-local-google.json. Do not repeat these
 passed checks. Remaining work is final release configuration/operational approval.
 
 Current130 (2026-10-20 WAT): owner confirms CLEARED after removing expired Paystack
@@ -1317,7 +1317,7 @@ setup again or paste keys. Only current owner input requested: Paystack TEST
 webhook URL (or blank), read-only, to avoid sending TEST events to production.
 Next public window must continue only remaining checks, preserve prior result,
 reinitialize checkout only if its expired tunnel callback makes that necessary.
-Evidence:tools/local-test/evidence/batch-128-provider-tunnel.json; local runtime
+Evidence:archive/local-test/evidence/batch-128-provider-tunnel.json; local runtime
 result/initial-timeout/rollback-result retained. See docs/PY35_HOSTED_CHECKS.md.
 
 Latest127 CONFIGURATION LOCATED (2026-10-20 WAT): owner explicitly requests secure
@@ -1421,7 +1421,7 @@ temporarily disabled before private transfer; no persistent WSL setting changed.
 monitoring/runtime and security-aware application rollback checks remain unverified,
 along with non-DB recovery coverage, recovery targets and controlled cutover.
 No production connection/change/migration, push, merge or deployment. Evidence:
-tools/local-test/evidence/batch-122-0022-rehearsal.json; docs/PY35_0022_REHEARSAL.md.
+archive/local-test/evidence/batch-122-0022-rehearsal.json; docs/PY35_0022_REHEARSAL.md.
 
 Latest121 BLOCKED (2026-10-20 WAT): owner explicitly approves0022 on an isolated
 restored PG17 clone, including safe rollback/recovery; production remains barred.
@@ -2403,7 +2403,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 - A reused-page Trial/logout/Admin browser check showed a possible existing late
   profile-response race. Independent role fixtures pass; deterministic logout
   verification remains part of PY-18/PY-07. Do not claim logout protection complete.
-- Evidence: tools/local-test/evidence/batch-1-*.json. No production/provider access.
+- Evidence: archive/local-test/evidence/batch-1-*.json. No production/provider access.
 
 ### Batch 2 — PY-34
 
@@ -2422,7 +2422,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 - Manual check: log into http://127.0.0.1:55446 as
   expired-reporter@example.com or expired-paid-reporter@example.com, password
   PriceYardDemo8!. Reporting remains available; full history stays restricted.
-- Evidence: tools/local-test/evidence/batch-2-*.json. Restarted only the disposable
+- Evidence: archive/local-test/evidence/batch-2-*.json. Restarted only the disposable
   preview to load backend code/new fake account fixtures; no original DB touched.
 
 ### Batch 3 — PY-10
@@ -2433,13 +2433,13 @@ No expansion of completed null-guard/account/UI scopes is needed.
   is rewritten. No spreadsheet program or external formula was executed.
 - Five regression tests reproduced 11 failing assertions/subtests before the
   fix. Current consolidated backend suite has 23 tests; final output recorded in
-  tools/local-test/evidence/batch-3-backend-tests.json.
+  archive/local-test/evidence/batch-3-backend-tests.json.
 - Real-browser original Admin CSV export/download passed: two synthetic rows,
   original headers and exact numeric prices; private source absent. Guest request
   rejected 401 and Trial rejected 403. No frontend change/build needed.
 - Manual check: log into http://127.0.0.1:55446 as admin@example.com with
   PriceYardDemo8!, then open /admin/export and click the existing Download CSV.
-- Evidence: tools/local-test/evidence/batch-3-*.json. Existing real spreadsheets
+- Evidence: archive/local-test/evidence/batch-3-*.json. Existing real spreadsheets
   and customer data were not accessed; real spreadsheet-product compatibility is
   not claimed from string/export checks.
 
@@ -2468,7 +2468,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   sign into another. No saved private account should reappear after logout.
 - Owner explicitly approved docs/LOCAL_SECURITY_STORAGE_PROPOSAL.md on 2026-10-16.
   That scope allows internal revocation records only, not new product fields or
-  production migration. Evidence: tools/local-test/evidence/batch-4-*.json.
+  production migration. Evidence: archive/local-test/evidence/batch-4-*.json.
 - Follow-up baseline initially hit the existing five-login/minute quota because
   all automated browsers shared localhost. The initially copied batch-4 baseline
   JSON was the earlier passing baseline, not that failed rerun. Replaced with the
@@ -2525,7 +2525,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   httpx deprecation warning; it did not fail tests and is operational follow-up.
 - Read-only sanitized process check found only guarded local-test Python processes
   for this repository, no original Vite/Uvicorn source watcher using real config.
-- Evidence: tools/local-test/evidence/batch-5-*.json. No live DB migration, push,
+- Evidence: archive/local-test/evidence/batch-5-*.json. No live DB migration, push,
   merge or deployment. Current completed checklist items: PY-04/PY-10/PY-15/PY-34;
   remaining items include explicitly partial work above, not 36 completed fixes.
 
@@ -2549,7 +2549,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 - Manual: log in as admin@example.com / PriceYardDemo8! at
   http://127.0.0.1:55446/admin/users; attempting to deactivate the sole Test Admin
   must show the existing last-admin error and keep that account active.
-- Evidence: tools/local-test/evidence/batch-6-*.json. Five checklist items fully
+- Evidence: archive/local-test/evidence/batch-6-*.json. Five checklist items fully
   verified so far (PY-04, PY-09, PY-10, PY-15, PY-34); other items remain pending
   or explicitly partial. Production still untouched.
 
@@ -2579,7 +2579,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   access gate; trial@example.com sees the two fabricated records. Password for
   both: PriceYardDemo8!. Current Prices remains public. Preview restarted with
   fresh fake accounts only. Test-only PostgreSQL remains stopped.
-- Evidence: tools/local-test/evidence/batch-7-*.json. Six checklist IDs complete;
+- Evidence: archive/local-test/evidence/batch-7-*.json. Six checklist IDs complete;
   30 remain pending/partial. All commits are local; production is untouched.
 
 ### Batch 8 — part of PY-33
@@ -2608,7 +2608,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   that dedicated fake account Paid; restarting preview restores its Free fixture.
 - Activation atomicity, duplicate provider-ID binding, recovery/reconciliation,
   renewal/trial value, and checkout response validation remain explicitly pending.
-  Evidence: tools/local-test/evidence/batch-8-*.json. Six IDs complete, 30 partial
+  Evidence: archive/local-test/evidence/batch-8-*.json. Six IDs complete, 30 partial
   or pending; no production access, push, merge or deployment.
 
 ### Batch 9 — parts of PY-31/PY-33/PY-26
@@ -2638,7 +2638,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   current prices/durations/trial/referrals/manual-grant behavior remain unchanged.
 - Manual: http://127.0.0.1:55446/__test__/payments. Dedicated fake account has
   already been credited by tests; a preview restart reseeds it for another run.
-  Evidence: tools/local-test/evidence/batch-9-*.json. Six complete checklist IDs;
+  Evidence: archive/local-test/evidence/batch-9-*.json. Six complete checklist IDs;
   other 30 remain partial/pending. Local-only commits; no production contact.
 
 ### Batch 10 — PY-11
@@ -2662,7 +2662,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 - Manual: http://127.0.0.1:55446/admin/prices, admin@example.com / PriceYardDemo8!.
   Original record rows should reflect saved approval/correction immediately.
   Synthetic PostgreSQL stopped; browser SQLite preview remains running.
-- Evidence: tools/local-test/evidence/batch-10-*.json. Seven IDs complete;
+- Evidence: archive/local-test/evidence/batch-10-*.json. Seven IDs complete;
   29 remain pending/partial. Remaining paid/trial-time approval is still pending.
 
 ### Batch 11 — further PY-18; part of PY-13
@@ -2694,7 +2694,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   fresh synthetic records; unknown-size administrative test records were reset.
 - Manual: http://127.0.0.1:55446/history using trial@example.com, paid@example.com
   or manual-paid@example.com. All retain the original entitlement screens.
-  Evidence: tools/local-test/evidence/batch-11-*.json. Seven IDs complete;
+  Evidence: archive/local-test/evidence/batch-11-*.json. Seven IDs complete;
   29 remain partial/pending. No production access or deployment.
 
 ### Batch 12 — PY-19
@@ -2718,7 +2718,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 - Manual: http://127.0.0.1:55446/admin/faq, admin@example.com / PriceYardDemo8!.
   Create a hidden fake FAQ and refresh: it remains available. Visitors see it
   only after Publish, and Hide removes it from their public FAQ list.
-- Evidence: tools/local-test/evidence/batch-12-*.json. Eight IDs complete;
+- Evidence: archive/local-test/evidence/batch-12-*.json. Eight IDs complete;
   28 remain partial/pending. Paid/trial-value business approval still pending.
 
 ### Batch 13 — PY-06; part of PY-08
@@ -2745,7 +2745,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   Restarted only the synthetic preview and the browser recheck passed.
 - Manual: http://127.0.0.1:55446/__test__/push. Separate test controls never
   request native notification permission or contact a delivery provider.
-- Evidence: tools/local-test/evidence/batch-13-*.json. Nine application-side IDs
+- Evidence: archive/local-test/evidence/batch-13-*.json. Nine application-side IDs
   complete; 27 pending/partial. PY-07 shared-device ownership/cleanup remains open.
 - Owner subsequently approved rules 1/2 in docs/PURCHASE_VALUE_APPROVAL.md;
   that approval is recorded for the next batch, not claimed implemented here.
@@ -2778,7 +2778,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   value-paid@example.com / value-trial@example.com, password PriceYardDemo8!.
   Automated checks have already applied those two fake purchases; replay will not
   extend them again. Restarting only the disposable preview reseeds the fixtures.
-- Evidence: tools/local-test/evidence/batch-14-*.json. Nine IDs fully complete;
+- Evidence: archive/local-test/evidence/batch-14-*.json. Nine IDs fully complete;
   27 pending/partial, including PY-32's separate indefinite-grant payment decision.
 
 ### Batch 15 — further PY-33
@@ -2808,7 +2808,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   Deployment requiring an outbound proxy or a future checkout host needs separate
   reviewed configuration/compatibility verification. Live-provider delivery and
   reconciliation are not claimed complete. No frontend rebuild needed.
-- Evidence: tools/local-test/evidence/batch-15-*.json. Nine IDs fully complete;
+- Evidence: archive/local-test/evidence/batch-15-*.json. Nine IDs fully complete;
   27 pending/partial. Original master/backup remain preserved; commits local only.
 
 ### Batch 16 — PY-17
@@ -2834,7 +2834,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   including original cards/filters/plans/Admin form, mobile overflow and rate limit.
 - Manual: http://127.0.0.1:55446/commodities/Egusi. Original detail layout loads
   for guests; trial@example.com / PriceYardDemo8! retains full-access sections.
-- Evidence: tools/local-test/evidence/batch-16-*.json. Ten IDs complete;
+- Evidence: archive/local-test/evidence/batch-16-*.json. Ten IDs complete;
   26 remain pending/partial. No production services/data or new dependencies.
 
 ### Batch 17 — further PY-07
@@ -2860,7 +2860,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   temporary API logins. No frontend source change/build in this batch.
 - Manual: http://127.0.0.1:55446/__test__/push, click Check device ownership
   protection. Existing login rate limits remain enforced. No keys/tokens printed.
-- Evidence: tools/local-test/evidence/batch-17-*.json. Ten IDs complete;
+- Evidence: archive/local-test/evidence/batch-17-*.json. Ten IDs complete;
   26 pending/partial. Logout push cleanup and JavaScript token storage remain
   separate PY-07 work; this does not claim complete shared-device safety.
 
@@ -2897,7 +2897,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 - Manual: http://127.0.0.1:55446/login. Sign into a fabricated account and use
   the original Logout button; account state clears immediately. Provider-native
   cleanup requires the automated mock checks here, not live notification access.
-- Evidence: tools/local-test/evidence/batch-18-*.json. Ten IDs complete;
+- Evidence: archive/local-test/evidence/batch-18-*.json. Ten IDs complete;
   26 pending/partial. Preview restart in batch 17 reseeded all payment fixtures,
   so /__test__/purchase-value is ready for a fresh manual demonstration. The reset
   test account now uses UpdatedPassword8! until the next disposable restart.
@@ -2943,7 +2943,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   and https://paystack.com/docs/api/transaction/#verify (2026-10-16).
   No live-provider compatibility/delivery claim, unattended reconciliation job,
   refund/chargeback rule or indefinite-manual-grant payment decision is introduced.
-- Evidence: tools/local-test/evidence/batch-19-*.json. Twelve IDs complete;
+- Evidence: archive/local-test/evidence/batch-19-*.json. Twelve IDs complete;
   24 pending/partial. Progress and commits stay local; master/backup preserved.
 
 ### Batch 20 — further PY-05/PY-26
@@ -2971,7 +2971,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   original Dashboard shows the reward. Automated check already added one referral.
 - Policy-based abuse caps/verified-email qualification/first-payment rewards were
   not introduced; they require a separate owner decision. Evidence:
-  tools/local-test/evidence/batch-20-*.json. Twelve IDs complete, 24 partial/pending.
+  archive/local-test/evidence/batch-20-*.json. Twelve IDs complete, 24 partial/pending.
 - Owner explicitly approved the exact indefinite-grant checkout/held-payment scope
   in docs/PURCHASE_VALUE_APPROVAL.md during this batch. Implement it next (batch 21);
   it is not awaiting approval and is not claimed implemented by this checkpoint.
@@ -3003,7 +3003,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   historical backfill. Historical successful payments remain unchanged. Native
   PostgreSQL cluster stopped; SQLite preview remains running. No frontend rebuild
   needed; the last original CSS artifact remains unchanged.
-- Evidence: tools/local-test/evidence/batch-21-*.json. Thirteen IDs complete;
+- Evidence: archive/local-test/evidence/batch-21-*.json. Thirteen IDs complete;
   23 pending/partial. All approved purchased-time rules now implemented; unattended
   recovery/operational refund decisions remain separate PY-31/PY-35 work.
 
@@ -3024,7 +3024,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 - Manual: http://127.0.0.1:55446/prices. Select Down, click Apply (the synthetic
   current row is Up, so no match), then Clear to restore Egusi/Kwali Market.
   Automated checks cover delayed response/timer races that are hard to time by hand.
-- Evidence: tools/local-test/evidence/batch-22-*.json. Thirteen IDs complete;
+- Evidence: archive/local-test/evidence/batch-22-*.json. Thirteen IDs complete;
   23 partial/pending. Local only; native PostgreSQL remains stopped.
 
 ### Batch 23 — further PY-20
@@ -3047,7 +3047,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   form and mobile layout. No frontend rebuild/change in this batch.
 - Manual: http://127.0.0.1:55446/prices; trial@example.com / PriceYardDemo8!
   can still open original Price History. No new pagination or hidden history cap.
-- Evidence: tools/local-test/evidence/batch-23-*.json. Thirteen IDs complete,
+- Evidence: archive/local-test/evidence/batch-23-*.json. Thirteen IDs complete,
   23 partial/pending. Native PostgreSQL shutdown's 20s wait timed out, but a
   subsequent pg_ctl status verified no server running. Preview remains local.
 
@@ -3068,7 +3068,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   approval requests, records attempts and rejects unknown fabricated recipients;
   default is disabled. It is separate from the product and was disabled after
   testing. Trial test fixture has a fabricated phone; no real recipient/service.
-- Evidence: tools/local-test/evidence/batch-24-*.json. Fourteen IDs complete;
+- Evidence: archive/local-test/evidence/batch-24-*.json. Fourteen IDs complete;
   22 partial/pending. Real delivery, durable retries/provider outages still require
   operational work; no such production capability is claimed by this local test.
 - Manual: http://127.0.0.1:55446/prices. Existing appearance is preserved; the
@@ -3098,7 +3098,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   PriceYardDemo8!. Only fabricated records are present. Original Audit logs show
   the price actions. No design, terminology, prices, durations, measurements,
   historical source records or production data changed.
-- Evidence: tools/local-test/evidence/batch-25-*.json. Fourteen IDs complete,
+- Evidence: archive/local-test/evidence/batch-25-*.json. Fourteen IDs complete,
   22 partial/pending; broader Admin writes and operational checks remain open.
 
 ### Batch 26 — further PY-08/PY-27
@@ -3121,7 +3121,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 - Manual: http://127.0.0.1:55446/feedback, trial@example.com / PriceYardDemo8!.
   Attach a small test image, then choose one over 2MB: the old attachment must
   disappear and the original size error appears. No live recipients/providers.
-- Evidence: tools/local-test/evidence/batch-26-*.json. Fourteen complete,
+- Evidence: archive/local-test/evidence/batch-26-*.json. Fourteen complete,
   22 partial/pending. No schema, prices, policy or production changes. Synthetic
   PostgreSQL remains running for the next security batch; stop it before final.
 - Owner responded to the Google-linking decision during this batch and authorized
@@ -3158,7 +3158,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   popup/button is intentionally not exercised with a live client/provider.
   Checker corrections used the existing numeric subscription URL and omitted
   private auth_provider from public UserResponse; product API fields unchanged.
-- Evidence: tools/local-test/evidence/batch-27-*.json. No frontend change/build.
+- Evidence: archive/local-test/evidence/batch-27-*.json. No frontend change/build.
   Manual original password login: http://127.0.0.1:55446/login. Fabricated Google
   API controls /__test__/google-mode are disabled after automated checks.
 - Contract reference (read-only):
@@ -3184,7 +3184,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   JS319.45kB/90.35kB gzip. Original CSS artifact index-19youOJ7.css unchanged.
 - Frontend-only batch; latest unchanged backend evidence is 126 tests/twenty
   pinned PG cases from batch 27, not claimed rerun here. PG remains running for
-  the next backend batch. Evidence: tools/local-test/evidence/batch-28-*.json.
+  the next backend batch. Evidence: archive/local-test/evidence/batch-28-*.json.
 - Manual: http://127.0.0.1:55446/prices?commodity=Egusi&market=Kwali+Market;
   original controls match the URL. Trial login still opens original Price History.
   Sixteen IDs complete; twenty partial/pending. No production or schema change.
@@ -3217,7 +3217,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   error; reload restores all cards. No new UI controls. TypeScript/Vite passed,
   3.08s; JS318.72kB/90.18kB gzip; original CSS index-19youOJ7.css unchanged.
 - Manual: http://127.0.0.1:55446/admin, admin@example.com / PriceYardDemo8!.
-  Evidence: tools/local-test/evidence/batch-29-*.json. Seventeen IDs complete,
+  Evidence: archive/local-test/evidence/batch-29-*.json. Seventeen IDs complete,
   nineteen partial/pending. Native synthetic PG is running for the next batch.
 
 ### Batch 30 — further PY-26/PY-28 (2026-10-17)
@@ -3470,7 +3470,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   no stored monetary values or rounding rules were changed to satisfy a test.
 - Browser original three create/edit/delete workflows pass; all nine audit records
   are verified, starting price history unchanged and temporary rows removed.
-  No frontend rebuild. Evidence: tools/local-test/evidence/batch-39-*.json.
+  No frontend rebuild. Evidence: archive/local-test/evidence/batch-39-*.json.
 - Manual: http://127.0.0.1:55446/admin/market-signals, /admin/quality-signals or
   /admin/costs with admin@example.com / PriceYardDemo8! in the isolated preview.
 - Eighteen IDs complete; eighteen partial/pending. Buying zone, Sell-watch window
@@ -3490,7 +3490,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   and unchanged historical prices. These resources originally have no delete
   control; only the disposable in-memory preview is restarted to remove temporary
   test entries. No database cleanup against disk/production and no frontend changes.
-  Evidence: tools/local-test/evidence/batch-40-*.json.
+  Evidence: archive/local-test/evidence/batch-40-*.json.
 - Manual: http://127.0.0.1:55446/admin/buying-zones, /admin/sell-watch or /admin/storage,
   using admin@example.com / PriceYardDemo8!. Original forms are unchanged.
 - Nineteen IDs complete; seventeen partial/pending. PY-26 covers identified
@@ -3513,7 +3513,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   exclude sources, legitimate original Admin price response still contains them.
   One initial browser check used the wrong test URL; corrected to existing /admin/audit,
   with no application routing changes. No frontend rebuild or schema changes.
-- Evidence: tools/local-test/evidence/batch-41-*.json. The in-memory preview has one
+- Evidence: archive/local-test/evidence/batch-41-*.json. The in-memory preview has one
   clearly fabricated legacy audit fixture solely for regression/manual verification.
   Manual: http://127.0.0.1:55446/admin/audit, admin@example.com / PriceYardDemo8!.
 - Nineteen IDs complete; seventeen partial/pending. Remaining source policy review,
@@ -3537,7 +3537,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   only by the keyboard focus-outline rule (31.72kB/7.13kB gzip). Backend unchanged:
   five targeted Admin access/audit compatibility tests pass, 0.503s; all 38 pinned
   PostgreSQL cases pass, 37.888s. Latest full backend remains 180 passes in batch 41.
-- Evidence: tools/local-test/evidence/batch-42-*.json. Manual: /admin/prices or
+- Evidence: archive/local-test/evidence/batch-42-*.json. Manual: /admin/prices or
   /admin/faq at http://127.0.0.1:55446 as demo Admin; Tab to a record, press Enter
   or Space, and confirm its ID is selected without saving. Nineteen IDs complete,
   seventeen partial/pending. No production access, push, merge or deployment.
@@ -3557,7 +3557,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 - TypeScript/Vite passes, 1.69s/101 modules; JS unchanged 320.89kB/90.90kB gzip;
   CSS31.84kB/7.16kB gzip. Backend unchanged: six relevant current-query compatibility
   tests pass, 0.509s; all 38 pinned PG cases pass, 33.429s. Latest full backend180.
-- Evidence: tools/local-test/evidence/batch-43-*.json. Manual: /prices at
+- Evidence: archive/local-test/evidence/batch-43-*.json. Manual: /prices at
   http://127.0.0.1:55446; original ordinary records still look the same. Browser
   stress text never persists in the preview. Twenty IDs complete, sixteen partial/
   pending. Next approved offline-price safeguard; no production/push/merge/deploy.
@@ -3630,7 +3630,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 - The isolated cluster had been interrupted; ordinary automatic recovery completed
   without reset/WAL/PID deletion or edits. Live directory/system identity is checked
   by the pinned runner before every connection/mutation; no production contacts.
-- Evidence: tools/local-test/evidence/batch-45-*.json. Manual: /prices at
+- Evidence: archive/local-test/evidence/batch-45-*.json. Manual: /prices at
   http://127.0.0.1:55446, open the confidence ? then press Escape; at mobile width,
   open Menu, Tab to its first link and press Escape. A fresh private browser opens
   the original tour; Tab remains inside it and Escape performs Skip.
@@ -3663,7 +3663,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   in-memory preview reseed afterward, restoring default fabricated passwords.
   The passing workflow never requires changing cooldown or production records.
 - TypeScript/Vite passes,1.45s/102modules;JS323.79kB/91.93kB gzip; original CSS
-  index-BEBH-Ai6.css unchanged. Evidence: tools/local-test/evidence/batch-46-*.json.
+  index-BEBH-Ai6.css unchanged. Evidence: archive/local-test/evidence/batch-46-*.json.
   Manual: /register at http://127.0.0.1:55446; original password form/visibility
   remain. Demo reset requests use only /__test__/inbox; no email is delivered.
 - Twenty-two IDs complete; fourteen partial/pending. Remaining edit/query/security
@@ -3729,7 +3729,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   New synthetic preview launcher18556/worker25204 was identity-verified for checks.
   After checks, only those verified processes were stopped; both55446/55448 were
   confirmed unbound. No added test workload remains running (stop-recovery evidence).
-- Recovery evidence: tools/local-test/evidence/batch-47-*-recovery.json,
+- Recovery evidence: archive/local-test/evidence/batch-47-*-recovery.json,
   batch-47-postgres.json, batch-47-run-lock.json and earlier before/after records.
   Current post-restart machine had about2.8GiB available initially/3.3GiB later and
   about214GiB disk free; these snapshots cannot diagnose its earlier memory state.
@@ -3765,7 +3765,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   only the disposable memory preview to remove fabricated planning fixtures.
   Five detail failure/race regressions and all14 dashboard labels/totals, one
   summary request and recovery pass. No external browser requests/providers.
-- Evidence: tools/local-test/evidence/batch-48-*.json. Manual: local /commodities/Egusi
+- Evidence: archive/local-test/evidence/batch-48-*.json. Manual: local /commodities/Egusi
   while logged in as admin@example.com / PriceYardDemo8!; Buying zone/Sell-watch
   headings/design stay the same. API requests include commodity_id; Admin lists
   remain complete. Any preview fixtures are synthetic only.
@@ -3794,7 +3794,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
 - Added a local stop_preview.ps1 helper using exact script/executable/parent and
   synthetic marker checks; verified it stops only the disposable preview and checks
   its port unbound. This preserves the launcher safeguards and avoids generic kills.
-- Evidence: tools/local-test/evidence/batch-49-*.json. All heavy checks sequential;
+- Evidence: archive/local-test/evidence/batch-49-*.json. All heavy checks sequential;
   native cluster stopped. Manual local commodity detail keeps the same six section
   headings/design. Exactly22 complete /14 partial or pending; PY-20 broader lists/
   history and remaining policies/operations still open. Local commits only.
@@ -3868,7 +3868,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   Browser scenarios/PG/backend/build run sequentially. No new dependency copies or
   installs. Reseed only the disposable memory preview to clear temporary planning
   records; no unsupported deletes or production/database changes.
-- Evidence tools/local-test/evidence/batch-52-*.json. PY-27 identified scope complete.
+- Evidence archive/local-test/evidence/batch-52-*.json. PY-27 identified scope complete.
   Exactly23 complete /13 partial or pending:02,05,07,08,13,14,20,28,29,30,31,35,36.
   Those still include owner policy choices, broader compatible bounds/history work
   and operational/live-provider verification; none claimed complete by this batch.
@@ -3904,7 +3904,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   original CSS index-BEBH-Ai6.css. No dependency copies/installations. Full196 backend
   baseline remains batch52; do not claim the full198 suite was executed here. New
   native case extends coverage; last full40-case native run remains batch47.
-  Evidence tools/local-test/evidence/batch-53-*.json. Exactly23 complete /13 partial
+  Evidence archive/local-test/evidence/batch-53-*.json. Exactly23 complete /13 partial
   or pending. Broader body/text limits and remaining owner/operational choices stay
   open. No production, push, merge or deployment.
 
@@ -4351,7 +4351,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   corrected fixture only. Literal-name test awaited loaded rows. Navigation
   regression now checks unchanged visible labels and intercepts actual ID query,
   retaining its original stale-response assertions. All external requests zero.
-- Evidence: tools/local-test/evidence/batch-65-*.json. Source-only API reference
+- Evidence: archive/local-test/evidence/batch-65-*.json. Source-only API reference
   refreshed106 existing operations. Synthetic preview reseeded after temporary
   collision/rename fixtures; current local link http://127.0.0.1:55446/prices.
 - Count:28 complete /8 partial or pending:02,05,07,08,13,14,20,35.
@@ -4398,7 +4398,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   This authorizes100-record Admin pages with Previous/Next, original forms/styles,
   full totals/all14 dashboard cards and compatible complete API results. No
   paging code included in66. Start with Users/Payments; public history/charts
-  remain separate. Evidence: tools/local-test/evidence/batch-66-*.json.
+  remain separate. Evidence: archive/local-test/evidence/batch-66-*.json.
 - Count:29 complete /7 partial or pending:02,05,07,13,14,20,35.
 
 
@@ -4444,7 +4444,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   review; reseed before unrelated tests. No sample fields/markets/measurements
   added to application source or real business data.
 - API source reference updated108 operations. Evidence:
-  tools/local-test/evidence/batch-67-*.json. Counts remain29 complete /7 partial
+  archive/local-test/evidence/batch-67-*.json. Counts remain29 complete /7 partial
   or pending:02,05,07,13,14,20,35. PY-20 next: other approved Admin lists; all
   public history/chart results remain unchanged and separate. Master/backup
   preserved; no production access, push, merge or deployment.
@@ -4485,7 +4485,7 @@ No expansion of completed null-guard/account/UI scopes is needed.
   referenced-delete and duplicate conflicts, unchanged historical price values.
   Seven original baseline workflows, original account/grant/revocation/six-audit
   workflow and all14 dashboard totals/one-query/outage recovery pass. All browser
-  external/production contacts zero. Evidence: tools/local-test/evidence/batch-68-*.json.
+  external/production contacts zero. Evidence: archive/local-test/evidence/batch-68-*.json.
 - Disposable catalog sample control: http://127.0.0.1:55446/__test__/catalog-paging.
   Additional example entries are inactive, uniquely marked synthetic and created
   only in the memory fixture. No real extra market, commodity, unit or grade.
@@ -4545,7 +4545,7 @@ Verification (one heavy phase at a time; native fixture stopped before build):
   the same identity-checking preview helper through approved escalation. No
   weakened checks or unrelated process termination. Dependencies not installed.
 
-Evidence: tools/local-test/evidence/batch-69-*.json; reusable time browser cases
+Evidence: archive/local-test/evidence/batch-69-*.json; reusable time browser cases
 and native case are tracked. Current count:30 complete,6 partial/pending:
 02,05,07,14,20,35. Continue approved PY-20 lists in small batches; preserve original
 public-history/chart completeness. Source/referral/session/movement policy gates
@@ -4589,7 +4589,7 @@ Verification:
   hashes match reused build, original CSS byte-identical; no dependency copies or
   installations. Source-only API index now112 declared operations.
 
-Evidence: tools/local-test/evidence/batch-70-*.json. Count remains30 complete and
+Evidence: archive/local-test/evidence/batch-70-*.json. Count remains30 complete and
 6 partial/pending (02,05,07,14,20,35); PY-20 now6/16 approved Admin lists paged,
 10 lists and complete public-history materialization remain. Next small lists
 must preserve existing subscription expiry/filter/source/ID-action semantics,
@@ -4638,7 +4638,7 @@ Verification:
 - Seven baseline browser workflows and all14 dashboard labels/totals/outage
   recovery passed, zero external/production contacts. Source-only API index114.
 
-Evidence: tools/local-test/evidence/batch-71-*.json.30 complete/6 partial-pending:
+Evidence: archive/local-test/evidence/batch-71-*.json.30 complete/6 partial-pending:
 02,05,07,14,20,35; approved Admin paging8/16. Next: remaining four intelligence
 lists, then Feedback/Subscriptions/Prices/flags, preserving existing expiry,
 filters, source rules and complete public history. Use --paging-cluster for the
@@ -4673,7 +4673,7 @@ Verification:
   reject/reload workflows pass. Seven baseline views and all14 Admin labels/
   totals/outage recovery pass. Zero external/production contacts.
 
-Evidence: tools/local-test/evidence/batch-72-*.json. Exactly31 complete and5
+Evidence: archive/local-test/evidence/batch-72-*.json. Exactly31 complete and5
 partial/pending:05,07,14,20,35. PY-02 complete for this finite approved scope;
 free-text editorial discipline is still necessary, and no production historical
 text review is authorized. Next approved small batch: Buying zones/Sell-watch
@@ -4710,7 +4710,7 @@ Verification:
   baseline passes seven workflows and all14 dashboard totals/outage recovery.
   Single browser at a time; no external requests/production contacts.
 
-Evidence: tools/local-test/evidence/batch-73-*.json.31 complete /5 partial-pending:
+Evidence: archive/local-test/evidence/batch-73-*.json.31 complete /5 partial-pending:
 05,07,14,20,35. Approved Admin paging10/16; next small batch Storage/Cost lists,
 then Feedback/Subscriptions/Prices/flags. Public history remains complete/separate.
 No production, historical rewrite, policy/measurement change, push/merge/deploy.
@@ -4748,7 +4748,7 @@ Verification:
   totals/outage recovery pass. Sequential heavy phases, one browser at a time;
   zero external requests/production contacts.
 
-Evidence: tools/local-test/evidence/batch-74-*.json.31 complete /5 partial-pending:
+Evidence: archive/local-test/evidence/batch-74-*.json.31 complete /5 partial-pending:
 05,07,14,20,35. Admin paging12/16; remaining Feedback/Subscriptions/Prices/flags.
 Subscription listing must still process every expired account, with staff and
 purchased-time preservation; do not page away those side effects. Full public
@@ -4792,7 +4792,7 @@ Verification:
   totals/outage recovery pass. Raw prices unchanged; one heavy phase/browser
   at a time, zero external requests/production contacts.
 
-Evidence: tools/local-test/evidence/batch-75-*.json. Exactly31 complete /5 partial
+Evidence: archive/local-test/evidence/batch-75-*.json. Exactly31 complete /5 partial
 or pending:05,07,14,20,35. Approved Admin paging13/16; next Subscriptions, Prices
 and flags. Subscription paging must preserve the original all-account expiry
 sweep, original User->Subscription writer lock order, staff authority and all
@@ -4837,7 +4837,7 @@ Verification:
   labels/full totals/outage recovery pass. Sequential heavy phases and no
   external requests/production contacts.
 
-Evidence: tools/local-test/evidence/batch-76-*.json.31 complete /5 partial-pending:
+Evidence: archive/local-test/evidence/batch-76-*.json.31 complete /5 partial-pending:
 05,07,14,20,35. Approved Admin paging14/16; next Prices/Flagged prices. Preserve
 latest-pair prefill across all price pages and full flag counts when finishing.
 Public history must remain complete; owner referral/session/movement decisions
@@ -4879,7 +4879,7 @@ Verification:
   await the existing prefill's async result. Seven baseline views and all14 dashboard
   labels/full totals/outage recovery pass; zero external/production contacts.
 
-Evidence: tools/local-test/evidence/batch-77-*.json.31 complete /5 partial-pending:
+Evidence: archive/local-test/evidence/batch-77-*.json.31 complete /5 partial-pending:
 05,07,14,20,35. Admin paging16/16 complete. PY-20 public-history materialization
 remains explicitly separate. Owner's "do the best option" reply approves the
 recommended local three-bonus/rolling30-day PY-05 scope; documented exact decision
@@ -4922,7 +4922,7 @@ Verification:
   No message sent. Seven baseline views and all14 dashboard full totals/outage
   recovery pass. Heavy phases/browser runs sequential, no external/production access.
 
-Evidence: tools/local-test/evidence/batch-78-*.json. Exactly32 complete /4 partial-
+Evidence: archive/local-test/evidence/batch-78-*.json. Exactly32 complete /4 partial-
 pending:07,14,20,35. Approved Admin pagination16/16 complete. PY-07 storage/session
 and PY-14 movement/confidence policy choices need concrete owner approvals before
 behavior changes. PY-20 full public-history/query materialization remains, with
@@ -4957,7 +4957,7 @@ baseline workflows and all14 dashboard cards pass; mobile375px unchanged, zero
 external/production contacts. Frontend unchanged:87 hashes and compiled assets
 match last validated78 build (reused, not a fresh build). Heavy tests sequential.
 
-Evidence:tools/local-test/evidence/batch-79-*.json. Exactly33 complete /3 partial-
+Evidence:archive/local-test/evidence/batch-79-*.json. Exactly33 complete /3 partial-
 pending:07,20,35. Next protected browser sessions, remaining full-history query
 bounds and local operational readiness evidence; live/provider/restore gates
 remain unauthorized. No production, push, merge or deployment.
@@ -5011,7 +5011,7 @@ unsupported-lock refusal and offline retry. Original payment failure/recovery/
 replay, fabricated Google/password fallback/new14-day trial, reset/single-use,
 three push-cleanup cases, source privacy, price editing, CSV, seven baseline
 views and all14 full-total dashboard cards pass. External/production contacts0.
-Evidence:tools/local-test/evidence/batch-80-*.json. Exactly34 complete /2 partial-
+Evidence:archive/local-test/evidence/batch-80-*.json. Exactly34 complete /2 partial-
 pending:20,35. Live cookie/provider/device/cutover/backup/rollout gates remain.
 No production, push, merge or deployment.
 
@@ -5045,7 +5045,7 @@ the usage limit; no unsafe-action determination. On resume, inspected actual dif
 clean whitespace and saved reports without repeating passed tests. Source/tests/
 evidence committed558f756eea2eb7db727708b9a72f81e5f40fd5a7, then confirmed clean
 Git status and unchanged master76dbd275/backup25899101 before advancing35/36.
-Evidence:tools/local-test/evidence/batch-81-*.json. PY-35 remains the only partial
+Evidence:archive/local-test/evidence/batch-81-*.json. PY-35 remains the only partial
 item. No production, push, merge or deployment.
 
 ### Batch 82 - PY-35 approved dependency security updates (2026-10-18)
@@ -5073,7 +5073,7 @@ Backend application code unchanged; reused286-test/native81 evidence, not a new
 full suite. All browser/provider tests isolated, external page/production contacts0.
 Authorized registry downloads/public advisory reads are separate from app tests.
 
-Evidence:tools/local-test/evidence/batch-82-*.json. Counts remain35/36;35 partial
+Evidence:archive/local-test/evidence/batch-82-*.json. Counts remain35/36;35 partial
 for remaining operational work. Do not claim all dependencies/CVEs or Linux/live
 hosting certified. Old root node_modules is retained; use marked55446 preview.
 Next tiny synthetic backup/restore, monitoring and release gate/runbooks. No
@@ -5114,7 +5114,7 @@ delivery/payment tests and approved rollout. No portable dependency/CVE-free or
 production readiness certificate claimed. Reused unchanged286-backend/native81
 and dependency/browser82 results; no unnecessary whole-suite rerun.
 
-Evidence:tools/local-test/evidence/batch-83-*.json. Precommit release inventory
+Evidence:archive/local-test/evidence/batch-83-*.json. Precommit release inventory
 records parent449475e and expected dirty tree; final --require-clean result stays
 ignored in runtime/local-release-check.json to avoid rewriting committed evidence.
 Only verified source/docs/test evidence is committed; archives/dependency trees/
@@ -5163,7 +5163,7 @@ Phase1 statuses:2 Passed(synthetic backup/recovery and finite scheduler),5 Faile
 because missing staging/provider prerequisites,2 Awaiting Production Approval.
 Passed subchecks never close original live gates;35/36 complete,PY-35 partial.
 All application backend/TSX/CSS files and approved policies unchanged. Evidence:
-tools/local-test/evidence/batch-84-*.json. Fresh local HTTP preview55446 only;
+archive/local-test/evidence/batch-84-*.json. Fresh local HTTP preview55446 only;
 runtime package/checkpoints/constraints remain ignored. Stop after reporting;
 no production approval requested, push, merge, deployment or live job.
 
@@ -5202,7 +5202,7 @@ unresolved executed check is failing. Existing84 source package/evidence is
 preserved at its historical revision and does not contain85; do not overwrite or
 use its checker to claim the updated source was staged. Refresh only under a
 reviewed next staging batch. Original live gates remain unrun;35/36 complete,
-PY-35 partial. Evidence:tools/local-test/evidence/batch-85-*.json.
+PY-35 partial. Evidence:archive/local-test/evidence/batch-85-*.json.
 
 Only authorized watchlist URL handling changes in application code; original
 design,14 cards,prices/measurements/history/trial/subscription/referral/access

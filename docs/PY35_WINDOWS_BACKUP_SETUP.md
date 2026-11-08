@@ -18,7 +18,7 @@ verification and explicit approval. No services purchased/accounts accessed.
   an administrator taking ownership or replace encryption.
 - No downloads, installs, database processes, exports, restores or uploads.
 
-[Creation script](../tools/local-test/prepare_private_backup_folder.ps1) creates
+[Creation script](../archive/local-test/prepare_private_backup_folder.ps1) creates
 the fixed folder with its private ACL at creation. Existing targets/redirected
 parents cause refusal; do not rerun/reset its permissions. Successful execution
 used the owner-authorized outside-workspace location. Evidence:batch-91-private-folder.json.

@@ -41,7 +41,7 @@ Reused saved evidence:
 | Dependency/release safeguards | Reviewed frontend lock/build82;60 Python packages/74 active requirements without conflicts84; preserved original Git references and explicit release refusal |
 
 These are different scoped runs, not a newly executed full combined suite.
-Evidence: `tools/local-test/evidence/batch-86-*.json` and the linked prior batches.
+Evidence: `archive/local-test/evidence/batch-86-*.json` and the linked prior batches.
 No unresolved failure in the executed checks. Missing real prerequisites are
 **Blocked/not attempted**, not failed tests. Historical corrected failures remain.
 

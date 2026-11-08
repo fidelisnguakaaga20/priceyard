@@ -16,7 +16,7 @@ succeeds; bounded last24h failure/restart query empty, instance series empty.
 Monitoring visibility passes; candidate readiness, alert receipt, secure hosted
 rollback and approved cutover remain unverified. No logs, secrets or DB reads;
 no repeated passed provider/backup/migration tests.35/36, production unchanged.
-Evidence:[batch134](../tools/local-test/evidence/batch-134-render-readonly.json).
+Evidence:[batch134](../archive/local-test/evidence/batch-134-render-readonly.json).
 
 Current133: owner confirms direct backend VITE_API_URL, sole SPA rewrite and no
 API proxy. Reuse batch132 browser contract: candidate Lax sessions are incompatible
@@ -135,7 +135,7 @@ checks in a separately bounded public window; the old tunnel and its callback
 address are now closed. No deployment approval should be requested until these
 results and the remaining Render operational checks pass.
 
-Redacted evidence:[batch128](../tools/local-test/evidence/batch-128-provider-tunnel.json).
+Redacted evidence:[batch128](../archive/local-test/evidence/batch-128-provider-tunnel.json).
 Runtime reports and test transaction reference stay ignored/outside Git history.
 
 Current125 supersedes connection/quota blockers below: owner confirms installed,

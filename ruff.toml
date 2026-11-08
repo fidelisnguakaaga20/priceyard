@@ -16,5 +16,5 @@ select = ["E4", "E7", "E9", "F"]
 allowed-unused-imports = ["app.models"]
 
 [lint.per-file-ignores]
-# Local test scripts must switch on network/process isolation before importing app code.
-"tools/local-test/*" = ["E402"]
+# Archived local test scripts switch on network/process isolation before importing app code.
+"archive/local-test/*" = ["E402"]

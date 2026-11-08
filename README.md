@@ -17,26 +17,84 @@ Built and shipped solo, end to end: product design, database schema, backend API
 
 ## Tech stack
 
-- **Backend:** Python, FastAPI, SQLAlchemy, PostgreSQL (Supabase), JWT + Google OAuth
+- **Backend:** Python 3.12, FastAPI, SQLAlchemy, Alembic, PostgreSQL (Supabase), JWT + Google OAuth
 - **Frontend:** React, TypeScript, Vite
-- **Infra:** Render (frontend + backend as separate services), Paystack, Brevo (transactional email)
+- **Infra:** Render (frontend + backend as separate services), Paystack, Brevo (transactional email), Sentry (error alerts), GitHub Actions (tests and deploys)
 
-## Local development and verified changes
+## Engineering quality
 
-The local development branch preserves the original application design and
-approved business rules. Start with [PRICEYARD_PROGRESS.md](PRICEYARD_PROGRESS.md)
-for current36-item counts, approvals, exact test results and interrupted work.
-Do not treat the live-app link above as a testing target.
+- **370 automated backend tests**, run in an isolated harness ([`tools/local-test/guard.py`](tools/local-test/guard.py)) that blocks network, DNS, child processes and real configuration, and gives each test a fresh in-memory database.
+- **Website page checks** ([`frontend/tests/smoke`](frontend/tests/smoke)): every public, member and admin page is opened in a real browser at phone and desktop width, using fake data and no network. The check fails on script errors, blank pages or content cut off at the screen edge.
+- **Consistent code style, enforced automatically:** Ruff for Python ([`ruff.toml`](ruff.toml)) and Prettier for the website ([`frontend/.prettierrc.json`](frontend/.prettierrc.json)).
+- **Deploys only after all checks pass** ([`.github/workflows/backend-tests.yml`](.github/workflows/backend-tests.yml)): every push runs the style checks, backend tests, website build and page checks. Only `master` deploys, and the backend deploy waits until `/health` reports the new commit.
+- **Security:** HttpOnly `__Host-` session cookie with a CSRF token, login throttling and rate limiting, sign-out-everywhere (login revocation), protected owner account, webhook-verified payments, and API docs hidden in production.
+- **Operations:** error alerts with personal data removed before sending, scheduled operational safeguards ([`tools/operations`](tools/operations)), and encrypted database backups with a tested restore procedure ([docs/BACKUP_RECOVERY.md](docs/BACKUP_RECOVERY.md)).
 
-- [Safe isolated browser/backend/PostgreSQL workflow](docs/LOCAL_DEVELOPMENT.md)
-- [Existing product, security and data-preservation contracts](docs/APPLICATION_CONTRACTS.md)
-- [Current API route reference](docs/api-endpoints.md)
-- [Local regression coverage and evidence](docs/TEST_COVERAGE.md)
-- [Migration preservation](docs/MIGRATION_PRESERVATION.md)
-- [Read-only-by-default payment recovery](docs/PAYMENT_RECONCILIATION.md)
+## Project structure
 
-Local verification is not production rollout approval. No production connection,
-push, merge, deployment or legacy-data repair is part of the local workflow.
+```
+backend/
+  app/            FastAPI app: routes, services, models, schemas
+  migrations/     Alembic database migrations
+  tests/          backend tests
+frontend/
+  src/            React app: public, member and admin pages
+  tests/smoke/    browser page checks
+tools/
+  local-test/     isolated test harness
+  operations/     scheduled operational safeguards and backup adapter
+docs/             architecture, API, database, access control and recovery docs
+archive/          past one-off scripts and result records, kept for the record
+```
+
+## Running locally
+
+Backend (needs PostgreSQL; copy `backend/.env.example` to `backend/.env` and fill it in):
+
+```bash
+cd backend
+python -m pip install -r requirements-dev.txt
+python -m alembic upgrade head
+python -m uvicorn app.main:app --reload
+```
+
+Frontend (proxies `/api/*` to the local backend):
+
+```bash
+cd frontend
+npm ci
+npm run dev
+```
+
+## Running the checks
+
+```bash
+# Backend tests (isolated, no database or network needed)
+python -I -B tools/local-test/guard.py
+
+# Python style
+ruff format --check . && ruff check .
+
+# Website style and build
+cd frontend && npm run format:check && npm run build
+
+# Website page checks (from frontend/, after npm ci in tests/smoke)
+npx vite preview --host 127.0.0.1 --port 4322 --strictPort &
+node tests/smoke/smoke.mjs
+```
+
+## Documentation
+
+- [Architecture](docs/architecture-design.md)
+- [Database schema](docs/database-schema.md)
+- [API routes](docs/api-endpoints.md)
+- [Access control matrix](docs/access-control-matrix.md)
+- [Product, security and data-preservation contracts](docs/APPLICATION_CONTRACTS.md)
+- [Test coverage](docs/TEST_COVERAGE.md)
+- [Monitoring](docs/MONITORING.md)
+- [Backup and recovery](docs/BACKUP_RECOVERY.md)
+- [Local development](docs/LOCAL_DEVELOPMENT.md)
+- [Build log](PRICEYARD_PROGRESS.md)
 
 ## Product notes
 

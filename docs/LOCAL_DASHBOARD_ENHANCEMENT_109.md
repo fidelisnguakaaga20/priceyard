@@ -36,7 +36,7 @@ before baseline verification. No unresolved test failure or weakened guards.
 
 Ignored evidence:tools/local-test/runtime/enhancement-109-summary.json,
 dashboard-race-before.json, dashboard-race-after.json, dashboard-checks.json.
-Executable regression:tools/local-test/dashboard_race_checks.mjs. No PostgreSQL
+Executable regression:archive/local-test/dashboard_race_checks.mjs. No PostgreSQL
 or backend suite repetition for this frontend-only change; no new dependency tree.
 
 The existing synthetic preview remains at http://127.0.0.1:55446/dashboard.

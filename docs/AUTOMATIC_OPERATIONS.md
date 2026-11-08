@@ -61,7 +61,7 @@ simulate-failure**; this mode contacts neither the application nor Paystack.
   39559936636 and39560074138 passed, including saved checkpoint retrieval;
   intentional failure39560232468 produced the confirmed approved-owner email.
   This does not certify the separately paused Windows backup task. Exact results:
-  `tools/local-test/evidence/batch-146-operational-activation.json`.
+  `archive/local-test/evidence/batch-146-operational-activation.json`.
 
 Sources: [GitHub OIDC](https://docs.github.com/en/actions/concepts/security/openid-connect),
 [workflow notifications](https://docs.github.com/en/account-and-profile/managing-subscriptions-and-notifications-on-github/setting-up-notifications/configuring-notifications),

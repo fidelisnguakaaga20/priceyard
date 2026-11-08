@@ -40,42 +40,42 @@ The full backend discovery command includes additional tests beside these files.
 
 | Workflow | Backend checks | Browser checks |
 | --- | --- | --- |
-| Password/reset/logout and Google ownership | [revocation](../backend/tests/test_login_revocation.py), [Google](../backend/tests/test_google_account_security.py), [password boundaries](../backend/tests/test_password_input_boundaries.py) | [accounts](../tools/local-test/account_checks.mjs), [Google](../tools/local-test/google_checks.mjs), [revocation](../tools/local-test/revocation_checks.mjs) |
-| Paid/trial value, provider evidence and recovery | [value](../backend/tests/test_subscription_value.py), [evidence](../backend/tests/test_payment_evidence.py), [reconciliation](../backend/tests/test_payment_reconciliation.py) | [value](../tools/local-test/purchase_value_checks.mjs), [verification](../tools/local-test/verification_checks.mjs), [recovery](../tools/local-test/reconciliation_checks.mjs) |
-| Historical access, current records and comparison specifications | [access](../backend/tests/test_price_access_boundaries.py), [current query](../backend/tests/test_current_price_query.py), [specifications](../backend/tests/test_current_price_specifications.py) | [access](../tools/local-test/access_checks.mjs), [comparison](../tools/local-test/comparison_checks.mjs), [history metadata](../tools/local-test/history_metadata_checks.mjs) |
-| Atomic business/audit writes and private sources | [price audit](../backend/tests/test_price_audit_atomicity.py), [catalog audit](../backend/tests/test_catalog_audit_atomicity.py), [response privacy](../backend/tests/test_audit_response_privacy.py) | [prices](../tools/local-test/price_admin_checks.mjs), [audit privacy](../tools/local-test/audit_privacy_checks.mjs), [catalog](../tools/local-test/catalog_checks.mjs) |
-| Six original intelligence forms and stored costs | [planning](../backend/tests/test_planning_validation.py), [cost limits](../backend/tests/test_cost_validation.py), [SQL scope](../backend/tests/test_intelligence_scope.py) | [saved-value editing](../tools/local-test/admin_edit_prefill_checks.mjs), [honest units](../tools/local-test/cost_unit_checks.mjs) |
-| Referrals and independent alerts/push ownership | [referrals](../backend/tests/test_referral_atomicity.py), [alerts](../backend/tests/test_watchlist_alert_service.py), [push](../backend/tests/test_push_ownership.py) | [referrals](../tools/local-test/referral_checks.mjs), [notifications](../tools/local-test/notification_checks.mjs), [push ownership](../tools/local-test/push_ownership_checks.mjs) |
-| All14 Admin metrics and full CSV export | [summary](../backend/tests/test_admin_summary.py), [CSV security](../backend/tests/test_report_export_safety.py), [streaming](../backend/tests/test_report_export_streaming.py) | [dashboard](../tools/local-test/dashboard_checks.mjs), [CSV](../tools/local-test/export_checks.mjs) |
-| Original UI, mobile, keyboard and honest offline copies | Existing account/access/query tests above | [original smoke tests](../tools/local-test/browser_checks.mjs), [keyboard](../tools/local-test/overlay_keyboard_checks.mjs), [offline](../tools/local-test/offline_ui_checks.mjs) |
-| Migration preservation, catalog races and safe test tooling | [migration preflight](../backend/tests/test_migration_safety.py), [catalog identity](../backend/tests/test_catalog_identity.py), [build recovery](../backend/tests/test_local_build_recovery.py), [isolation](../tools/local-test/test_isolation.py) | [native runner](../tools/local-test/verify_pg_security.py), [guarded build](../tools/local-test/build_frontend.py) |
+| Password/reset/logout and Google ownership | [revocation](../backend/tests/test_login_revocation.py), [Google](../backend/tests/test_google_account_security.py), [password boundaries](../backend/tests/test_password_input_boundaries.py) | [accounts](../archive/local-test/account_checks.mjs), [Google](../archive/local-test/google_checks.mjs), [revocation](../archive/local-test/revocation_checks.mjs) |
+| Paid/trial value, provider evidence and recovery | [value](../backend/tests/test_subscription_value.py), [evidence](../backend/tests/test_payment_evidence.py), [reconciliation](../backend/tests/test_payment_reconciliation.py) | [value](../archive/local-test/purchase_value_checks.mjs), [verification](../archive/local-test/verification_checks.mjs), [recovery](../archive/local-test/reconciliation_checks.mjs) |
+| Historical access, current records and comparison specifications | [access](../backend/tests/test_price_access_boundaries.py), [current query](../backend/tests/test_current_price_query.py), [specifications](../backend/tests/test_current_price_specifications.py) | [access](../archive/local-test/access_checks.mjs), [comparison](../archive/local-test/comparison_checks.mjs), [history metadata](../archive/local-test/history_metadata_checks.mjs) |
+| Atomic business/audit writes and private sources | [price audit](../backend/tests/test_price_audit_atomicity.py), [catalog audit](../backend/tests/test_catalog_audit_atomicity.py), [response privacy](../backend/tests/test_audit_response_privacy.py) | [prices](../archive/local-test/price_admin_checks.mjs), [audit privacy](../archive/local-test/audit_privacy_checks.mjs), [catalog](../archive/local-test/catalog_checks.mjs) |
+| Six original intelligence forms and stored costs | [planning](../backend/tests/test_planning_validation.py), [cost limits](../backend/tests/test_cost_validation.py), [SQL scope](../backend/tests/test_intelligence_scope.py) | [saved-value editing](../archive/local-test/admin_edit_prefill_checks.mjs), [honest units](../archive/local-test/cost_unit_checks.mjs) |
+| Referrals and independent alerts/push ownership | [referrals](../backend/tests/test_referral_atomicity.py), [alerts](../backend/tests/test_watchlist_alert_service.py), [push](../backend/tests/test_push_ownership.py) | [referrals](../archive/local-test/referral_checks.mjs), [notifications](../archive/local-test/notification_checks.mjs), [push ownership](../archive/local-test/push_ownership_checks.mjs) |
+| All14 Admin metrics and full CSV export | [summary](../backend/tests/test_admin_summary.py), [CSV security](../backend/tests/test_report_export_safety.py), [streaming](../backend/tests/test_report_export_streaming.py) | [dashboard](../archive/local-test/dashboard_checks.mjs), [CSV](../archive/local-test/export_checks.mjs) |
+| Original UI, mobile, keyboard and honest offline copies | Existing account/access/query tests above | [original smoke tests](../archive/local-test/browser_checks.mjs), [keyboard](../archive/local-test/overlay_keyboard_checks.mjs), [offline](../archive/local-test/offline_ui_checks.mjs) |
+| Migration preservation, catalog races and safe test tooling | [migration preflight](../backend/tests/test_migration_safety.py), [catalog identity](../backend/tests/test_catalog_identity.py), [build recovery](../backend/tests/test_local_build_recovery.py), [isolation](../archive/local-test/test_isolation.py) | [native runner](../archive/local-test/verify_pg_security.py), [guarded build](../tools/local-test/build_frontend.py) |
 
 ## Evidence and limits
 
-- [Latest full backend suite](../tools/local-test/evidence/batch-81-backend.json).
-- [Focused native history check](../tools/local-test/evidence/batch-81-postgres.json).
+- [Latest full backend suite](../archive/local-test/evidence/batch-81-backend.json).
+- [Focused native history check](../archive/local-test/evidence/batch-81-postgres.json).
 - Current dependency-update browser/build evidence:batch82. Source/build hashes
   match89 files; original appearance checked at desktop/mobile widths. See
   [dependency readiness](DEPENDENCY_READINESS.md).
-- [Synthetic native backup/restore](../tools/local-test/evidence/batch-83-recovery.json),
-  [four recovery guard tests](../tools/local-test/evidence/batch-83-recovery-guards.json),
-  [three release-gate tests](../tools/local-test/evidence/batch-83-release-gate-tests.json)
-  and [monitoring browser drill](../tools/local-test/evidence/batch-83-monitoring-browser.json).
+- [Synthetic native backup/restore](../archive/local-test/evidence/batch-83-recovery.json),
+  [four recovery guard tests](../archive/local-test/evidence/batch-83-recovery-guards.json),
+  [three release-gate tests](../archive/local-test/evidence/batch-83-release-gate-tests.json)
+  and [monitoring browser drill](../archive/local-test/evidence/batch-83-monitoring-browser.json).
   Reuses unchanged286-test backend evidence; no redundant full-suite run.
 - The following batch47/61/62/63 links are historical focused evidence, not current
   fixture usage or latest build/suite counts.
-- [Last full native baseline](../tools/local-test/evidence/batch-47-postgres.json).
-- Catalog commit races passed in the [initial focused run](../tools/local-test/evidence/batch-62-postgres-initial.json);
+- [Last full native baseline](../archive/local-test/evidence/batch-47-postgres.json).
+- Catalog commit races passed in the [initial focused run](../archive/local-test/evidence/batch-62-postgres-initial.json);
   that same run contains a second-case connection setup error. Only that case was
-  retried successfully using the [approved runner](../tools/local-test/evidence/batch-62-postgres-rollback-retry.json).
+  retried successfully using the [approved runner](../archive/local-test/evidence/batch-62-postgres-rollback-retry.json).
   Do not describe the initial run as wholly passing. Fixture73/80 schemas, stopped.
-- [Catalog browser checks](../tools/local-test/evidence/batch-62-browser-catalog.json),
-  [14-card dashboard](../tools/local-test/evidence/batch-62-browser-dashboard.json),
-  [six-form checks](../tools/local-test/evidence/batch-61-browser-prefill.json).
-- [Isolation probes](../tools/local-test/evidence/batch-63-isolation.json) and
-  [current original browser smoke checks](../tools/local-test/evidence/batch-63-browser-baseline.json).
-- [Current84-file frontend/source preservation](../tools/local-test/evidence/batch-62-frontend-preservation.json)
-  reuses the [verified build](../tools/local-test/evidence/batch-61-build.json).
+- [Catalog browser checks](../archive/local-test/evidence/batch-62-browser-catalog.json),
+  [14-card dashboard](../archive/local-test/evidence/batch-62-browser-dashboard.json),
+  [six-form checks](../archive/local-test/evidence/batch-61-browser-prefill.json).
+- [Isolation probes](../archive/local-test/evidence/batch-63-isolation.json) and
+  [current original browser smoke checks](../archive/local-test/evidence/batch-63-browser-baseline.json).
+- [Current84-file frontend/source preservation](../archive/local-test/evidence/batch-62-frontend-preservation.json)
+  reuses the [verified build](../archive/local-test/evidence/batch-61-build.json).
 
 The process guards are not a virtual machine or a certificate against malicious
 native code. Test-provider responses are fabricated, not proof of live Paystack,

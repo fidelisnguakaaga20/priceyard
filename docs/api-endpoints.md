@@ -50,7 +50,7 @@ The approved business rules and operational limits are recorded in
 
 ## Route index
 
-Generated from router declarations with `tools/local-test/update_api_reference.py`.
+Generated from router declarations with `archive/local-test/update_api_reference.py`.
 Only source AST is read; no settings, credentials, application imports, database
 connection or provider request is involved. Dependency expressions are copied
 from declarations for traceability; follow the linked handler for all checks.

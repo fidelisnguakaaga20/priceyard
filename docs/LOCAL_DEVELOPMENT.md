@@ -55,7 +55,7 @@ $testPython = '.\.git\priceyard-local-recovery-20261015\p00\runtime\venv\Scripts
 Run one phase at a time. Choose tests relevant to the batch; run a broader suite
 when changed behavior warrants it. A focused run is not a full-suite pass. Save
 reports from ignored `tools/local-test/runtime` to the current batch's tracked
-`tools/local-test/evidence` files before another run overwrites them. Wait for
+`archive/local-test/evidence` files before another run overwrites them. Wait for
 command exit, including yielded tool sessions, before dependent staging/commits.
 
 If frontend sources change, stop the preview and native fixture first. Reuse the
@@ -74,7 +74,7 @@ sources. Keep the original CSS and visible behavior unless specifically approved
 
 ## Smaller native PostgreSQL fixture
 
-Follow [the test harness guide](../tools/local-test/README.md) for exact commands.
+Follow [the test harness guide](../archive/local-test/README.md) for exact commands.
 The current pinned `postgres-paging-20261018` fixture is literal127.0.0.1:55449
 (system identifier7697910732590408300). The old recovery fixture is exhausted80/80
 and must remain stopped/intact. The runner verifies the live
