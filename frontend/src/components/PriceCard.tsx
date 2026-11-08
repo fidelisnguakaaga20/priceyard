@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { CommodityImage } from "./CommodityImage";
 import { ConfidenceInfo } from "./ConfidenceInfo";
 import { FlagPriceButton } from "./FlagPriceButton";
-import { NativeShareButton } from "./ShareButtons";
+import { PriceShareButton } from "./ShareButtons";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { apiFetch, ApiError } from "../services/api";
@@ -127,10 +127,7 @@ export function PriceCard({ item, compact = false }: { item: PriceUpdate; compac
         <Link className="text-link" to={priceHistoryLink(item)}>
           View price history
         </Link>
-        <a className="text-link" href={whatsAppShareUrl(item)} target="_blank" rel="noopener noreferrer">
-          Share on WhatsApp
-        </a>
-        <NativeShareButton content={priceShareContent(item)} />
+        <PriceShareButton content={priceShareContent(item)} whatsAppUrl={whatsAppShareUrl(item)} />
         {token ? (
           <button
             type="button"

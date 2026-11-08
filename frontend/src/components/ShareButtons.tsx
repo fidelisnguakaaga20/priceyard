@@ -3,16 +3,13 @@ import type { ShareContent } from "../utils";
 
 /** navigator.share opens the device's native share sheet (WhatsApp, Facebook, Telegram,
  * SMS, etc. -- whatever's installed), so one button covers every platform instead of
- * maintaining a separate link per app. Not supported on most desktop browsers, where
- * the WhatsApp link next to it remains the primary share path. */
+ * maintaining a separate link per app. Not supported on some desktop browsers. */
 function canUseNativeShare(): boolean {
   return typeof navigator !== "undefined" && typeof navigator.share === "function";
 }
 
-export function NativeShareButton({ content, label = "Share" }: { content: ShareContent; label?: string }) {
+function useNativeShare(content: ShareContent) {
   const [busy, setBusy] = useState(false);
-  if (!canUseNativeShare()) return null;
-
   const share = async () => {
     if (busy) return;
     setBusy(true);
@@ -24,10 +21,14 @@ export function NativeShareButton({ content, label = "Share" }: { content: Share
       setBusy(false);
     }
   };
+  return { busy, share };
+}
 
-  // 📤 is the same glyph most phone share sheets already use for "share" -- paired with
-  // muted styling (vs. the bold WhatsApp link) so it reads as a secondary, catch-all
-  // option rather than a second, equally-weighted choice next to WhatsApp.
+export function NativeShareButton({ content, label = "Share" }: { content: ShareContent; label?: string }) {
+  const { busy, share } = useNativeShare(content);
+  if (!canUseNativeShare()) return null;
+
+  // Muted styling: a secondary, catch-all option on cards that have their own main action.
   return (
     <button
       type="button"
@@ -35,7 +36,31 @@ export function NativeShareButton({ content, label = "Share" }: { content: Share
       disabled={busy}
       onClick={() => void share()}
     >
-      {busy ? "Sharing…" : `📤 ${label} to other apps`}
+      {busy ? "Sharing…" : `📤 ${label}`}
+    </button>
+  );
+}
+
+/** The single Share action on a price: opens the device's share sheet where the browser
+ * has one, and otherwise opens WhatsApp with the same message ready, so every visitor
+ * can still share. */
+export function PriceShareButton({ content, whatsAppUrl }: { content: ShareContent; whatsAppUrl: string }) {
+  const { busy, share } = useNativeShare(content);
+  if (!canUseNativeShare()) {
+    return (
+      <a className="text-link" href={whatsAppUrl} target="_blank" rel="noopener noreferrer">
+        📤 Share
+      </a>
+    );
+  }
+  return (
+    <button
+      type="button"
+      className="text-link text-link-button share-button"
+      disabled={busy}
+      onClick={() => void share()}
+    >
+      {busy ? "Sharing…" : "📤 Share"}
     </button>
   );
 }

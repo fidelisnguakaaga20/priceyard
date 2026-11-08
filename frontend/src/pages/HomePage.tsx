@@ -7,7 +7,7 @@ import { LoadingSpinner } from "../components/LoadingSpinner";
 import { HomePriceSearch } from "../components/HomePriceSearch";
 import { GroupedPriceCards } from "../components/GroupedPriceCards";
 import { SavedPriceNotice } from "../components/SavedPriceNotice";
-import { NativeShareButton } from "../components/ShareButtons";
+import { NativeShareButton, PriceShareButton } from "../components/ShareButtons";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { usePreferences } from "../context/PreferencesContext";
 import { apiFetch, apiFetchWithProvenance } from "../services/api";
@@ -134,10 +134,7 @@ export function HomePage() {
               <span className="muted">
                 {prices[0].market.name} · updated {relativePriceTime(prices[0].update_date_time)}
               </span>
-              <a className="text-link" href={whatsAppShareUrl(prices[0])} target="_blank" rel="noopener noreferrer">
-                Share on WhatsApp →
-              </a>
-              <NativeShareButton content={priceShareContent(prices[0])} />
+              <PriceShareButton content={priceShareContent(prices[0])} whatsAppUrl={whatsAppShareUrl(prices[0])} />
             </div>
           )}
           <div className="button-row">

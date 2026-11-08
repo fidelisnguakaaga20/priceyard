@@ -407,6 +407,9 @@ html.easy-reading .movement {
   font-size: 0.85rem;
   font-weight: 700;
 }
+.share-button {
+  font-weight: 750;
+}
 .text-link-cta {
   color: #d98a1f;
   font-weight: 800;
