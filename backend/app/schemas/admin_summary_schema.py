@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 class AdminSummary(BaseModel):
     """The fourteen existing dashboard metrics; no account-entry/schema fields."""
+
     users: int
     commodities: int
     markets: int

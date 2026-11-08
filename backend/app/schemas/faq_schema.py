@@ -33,7 +33,9 @@ _VENDOR_INSTRUCTION_PATTERN = re.compile(
 def validate_faq_content(value: str) -> str:
     for pattern in _POSITIVE_GUARANTEE_PATTERNS:
         if pattern.search(value):
-            raise ValueError("FAQ content must not contain guarantees, financial advice, or forced buy/sell instructions")
+            raise ValueError(
+                "FAQ content must not contain guarantees, financial advice, or forced buy/sell instructions"
+            )
     if _PRIVATE_PHONE_PATTERN.search(value) or _PRIVATE_ACCOUNT_PATTERN.search(value):
         raise ValueError("FAQ content must not contain private phone or account-number instructions")
     if _VENDOR_INSTRUCTION_PATTERN.search(value):

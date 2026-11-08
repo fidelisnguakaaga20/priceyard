@@ -6,7 +6,13 @@ from app.models.commodity import Commodity
 from app.models.user import User
 from app.schemas.commodity_schema import CommodityCreate, CommodityResponse, CommodityUpdate
 from app.services.audit_service import create_audit_log, snapshot_model
-from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, release_for_stream, stream_admin_records
+from app.services.admin_list_service import (
+    AdminJSONResponse,
+    AdminRecordPage,
+    admin_record_page,
+    release_for_stream,
+    stream_admin_records,
+)
 from app.services.commodity_service import (
     create_commodity,
     delete_commodity,
@@ -18,10 +24,26 @@ from app.utils.permissions import require_roles
 router = APIRouter(prefix="/commodities", tags=["commodities"])
 
 
-def _save_catalog_audit(db: Session, admin: User, action: str, record_id: int, *, old_value: dict | None = None, new_value: dict | None = None) -> None:
+def _save_catalog_audit(
+    db: Session,
+    admin: User,
+    action: str,
+    record_id: int,
+    *,
+    old_value: dict | None = None,
+    new_value: dict | None = None,
+) -> None:
     try:
-        create_audit_log(db, actor=admin, action=action, table_name="commodities", record_id=record_id,
-                         old_value=old_value, new_value=new_value, commit=False)
+        create_audit_log(
+            db,
+            actor=admin,
+            action=action,
+            table_name="commodities",
+            record_id=record_id,
+            old_value=old_value,
+            new_value=new_value,
+            commit=False,
+        )
         db.commit()
     except Exception:
         db.rollback()
@@ -30,8 +52,16 @@ def _save_catalog_audit(db: Session, admin: User, action: str, record_id: int, *
 
 @router.get("", response_model=list[CommodityResponse])
 def get_commodities(db: Session = Depends(get_db)) -> Response:
-    return AdminJSONResponse(stream_admin_records(release_for_stream(db), Commodity, CommodityResponse,
-        order=(("name", False), ("id", False)), where=(Commodity.is_active.is_(True),)), private=False)
+    return AdminJSONResponse(
+        stream_admin_records(
+            release_for_stream(db),
+            Commodity,
+            CommodityResponse,
+            order=(("name", False), ("id", False)),
+            where=(Commodity.is_active.is_(True),),
+        ),
+        private=False,
+    )
 
 
 @router.get("/admin/all", response_model=list[CommodityResponse])
@@ -39,8 +69,11 @@ def get_all_commodities_for_admin(
     db: Session = Depends(get_db),
     _admin: User = Depends(require_roles("admin")),
 ) -> Response:
-    return AdminJSONResponse(stream_admin_records(release_for_stream(db), Commodity, CommodityResponse,
-        order=(("name", False), ("id", False))))
+    return AdminJSONResponse(
+        stream_admin_records(
+            release_for_stream(db), Commodity, CommodityResponse, order=(("name", False), ("id", False))
+        )
+    )
 
 
 @router.get("/admin/page", response_model=AdminRecordPage[CommodityResponse])

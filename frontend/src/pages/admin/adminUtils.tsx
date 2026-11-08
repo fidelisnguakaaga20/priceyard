@@ -12,12 +12,19 @@ export function useAdminList<T>(path: string) {
   const [error, setError] = useState("");
   const reload = useCallback(async () => {
     if (!token) return;
-    setLoading(true); setError("");
-    try { setData(await apiFetch<T[]>(path, {}, token)); }
-    catch (err) { setError(err instanceof ApiError ? err.detail : "Unable to load records."); }
-    finally { setLoading(false); }
+    setLoading(true);
+    setError("");
+    try {
+      setData(await apiFetch<T[]>(path, {}, token));
+    } catch (err) {
+      setError(err instanceof ApiError ? err.detail : "Unable to load records.");
+    } finally {
+      setLoading(false);
+    }
   }, [path, token]);
-  useEffect(() => { void reload(); }, [reload]);
+  useEffect(() => {
+    void reload();
+  }, [reload]);
   return { data, setData, loading, error, reload, token };
 }
 
@@ -47,8 +54,18 @@ type AdminActionButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   busyLabel?: string;
 };
 
-export function AdminActionButton({ busy = false, busyLabel = "Please wait…", children, disabled, ...props }: AdminActionButtonProps) {
-  return <button {...props} disabled={disabled || busy}>{busy ? <ButtonSpinner label={busyLabel} /> : children}</button>;
+export function AdminActionButton({
+  busy = false,
+  busyLabel = "Please wait…",
+  children,
+  disabled,
+  ...props
+}: AdminActionButtonProps) {
+  return (
+    <button {...props} disabled={disabled || busy}>
+      {busy ? <ButtonSpinner label={busyLabel} /> : children}
+    </button>
+  );
 }
 
 export function errorText(err: unknown): string {

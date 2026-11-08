@@ -11,10 +11,14 @@ export function historyPeriodBounds(period: HistoryPeriod, now = Date.now()) {
   return { start: today - (Number(period) - 1) * DAY_MS, end: today + DAY_MS };
 }
 
-export function historyInPeriod<T extends { update_date_time: string }>(items: T[], period: HistoryPeriod, now = Date.now()): T[] {
+export function historyInPeriod<T extends { update_date_time: string }>(
+  items: T[],
+  period: HistoryPeriod,
+  now = Date.now(),
+): T[] {
   const bounds = historyPeriodBounds(period, now);
   if (!bounds) return items;
-  return items.filter(item => {
+  return items.filter((item) => {
     const time = priceEpoch(item.update_date_time);
     return Number.isFinite(time) && time >= bounds.start && time < bounds.end;
   });
@@ -24,7 +28,10 @@ export function historyPeriodDescription(period: HistoryPeriod, now = Date.now()
   const bounds = historyPeriodBounds(period, now);
   if (!bounds) return "All recorded dates";
   const format = new Intl.DateTimeFormat("en-NG", {
-    timeZone: "Africa/Lagos", day: "numeric", month: "short", year: "numeric",
+    timeZone: "Africa/Lagos",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
   });
   return `${format.format(bounds.start)} – ${format.format(bounds.end - 1)} (WAT, including today)`;
 }

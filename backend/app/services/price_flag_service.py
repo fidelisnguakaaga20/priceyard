@@ -52,11 +52,28 @@ def list_flagged_price_updates(db: Session) -> list[FlaggedPriceSummary]:
 def flagged_price_page(db: Session, *, offset: int) -> AdminRecordPage[FlaggedPriceSummary]:
     grouped = _flagged_statement().order_by(None).cte("flagged_groups")
     total = select(func.count().label("total")).select_from(grouped).cte("flagged_total")
-    page = select(grouped).order_by(grouped.c.latest_flag_at.desc(), grouped.c.price_update_id.desc()).offset(offset).limit(PAGE_SIZE).cte("flagged_page")
-    rows = db.execute(select(page, total.c.total).select_from(total).outerjoin(page, true())
-        .order_by(page.c.latest_flag_at.desc(), page.c.price_update_id.desc())).mappings().all()
-    return AdminRecordPage(items=[FlaggedPriceSummary(**row) for row in rows if row['price_update_id'] is not None],
-                           total=rows[0]['total'], offset=offset)
+    page = (
+        select(grouped)
+        .order_by(grouped.c.latest_flag_at.desc(), grouped.c.price_update_id.desc())
+        .offset(offset)
+        .limit(PAGE_SIZE)
+        .cte("flagged_page")
+    )
+    rows = (
+        db.execute(
+            select(page, total.c.total)
+            .select_from(total)
+            .outerjoin(page, true())
+            .order_by(page.c.latest_flag_at.desc(), page.c.price_update_id.desc())
+        )
+        .mappings()
+        .all()
+    )
+    return AdminRecordPage(
+        items=[FlaggedPriceSummary(**row) for row in rows if row["price_update_id"] is not None],
+        total=rows[0]["total"],
+        offset=offset,
+    )
 
 
 def stream_flagged_prices(engine):
@@ -72,6 +89,7 @@ def stream_flagged_prices(engine):
                 yield "]"
             finally:
                 rows.close()
+
     return content()
 
 

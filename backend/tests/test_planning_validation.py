@@ -1,4 +1,5 @@
 """Reject clearing required intelligence fields; preserve optional values/history."""
+
 from datetime import datetime, timezone
 from decimal import Decimal
 import unittest
@@ -24,11 +25,66 @@ from app.models.user import User
 from app.security import create_access_token
 
 RESOURCES = {
-    "buying": ("buying-zones", {"price_low": "210000", "price_high": "220000", "reason": "Synthetic saved reason", "confidence": "Low confidence", "valid_from": "2026-10-01", "valid_to": "2026-10-31"}, ("commodity_id", "market_id", "price_low", "price_high", "reason", "confidence"), "valid_to", "reason"),
-    "sell": ("sell-watch-windows", {"start_period": "Synthetic recorded start", "end_period": "Synthetic recorded end", "observation": "Synthetic saved observation", "confidence": "Low confidence"}, ("commodity_id", "market_id", "start_period", "observation", "confidence"), "end_period", "observation"),
-    "market": ("market-signals", {"signal_type": "Synthetic observation", "signal_description": "Synthetic description", "possible_meaning": "Synthetic optional note"}, ("commodity_id", "market_id", "signal_type", "signal_description"), "possible_meaning", "signal_description"),
-    "quality": ("quality-signals", {"quality_status": "Synthetic observation", "moisture_status": "Synthetic moisture note", "storage_readiness": "Synthetic readiness note", "risk_note": "Synthetic optional risk"}, ("commodity_id", "market_id"), "risk_note", "quality_status"),
-    "storage": ("storage-suitability", {"suitability_status": "watch", "summary": "Synthetic saved summary", "quality_storage_notes": "Synthetic optional storage note"}, ("commodity_id", "market_id", "suitability_status"), "quality_storage_notes", "summary"),
+    "buying": (
+        "buying-zones",
+        {
+            "price_low": "210000",
+            "price_high": "220000",
+            "reason": "Synthetic saved reason",
+            "confidence": "Low confidence",
+            "valid_from": "2026-10-01",
+            "valid_to": "2026-10-31",
+        },
+        ("commodity_id", "market_id", "price_low", "price_high", "reason", "confidence"),
+        "valid_to",
+        "reason",
+    ),
+    "sell": (
+        "sell-watch-windows",
+        {
+            "start_period": "Synthetic recorded start",
+            "end_period": "Synthetic recorded end",
+            "observation": "Synthetic saved observation",
+            "confidence": "Low confidence",
+        },
+        ("commodity_id", "market_id", "start_period", "observation", "confidence"),
+        "end_period",
+        "observation",
+    ),
+    "market": (
+        "market-signals",
+        {
+            "signal_type": "Synthetic observation",
+            "signal_description": "Synthetic description",
+            "possible_meaning": "Synthetic optional note",
+        },
+        ("commodity_id", "market_id", "signal_type", "signal_description"),
+        "possible_meaning",
+        "signal_description",
+    ),
+    "quality": (
+        "quality-signals",
+        {
+            "quality_status": "Synthetic observation",
+            "moisture_status": "Synthetic moisture note",
+            "storage_readiness": "Synthetic readiness note",
+            "risk_note": "Synthetic optional risk",
+        },
+        ("commodity_id", "market_id"),
+        "risk_note",
+        "quality_status",
+    ),
+    "storage": (
+        "storage-suitability",
+        {
+            "suitability_status": "watch",
+            "summary": "Synthetic saved summary",
+            "quality_storage_notes": "Synthetic optional storage note",
+        },
+        ("commodity_id", "market_id", "suitability_status"),
+        "quality_storage_notes",
+        "summary",
+    ),
 }
 
 
@@ -36,15 +92,41 @@ def exercise_planning_validation(check, engine, kind):
     Base.metadata.create_all(engine)
     suffix = uuid.uuid4().hex[:8]
     with Session(engine) as db:
-        admin = User(full_name="Synthetic planning Admin", email=f"plan-{suffix}@example.com", password_hash="unused", role="admin", referral_code="P"+suffix)
-        free = User(full_name="Synthetic other user", email=f"plan-other-{suffix}@example.com", password_hash="unused", role="free_user", referral_code="F"+suffix)
-        commodity, market = Commodity(name="Synthetic Egusi "+suffix), Market(name="Synthetic Kwali "+suffix)
-        db.add_all([admin, free, commodity, market]); db.flush()
+        admin = User(
+            full_name="Synthetic planning Admin",
+            email=f"plan-{suffix}@example.com",
+            password_hash="unused",
+            role="admin",
+            referral_code="P" + suffix,
+        )
+        free = User(
+            full_name="Synthetic other user",
+            email=f"plan-other-{suffix}@example.com",
+            password_hash="unused",
+            role="free_user",
+            referral_code="F" + suffix,
+        )
+        commodity, market = Commodity(name="Synthetic Egusi " + suffix), Market(name="Synthetic Kwali " + suffix)
+        db.add_all([admin, free, commodity, market])
+        db.flush()
         scope = {"commodity_id": commodity.id, "market_id": market.id}
-        db.add(PriceUpdate(**scope, unit="1 bag", bag_size=None, price_low=210000, price_high=220000, status="approved", movement="unknown", confidence_level="Low confidence", created_by=admin.id, update_date_time=datetime.now(timezone.utc)))
+        db.add(
+            PriceUpdate(
+                **scope,
+                unit="1 bag",
+                bag_size=None,
+                price_low=210000,
+                price_high=220000,
+                status="approved",
+                movement="unknown",
+                confidence_level="Low confidence",
+                created_by=admin.id,
+                update_date_time=datetime.now(timezone.utc),
+            )
+        )
         db.commit()
-        headers = {"Authorization": "Bearer "+create_access_token(user_id=admin.id)}
-        free_headers = {"Authorization": "Bearer "+create_access_token(user_id=free.id)}
+        headers = {"Authorization": "Bearer " + create_access_token(user_id=admin.id)}
+        free_headers = {"Authorization": "Bearer " + create_access_token(user_id=free.id)}
 
     def sessions():
         with Session(engine) as db:
@@ -52,13 +134,24 @@ def exercise_planning_validation(check, engine, kind):
 
     def state():
         with Session(engine) as db:
-            return {model.__tablename__: db.execute(select(model.__table__).order_by(model.id)).all() for model in (BuyingZone, SellWatchWindow, MarketSignal, QualitySignal, StorageSuitability, AuditLog, PriceUpdate)}
+            return {
+                model.__tablename__: db.execute(select(model.__table__).order_by(model.id)).all()
+                for model in (
+                    BuyingZone,
+                    SellWatchWindow,
+                    MarketSignal,
+                    QualitySignal,
+                    StorageSuitability,
+                    AuditLog,
+                    PriceUpdate,
+                )
+            }
 
     app.dependency_overrides[get_db] = sessions
     try:
         with TestClient(app, raise_server_exceptions=False) as client:
             endpoint, values, required, nullable, text_field = RESOURCES[kind]
-            response = client.post("/"+endpoint, json={**scope, **values}, headers=headers)
+            response = client.post("/" + endpoint, json={**scope, **values}, headers=headers)
             check.assertEqual(response.status_code, 201, response.text)
             item_id = response.json()["id"]
             path = f"/{endpoint}/{item_id}"
@@ -67,7 +160,12 @@ def exercise_planning_validation(check, engine, kind):
                 invalid = client.patch(path, json={field: None}, headers=headers)
                 check.assertEqual(invalid.status_code, 422, invalid.text)
                 check.assertEqual(state(), before)
-            check.assertEqual(client.patch(path, json={text_field: "Synthetic unauthorized change"}, headers=free_headers).status_code, 403)
+            check.assertEqual(
+                client.patch(
+                    path, json={text_field: "Synthetic unauthorized change"}, headers=free_headers
+                ).status_code,
+                403,
+            )
             check.assertEqual(client.patch(path, json={text_field: "Synthetic unauthorized change"}).status_code, 401)
             check.assertEqual(state(), before)
             cleared = client.patch(path, json={nullable: None}, headers=headers)
@@ -88,7 +186,7 @@ def exercise_planning_validation(check, engine, kind):
             check.assertIsNone(reloaded[nullable])
             after = state()
             check.assertEqual(after["price_updates"], before["price_updates"])
-            check.assertEqual(len(after["audit_logs"]), len(before["audit_logs"])+2)
+            check.assertEqual(len(after["audit_logs"]), len(before["audit_logs"]) + 2)
     finally:
         app.dependency_overrides.clear()
 

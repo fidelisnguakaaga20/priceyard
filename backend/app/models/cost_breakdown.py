@@ -36,7 +36,9 @@ class CostBreakdown(Base):
     # update replaces the old row entirely (a new id), so a cost breakdown tied to a
     # single price_update_id would silently stop showing the moment the price next
     # changed. This way the cost data stays attached and visible across price updates.
-    commodity_id: Mapped[int] = mapped_column(ForeignKey("commodities.id", ondelete="RESTRICT"), nullable=False, index=True)
+    commodity_id: Mapped[int] = mapped_column(
+        ForeignKey("commodities.id", ondelete="RESTRICT"), nullable=False, index=True
+    )
     market_id: Mapped[int] = mapped_column(ForeignKey("markets.id", ondelete="RESTRICT"), nullable=False, index=True)
     transport: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False, default=Decimal("0.00"))
     warehouse: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False, default=Decimal("0.00"))
@@ -45,13 +47,13 @@ class CostBreakdown(Base):
     loading_offloading: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False, default=Decimal("0.00"))
     other_costs: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False, default=Decimal("0.00"))
     # Admin-named cost lines ({"name": ..., "amount": "0.00"}); they add to the fixed columns above.
-    cost_items: Mapped[list[dict[str, Any]]] = mapped_column(JSON, nullable=False, default=list, server_default=text("'[]'"))
+    cost_items: Mapped[list[dict[str, Any]]] = mapped_column(
+        JSON, nullable=False, default=list, server_default=text("'[]'")
+    )
     total_additional_cost: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False)
     purchase_price_reference: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False)
     total_estimated_landing_storage_cost: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
     )

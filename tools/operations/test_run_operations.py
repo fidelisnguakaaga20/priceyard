@@ -1,4 +1,5 @@
 """Synthetic-only checks for scheduler bounds, privacy and resumable progress."""
+
 from contextlib import redirect_stderr, redirect_stdout
 from email.message import Message
 import io
@@ -34,8 +35,13 @@ def report(*, checkpoint=None, complete=True, busy=False, outcome="confirmed"):
     outcomes = dict.fromkeys(ops.OUTCOMES, 0)
     if not busy:
         outcomes[outcome] = 1
-    return {"busy": busy, "complete": complete, "processed": sum(outcomes.values()),
-            "outcomes": outcomes, "checkpoint": checkpoint}
+    return {
+        "busy": busy,
+        "complete": complete,
+        "processed": sum(outcomes.values()),
+        "outcomes": outcomes,
+        "checkpoint": checkpoint,
+    }
 
 
 class FakeClient:
@@ -58,10 +64,13 @@ class FakeClient:
         return self.left
 
 
-ENV = {"GITHUB_TOKEN": "synthetic-github-token", "GITHUB_REPOSITORY": ops.REPOSITORY,
-       "GITHUB_REF": "refs/heads/master",
-       "ACTIONS_ID_TOKEN_REQUEST_URL": "https://run-actions-test.actions.githubusercontent.com/idtoken?api-version=2.0",
-       "ACTIONS_ID_TOKEN_REQUEST_TOKEN": "synthetic-request-token"}
+ENV = {
+    "GITHUB_TOKEN": "synthetic-github-token",
+    "GITHUB_REPOSITORY": ops.REPOSITORY,
+    "GITHUB_REF": "refs/heads/master",
+    "ACTIONS_ID_TOKEN_REQUEST_URL": "https://run-actions-test.actions.githubusercontent.com/idtoken?api-version=2.0",
+    "ACTIONS_ID_TOKEN_REQUEST_TOKEN": "synthetic-request-token",
+}
 JWT = "header." + "synthetic" * 10 + ".signature"
 
 
@@ -112,22 +121,38 @@ class HttpTests(unittest.TestCase):
         request = client.calls[0]
         self.assertEqual(parse_qs(urlsplit(request[1]).query)["audience"], [ops.RECOVERY])
         self.assertEqual(request[2]["headers"]["Authorization"], "Bearer synthetic-request-token")
-        for url in ("https://evil.example/idtoken", "http://run.actions.githubusercontent.com/idtoken",
-                    "https://run.actions.githubusercontent.com.evil.test/idtoken"):
+        for url in (
+            "https://evil.example/idtoken",
+            "http://run.actions.githubusercontent.com/idtoken",
+            "https://run.actions.githubusercontent.com.evil.test/idtoken",
+        ):
             with self.subTest(url=url), self.assertRaises(ops.SafeFailure):
                 ops.oidc_token(FakeClient(), {**ENV, "ACTIONS_ID_TOKEN_REQUEST_URL": url})
 
 
 class CheckpointTests(unittest.TestCase):
     def client(self, token="gAAAA_synthetic==", **artifact_changes):
-        artifact = {"id": 25, "name": ops.ARTIFACT, "size_in_bytes": 300, "expired": False,
-                    "workflow_run": {"id": 20, "head_branch": "master"}, **artifact_changes}
-        run = {"path": ops.WORKFLOW, "head_branch": "master", "event": "schedule",
-               "head_repository": {"full_name": ops.REPOSITORY}}
-        return FakeClient(jsons=[{"artifacts": [artifact], "total_count": 1}, run], requests=[
-            (302, headers(Location="https://test.blob.core.windows.net/artifact?signed=synthetic"), b""),
-            (200, headers("application/zip"), archive(token)),
-        ])
+        artifact = {
+            "id": 25,
+            "name": ops.ARTIFACT,
+            "size_in_bytes": 300,
+            "expired": False,
+            "workflow_run": {"id": 20, "head_branch": "master"},
+            **artifact_changes,
+        }
+        run = {
+            "path": ops.WORKFLOW,
+            "head_branch": "master",
+            "event": "schedule",
+            "head_repository": {"full_name": ops.REPOSITORY},
+        }
+        return FakeClient(
+            jsons=[{"artifacts": [artifact], "total_count": 1}, run],
+            requests=[
+                (302, headers(Location="https://test.blob.core.windows.net/artifact?signed=synthetic"), b""),
+                (200, headers("application/zip"), archive(token)),
+            ],
+        )
 
     def test_first_run_can_start_but_listing_failure_cannot_reset_progress(self):
         self.assertIsNone(ops.load_checkpoint(FakeClient(jsons=[{"artifacts": [], "total_count": 0}]), ENV))
@@ -195,8 +220,12 @@ class RecoveryTests(unittest.TestCase):
             self.assertEqual(json.loads(path.read_text()), {"checkpoint": "gAAAA_same=="})
 
     def test_invalid_aggregate_or_token_does_not_overwrite_previous_position(self):
-        for invalid in (report(checkpoint="gAAAA_wrong=="), {**report(), "payment_id": 99},
-                        {**report(), "processed": True}, {**report(), "processed": 26}):
+        for invalid in (
+            report(checkpoint="gAAAA_wrong=="),
+            {**report(), "payment_id": 99},
+            {**report(), "processed": True},
+            {**report(), "processed": 26},
+        ):
             client = FakeClient(jsons=[{"value": JWT}, invalid])
             with tempfile.TemporaryDirectory() as temp:
                 path = Path(temp) / "checkpoint.json"
@@ -206,8 +235,13 @@ class RecoveryTests(unittest.TestCase):
                 self.assertEqual(json.loads(path.read_text()), {"checkpoint": "gAAAA_original=="})
 
     def test_maximum_two_pages_even_with_more_work(self):
-        client = FakeClient(jsons=[{"value": JWT}, report(complete=False, checkpoint="gAAAA_one=="),
-                                   report(complete=False, checkpoint="gAAAA_two==")])
+        client = FakeClient(
+            jsons=[
+                {"value": JWT},
+                report(complete=False, checkpoint="gAAAA_one=="),
+                report(complete=False, checkpoint="gAAAA_two=="),
+            ]
+        )
         with tempfile.TemporaryDirectory() as temp:
             path = Path(temp) / "checkpoint.json"
             ops.recover(client, ENV, None, path)
@@ -241,20 +275,28 @@ class MainTests(unittest.TestCase):
         self.assertFalse(client.mock_calls)
 
     def test_health_only_has_no_identity_checkpoint_or_recovery_call(self):
-        client = FakeClient(jsons=[{"status": "healthy"}, {"status": "healthy"}],
-                            requests=[(200, headers("text/html"), b"<title>PriceYard</title>")])
+        client = FakeClient(
+            jsons=[{"status": "healthy"}, {"status": "healthy"}],
+            requests=[(200, headers("text/html"), b"<title>PriceYard</title>")],
+        )
         with redirect_stdout(io.StringIO()):
             self.assertEqual(ops.main({"OPS_MODE": "health-only"}, client), 0)
-        self.assertEqual([call[1] for call in client.calls],
-                         [ops.FRONTEND + "/api/health", ops.API + "/health", ops.FRONTEND + "/login"])
+        self.assertEqual(
+            [call[1] for call in client.calls],
+            [ops.FRONTEND + "/api/health", ops.API + "/health", ops.FRONTEND + "/login"],
+        )
 
     def test_health_accepts_reported_commit_but_not_other_shapes(self):
         live = {"status": "healthy", "deployed_commit": "631fbfef654af6ad35f3d168a72874da2e6efb7b"}
         client = FakeClient(jsons=[live, live], requests=[(200, headers("text/html"), b"PriceYard")])
         with redirect_stdout(io.StringIO()):
             self.assertEqual(ops.main({"OPS_MODE": "health-only"}, client), 0)
-        for bad in ({"status": "degraded", "deployed_commit": "abc"}, {"status": "healthy", "extra": "x"},
-                    {"status": "healthy", "deployed_commit": 1}, ["healthy"]):
+        for bad in (
+            {"status": "degraded", "deployed_commit": "abc"},
+            {"status": "healthy", "extra": "x"},
+            {"status": "healthy", "deployed_commit": 1},
+            ["healthy"],
+        ):
             client = FakeClient(jsons=[bad, bad], requests=[(200, headers("text/html"), b"PriceYard")])
             with redirect_stderr(io.StringIO()) as error:
                 self.assertEqual(ops.main({"OPS_MODE": "health-only"}, client), 1)
@@ -263,10 +305,16 @@ class MainTests(unittest.TestCase):
     def test_failed_recovery_step_exposes_only_constant_output_flag(self):
         with tempfile.TemporaryDirectory() as temp:
             path, output = Path(temp) / "checkpoint.json", Path(temp) / "outputs"
-            client = FakeClient(jsons=[{"artifacts": [], "total_count": 0}, {"status": "healthy"},
-                                       {"status": "healthy"}, {"value": JWT},
-                                       report(complete=False, checkpoint="gAAAA_private==", outcome="review_required")],
-                                requests=[(200, headers("text/html"), b"PriceYard")])
+            client = FakeClient(
+                jsons=[
+                    {"artifacts": [], "total_count": 0},
+                    {"status": "healthy"},
+                    {"status": "healthy"},
+                    {"value": JWT},
+                    report(complete=False, checkpoint="gAAAA_private==", outcome="review_required"),
+                ],
+                requests=[(200, headers("text/html"), b"PriceYard")],
+            )
             environ = {**ENV, "OPS_MODE": "recover", "OPS_STATE_PATH": str(path), "GITHUB_OUTPUT": str(output)}
             with redirect_stderr(io.StringIO()) as error:
                 self.assertEqual(ops.main(environ, client), 1)
@@ -276,9 +324,14 @@ class MainTests(unittest.TestCase):
     def test_frontend_failure_alerts_without_disabling_backend_recovery(self):
         with tempfile.TemporaryDirectory() as temp:
             path = Path(temp) / "checkpoint.json"
-            client = FakeClient(jsons=[{"artifacts": [], "total_count": 0},
-                                       ops.SafeFailure("Synthetic frontend outage."),
-                                       {"value": JWT}, report()])
+            client = FakeClient(
+                jsons=[
+                    {"artifacts": [], "total_count": 0},
+                    ops.SafeFailure("Synthetic frontend outage."),
+                    {"value": JWT},
+                    report(),
+                ]
+            )
             environ = {**ENV, "OPS_MODE": "recover", "OPS_STATE_PATH": str(path)}
             with redirect_stderr(io.StringIO()) as error:
                 self.assertEqual(ops.main(environ, client), 1)

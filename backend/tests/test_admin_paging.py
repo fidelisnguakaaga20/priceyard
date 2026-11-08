@@ -17,22 +17,42 @@ from app.schemas.user_schema import UserResponse
 from app.security import create_access_token
 from app.services.admin_list_service import AdminJSONResponse, admin_record_page, stream_admin_records
 
-RESOURCES = ((User, UserResponse, (("id", False),), "/users"),
-             (Payment, PaymentResponse, (("created_at", True), ("id", True)), "/payments"))
+RESOURCES = (
+    (User, UserResponse, (("id", False),), "/users"),
+    (Payment, PaymentResponse, (("created_at", True), ("id", True)), "/payments"),
+)
 
 
 def seed_pages(engine):
     Base.metadata.create_all(engine)
     with Session(engine) as db:
         moment = datetime(2026, 10, 18, 8, tzinfo=timezone.utc)
-        users = [User(full_name=f"Synthetic page {index:03}", email=f"page-{index:03}@example.com",
-                      password_hash="PRIVATE-PAGE-HASH", role="admin" if index == 0 else "free_user",
-                      referral_code=f"PAGE{index:03}", created_at=moment) for index in range(205)]
-        db.add_all(users); db.flush()
+        users = [
+            User(
+                full_name=f"Synthetic page {index:03}",
+                email=f"page-{index:03}@example.com",
+                password_hash="PRIVATE-PAGE-HASH",
+                role="admin" if index == 0 else "free_user",
+                referral_code=f"PAGE{index:03}",
+                created_at=moment,
+            )
+            for index in range(205)
+        ]
+        db.add_all(users)
+        db.flush()
         for index, user in enumerate(users):
-            db.add(Payment(user_id=user.id, reference=f"py_synthetic_page_{index:03}", plan="monthly", amount=2500,
-                           currency="NGN", status=("pending", "success", "failed")[index % 3],
-                           paystack_transaction_id=f"PRIVATE-PROVIDER-{index}", created_at=moment))
+            db.add(
+                Payment(
+                    user_id=user.id,
+                    reference=f"py_synthetic_page_{index:03}",
+                    plan="monthly",
+                    amount=2500,
+                    currency="NGN",
+                    status=("pending", "success", "failed")[index % 3],
+                    paystack_transaction_id=f"PRIVATE-PROVIDER-{index}",
+                    created_at=moment,
+                )
+            )
         db.commit()
         return users[0].id, users[1].id
 
@@ -42,10 +62,12 @@ def verify_pages(check, engine):
     with Session(engine) as db:
         before = {model: db.execute(select(model.__table__).order_by(model.id)).all() for model, *_ in RESOURCES}
     max_hydrated = 0
+
     def loaded(db, item):
         nonlocal max_hydrated
         if db.get_bind() is engine:
             max_hydrated = max(max_hydrated, len(db.identity_map))
+
     event.listen(Session, "loaded_as_persistent", loaded)
     try:
         for model, schema, order, _ in RESOURCES:
@@ -53,8 +75,10 @@ def verify_pages(check, engine):
             actual = []
             for offset, count in ((0, 100), (100, 100), (200, 5), (300, 0)):
                 statements = []
+
                 def query(*args):
                     statements.append(True)
+
                 event.listen(engine, "before_cursor_execute", query)
                 try:
                     with Session(engine) as db:
@@ -64,7 +88,7 @@ def verify_pages(check, engine):
                     event.remove(engine, "before_cursor_execute", query)
                 check.assertEqual(len(statements), 1)
                 check.assertEqual((page.total, page.offset, page.limit, len(page.items)), (205, offset, 100, count))
-                check.assertEqual([row.id for row in page.items], expected[offset:offset+100])
+                check.assertEqual([row.id for row in page.items], expected[offset : offset + 100])
                 actual.extend(row.id for row in page.items)
             check.assertEqual(actual, expected)
             legacy = json.loads("".join(stream_admin_records(engine, model, schema, order=order)))
@@ -91,11 +115,17 @@ class AdminPagingTests(unittest.TestCase):
 
     def client(self):
         admin, customer = seed_pages(self.engine)
+
         def sessions():
             with Session(self.engine) as db:
                 yield db
+
         app.dependency_overrides[get_db] = sessions
-        return TestClient(app), {"Authorization": "Bearer " + create_access_token(user_id=admin)}, {"Authorization": "Bearer " + create_access_token(user_id=customer)}
+        return (
+            TestClient(app),
+            {"Authorization": "Bearer " + create_access_token(user_id=admin)},
+            {"Authorization": "Bearer " + create_access_token(user_id=customer)},
+        )
 
     def test_original_complete_api_and_new_pages_keep_permissions_and_fields(self):
         client, admin, customer = self.client()
@@ -129,20 +159,25 @@ class AdminPagingTests(unittest.TestCase):
 
     def test_failed_send_closes_the_legacy_stream(self):
         closed = []
+
         def content():
             try:
                 yield "["
                 yield "]"
             finally:
                 closed.append(True)
+
         async def send(message):
             if message["type"] == "http.response.body":
                 raise OSError("Synthetic disconnect")
+
         async def receive():
             return {"type": "http.disconnect"}
+
         async def run():
             with self.assertRaises(Exception):
                 await AdminJSONResponse(content())({"type": "http", "asgi": {"spec_version": "2.4"}}, receive, send)
+
         anyio.run(run)
         self.assertEqual(closed, [True])
 
@@ -155,23 +190,31 @@ class AdminPagingTests(unittest.TestCase):
 
     def test_cancelled_response_closes_its_source(self):
         closed = []
+
         def content():
             try:
                 yield "["
                 yield "]"
             finally:
                 closed.append(True)
+
         async def run():
             started = anyio.Event()
+
             async def send(message):
                 if message["type"] == "http.response.body":
                     started.set()
                     await anyio.sleep_forever()
+
             async def receive():
                 return {"type": "http.disconnect"}
+
             async with anyio.create_task_group() as group:
-                group.start_soon(AdminJSONResponse(content()), {"type": "http", "asgi": {"spec_version": "2.4"}}, receive, send)
+                group.start_soon(
+                    AdminJSONResponse(content()), {"type": "http", "asgi": {"spec_version": "2.4"}}, receive, send
+                )
                 await started.wait()
                 group.cancel_scope.cancel()
+
         anyio.run(run)
         self.assertEqual(closed, [True])

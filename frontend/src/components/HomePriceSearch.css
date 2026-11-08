@@ -26,7 +26,7 @@
 .home-price-search label {
   min-width: 0;
   color: var(--color-text);
-  font-size: .86rem;
+  font-size: 0.86rem;
   font-weight: 700;
 }
 
@@ -46,7 +46,7 @@
 
 .home-price-search .home-search-status {
   margin: 10px 0 0;
-  font-size: .9rem;
+  font-size: 0.9rem;
   line-height: 1.5;
   color: var(--color-text);
 }

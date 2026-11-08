@@ -19,7 +19,13 @@ from app.services.price_update_service import list_latest_approved_price_updates
 def seed_identity(engine):
     Base.metadata.create_all(engine)
     with Session(engine) as db:
-        owner = User(full_name="Synthetic identity Admin", email="identity-filter@example.com", password_hash="unused", role="admin", referral_code="FILTERID")
+        owner = User(
+            full_name="Synthetic identity Admin",
+            email="identity-filter@example.com",
+            password_hash="unused",
+            role="admin",
+            referral_code="FILTERID",
+        )
         commodities = [Commodity(name="Egusi"), Commodity(name="Egusi synthetic %20")]
         markets = [Market(name="Kwali Market", state="FCT"), Market(name="Kwali Market", state="Benue")]
         db.add_all([owner, *commodities, *markets])
@@ -28,10 +34,22 @@ def seed_identity(engine):
         for commodity in commodities:
             for market in markets:
                 for offset in range(2):
-                    db.add(PriceUpdate(commodity_id=commodity.id, market_id=market.id, unit="1 bag", bag_size=None,
-                        price_low=210000 + commodity.id * 100 + market.id * 10 + offset, price_high=220000,
-                        update_date_time=moment + timedelta(hours=offset), confidence_level="Low confidence",
-                        movement="unknown", status="approved", created_by=owner.id, source_1="PRIVATE-IDENTITY-SOURCE"))
+                    db.add(
+                        PriceUpdate(
+                            commodity_id=commodity.id,
+                            market_id=market.id,
+                            unit="1 bag",
+                            bag_size=None,
+                            price_low=210000 + commodity.id * 100 + market.id * 10 + offset,
+                            price_high=220000,
+                            update_date_time=moment + timedelta(hours=offset),
+                            confidence_level="Low confidence",
+                            movement="unknown",
+                            status="approved",
+                            created_by=owner.id,
+                            source_1="PRIVATE-IDENTITY-SOURCE",
+                        )
+                    )
         db.commit()
         return owner.id, [row.id for row in commodities], [row.id for row in markets]
 
@@ -40,14 +58,18 @@ def verify_identity_filters(check, engine):
     _, commodities, markets = seed_identity(engine)
     with Session(engine) as db:
         before = db.execute(select(PriceUpdate.__table__).order_by(PriceUpdate.id)).all()
-        check.assertEqual(len(list_latest_approved_price_updates(db, commodity_search="Egusi", market_search="Kwali")), 4)
+        check.assertEqual(
+            len(list_latest_approved_price_updates(db, commodity_search="Egusi", market_search="Kwali")), 4
+        )
         for commodity in commodities:
             for market in markets:
                 current = list_latest_approved_price_updates(db, commodity_id=commodity, market_id=market)
                 history = list_price_history(db, commodity_id=commodity, market_id=market)
                 check.assertEqual(len(current), 1)
                 check.assertEqual(len(history), 2)
-                check.assertTrue(all((row.commodity_id, row.market_id) == (commodity, market) for row in [*current, *history]))
+                check.assertTrue(
+                    all((row.commodity_id, row.market_id) == (commodity, market) for row in [*current, *history])
+                )
                 check.assertEqual(current[0].id, history[-1].id)
         original_ids = [row.id for row in list_price_history(db, commodity_id=commodities[0])]
         item = db.get(Commodity, commodities[0])
@@ -74,11 +96,18 @@ class PriceIdentityFilterTests(unittest.TestCase):
 
     def prepare_client(self):
         owner_id, commodities, markets = seed_identity(self.engine)
+
         def sessions():
             with Session(self.engine) as db:
                 yield db
+
         app.dependency_overrides[get_db] = sessions
-        return TestClient(app), {"Authorization": "Bearer " + create_access_token(user_id=owner_id)}, commodities, markets
+        return (
+            TestClient(app),
+            {"Authorization": "Bearer " + create_access_token(user_id=owner_id)},
+            commodities,
+            markets,
+        )
 
     def test_http_current_history_forward_existing_ids_without_exposing_sources(self):
         client, headers, commodities, markets = self.prepare_client()
@@ -88,7 +117,12 @@ class PriceIdentityFilterTests(unittest.TestCase):
                 response = client.get(path + query, headers=credentials)
                 self.assertEqual(response.status_code, 200)
                 self.assertEqual(len(response.json()), count)
-                self.assertTrue(all(row["commodity_id"] == commodities[0] and row["market_id"] == markets[1] for row in response.json()))
+                self.assertTrue(
+                    all(
+                        row["commodity_id"] == commodities[0] and row["market_id"] == markets[1]
+                        for row in response.json()
+                    )
+                )
                 self.assertNotIn("PRIVATE-IDENTITY", response.text)
             self.assertEqual(client.get("/price-updates/history" + query).status_code, 401)
             self.assertEqual(len(client.get("/price-updates?commodity=Egusi&market=Kwali").json()), 4)
@@ -105,7 +139,9 @@ class PriceIdentityFilterTests(unittest.TestCase):
     def test_share_uses_existing_price_identity_after_rename_but_only_current_amounts(self):
         client, _, commodities, _ = self.prepare_client()
         with Session(self.engine) as db:
-            historical = db.scalars(select(PriceUpdate).where(PriceUpdate.commodity_id == commodities[0]).order_by(PriceUpdate.id)).first()
+            historical = db.scalars(
+                select(PriceUpdate).where(PriceUpdate.commodity_id == commodities[0]).order_by(PriceUpdate.id)
+            ).first()
             historical.price_low = 12345
             historical.price_high = 23456
             historical_id = historical.id
@@ -125,6 +161,7 @@ class PriceIdentityFilterTests(unittest.TestCase):
         # Pass the already-decoded ASGI path value directly: TestClient's
         # synthetic transport decodes a literal percent escape a second time.
         from app.routes.share_routes import share_commodity_card
+
         with Session(self.engine) as db:
             response = share_commodity_card("Egusi synthetic %20", pu=None, commodity_id=None, db=db)
             self.assertIn(f"commodity_id={commodities[1]}", response.body.decode())
@@ -134,7 +171,9 @@ class PriceIdentityFilterTests(unittest.TestCase):
             self.assertNotIn(f"commodity_id={commodities[1]}", response.text)
         with Session(self.engine) as db:
             future = Commodity(name="Future renamed synthetic", is_upcoming=True)
-            db.add(future); db.commit(); future_id = future.id
+            db.add(future)
+            db.commit()
+            future_id = future.id
         with client:
             response = client.get(f"/share/commodities/Old%20future?commodity_id={future_id}&v=synthetic")
             self.assertEqual(response.status_code, 200)
@@ -146,9 +185,16 @@ class PriceIdentityFilterTests(unittest.TestCase):
         client, _, commodities, _ = self.prepare_client()
         with Session(self.engine) as db:
             price = db.scalars(select(PriceUpdate).order_by(PriceUpdate.id)).first()
-            price.status = "pending"; price_id = price.id; db.commit()
+            price.status = "pending"
+            price_id = price.id
+            db.commit()
         with client:
-            for query in ("pu=2147483647", f"pu={price_id}", "commodity_id=2147483647", f"pu={price_id + 1}&commodity_id={commodities[1]}"):
+            for query in (
+                "pu=2147483647",
+                f"pu={price_id}",
+                "commodity_id=2147483647",
+                f"pu={price_id + 1}&commodity_id={commodities[1]}",
+            ):
                 self.assertEqual(client.get("/share/commodities/Egusi?" + query).status_code, 404)
             for value in ("0", "2147483648", "not-an-id"):
                 self.assertEqual(client.get("/share/commodities/Egusi?pu=" + value).status_code, 422)
@@ -156,5 +202,5 @@ class PriceIdentityFilterTests(unittest.TestCase):
     def test_share_name_boundary_matches_existing_catalog_storage(self):
         client, _, _, _ = self.prepare_client()
         with client:
-            self.assertEqual(client.get("/share/commodities/" + "n"*100).status_code, 200)
-            self.assertEqual(client.get("/share/commodities/" + "n"*101).status_code, 422)
+            self.assertEqual(client.get("/share/commodities/" + "n" * 100).status_code, 200)
+            self.assertEqual(client.get("/share/commodities/" + "n" * 101).status_code, 422)

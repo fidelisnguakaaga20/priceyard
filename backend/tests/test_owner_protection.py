@@ -1,4 +1,5 @@
 """Synthetic API proofs for derived Owner authority; no production configuration."""
+
 from datetime import datetime, timedelta, timezone
 import unittest
 from unittest.mock import patch
@@ -28,12 +29,21 @@ class OwnerProtectionTests(unittest.TestCase):
         Base.metadata.create_all(self.engine)
         self.ids = {}
         with Session(self.engine) as db:
-            for label, role in (("founder", "admin"), ("staff", "admin"),
-                                ("other-admin", "admin"), ("member", "free_user"),
-                                ("reporter", "reporter")):
-                user = User(full_name="Synthetic " + label, email=label + "@example.com",
-                            password_hash="synthetic-unchanged-hash", role=role,
-                            is_active=True, referral_code="OWNERTEST" + str(len(self.ids)))
+            for label, role in (
+                ("founder", "admin"),
+                ("staff", "admin"),
+                ("other-admin", "admin"),
+                ("member", "free_user"),
+                ("reporter", "reporter"),
+            ):
+                user = User(
+                    full_name="Synthetic " + label,
+                    email=label + "@example.com",
+                    password_hash="synthetic-unchanged-hash",
+                    role=role,
+                    is_active=True,
+                    referral_code="OWNERTEST" + str(len(self.ids)),
+                )
                 user.subscription = build_trial_subscription(user=user)
                 if label == "founder":
                     user.subscription.status = "expired"
@@ -46,10 +56,13 @@ class OwnerProtectionTests(unittest.TestCase):
         def sessions():
             with Session(self.engine, expire_on_commit=False) as db:
                 yield db
+
         app.dependency_overrides[get_db] = sessions
         self.client = TestClient(app, raise_server_exceptions=False)
-        self.headers = {name: {"Authorization": "Bearer " + create_access_token(user_id=user_id)}
-                        for name, user_id in self.ids.items()}
+        self.headers = {
+            name: {"Authorization": "Bearer " + create_access_token(user_id=user_id)}
+            for name, user_id in self.ids.items()
+        }
 
     def tearDown(self):
         self.client.close()
@@ -60,19 +73,29 @@ class OwnerProtectionTests(unittest.TestCase):
     def state(self):
         with Session(self.engine) as db:
             return {
-                "users": [(u.id, u.email, u.role, u.is_active, u.auth_version, u.password_hash)
-                          for u in db.scalars(select(User).order_by(User.id))],
-                "subscriptions": [(s.user_id, s.status, s.plan_name, s.start_date, s.end_date,
-                                   s.trial_started_at, s.trial_ends_at, s.payment_reference)
-                                  for s in db.scalars(select(Subscription).order_by(Subscription.id))],
-                "audits": [(a.id, a.action, a.record_id)
-                           for a in db.scalars(select(AuditLog).order_by(AuditLog.id))],
+                "users": [
+                    (u.id, u.email, u.role, u.is_active, u.auth_version, u.password_hash)
+                    for u in db.scalars(select(User).order_by(User.id))
+                ],
+                "subscriptions": [
+                    (
+                        s.user_id,
+                        s.status,
+                        s.plan_name,
+                        s.start_date,
+                        s.end_date,
+                        s.trial_started_at,
+                        s.trial_ends_at,
+                        s.payment_reference,
+                    )
+                    for s in db.scalars(select(Subscription).order_by(Subscription.id))
+                ],
+                "audits": [(a.id, a.action, a.record_id) for a in db.scalars(select(AuditLog).order_by(AuditLog.id))],
             }
 
     def denied(self, actor, target, payload, expected=403, headers=None):
         before = self.state()
-        response = self.client.patch(f"/users/{self.ids[target]}", json=payload,
-                                     headers=headers or self.headers[actor])
+        response = self.client.patch(f"/users/{self.ids[target]}", json=payload, headers=headers or self.headers[actor])
         self.assertEqual(response.status_code, expected, response.text)
         self.assertEqual(self.state(), before)
         return response
@@ -95,14 +118,23 @@ class OwnerProtectionTests(unittest.TestCase):
         self.assertEqual(self.state(), before)
 
     def test_other_admin_cannot_demote_deactivate_or_even_resubmit_owner_authority(self):
-        for payload in ({"role": "free_user"}, {"role": "reporter"}, {"is_active": False},
-                        {"role": "admin"}, {"is_active": True}):
+        for payload in (
+            {"role": "free_user"},
+            {"role": "reporter"},
+            {"is_active": False},
+            {"role": "admin"},
+            {"is_active": True},
+        ):
             with self.subTest(payload=payload):
                 self.denied("staff", "founder", payload)
 
     def test_owner_cannot_demote_or_deactivate_self(self):
-        for payload in ({"is_active": False}, {"role": "free_user"}, {"role": "reporter"},
-                        {"role": "paid_user", "is_active": False}):
+        for payload in (
+            {"is_active": False},
+            {"role": "free_user"},
+            {"role": "reporter"},
+            {"role": "paid_user", "is_active": False},
+        ):
             with self.subTest(payload=payload):
                 self.denied("founder", "founder", payload, 409)
 
@@ -124,15 +156,17 @@ class OwnerProtectionTests(unittest.TestCase):
     def test_owner_can_appoint_demote_disable_and_reactivate_staff_with_audits_and_revocation(self):
         original = self.state()["subscriptions"]
         for role in ("admin", "reporter"):
-            response = self.client.patch(f"/users/{self.ids['member']}", json={"role": role},
-                                         headers=self.headers["founder"])
+            response = self.client.patch(
+                f"/users/{self.ids['member']}", json={"role": role}, headers=self.headers["founder"]
+            )
             self.assertEqual(response.status_code, 200, response.text)
             self.assertEqual(response.json()["role"], role)
             self.assertFalse(response.json()["is_owner"])
         self.assertEqual(self.state()["subscriptions"], original)
         for enabled in (False, True):
-            response = self.client.patch(f"/users/{self.ids['staff']}", json={"is_active": enabled},
-                                         headers=self.headers["founder"])
+            response = self.client.patch(
+                f"/users/{self.ids['staff']}", json={"is_active": enabled}, headers=self.headers["founder"]
+            )
             self.assertEqual(response.status_code, 200, response.text)
         self.assertEqual(self.client.get("/auth/me", headers=self.headers["staff"]).status_code, 401)
         with Session(self.engine) as db:
@@ -142,16 +176,18 @@ class OwnerProtectionTests(unittest.TestCase):
 
     def test_regular_admin_keeps_normal_non_admin_management_and_subscription_rules(self):
         for role, status in (("paid_user", "active"), ("free_user", "free"), ("reporter", "free")):
-            response = self.client.patch(f"/users/{self.ids['member']}", json={"role": role},
-                                         headers=self.headers["staff"])
+            response = self.client.patch(
+                f"/users/{self.ids['member']}", json={"role": role}, headers=self.headers["staff"]
+            )
             self.assertEqual(response.status_code, 200, response.text)
             self.assertEqual(response.json()["role"], role)
             with Session(self.engine) as db:
                 subscription = db.get(User, self.ids["member"]).subscription
                 self.assertEqual(subscription.status, status)
                 self.assertIsNone(subscription.end_date)
-        response = self.client.patch(f"/users/{self.ids['member']}", json={"is_active": False},
-                                     headers=self.headers["staff"])
+        response = self.client.patch(
+            f"/users/{self.ids['member']}", json={"is_active": False}, headers=self.headers["staff"]
+        )
         self.assertEqual(response.status_code, 200, response.text)
 
     def test_forged_owner_payload_headers_and_signed_role_claim_do_not_grant_authority(self):
@@ -159,8 +195,9 @@ class OwnerProtectionTests(unittest.TestCase):
         spoofed_headers = dict(self.headers["staff"], **{"X-Owner": "true", "X-Owner-Email": "founder@example.com"})
         self.denied("staff", "member", {"role": "admin"}, headers=spoofed_headers)
         settings = get_settings()
-        claims = jwt.decode(self.headers["staff"]["Authorization"].split()[1], settings.jwt_secret,
-                            algorithms=[settings.jwt_algorithm])
+        claims = jwt.decode(
+            self.headers["staff"]["Authorization"].split()[1], settings.jwt_secret, algorithms=[settings.jwt_algorithm]
+        )
         claims.update(role="owner", is_owner=True, email="founder@example.com")
         spoofed = jwt.encode(claims, settings.jwt_secret, algorithm=settings.jwt_algorithm)
         self.denied("staff", "member", {"role": "admin"}, headers={"Authorization": "Bearer " + spoofed})
@@ -177,19 +214,30 @@ class OwnerProtectionTests(unittest.TestCase):
         self.denied("founder", "member", {"role": "admin"})
         self.denied("staff", "founder", {"role": "admin"})
         with patch("app.routes.auth_routes.notify_admins", return_value=None):
-            response = self.client.post("/auth/register", json={
-                "full_name": "Synthetic new member", "email": "registration-owner-test@example.com",
-                "password": "PriceYardDemo8!", "role": "admin", "is_owner": True,
-            })
+            response = self.client.post(
+                "/auth/register",
+                json={
+                    "full_name": "Synthetic new member",
+                    "email": "registration-owner-test@example.com",
+                    "password": "PriceYardDemo8!",
+                    "role": "admin",
+                    "is_owner": True,
+                },
+            )
         self.assertEqual(response.status_code, 201, response.text)
         self.assertEqual(response.json()["role"], "free_user")
         self.assertFalse(response.json()["is_owner"])
 
     def test_ambiguous_case_variant_owner_email_fails_closed_and_protected_row_stays_unchanged(self):
         with Session(self.engine) as db:
-            duplicate = User(full_name="Synthetic legacy duplicate", email="FOUNDER@example.com",
-                             password_hash="synthetic-only", role="admin", is_active=True,
-                             referral_code="OWNERDUP")
+            duplicate = User(
+                full_name="Synthetic legacy duplicate",
+                email="FOUNDER@example.com",
+                password_hash="synthetic-only",
+                role="admin",
+                is_active=True,
+                referral_code="OWNERDUP",
+            )
             db.add(duplicate)
             db.commit()
         profile = self.client.get("/auth/me", headers=self.headers["founder"])
@@ -200,8 +248,9 @@ class OwnerProtectionTests(unittest.TestCase):
     def test_owner_grant_audit_failure_rolls_back_all_role_and_subscription_changes(self):
         before = self.state()
         with patch("app.routes.user_routes.create_audit_log", side_effect=RuntimeError("Synthetic audit failure")):
-            response = self.client.patch(f"/users/{self.ids['member']}", json={"role": "admin"},
-                                         headers=self.headers["founder"])
+            response = self.client.patch(
+                f"/users/{self.ids['member']}", json={"role": "admin"}, headers=self.headers["founder"]
+            )
         self.assertEqual(response.status_code, 500)
         self.assertEqual(self.state(), before)
         self.assertTrue(self.client.get("/auth/me", headers=self.headers["founder"]).json()["is_owner"])
@@ -210,8 +259,9 @@ class OwnerProtectionTests(unittest.TestCase):
         # Keep the same token: browser/JWT role snapshots must not retain authority.
         headers = self.headers["staff"]
         self.assertEqual(self.client.get("/users/page", headers=headers).status_code, 200)
-        response = self.client.patch(f"/users/{self.ids['staff']}", json={"role": "reporter"},
-                                     headers=self.headers["founder"])
+        response = self.client.patch(
+            f"/users/{self.ids['staff']}", json={"role": "reporter"}, headers=self.headers["founder"]
+        )
         self.assertEqual(response.status_code, 200, response.text)
         self.assertEqual(self.client.get("/users/page", headers=headers).status_code, 403)
         profile = self.client.get("/auth/me", headers=headers)
@@ -235,15 +285,18 @@ class OwnerProtectionTests(unittest.TestCase):
             db.commit()
             target = db.get(User, self.ids["member"])
             with self.assertRaises(HTTPException) as denied:
-                update_user(db, target, AdminUserUpdate(is_active=False), actor=actor,
-                            actor_auth_version=captured_version)
+                update_user(
+                    db, target, AdminUserUpdate(is_active=False), actor=actor, actor_auth_version=captured_version
+                )
             self.assertEqual(denied.exception.status_code, 403)
             db.rollback()
         after = self.state()
         self.assertEqual(after["subscriptions"], before["subscriptions"])
         self.assertEqual(after["audits"], before["audits"])
-        self.assertEqual(next(row for row in after["users"] if row[0] == self.ids["member"]),
-                         next(row for row in before["users"] if row[0] == self.ids["member"]))
+        self.assertEqual(
+            next(row for row in after["users"] if row[0] == self.ids["member"]),
+            next(row for row in before["users"] if row[0] == self.ids["member"]),
+        )
 
 
 def verify_owner_demotion_blocks_already_authenticated_staff(test, engine):
@@ -255,9 +308,14 @@ def verify_owner_demotion_blocks_already_authenticated_staff(test, engine):
     with Session(engine) as db:
         ids = {}
         for label, role in (("founder", "admin"), ("staff", "admin"), ("member", "free_user")):
-            user = User(full_name="Synthetic PG " + label, email=label + "@owner-pg.example.com",
-                        password_hash="synthetic-unused", role=role, is_active=True,
-                        referral_code="OWNERPG" + str(len(ids)))
+            user = User(
+                full_name="Synthetic PG " + label,
+                email=label + "@owner-pg.example.com",
+                password_hash="synthetic-unused",
+                role=role,
+                is_active=True,
+                referral_code="OWNERPG" + str(len(ids)),
+            )
             user.subscription = build_trial_subscription(user=user)
             db.add(user)
             db.flush()
@@ -267,6 +325,7 @@ def verify_owner_demotion_blocks_already_authenticated_staff(test, engine):
     def sessions():
         with Session(engine, expire_on_commit=False) as db:
             yield db
+
     previous_override = app.dependency_overrides.get(get_db)
     app.dependency_overrides[get_db] = sessions
     held = threading.Event()
@@ -289,18 +348,26 @@ def verify_owner_demotion_blocks_already_authenticated_staff(test, engine):
     def worker(label, target, payload):
         try:
             with TestClient(app, raise_server_exceptions=False) as client:
-                response = client.patch(f"/users/{ids[target]}", json=payload, headers={
-                    "Authorization": "Bearer " + create_access_token(user_id=ids[label]),
-                })
+                response = client.patch(
+                    f"/users/{ids[target]}",
+                    json=payload,
+                    headers={
+                        "Authorization": "Bearer " + create_access_token(user_id=ids[label]),
+                    },
+                )
                 outcomes[label] = response.status_code
         except BaseException as error:
             outcomes[label] = type(error).__name__
 
-    threads = [threading.Thread(target=worker, args=("founder", "staff", {"role": "reporter"})),
-               threading.Thread(target=worker, args=("staff", "member", {"is_active": False}))]
+    threads = [
+        threading.Thread(target=worker, args=("founder", "staff", {"role": "reporter"})),
+        threading.Thread(target=worker, args=("staff", "member", {"is_active": False})),
+    ]
     try:
-        with patch.object(get_settings(), "owner_email", "founder@owner-pg.example.com"), \
-                patch.object(user_routes, "prepare_user_update", side_effect=interleave):
+        with (
+            patch.object(get_settings(), "owner_email", "founder@owner-pg.example.com"),
+            patch.object(user_routes, "prepare_user_update", side_effect=interleave),
+        ):
             threads[0].start()
             test.assertTrue(held.wait(8), "Owner did not acquire the existing transaction guard")
             threads[1].start()

@@ -150,16 +150,14 @@ def create_price_update(db: Session, payload: PriceUpdateCreate, creator: User, 
         db.commit() if commit else db.flush()
     except IntegrityError as exc:
         db.rollback()
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Price update could not be saved") from exc
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Price update could not be saved"
+        ) from exc
     return get_price_update_for_admin(db, price_update.id)
 
 
 def get_price_update_for_admin(db: Session, price_update_id: int, *, lock: bool = False) -> PriceUpdate:
-    statement = (
-        select(PriceUpdate)
-        .options(*PRICE_UPDATE_LOAD_OPTIONS)
-        .where(PriceUpdate.id == price_update_id)
-    )
+    statement = select(PriceUpdate).options(*PRICE_UPDATE_LOAD_OPTIONS).where(PriceUpdate.id == price_update_id)
     if lock:
         statement = statement.with_for_update().execution_options(populate_existing=True)
     price_update = db.scalar(statement)
@@ -202,25 +200,33 @@ def _latest_approved_price_statement(
     # This prevents an older non-outdated record from resurfacing as "current".
     # Movement is also applied after selecting the latest record so a movement
     # filter cannot accidentally surface an older historical match.
-    ranked = _approved_price_statement(
-        commodity_search=commodity_search,
-        market_search=market_search,
-        commodity_id=commodity_id, market_id=market_id,
-        selected_date=selected_date,
-        movement=None,
-        include_outdated=True,
-    ).with_only_columns(
-        PriceUpdate.id.label("price_update_id"),
-        func.row_number().over(
-            partition_by=(
-                PriceUpdate.commodity_id, PriceUpdate.market_id,
-                func.lower(func.trim(func.coalesce(PriceUpdate.unit, ""))),
-                func.lower(func.trim(func.coalesce(PriceUpdate.bag_size, ""))),
-                func.lower(func.trim(func.coalesce(PriceUpdate.commodity_type, ""))),
-            ),
-            order_by=(PriceUpdate.update_date_time.desc(), PriceUpdate.id.desc()),
-        ).label("position"),
-    ).subquery()
+    ranked = (
+        _approved_price_statement(
+            commodity_search=commodity_search,
+            market_search=market_search,
+            commodity_id=commodity_id,
+            market_id=market_id,
+            selected_date=selected_date,
+            movement=None,
+            include_outdated=True,
+        )
+        .with_only_columns(
+            PriceUpdate.id.label("price_update_id"),
+            func.row_number()
+            .over(
+                partition_by=(
+                    PriceUpdate.commodity_id,
+                    PriceUpdate.market_id,
+                    func.lower(func.trim(func.coalesce(PriceUpdate.unit, ""))),
+                    func.lower(func.trim(func.coalesce(PriceUpdate.bag_size, ""))),
+                    func.lower(func.trim(func.coalesce(PriceUpdate.commodity_type, ""))),
+                ),
+                order_by=(PriceUpdate.update_date_time.desc(), PriceUpdate.id.desc()),
+            )
+            .label("position"),
+        )
+        .subquery()
+    )
 
     # Rank inside the database so retained history is not loaded into Python
     # for every current-price/ticker request. Do not limit or delete history.
@@ -246,11 +252,18 @@ def list_latest_approved_price_updates(
     selected_date: date | None = None,
     movement: Movement | None = None,
 ) -> list[PriceUpdate]:
-    return list(db.scalars(_latest_approved_price_statement(
-        commodity_search=commodity_search, market_search=market_search,
-        commodity_id=commodity_id, market_id=market_id,
-        selected_date=selected_date, movement=movement,
-    )).all())
+    return list(
+        db.scalars(
+            _latest_approved_price_statement(
+                commodity_search=commodity_search,
+                market_search=market_search,
+                commodity_id=commodity_id,
+                market_id=market_id,
+                selected_date=selected_date,
+                movement=movement,
+            )
+        ).all()
+    )
 
 
 def list_price_history(
@@ -267,7 +280,8 @@ def list_price_history(
     statement = _approved_price_statement(
         commodity_search=commodity_search,
         market_search=market_search,
-        commodity_id=commodity_id, market_id=market_id,
+        commodity_id=commodity_id,
+        market_id=market_id,
         selected_date=selected_date,
         movement=movement,
         time_of_day=time_of_day,
@@ -279,8 +293,11 @@ def list_price_history(
 def stream_price_history(engine, **filters):
     # Reuse every existing history filter/publication rule. Scalar eager joins
     # avoid per-record catalog queries and keep one complete cursor snapshot.
-    statement = _approved_price_statement(**filters, include_outdated=True,
-        load_options=(contains_eager(PriceUpdate.commodity), contains_eager(PriceUpdate.market)))
+    statement = _approved_price_statement(
+        **filters,
+        include_outdated=True,
+        load_options=(contains_eager(PriceUpdate.commodity), contains_eager(PriceUpdate.market)),
+    )
     statement = statement.order_by(PriceUpdate.update_date_time.asc(), PriceUpdate.id.asc())
     return stream_schema_records(engine, statement, PriceUpdatePublicResponse)
 
@@ -296,16 +313,16 @@ def list_price_history_pairs(db: Session) -> list[dict[str, dict[str, str]]]:
         .distinct()
         .order_by(Commodity.name, Market.name)
     )
-    return [{"commodity": {"name": commodity}, "market": {"name": market}} for commodity, market in db.execute(statement)]
+    return [
+        {"commodity": {"name": commodity}, "market": {"name": market}} for commodity, market in db.execute(statement)
+    ]
 
 
 def get_submission_stats(db: Session, user_id: int) -> dict[str, int]:
     """Counts of this user's own price-update submissions by status, so reporters
     (who otherwise get no feedback after submitting) can see their contributions."""
     rows = db.execute(
-        select(PriceUpdate.status, func.count())
-        .where(PriceUpdate.created_by == user_id)
-        .group_by(PriceUpdate.status)
+        select(PriceUpdate.status, func.count()).where(PriceUpdate.created_by == user_id).group_by(PriceUpdate.status)
     ).all()
     counts = {status_value: count for status_value, count in rows}
     return {
@@ -343,7 +360,9 @@ def list_market_comparison(
     )
 
 
-def update_price_update(db: Session, price_update: PriceUpdate, payload: PriceUpdateUpdate, *, commit: bool = True) -> PriceUpdate:
+def update_price_update(
+    db: Session, price_update: PriceUpdate, payload: PriceUpdateUpdate, *, commit: bool = True
+) -> PriceUpdate:
     changes = payload.model_dump(exclude_unset=True)
     if not changes:
         return get_price_update_for_admin(db, price_update.id)
@@ -379,8 +398,13 @@ def update_price_update(db: Session, price_update: PriceUpdate, payload: PriceUp
     _validate_final_ranges(price_update, changes)
 
     changed = {name for name, value in changes.items() if value != getattr(price_update, name)}
-    validate_price_claims(db, model_claim_values(price_update, changes), record_id=price_update.id,
-                          movement=False, confidence=bool(changed & CONFIDENCE_INPUTS))
+    validate_price_claims(
+        db,
+        model_claim_values(price_update, changes),
+        record_id=price_update.id,
+        movement=False,
+        confidence=bool(changed & CONFIDENCE_INPUTS),
+    )
 
     for field, value in changes.items():
         setattr(price_update, field, value)
@@ -389,14 +413,17 @@ def update_price_update(db: Session, price_update: PriceUpdate, payload: PriceUp
         db.commit() if commit else db.flush()
     except IntegrityError as exc:
         db.rollback()
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Price update could not be updated") from exc
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Price update could not be updated"
+        ) from exc
     return get_price_update_for_admin(db, price_update.id)
 
 
 def approve_price_update(db: Session, price_update: PriceUpdate, approver: User, *, commit: bool = True) -> PriceUpdate:
     if price_update.status != "approved":
-        validate_price_claims(db, model_claim_values(price_update), record_id=price_update.id,
-                              movement=approver.role != "admin")
+        validate_price_claims(
+            db, model_claim_values(price_update), record_id=price_update.id, movement=approver.role != "admin"
+        )
     price_update.status = "approved"
     price_update.approved_by = approver.id
     db.commit() if commit else db.flush()

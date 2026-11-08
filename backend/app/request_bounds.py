@@ -1,4 +1,5 @@
 """Bound HTTP input before JSON parsing, database work or provider calls."""
+
 from starlette.responses import JSONResponse
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 

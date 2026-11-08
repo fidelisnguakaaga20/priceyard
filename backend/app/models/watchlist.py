@@ -37,9 +37,7 @@ class Watchlist(Base):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
-    )
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     commodity_id: Mapped[int | None] = mapped_column(
         ForeignKey("commodities.id", ondelete="CASCADE"), nullable=True, index=True
     )
@@ -51,9 +49,7 @@ class Watchlist(Base):
     # 'at_or_above' (sell-side: alert when the range's high reaches this or higher).
     # Always set together with target_price, always null otherwise.
     target_direction: Mapped[str | None] = mapped_column(String(20), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
     )

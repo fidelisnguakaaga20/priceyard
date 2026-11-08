@@ -9,8 +9,12 @@ export function PremiumGate({ children, description }: { children: React.ReactNo
       <span className="lock-icon">🔒</span>
       <div>
         <strong>This information is locked.</strong>
-        <p>{description ?? (user ? "Upgrade to see this." : "Register free or log in to unlock full price details.")}</p>
-        <Link className="button button-small" to={user ? "/dashboard" : "/login"}>{user ? "Upgrade →" : "Log in"}</Link>
+        <p>
+          {description ?? (user ? "Upgrade to see this." : "Register free or log in to unlock full price details.")}
+        </p>
+        <Link className="button button-small" to={user ? "/dashboard" : "/login"}>
+          {user ? "Upgrade →" : "Log in"}
+        </Link>
       </div>
     </div>
   );

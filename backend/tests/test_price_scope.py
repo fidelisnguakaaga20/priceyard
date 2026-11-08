@@ -31,7 +31,12 @@ from app.services.storage_suitability_service import create_storage_suitability
 
 
 RESOURCES = (
-    (MarketSignal, MarketSignalCreate, create_market_signal, {"signal_type": "Synthetic", "signal_description": "Saved observation"}),
+    (
+        MarketSignal,
+        MarketSignalCreate,
+        create_market_signal,
+        {"signal_type": "Synthetic", "signal_description": "Saved observation"},
+    ),
     (QualitySignal, QualitySignalCreate, create_quality_signal, {"quality_status": "Saved observation"}),
     (StorageSuitability, StorageSuitabilityCreate, create_storage_suitability, {"suitability_status": "good"}),
 )
@@ -40,7 +45,13 @@ RESOURCES = (
 def seed_scope(engine):
     Base.metadata.create_all(engine)
     with Session(engine) as db:
-        owner = User(full_name="Synthetic scope owner", email="scope-owner@example.com", password_hash="unused", role="admin", referral_code="PRICESCOPE")
+        owner = User(
+            full_name="Synthetic scope owner",
+            email="scope-owner@example.com",
+            password_hash="unused",
+            role="admin",
+            referral_code="PRICESCOPE",
+        )
         commodities = [Commodity(name="Egusi"), Commodity(name="Honey Beans")]
         markets = [Market(name="Kwali Market"), Market(name="Synthetic scope fixture")]
         db.add_all([owner, *commodities, *markets])
@@ -49,9 +60,20 @@ def seed_scope(engine):
 
 
 def new_price(db, owner_id, commodity_id, market_id):
-    price = PriceUpdate(commodity_id=commodity_id, market_id=market_id, unit="1 bag", bag_size=None,
-        price_low=210000, price_high=220000, movement="unknown", confidence_level="Low confidence",
-        status="approved", created_by=owner_id, update_date_time=datetime.now(timezone.utc), source_1="PRIVATE-SCOPE-EVIDENCE")
+    price = PriceUpdate(
+        commodity_id=commodity_id,
+        market_id=market_id,
+        unit="1 bag",
+        bag_size=None,
+        price_low=210000,
+        price_high=220000,
+        movement="unknown",
+        confidence_level="Low confidence",
+        status="approved",
+        created_by=owner_id,
+        update_date_time=datetime.now(timezone.utc),
+        source_1="PRIVATE-SCOPE-EVIDENCE",
+    )
     db.add(price)
     db.commit()
     return price.id
@@ -60,7 +82,11 @@ def new_price(db, owner_id, commodity_id, market_id):
 def attach(db, resource, owner_id, price_id, commodity_id, market_id):
     model, schema, create, fields = resource
     payload = schema(price_update_id=price_id, commodity_id=commodity_id, market_id=market_id, **fields)
-    return create(db, payload, commit=False) if model is StorageSuitability else create(db, payload, db.get(User, owner_id), commit=False)
+    return (
+        create(db, payload, commit=False)
+        if model is StorageSuitability
+        else create(db, payload, db.get(User, owner_id), commit=False)
+    )
 
 
 def verify_scope_races(check, engine):
@@ -81,10 +107,21 @@ def verify_scope_races(check, engine):
                 if make_child:
                     item = attach(db, resource, owner_id, price_id, commodity_id, market_id)
                 else:
-                    item = update_price_update(db, get_price_update_for_admin(db, price_id, lock=True),
-                                               PriceUpdateUpdate(commodity_id=other_id), commit=False)
-                create_audit_log(db, actor=db.get(User, owner_id), action="synthetic.scope", table_name=item.__tablename__,
-                                 record_id=item.id, new_value=snapshot_model(item), commit=False)
+                    item = update_price_update(
+                        db,
+                        get_price_update_for_admin(db, price_id, lock=True),
+                        PriceUpdateUpdate(commodity_id=other_id),
+                        commit=False,
+                    )
+                create_audit_log(
+                    db,
+                    actor=db.get(User, owner_id),
+                    action="synthetic.scope",
+                    table_name=item.__tablename__,
+                    record_id=item.id,
+                    new_value=snapshot_model(item),
+                    commit=False,
+                )
 
             def first_writer():
                 try:
@@ -115,7 +152,10 @@ def verify_scope_races(check, engine):
                 finally:
                     finished.set()
 
-            workers = [threading.Thread(target=first_writer, name="scope-first"), threading.Thread(target=contender, name="scope-contender")]
+            workers = [
+                threading.Thread(target=first_writer, name="scope-first"),
+                threading.Thread(target=contender, name="scope-contender"),
+            ]
             event.listen(engine, "before_cursor_execute", observe)
             try:
                 for worker in workers:
@@ -134,7 +174,9 @@ def verify_scope_races(check, engine):
                 linked = db.scalars(select(model).where(model.price_update_id == price_id)).all()
                 check.assertEqual(price.commodity_id, commodity_id if child_first else other_id)
                 check.assertEqual(len(linked), 1 if child_first else 0)
-                check.assertTrue(all((row.commodity_id, row.market_id) == (price.commodity_id, price.market_id) for row in linked))
+                check.assertTrue(
+                    all((row.commodity_id, row.market_id) == (price.commodity_id, price.market_id) for row in linked)
+                )
                 check.assertEqual(price.source_1, "PRIVATE-SCOPE-EVIDENCE")
     with Session(engine) as db:
         check.assertEqual(len(db.scalars(select(AuditLog)).all()), 6)
@@ -171,9 +213,14 @@ class PriceScopeTests(unittest.TestCase):
     def test_unlinked_correction_preserves_price_id_fields_and_source(self):
         with Session(self.engine) as db:
             price_id = new_price(db, self.owner_id, self.commodity_id, self.market_id)
-            item = update_price_update(db, get_price_update_for_admin(db, price_id),
-                                      PriceUpdateUpdate(commodity_id=self.other_id, market_id=self.other_market_id))
-            self.assertEqual((item.id, item.commodity.id, item.market.id), (price_id, self.other_id, self.other_market_id))
+            item = update_price_update(
+                db,
+                get_price_update_for_admin(db, price_id),
+                PriceUpdateUpdate(commodity_id=self.other_id, market_id=self.other_market_id),
+            )
+            self.assertEqual(
+                (item.id, item.commodity.id, item.market.id), (price_id, self.other_id, self.other_market_id)
+            )
             self.assertEqual(item.source_1, "PRIVATE-SCOPE-EVIDENCE")
             self.assertEqual(item.unit, "1 bag")
             self.assertIsNone(item.bag_size)
@@ -184,8 +231,11 @@ class PriceScopeTests(unittest.TestCase):
             for resource in RESOURCES:
                 attach(db, resource, self.owner_id, price_id, self.commodity_id, self.market_id)
             db.commit()
-            item = update_price_update(db, db.get(PriceUpdate, price_id), PriceUpdateUpdate(
-                commodity_id=self.commodity_id, market_id=self.market_id, price_low=211000))
+            item = update_price_update(
+                db,
+                db.get(PriceUpdate, price_id),
+                PriceUpdateUpdate(commodity_id=self.commodity_id, market_id=self.market_id, price_low=211000),
+            )
             self.assertEqual(item.price_low, 211000)
             for resource in RESOURCES:
                 self.assertEqual(db.scalar(select(resource[0])).price_update_id, price_id)
@@ -207,15 +257,29 @@ class PriceScopeTests(unittest.TestCase):
             price_id = new_price(db, self.owner_id, self.commodity_id, self.market_id)
             attach(db, RESOURCES[0], self.owner_id, price_id, self.commodity_id, self.market_id)
             db.commit()
-            before = {model.__tablename__: db.execute(select(model.__table__)).all() for model in (PriceUpdate, MarketSignal, AuditLog)}
+            before = {
+                model.__tablename__: db.execute(select(model.__table__)).all()
+                for model in (PriceUpdate, MarketSignal, AuditLog)
+            }
+
         def sessions():
             with Session(self.engine) as db:
                 yield db
+
         app.dependency_overrides[get_db] = sessions
         with TestClient(app) as client:
-            response = client.patch(f"/price-updates/{price_id}", json={"commodity_id": self.other_id},
-                headers={"Authorization": "Bearer " + create_access_token(user_id=self.owner_id)})
+            response = client.patch(
+                f"/price-updates/{price_id}",
+                json={"commodity_id": self.other_id},
+                headers={"Authorization": "Bearer " + create_access_token(user_id=self.owner_id)},
+            )
             self.assertEqual(response.status_code, 409)
             self.assertNotIn("PRIVATE", response.text)
         with Session(self.engine) as db:
-            self.assertEqual({model.__tablename__: db.execute(select(model.__table__)).all() for model in (PriceUpdate, MarketSignal, AuditLog)}, before)
+            self.assertEqual(
+                {
+                    model.__tablename__: db.execute(select(model.__table__)).all()
+                    for model in (PriceUpdate, MarketSignal, AuditLog)
+                },
+                before,
+            )

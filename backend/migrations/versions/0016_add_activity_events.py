@@ -4,6 +4,7 @@ Revision ID: 0016_add_activity_events
 Revises: 0015_add_payments
 Create Date: 2026-10-04
 """
+
 from typing import Sequence, Union
 
 from alembic import op

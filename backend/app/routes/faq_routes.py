@@ -8,7 +8,13 @@ from app.models.faq_item import FAQItem
 from app.models.user import User
 from app.schemas.faq_schema import FAQAdminResponse, FAQCreate, FAQPublicResponse, FAQUpdate
 from app.services.audit_service import create_audit_log, snapshot_model
-from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, release_for_stream, stream_admin_records
+from app.services.admin_list_service import (
+    AdminJSONResponse,
+    AdminRecordPage,
+    admin_record_page,
+    release_for_stream,
+    stream_admin_records,
+)
 from app.services.faq_service import (
     create_faq,
     delete_faq,
@@ -22,10 +28,26 @@ from app.utils.permissions import require_roles
 router = APIRouter(prefix="/faq", tags=["faq"])
 
 
-def _save_faq_audit(db: Session, admin: User, action: str, record_id: int, *, old_value: dict | None = None, new_value: dict | None = None) -> None:
+def _save_faq_audit(
+    db: Session,
+    admin: User,
+    action: str,
+    record_id: int,
+    *,
+    old_value: dict | None = None,
+    new_value: dict | None = None,
+) -> None:
     try:
-        create_audit_log(db, actor=admin, action=action, table_name="faq_items", record_id=record_id,
-                         old_value=old_value, new_value=new_value, commit=False)
+        create_audit_log(
+            db,
+            actor=admin,
+            action=action,
+            table_name="faq_items",
+            record_id=record_id,
+            old_value=old_value,
+            new_value=new_value,
+            commit=False,
+        )
         db.commit()
     except Exception:
         db.rollback()
@@ -34,8 +56,16 @@ def _save_faq_audit(db: Session, admin: User, action: str, record_id: int, *, ol
 
 @router.get("", response_model=list[FAQPublicResponse])
 def get_published_items(db: Session = Depends(get_db)) -> Response:
-    return AdminJSONResponse(stream_admin_records(release_for_stream(db), FAQItem, FAQPublicResponse,
-        order=(("category", False), ("id", False)), where=(FAQItem.is_published.is_(True),)), private=False)
+    return AdminJSONResponse(
+        stream_admin_records(
+            release_for_stream(db),
+            FAQItem,
+            FAQPublicResponse,
+            order=(("category", False), ("id", False)),
+            where=(FAQItem.is_published.is_(True),),
+        ),
+        private=False,
+    )
 
 
 @router.get("/admin", response_model=list[FAQAdminResponse])
@@ -43,8 +73,11 @@ def get_admin_items(
     db: Session = Depends(get_db),
     _: User = Depends(require_roles("admin")),
 ) -> Response:
-    return AdminJSONResponse(stream_admin_records(release_for_stream(db), FAQItem, FAQAdminResponse,
-        order=(("category", False), ("id", False))))
+    return AdminJSONResponse(
+        stream_admin_records(
+            release_for_stream(db), FAQItem, FAQAdminResponse, order=(("category", False), ("id", False))
+        )
+    )
 
 
 @router.get("/admin/page", response_model=AdminRecordPage[FAQAdminResponse])
@@ -53,8 +86,9 @@ def get_admin_faq_page(
     db: Session = Depends(get_db),
     _: User = Depends(require_roles("admin")),
 ) -> AdminRecordPage[FAQAdminResponse]:
-    return admin_record_page(db, FAQItem, FAQAdminResponse, offset=offset,
-        order=(("is_published", True), ("category", False), ("id", False)))
+    return admin_record_page(
+        db, FAQItem, FAQAdminResponse, offset=offset, order=(("is_published", True), ("category", False), ("id", False))
+    )
 
 
 @router.get("/{faq_id}", response_model=FAQPublicResponse)

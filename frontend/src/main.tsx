@@ -18,7 +18,9 @@ if ("serviceWorker" in navigator) {
       if (api.username || api.password || api.search || api.hash) return;
       worker.searchParams.set("api", api.href);
       navigator.serviceWorker.register(worker.href).catch(() => {});
-    } catch { /* Offline support is optional when configuration is invalid. */ }
+    } catch {
+      /* Offline support is optional when configuration is invalid. */
+    }
   });
 }
 

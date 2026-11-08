@@ -1,4 +1,5 @@
 """Synthetic-only PG17 compatibility/restore check; never opens a real backup."""
+
 import json
 import os
 from pathlib import Path
@@ -117,15 +118,28 @@ echo SYNTHETIC_RESTORE_DIGEST_EXTENSIONS_AND_CHECKSUMS_PASSED
 
 
 def main():
-    env = {k: os.environ[k] for k in (
-        "SYSTEMROOT", "WINDIR", "USERPROFILE", "APPDATA", "LOCALAPPDATA", "TEMP", "TMP"
-    ) if k in os.environ}
-    base = [CLI, "--config", str(ROOT / "docker-feasibility-cli"),
-            "--host", "npipe:////./pipe/dockerDesktopLinuxEngine"]
+    env = {
+        k: os.environ[k]
+        for k in ("SYSTEMROOT", "WINDIR", "USERPROFILE", "APPDATA", "LOCALAPPDATA", "TEMP", "TMP")
+        if k in os.environ
+    }
+    base = [
+        CLI,
+        "--config",
+        str(ROOT / "docker-feasibility-cli"),
+        "--host",
+        "npipe:////./pipe/dockerDesktopLinuxEngine",
+    ]
 
     def docker(args, timeout=10):
-        return subprocess.run(base + args, env=env, capture_output=True, text=True,
-                              timeout=timeout, creationflags=subprocess.CREATE_NO_WINDOW)
+        return subprocess.run(
+            base + args,
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            creationflags=subprocess.CREATE_NO_WINDOW,
+        )
 
     image = docker(["image", "inspect", IMAGE, "--format", "{{json .}}"])
     if image.returncode:
@@ -136,22 +150,47 @@ def main():
     if metadata["Config"].get("Volumes"):
         raise RuntimeError("Declared persistent image volumes require separate review")
     name = "priceyard-fabricated-ram-" + uuid.uuid4().hex[:10]
-    create = docker([
-        "container", "create", "--pull=never", "--name", name,
-        "--label", "purpose=priceyard-synthetic-ram-fixture", "--network=none",
-        "--read-only", "--user=postgres", "--cap-drop=ALL",
-        "--security-opt=no-new-privileges", "--log-driver=none", "--no-healthcheck",
-        "--memory=512m", "--memory-swap=512m", "--cpus=1", "--pids-limit=64",
-        "--shm-size=16m", "--ulimit=core=0", "--stop-signal=SIGTERM",
-        "--tmpfs=/work:rw,noexec,nosuid,nodev,size=268435456,mode=1777",
-        "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=8388608,mode=1777",
-        "--entrypoint=/bin/sh", IMAGE, "-c", SCRIPT,
-    ])
+    create = docker(
+        [
+            "container",
+            "create",
+            "--pull=never",
+            "--name",
+            name,
+            "--label",
+            "purpose=priceyard-synthetic-ram-fixture",
+            "--network=none",
+            "--read-only",
+            "--user=postgres",
+            "--cap-drop=ALL",
+            "--security-opt=no-new-privileges",
+            "--log-driver=none",
+            "--no-healthcheck",
+            "--memory=512m",
+            "--memory-swap=512m",
+            "--cpus=1",
+            "--pids-limit=64",
+            "--shm-size=16m",
+            "--ulimit=core=0",
+            "--stop-signal=SIGTERM",
+            "--tmpfs=/work:rw,noexec,nosuid,nodev,size=268435456,mode=1777",
+            "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=8388608,mode=1777",
+            "--entrypoint=/bin/sh",
+            IMAGE,
+            "-c",
+            SCRIPT,
+        ]
+    )
     if create.returncode:
         (ROOT / "ram-fixture-create-private.log").write_text(create.stderr, encoding="utf-8")
         raise RuntimeError("Fabricated container creation failed; no backup was opened")
-    result = {"synthetic_only": True, "production_access": False,
-              "real_backup_opened": False, "image": IMAGE, "status": "failed"}
+    result = {
+        "synthetic_only": True,
+        "production_access": False,
+        "real_backup_opened": False,
+        "image": IMAGE,
+        "status": "failed",
+    }
     try:
         inspection = docker(["container", "inspect", name, "--format", "{{json .}}"])
         if inspection.returncode:
@@ -159,11 +198,16 @@ def main():
         info = json.loads(inspection.stdout)
         host = info["HostConfig"]
         expected = (
-            host["NetworkMode"] == "none" and host["ReadonlyRootfs"]
-            and host["Memory"] == MEMORY and host["MemorySwap"] == MEMORY
-            and host["NanoCpus"] == 1_000_000_000 and host["PidsLimit"] == 64
-            and host["LogConfig"]["Type"] == "none" and not host["Privileged"]
-            and not host.get("Binds") and not host.get("VolumesFrom")
+            host["NetworkMode"] == "none"
+            and host["ReadonlyRootfs"]
+            and host["Memory"] == MEMORY
+            and host["MemorySwap"] == MEMORY
+            and host["NanoCpus"] == 1_000_000_000
+            and host["PidsLimit"] == 64
+            and host["LogConfig"]["Type"] == "none"
+            and not host["Privileged"]
+            and not host.get("Binds")
+            and not host.get("VolumesFrom")
             and "ALL" in host["CapDrop"]
             and "no-new-privileges" in host["SecurityOpt"]
             and info["Config"]["User"] == "postgres"
@@ -175,16 +219,19 @@ def main():
         result["docker_configuration_guards"] = "passed"
         completed = docker(["container", "start", "--attach", name], timeout=100)
         (ROOT / "ram-fixture-execution-private.log").write_text(
-            completed.stdout + "\n" + completed.stderr, encoding="utf-8")
-        expected_markers = ["RAM_SWAP_ROOT_AND_NETWORK_GUARDS_PASSED",
-                            "NATIVE_CHECK_CONSTRAINT_CAST_PARSER_AND_ENFORCEMENT_PASSED",
-                            "RECORDED_PRELOAD_LIBRARIES_AND_SAFEUPDATE_GUARD_PASSED",
-                            "EXACT_EXTENSION_VERSIONS_AND_LOCALE_PASSED",
-                            "BOOTSTRAP_AND_EXPLICIT_GRANTOR_RESTORE_PASSED",
-                            "RECORDED_SCHEMA_PRIVILEGES_AND_GRANT_OPTION_PASSED",
-                            "RECORDED_EXTENSION_VIEW_OWNERSHIP_PASSED",
-                            "LIVE_COLUMN_ORDER_WITH_DROPPED_ATTRIBUTE_GAPS_PASSED",
-                            "SYNTHETIC_RESTORE_DIGEST_EXTENSIONS_AND_CHECKSUMS_PASSED"]
+            completed.stdout + "\n" + completed.stderr, encoding="utf-8"
+        )
+        expected_markers = [
+            "RAM_SWAP_ROOT_AND_NETWORK_GUARDS_PASSED",
+            "NATIVE_CHECK_CONSTRAINT_CAST_PARSER_AND_ENFORCEMENT_PASSED",
+            "RECORDED_PRELOAD_LIBRARIES_AND_SAFEUPDATE_GUARD_PASSED",
+            "EXACT_EXTENSION_VERSIONS_AND_LOCALE_PASSED",
+            "BOOTSTRAP_AND_EXPLICIT_GRANTOR_RESTORE_PASSED",
+            "RECORDED_SCHEMA_PRIVILEGES_AND_GRANT_OPTION_PASSED",
+            "RECORDED_EXTENSION_VIEW_OWNERSHIP_PASSED",
+            "LIVE_COLUMN_ORDER_WITH_DROPPED_ATTRIBUTE_GAPS_PASSED",
+            "SYNTHETIC_RESTORE_DIGEST_EXTENSIONS_AND_CHECKSUMS_PASSED",
+        ]
         result["checks"] = {marker: marker in completed.stdout for marker in expected_markers}
         if completed.returncode or not all(result["checks"].values()):
             raise RuntimeError("Synthetic target check failed; protected actual restore remains forbidden")

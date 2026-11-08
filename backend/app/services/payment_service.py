@@ -35,15 +35,24 @@ PLAN_PRICES: dict[str, Decimal] = {
 
 
 def _valid_checkout_url(value: object) -> bool:
-    if (not isinstance(value, str) or not 1 <= len(value) <= 2048
-            or any(ord(char) <= 32 or ord(char) >= 127 for char in value)
-            or "\\" in value or "#" in value):
+    if (
+        not isinstance(value, str)
+        or not 1 <= len(value) <= 2048
+        or any(ord(char) <= 32 or ord(char) >= 127 for char in value)
+        or "\\" in value
+        or "#" in value
+    ):
         return False
     try:
         parsed = urlsplit(value)
-        return (parsed.scheme == "https" and parsed.hostname == "checkout.paystack.com"
-                and parsed.username is None and parsed.password is None
-                and parsed.port in {None, 443} and parsed.path not in {"", "/"})
+        return (
+            parsed.scheme == "https"
+            and parsed.hostname == "checkout.paystack.com"
+            and parsed.username is None
+            and parsed.password is None
+            and parsed.port in {None, 443}
+            and parsed.path not in {"", "/"}
+        )
     except ValueError:
         return False
 
@@ -51,7 +60,9 @@ def _valid_checkout_url(value: object) -> bool:
 def initiate_payment(db: Session, user: User, plan: PaymentPlan) -> PaymentInitiateResponse:
     subscription = db.scalar(select(Subscription).where(Subscription.user_id == user.id))
     if subscription is not None and subscription.status == "active" and subscription.end_date is None:
-        raise HTTPException(status_code=409, detail="Your account already has indefinite access. Contact support before buying a plan.")
+        raise HTTPException(
+            status_code=409, detail="Your account already has indefinite access. Contact support before buying a plan."
+        )
     settings = get_settings()
     if not settings.paystack_secret_key:
         raise HTTPException(
@@ -82,7 +93,9 @@ def initiate_payment(db: Session, user: User, plan: PaymentPlan) -> PaymentIniti
                     "Authorization": f"Bearer {settings.paystack_secret_key}",
                     "Content-Type": "application/json",
                 },
-                timeout=(3, 15), allow_redirects=False, verify=True,
+                timeout=(3, 15),
+                allow_redirects=False,
+                verify=True,
             )
         body = response.json()
     except (requests.RequestException, ValueError):
@@ -116,8 +129,12 @@ def initiate_payment(db: Session, user: User, plan: PaymentPlan) -> PaymentIniti
 
 def verify_webhook_signature(raw_body: bytes, signature: str | None) -> bool:
     settings = get_settings()
-    if (not settings.paystack_secret_key or not isinstance(signature, str)
-            or len(signature) != 128 or any(char not in "0123456789abcdefABCDEF" for char in signature)):
+    if (
+        not settings.paystack_secret_key
+        or not isinstance(signature, str)
+        or len(signature) != 128
+        or any(char not in "0123456789abcdefABCDEF" for char in signature)
+    ):
         return False
     expected = hmac.new(settings.paystack_secret_key.encode("utf-8"), raw_body, hashlib.sha512).hexdigest()
     return hmac.compare_digest(expected, signature.lower())
@@ -125,12 +142,25 @@ def verify_webhook_signature(raw_body: bytes, signature: str | None) -> bool:
 
 def _validate_recorded_evidence(payment: Payment, data: dict, *, allow_unconfirmed: bool = False) -> None:
     amount, transaction_id = data.get("amount"), data.get("id")
-    allowed = {"success", "abandoned", "failed", "ongoing", "pending", "processing", "queued", "reversed"} if allow_unconfirmed else {"success"}
-    if (data.get("reference") != payment.reference
-            or type(amount) is not int or amount <= 0 or Decimal(amount) != payment.amount * 100
-            or data.get("currency") != "NGN" or payment.currency != "NGN"
-            or not isinstance(data.get("status"), str) or data["status"] not in allowed or payment.plan not in PLAN_PRICES
-            or type(transaction_id) is not int or transaction_id <= 0 or len(str(transaction_id)) > 100):
+    allowed = (
+        {"success", "abandoned", "failed", "ongoing", "pending", "processing", "queued", "reversed"}
+        if allow_unconfirmed
+        else {"success"}
+    )
+    if (
+        data.get("reference") != payment.reference
+        or type(amount) is not int
+        or amount <= 0
+        or Decimal(amount) != payment.amount * 100
+        or data.get("currency") != "NGN"
+        or payment.currency != "NGN"
+        or not isinstance(data.get("status"), str)
+        or data["status"] not in allowed
+        or payment.plan not in PLAN_PRICES
+        or type(transaction_id) is not int
+        or transaction_id <= 0
+        or len(str(transaction_id)) > 100
+    ):
         raise HTTPException(status_code=422, detail="Payment evidence does not match the recorded purchase")
 
 
@@ -147,15 +177,21 @@ def verify_recorded_payment(db: Session, user: User, reference: str) -> Payment:
         with requests.Session() as transport:
             transport.trust_env = False
             response = transport.get(
-                "https://api.paystack.co/transaction/verify/"+quote(reference, safe=""),
+                "https://api.paystack.co/transaction/verify/" + quote(reference, safe=""),
                 headers={"Authorization": f"Bearer {settings.paystack_secret_key}"},
-                timeout=(3, 15), allow_redirects=False, verify=True,
+                timeout=(3, 15),
+                allow_redirects=False,
+                verify=True,
             )
         body = response.json()
     except (requests.RequestException, ValueError):
         raise HTTPException(status_code=502, detail="Could not reach the payment provider") from None
-    if (not 200 <= response.status_code < 300 or not isinstance(body, dict)
-            or body.get("status") is not True or not isinstance(body.get("data"), dict)):
+    if (
+        not 200 <= response.status_code < 300
+        or not isinstance(body, dict)
+        or body.get("status") is not True
+        or not isinstance(body.get("data"), dict)
+    ):
         raise HTTPException(status_code=502, detail="Could not verify payment")
     data = body["data"]
     _validate_recorded_evidence(payment, data, allow_unconfirmed=True)
@@ -185,7 +221,12 @@ def handle_webhook_event(db: Session, payload: dict) -> None:
     # SQLite is used only for unit/preview tests; PostgreSQL races are tested too.
     if db.get_bind().dialect.name == "postgresql":
         db.execute(text("SELECT pg_advisory_xact_lock(741523, 2)"))
-    payment = db.scalar(select(Payment).where(Payment.reference == reference).with_for_update().execution_options(populate_existing=True))
+    payment = db.scalar(
+        select(Payment)
+        .where(Payment.reference == reference)
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    )
     if payment is None:
         return
 
@@ -198,29 +239,55 @@ def handle_webhook_event(db: Session, payload: dict) -> None:
     if payment.status == "success":
         return
 
-    duplicate = db.scalar(select(Payment.id).where(Payment.paystack_transaction_id == str(transaction_id), Payment.id != payment.id))
+    duplicate = db.scalar(
+        select(Payment.id).where(Payment.paystack_transaction_id == str(transaction_id), Payment.id != payment.id)
+    )
     if duplicate is not None:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Payment transaction is already recorded for another purchase")
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail="Payment transaction is already recorded for another purchase"
+        )
 
     held_for_review = False
     try:
-        user = db.scalar(select(User).where(User.id == payment.user_id).with_for_update().execution_options(populate_existing=True))
+        user = db.scalar(
+            select(User).where(User.id == payment.user_id).with_for_update().execution_options(populate_existing=True)
+        )
         # Do not use an expiry helper here: its intermediate commit could release
         # the confirmation lock before access and the audit record are saved.
-        subscription = db.scalar(select(Subscription).where(Subscription.user_id == payment.user_id).with_for_update().execution_options(populate_existing=True))
+        subscription = db.scalar(
+            select(Subscription)
+            .where(Subscription.user_id == payment.user_id)
+            .with_for_update()
+            .execution_options(populate_existing=True)
+        )
         if user is None or subscription is None:
-            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Subscription record is unavailable; payment not applied")
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT, detail="Subscription record is unavailable; payment not applied"
+            )
         if subscription.status == "active" and subscription.end_date is None:
             old_value = snapshot_model(payment)
             payment.status = "pending"  # Confirmed funds, activation held; no days consumed.
             payment.paystack_transaction_id = str(transaction_id)
-            already_logged = db.scalar(select(AuditLog.id).where(
-                AuditLog.action == "payment.review_required", AuditLog.table_name == "payments",
-                AuditLog.record_id == payment.id,
-            ).limit(1))
+            already_logged = db.scalar(
+                select(AuditLog.id)
+                .where(
+                    AuditLog.action == "payment.review_required",
+                    AuditLog.table_name == "payments",
+                    AuditLog.record_id == payment.id,
+                )
+                .limit(1)
+            )
             if already_logged is None:
-                create_audit_log(db, actor=user, action="payment.review_required", table_name="payments",
-                                 record_id=payment.id, old_value=old_value, new_value=snapshot_model(payment), commit=False)
+                create_audit_log(
+                    db,
+                    actor=user,
+                    action="payment.review_required",
+                    table_name="payments",
+                    record_id=payment.id,
+                    old_value=old_value,
+                    new_value=snapshot_model(payment),
+                    commit=False,
+                )
             held_for_review = True
         else:
             old_value = snapshot_model(subscription)
@@ -229,8 +296,14 @@ def handle_webhook_event(db: Session, payload: dict) -> None:
             activate_paid_subscription(db, subscription, plan=payment.plan, commit=False)
             subscription.payment_reference = payment.reference
             create_audit_log(
-                db, actor=user, action="payment.success", table_name="subscriptions",
-                record_id=subscription.id, old_value=old_value, new_value=snapshot_model(subscription), commit=False,
+                db,
+                actor=user,
+                action="payment.success",
+                table_name="subscriptions",
+                record_id=subscription.id,
+                old_value=old_value,
+                new_value=snapshot_model(subscription),
+                commit=False,
             )
         db.commit()
     except Exception:
@@ -238,7 +311,10 @@ def handle_webhook_event(db: Session, payload: dict) -> None:
         raise
 
     if held_for_review:
-        raise HTTPException(status_code=409, detail="Payment confirmed; activation requires manual review while indefinite access remains active")
+        raise HTTPException(
+            status_code=409,
+            detail="Payment confirmed; activation requires manual review while indefinite access remains active",
+        )
 
     try:
         notify_admins(

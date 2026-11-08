@@ -51,7 +51,9 @@ def update_commodity(db: Session, commodity: Commodity, payload: CommodityUpdate
     if "name" in changes and changes["name"] is None:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Commodity name cannot be null")
     if "is_active" in changes and changes["is_active"] is None:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Commodity active status cannot be null")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Commodity active status cannot be null"
+        )
     if "name" in changes:
         lock_catalog_identity(db, "commodity")
         _ensure_unique_name(db, changes["name"], exclude_id=commodity.id)

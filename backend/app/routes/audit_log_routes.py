@@ -6,7 +6,13 @@ from app.models.audit_log import AuditLog
 from app.models.user import User
 from app.schemas.audit_log_schema import AuditLogResponse
 from app.services.audit_service import get_audit_log
-from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, release_for_stream, stream_admin_records
+from app.services.admin_list_service import (
+    AdminJSONResponse,
+    AdminRecordPage,
+    admin_record_page,
+    release_for_stream,
+    stream_admin_records,
+)
 from app.utils.permissions import require_roles
 
 router = APIRouter(prefix="/audit-logs", tags=["audit-logs"])
@@ -17,8 +23,11 @@ def get_logs(
     db: Session = Depends(get_db),
     _: User = Depends(require_roles("admin")),
 ) -> Response:
-    return AdminJSONResponse(stream_admin_records(release_for_stream(db), AuditLog, AuditLogResponse,
-        order=(("created_at", True), ("id", True))))
+    return AdminJSONResponse(
+        stream_admin_records(
+            release_for_stream(db), AuditLog, AuditLogResponse, order=(("created_at", True), ("id", True))
+        )
+    )
 
 
 @router.get("/page", response_model=AdminRecordPage[AuditLogResponse])
@@ -27,8 +36,7 @@ def get_logs_page(
     db: Session = Depends(get_db),
     _: User = Depends(require_roles("admin")),
 ) -> AdminRecordPage[AuditLogResponse]:
-    return admin_record_page(db, AuditLog, AuditLogResponse, offset=offset,
-        order=(("created_at", True), ("id", True)))
+    return admin_record_page(db, AuditLog, AuditLogResponse, offset=offset, order=(("created_at", True), ("id", True)))
 
 
 @router.get("/{audit_log_id}", response_model=AuditLogResponse)

@@ -68,9 +68,9 @@ def share_commodity_card(
     # identity, never that historical row's amounts or confidential fields.
     commodity = None
     if pu is not None:
-        linked_id = db.scalar(select(PriceUpdate.commodity_id).where(
-            PriceUpdate.id == pu, PriceUpdate.status == "approved"
-        ))
+        linked_id = db.scalar(
+            select(PriceUpdate.commodity_id).where(PriceUpdate.id == pu, PriceUpdate.status == "approved")
+        )
         if linked_id is not None and (commodity_id is None or commodity_id == linked_id):
             commodity = db.get(Commodity, linked_id)
     elif commodity_id is not None:

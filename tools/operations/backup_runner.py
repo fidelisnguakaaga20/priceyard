@@ -3,6 +3,7 @@
 Reuses the exact reviewed backup core outside Git. It does not install a task,
 read application configuration, upload files, restore databases or run migrations.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -35,8 +36,7 @@ def adapt_core(source: str) -> str:
             "def main():\n    global RUN, PASSWORD, ARCHIVE_PASSWORD, ENV\n"
             "    if not sys.stdin.isatty() or not sys.stdout.isatty():\n"
             "        raise RuntimeError('Interactive owner console required; production was not contacted')",
-            "def main():\n    global RUN, PASSWORD, ARCHIVE_PASSWORD, ENV\n"
-            "    _verify_scheduled_context()",
+            "def main():\n    global RUN, PASSWORD, ARCHIVE_PASSWORD, ENV\n    _verify_scheduled_context()",
         ),
         ("    arguments = sys.argv[1:]", "    arguments = []  # enrolled mode never accepts credentials in arguments"),
     )
@@ -48,14 +48,25 @@ def adapt_core(source: str) -> str:
 
 
 def validate_enrollment(value: object) -> dict[str, str]:
-    if not isinstance(value, dict) or set(value) != {"purpose", "project", "revision", "database_password", "archive_passphrase"}:
+    if not isinstance(value, dict) or set(value) != {
+        "purpose",
+        "project",
+        "revision",
+        "database_password",
+        "archive_passphrase",
+    }:
         raise RuntimeError("Invalid protected enrollment")
     if (value["purpose"], value["project"], value["revision"]) != (PURPOSE, "lrvpjfbtmftjkzaxbunk", REVISION):
         raise RuntimeError("Protected enrollment target differs")
     password, archive = value["database_password"], value["archive_passphrase"]
     if not isinstance(password, str) or not password or len(password) > 4096 or "\x00" in password:
         raise RuntimeError("Invalid enrolled database password")
-    if not isinstance(archive, str) or len(archive) < 24 or len(archive) > 1024 or any(ord(c) < 32 or ord(c) > 126 for c in archive):
+    if (
+        not isinstance(archive, str)
+        or len(archive) < 24
+        or len(archive) > 1024
+        or any(ord(c) < 32 or ord(c) > 126 for c in archive)
+    ):
         raise RuntimeError("Archive passphrase must contain at least 24 printable ASCII characters")
     if archive == password:
         raise RuntimeError("Database password and archive passphrase must differ")
@@ -65,6 +76,7 @@ def validate_enrollment(value: object) -> dict[str, str]:
 def protected_file(path: Path) -> None:
     """Fail closed before reading secrets or creating plaintext."""
     from ctypes import wintypes
+
     get = ctypes.WinDLL("kernel32", use_last_error=True).GetFileAttributesW
     get.argtypes = [wintypes.LPCWSTR]
     get.restype = wintypes.DWORD
@@ -92,8 +104,15 @@ def unprotect(data: bytes) -> bytes:
     entropy, entropy_buffer = blob(ENTROPY)
     output = Blob()
     crypt = ctypes.WinDLL("crypt32", use_last_error=True).CryptUnprotectData
-    crypt.argtypes = [ctypes.POINTER(Blob), ctypes.c_void_p, ctypes.POINTER(Blob), ctypes.c_void_p,
-                      ctypes.c_void_p, wintypes.DWORD, ctypes.POINTER(Blob)]
+    crypt.argtypes = [
+        ctypes.POINTER(Blob),
+        ctypes.c_void_p,
+        ctypes.POINTER(Blob),
+        ctypes.c_void_p,
+        ctypes.c_void_p,
+        wintypes.DWORD,
+        ctypes.POINTER(Blob),
+    ]
     crypt.restype = wintypes.BOOL
     if not crypt(ctypes.byref(source), None, ctypes.byref(entropy), None, None, 1, ctypes.byref(output)):
         raise RuntimeError("Protected enrollment unavailable to this Windows account")
@@ -119,8 +138,15 @@ def protect(data: bytes) -> bytes:
     source, entropy = Blob(len(data), source_buffer), Blob(len(ENTROPY), entropy_buffer)
     output = Blob()
     crypt = ctypes.WinDLL("crypt32", use_last_error=True).CryptProtectData
-    crypt.argtypes = [ctypes.POINTER(Blob), wintypes.LPCWSTR, ctypes.POINTER(Blob), ctypes.c_void_p,
-                      ctypes.c_void_p, wintypes.DWORD, ctypes.POINTER(Blob)]
+    crypt.argtypes = [
+        ctypes.POINTER(Blob),
+        wintypes.LPCWSTR,
+        ctypes.POINTER(Blob),
+        ctypes.c_void_p,
+        ctypes.c_void_p,
+        wintypes.DWORD,
+        ctypes.POINTER(Blob),
+    ]
     crypt.restype = wintypes.BOOL
     if not crypt(ctypes.byref(source), PURPOSE, ctypes.byref(entropy), None, None, 1, ctypes.byref(output)):
         raise RuntimeError("Cannot create owner-protected backup enrollment")
@@ -146,10 +172,20 @@ def verify_owner_context() -> None:
     windows = os.environ.get("SYSTEMROOT", r"C:\Windows")
     launcher = Path(__file__).resolve().with_name("backup_windows.ps1")
     result = subprocess.run(
-        [str(Path(windows) / "System32/WindowsPowerShell/v1.0/powershell.exe"),
-         "-NoProfile", "-NonInteractive", "-File", str(launcher), "-Action", "Verify"],
-        stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-        timeout=30, creationflags=subprocess.CREATE_NO_WINDOW,
+        [
+            str(Path(windows) / "System32/WindowsPowerShell/v1.0/powershell.exe"),
+            "-NoProfile",
+            "-NonInteractive",
+            "-File",
+            str(launcher),
+            "-Action",
+            "Verify",
+        ],
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        timeout=30,
+        creationflags=subprocess.CREATE_NO_WINDOW,
     )
     if result.returncode:
         raise RuntimeError("Windows backup owner, ACL, EFS or key verification failed")
@@ -160,19 +196,33 @@ def protect_child_lifetime() -> None:
     from ctypes import wintypes
 
     class BasicLimits(ctypes.Structure):
-        _fields_ = [("process_time", ctypes.c_int64), ("job_time", ctypes.c_int64),
-                    ("flags", wintypes.DWORD), ("minimum_working_set", ctypes.c_size_t),
-                    ("maximum_working_set", ctypes.c_size_t), ("active_processes", wintypes.DWORD),
-                    ("affinity", ctypes.c_size_t), ("priority", wintypes.DWORD), ("scheduling", wintypes.DWORD)]
+        _fields_ = [
+            ("process_time", ctypes.c_int64),
+            ("job_time", ctypes.c_int64),
+            ("flags", wintypes.DWORD),
+            ("minimum_working_set", ctypes.c_size_t),
+            ("maximum_working_set", ctypes.c_size_t),
+            ("active_processes", wintypes.DWORD),
+            ("affinity", ctypes.c_size_t),
+            ("priority", wintypes.DWORD),
+            ("scheduling", wintypes.DWORD),
+        ]
 
     class IoCounters(ctypes.Structure):
-        _fields_ = [(name, ctypes.c_uint64) for name in
-                    ("read_ops", "write_ops", "other_ops", "read_bytes", "write_bytes", "other_bytes")]
+        _fields_ = [
+            (name, ctypes.c_uint64)
+            for name in ("read_ops", "write_ops", "other_ops", "read_bytes", "write_bytes", "other_bytes")
+        ]
 
     class ExtendedLimits(ctypes.Structure):
-        _fields_ = [("basic", BasicLimits), ("io", IoCounters),
-                    ("process_memory", ctypes.c_size_t), ("job_memory", ctypes.c_size_t),
-                    ("peak_process_memory", ctypes.c_size_t), ("peak_job_memory", ctypes.c_size_t)]
+        _fields_ = [
+            ("basic", BasicLimits),
+            ("io", IoCounters),
+            ("process_memory", ctypes.c_size_t),
+            ("job_memory", ctypes.c_size_t),
+            ("peak_process_memory", ctypes.c_size_t),
+            ("peak_job_memory", ctypes.c_size_t),
+        ]
 
     kernel = ctypes.WinDLL("kernel32", use_last_error=True)
     kernel.CreateJobObjectW.argtypes = [ctypes.c_void_p, wintypes.LPCWSTR]
@@ -205,8 +255,14 @@ def write_status(state: str, **extra) -> None:
             previous = json.loads(STATUS.read_text(encoding="utf-8"))
         except (ValueError, OSError):
             pass
-    payload = {"purpose": PURPOSE, "status": state, "checked_at": dt.datetime.now(dt.timezone.utc).isoformat(),
-               "last_success_at": previous.get("last_success_at"), "database_restoration_verified": False, **extra}
+    payload = {
+        "purpose": PURPOSE,
+        "status": state,
+        "checked_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "last_success_at": previous.get("last_success_at"),
+        "database_restoration_verified": False,
+        **extra,
+    }
     if state == "passed":
         payload["last_success_at"] = payload["checked_at"]
     pending = STATUS.with_suffix(".pending")
@@ -236,15 +292,24 @@ def enroll() -> int:
     repeat = getpass.getpass("Repeat archive passphrase (hidden): ")
     if archive != repeat:
         raise RuntimeError("Archive passphrases differ; enrollment was not saved")
-    value = validate_enrollment({"purpose": PURPOSE, "project": "lrvpjfbtmftjkzaxbunk", "revision": REVISION,
-                                 "database_password": password, "archive_passphrase": archive})
+    value = validate_enrollment(
+        {
+            "purpose": PURPOSE,
+            "project": "lrvpjfbtmftjkzaxbunk",
+            "revision": REVISION,
+            "database_password": password,
+            "archive_passphrase": archive,
+        }
+    )
     data = json.dumps(value).encode("utf-8")
     sealed = protect(data)
     if unprotect(sealed) != data:
         raise RuntimeError("Protected enrollment validation failed")
     with ENROLLMENT.open("xb") as file:
         protected_file(ENROLLMENT)
-        file.write(sealed); file.flush(); os.fsync(file.fileno())
+        file.write(sealed)
+        file.flush()
+        os.fsync(file.fileno())
     value.clear()
     namespace.clear()
     password = archive = repeat = data = None
@@ -262,12 +327,14 @@ def run() -> int:
     source = load_core()  # Validate immutable source before decrypting enrollment.
     protect_child_lifetime()
     import msvcrt
+
     lock = ROOT / "PrivateRestoreEfs" / "recurring-backup.lock"
     with lock.open("a+b") as handle:
         protected_file(lock)
         handle.seek(0)
         if not handle.read(1):
-            handle.write(b"0"); handle.flush()
+            handle.write(b"0")
+            handle.flush()
         handle.seek(0)
         try:
             msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
@@ -288,8 +355,11 @@ def run() -> int:
                 return credentials["database_password"]
 
             exec(compile(source, str(CORE), "exec"), namespace)
-            namespace.update(_verify_scheduled_context=verify_context, hidden=enrolled_hidden,
-                             choose_archive_password=lambda: credentials["archive_passphrase"])
+            namespace.update(
+                _verify_scheduled_context=verify_context,
+                hidden=enrolled_hidden,
+                choose_archive_password=lambda: credentials["archive_passphrase"],
+            )
             write_status("running")
             try:
                 namespace["main"]()

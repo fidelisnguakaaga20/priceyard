@@ -1,4 +1,5 @@
 """Authenticate only the repository's scheduled operational workflow via GitHub OIDC."""
+
 import json
 import re
 import threading
@@ -55,13 +56,22 @@ def _download_keys() -> dict[str, RSAPublicKey]:
                     raise ValueError("OIDC key response is too large")
                 body.extend(chunk)
     payload = json.loads(body)
-    if not isinstance(payload, dict) or not isinstance(payload.get("keys"), list) or not 1 <= len(payload["keys"]) <= 32:
+    if (
+        not isinstance(payload, dict)
+        or not isinstance(payload.get("keys"), list)
+        or not 1 <= len(payload["keys"]) <= 32
+    ):
         raise ValueError("Invalid OIDC key set")
     keys = {}
     for value in payload["keys"]:
-        if (not isinstance(value, dict) or value.get("kty") != "RSA"
-                or value.get("use", "sig") != "sig" or value.get("alg", "RS256") != "RS256"
-                or not isinstance(value.get("kid"), str) or not _KID.fullmatch(value["kid"])):
+        if (
+            not isinstance(value, dict)
+            or value.get("kty") != "RSA"
+            or value.get("use", "sig") != "sig"
+            or value.get("alg", "RS256") != "RS256"
+            or not isinstance(value.get("kid"), str)
+            or not _KID.fullmatch(value["kid"])
+        ):
             continue
         if value["kid"] in keys:
             raise ValueError("Duplicate OIDC key")
@@ -104,17 +114,25 @@ def authorize_operation(request: Request) -> None:
         _reject(401, "Operational authentication failed")
     try:
         header = jwt.get_unverified_header(token)
-        if (header.get("alg") != "RS256" or not isinstance(header.get("kid"), str)
-                or not _KID.fullmatch(header["kid"])):
+        if header.get("alg") != "RS256" or not isinstance(header.get("kid"), str) or not _KID.fullmatch(header["kid"]):
             raise ValueError("Invalid OIDC header")
         key = _verification_key(header["kid"])
-        claims = jwt.decode(token, key, algorithms=["RS256"], audience=AUDIENCE, issuer=ISSUER,
-                            options={"require": ["exp", "iat", "nbf", "jti", "sub", "aud", "iss"], "strict_aud": True})
-        if (any(claims.get(name) != expected for name, expected in EXPECTED_CLAIMS.items())
-                or claims.get("sub") not in EXPECTED_SUBJECTS
-                or any(type(claims[name]) is not int for name in ("exp", "iat", "nbf"))
-                or claims.get("event_name") not in {"schedule", "workflow_dispatch"}
-                or not isinstance(claims["jti"], str) or not 1 <= len(claims["jti"]) <= 128):
+        claims = jwt.decode(
+            token,
+            key,
+            algorithms=["RS256"],
+            audience=AUDIENCE,
+            issuer=ISSUER,
+            options={"require": ["exp", "iat", "nbf", "jti", "sub", "aud", "iss"], "strict_aud": True},
+        )
+        if (
+            any(claims.get(name) != expected for name, expected in EXPECTED_CLAIMS.items())
+            or claims.get("sub") not in EXPECTED_SUBJECTS
+            or any(type(claims[name]) is not int for name in ("exp", "iat", "nbf"))
+            or claims.get("event_name") not in {"schedule", "workflow_dispatch"}
+            or not isinstance(claims["jti"], str)
+            or not 1 <= len(claims["jti"]) <= 128
+        ):
             raise ValueError("Unapproved OIDC workflow")
     except (jwt.PyJWTError, ValueError, TypeError, UnicodeError):
         _reject(401, "Operational authentication failed")

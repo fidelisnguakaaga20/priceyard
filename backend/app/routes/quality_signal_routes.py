@@ -5,7 +5,13 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.services.audit_service import save_audited_resource, snapshot_model
-from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, release_for_stream, stream_admin_records
+from app.services.admin_list_service import (
+    AdminJSONResponse,
+    AdminRecordPage,
+    admin_record_page,
+    release_for_stream,
+    stream_admin_records,
+)
 from app.models.quality_signal import QualitySignal
 from app.models.user import User
 from app.schemas.quality_signal_schema import QualitySignalCreate, QualitySignalResponse, QualitySignalUpdate
@@ -27,8 +33,15 @@ def get_signals(
     commodity_id: Annotated[int | None, Query(gt=0)] = None,
 ) -> Response:
     conditions = (QualitySignal.commodity_id == commodity_id,) if commodity_id is not None else ()
-    return AdminJSONResponse(stream_admin_records(release_for_stream(db), QualitySignal, QualitySignalResponse,
-        order=(("created_at", True), ("id", True)), where=conditions))
+    return AdminJSONResponse(
+        stream_admin_records(
+            release_for_stream(db),
+            QualitySignal,
+            QualitySignalResponse,
+            order=(("created_at", True), ("id", True)),
+            where=conditions,
+        )
+    )
 
 
 @router.get("/admin/page", response_model=AdminRecordPage[QualitySignalResponse])
@@ -37,8 +50,9 @@ def get_admin_signals_page(
     db: Session = Depends(get_db),
     _: User = Depends(require_roles("admin")),
 ) -> AdminRecordPage[QualitySignalResponse]:
-    return admin_record_page(db, QualitySignal, QualitySignalResponse, offset=offset,
-        order=(("created_at", True), ("id", True)))
+    return admin_record_page(
+        db, QualitySignal, QualitySignalResponse, offset=offset, order=(("created_at", True), ("id", True))
+    )
 
 
 @router.get("/{signal_id}", response_model=QualitySignalResponse)

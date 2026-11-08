@@ -35,9 +35,7 @@ def get_feedback(db: Session, feedback_id: int, *, lock: bool = False) -> Feedba
 
 
 def feedback_summary(db: Session) -> FeedbackSummaryResponse:
-    count_value, average_value = db.execute(
-        select(func.count(Feedback.id), func.avg(Feedback.rating))
-    ).one()
+    count_value, average_value = db.execute(select(func.count(Feedback.id), func.avg(Feedback.rating))).one()
     return FeedbackSummaryResponse(
         count=int(count_value or 0),
         average_rating=float(average_value) if average_value is not None else None,
@@ -53,9 +51,13 @@ def _testimonial_quote(item: Feedback) -> str | None:
     return item.complaint_or_suggestion or item.comment
 
 
-def set_testimonial_publication(db: Session, item: Feedback, *, is_public: bool, display_name: str | None, commit: bool = True) -> Feedback:
+def set_testimonial_publication(
+    db: Session, item: Feedback, *, is_public: bool, display_name: str | None, commit: bool = True
+) -> Feedback:
     if is_public and not _testimonial_quote(item):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="This feedback has no text to display as a testimonial")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="This feedback has no text to display as a testimonial"
+        )
     item.is_public_testimonial = is_public
     item.testimonial_display_name = display_name if is_public else item.testimonial_display_name
     db.commit() if commit else db.flush()
@@ -63,11 +65,7 @@ def set_testimonial_publication(db: Session, item: Feedback, *, is_public: bool,
 
 
 def list_public_testimonials(db: Session) -> list[TestimonialResponse]:
-    statement = (
-        select(Feedback)
-        .where(Feedback.is_public_testimonial.is_(True))
-        .order_by(Feedback.created_at.desc())
-    )
+    statement = select(Feedback).where(Feedback.is_public_testimonial.is_(True)).order_by(Feedback.created_at.desc())
     items = db.scalars(statement).all()
     return [
         TestimonialResponse(

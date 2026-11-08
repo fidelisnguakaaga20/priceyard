@@ -98,7 +98,11 @@ def reset_password(db: Session, *, token: str, new_password: str) -> str:
     db.execute(select(User.id).where(User.id == record.user_id).with_for_update()).scalar_one_or_none()
     claimed = db.execute(
         update(PasswordResetToken)
-        .where(PasswordResetToken.id == record.id, PasswordResetToken.used_at.is_(None), PasswordResetToken.expires_at > now)
+        .where(
+            PasswordResetToken.id == record.id,
+            PasswordResetToken.used_at.is_(None),
+            PasswordResetToken.expires_at > now,
+        )
         .values(used_at=now)
         .execution_options(synchronize_session=False)
     ).rowcount
@@ -106,7 +110,8 @@ def reset_password(db: Session, *, token: str, new_password: str) -> str:
         db.rollback()
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Reset link is invalid or expired")
     changed = db.execute(
-        update(User).where(User.id == record.user_id, User.is_active.is_(True))
+        update(User)
+        .where(User.id == record.user_id, User.is_active.is_(True))
         .values(password_hash=password_hash, auth_version=User.auth_version + 1)
     ).rowcount
     if changed != 1:

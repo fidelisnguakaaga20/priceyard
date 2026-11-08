@@ -30,13 +30,20 @@ class FeedbackUploadBoundsTests(unittest.TestCase):
     def test_original_optional_and_malformed_inputs(self):
         for value in (None, ""):
             self.assertIsNone(FeedbackCreate(rating=5, screenshot_data=value).screenshot_data)
-        for value in ("data:text/html;base64,WA==", "data:image/png;base64,not base64", "data:image/png;base64,é", "data:image/png;base64"):
+        for value in (
+            "data:text/html;base64,WA==",
+            "data:image/png;base64,not base64",
+            "data:image/png;base64,é",
+            "data:image/png;base64",
+        ):
             with self.subTest(value=value), self.assertRaises(ValidationError):
                 FeedbackCreate(rating=5, screenshot_data=value)
 
     def test_valid_original_image_and_feedback_fields_remain_unchanged(self):
         value = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII="
-        payload = FeedbackCreate(rating=4, screenshot_data=value, complaint_or_suggestion="Synthetic feedback", continue_using_feedback=True)
+        payload = FeedbackCreate(
+            rating=4, screenshot_data=value, complaint_or_suggestion="Synthetic feedback", continue_using_feedback=True
+        )
         self.assertEqual(payload.screenshot_data, value)
         self.assertEqual(payload.complaint_or_suggestion, "Synthetic feedback")
         self.assertTrue(payload.continue_using_feedback)

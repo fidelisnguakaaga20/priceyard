@@ -1,4 +1,5 @@
 """Bounded recovery of recorded purchases; no charging or background startup."""
+
 from contextlib import contextmanager
 import math
 import time
@@ -37,23 +38,41 @@ def _single_worker(engine: Engine, apply: bool):
                     raise
 
 
-def reconcile_payments(engine: Engine, *, apply: bool = False, limit: int = 25,
-                       after_id: int = 0, ceiling_id: int | None = None,
-                       time_budget_seconds: float = 45) -> dict:
+def reconcile_payments(
+    engine: Engine,
+    *,
+    apply: bool = False,
+    limit: int = 25,
+    after_id: int = 0,
+    ceiling_id: int | None = None,
+    time_budget_seconds: float = 45,
+) -> dict:
     """One serial, resumable page. Default dry run never verifies or changes rows.
 
     Only pending/failed recorded purchases qualify. Existing evidence validation,
     locking, activation, purchased-time preservation and audit logic are reused.
     Successful legacy purchases are never re-credited or automatically repaired.
     """
-    if (type(apply) is not bool or type(limit) is not int or not 1 <= limit <= 100
-            or type(after_id) is not int or after_id < 0
-            or (ceiling_id is not None and (type(ceiling_id) is not int or ceiling_id < after_id))
-            or type(time_budget_seconds) not in (int, float)
-            or not math.isfinite(time_budget_seconds) or not 0 < time_budget_seconds <= 300):
+    if (
+        type(apply) is not bool
+        or type(limit) is not int
+        or not 1 <= limit <= 100
+        or type(after_id) is not int
+        or after_id < 0
+        or (ceiling_id is not None and (type(ceiling_id) is not int or ceiling_id < after_id))
+        or type(time_budget_seconds) not in (int, float)
+        or not math.isfinite(time_budget_seconds)
+        or not 0 < time_budget_seconds <= 300
+    ):
         raise ValueError("Invalid reconciliation bounds")
-    report = {"dry_run": not apply, "busy": False, "complete": False,
-              "ceiling_id": ceiling_id, "next_after_id": after_id, "outcomes": []}
+    report = {
+        "dry_run": not apply,
+        "busy": False,
+        "complete": False,
+        "ceiling_id": ceiling_id,
+        "next_after_id": after_id,
+        "outcomes": [],
+    }
     started = time.monotonic()
     with _single_worker(engine, apply) as acquired:
         if not acquired:
@@ -64,9 +83,18 @@ def reconcile_payments(engine: Engine, *, apply: bool = False, limit: int = 25,
             if ceiling is None:
                 ceiling = db.scalar(select(Payment.id).order_by(Payment.id.desc()).limit(1)) or 0
             report["ceiling_id"] = ceiling
-            candidates = list(db.scalars(select(Payment.id).where(
-                Payment.status.in_(("pending", "failed")), Payment.id > after_id, Payment.id <= ceiling,
-            ).order_by(Payment.id).limit(limit)))
+            candidates = list(
+                db.scalars(
+                    select(Payment.id)
+                    .where(
+                        Payment.status.in_(("pending", "failed")),
+                        Payment.id > after_id,
+                        Payment.id <= ceiling,
+                    )
+                    .order_by(Payment.id)
+                    .limit(limit)
+                )
+            )
         last_id = after_id
         for payment_id in candidates:
             if time.monotonic() - started >= time_budget_seconds:
@@ -85,17 +113,29 @@ def reconcile_payments(engine: Engine, *, apply: bool = False, limit: int = 25,
                     except Exception:
                         db.rollback()
                         # Approved manual-grant holds commit evidence before409.
-                        held = db.scalar(select(AuditLog.id).where(
-                            AuditLog.action == "payment.review_required", AuditLog.table_name == "payments",
-                            AuditLog.record_id == payment_id,
-                        ).limit(1))
+                        held = db.scalar(
+                            select(AuditLog.id)
+                            .where(
+                                AuditLog.action == "payment.review_required",
+                                AuditLog.table_name == "payments",
+                                AuditLog.record_id == payment_id,
+                            )
+                            .limit(1)
+                        )
                         outcome = "review_required" if held is not None else "error"
             report["outcomes"].append({"payment_id": payment_id, "outcome": outcome})
             last_id = payment_id
         with Session(engine, autoflush=False) as db:
-            remaining = db.scalar(select(Payment.id).where(
-                Payment.status.in_(("pending", "failed")), Payment.id > last_id, Payment.id <= ceiling,
-            ).order_by(Payment.id).limit(1))
+            remaining = db.scalar(
+                select(Payment.id)
+                .where(
+                    Payment.status.in_(("pending", "failed")),
+                    Payment.id > last_id,
+                    Payment.id <= ceiling,
+                )
+                .order_by(Payment.id)
+                .limit(1)
+            )
         report["complete"] = remaining is None
         report["next_after_id"] = 0 if report["complete"] else last_id
     return report

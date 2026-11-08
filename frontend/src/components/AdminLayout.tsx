@@ -35,20 +35,46 @@ export function AdminLayout() {
     if (!token) return;
     let cancelled = false;
     const poll = () => {
-      void apiFetch<ActivitySummary>("/activity/summary", {}, token).then((data) => { if (!cancelled) setUnseen(data.unseen_count); }).catch(() => {});
-      void apiFetch<unknown[]>("/price-updates/admin/flagged", {}, token).then((data) => { if (!cancelled) setFlaggedCount(data.length); }).catch(() => {});
+      void apiFetch<ActivitySummary>("/activity/summary", {}, token)
+        .then((data) => {
+          if (!cancelled) setUnseen(data.unseen_count);
+        })
+        .catch(() => {});
+      void apiFetch<unknown[]>("/price-updates/admin/flagged", {}, token)
+        .then((data) => {
+          if (!cancelled) setFlaggedCount(data.length);
+        })
+        .catch(() => {});
     };
     poll();
     const interval = setInterval(poll, POLL_MS);
-    return () => { cancelled = true; clearInterval(interval); };
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
   }, [token]);
 
-  return <section className="page page-section admin-page">
-    <div className="page-title"><span className="eyebrow">Administrator</span><h1>PriceYard admin</h1><p>Manage the approved MVP records without changing the product scope.</p></div>
-    <nav className="admin-nav" aria-label="Admin navigation">
-      {adminLinks.map(([to, label]) => <NavLink key={to} to={to} end={to === "/admin"}>{label}{to === "/admin/flagged" && flaggedCount > 0 && <span className="admin-nav-badge">{flaggedCount}</span>}</NavLink>)}
-      <NavLink to="/admin/activity" onClick={() => setUnseen(0)}>Activity{unseen > 0 && <span className="admin-nav-badge">{unseen}</span>}</NavLink>
-    </nav>
-    <div className="admin-content"><Outlet /></div>
-  </section>;
+  return (
+    <section className="page page-section admin-page">
+      <div className="page-title">
+        <span className="eyebrow">Administrator</span>
+        <h1>PriceYard admin</h1>
+        <p>Manage the approved MVP records without changing the product scope.</p>
+      </div>
+      <nav className="admin-nav" aria-label="Admin navigation">
+        {adminLinks.map(([to, label]) => (
+          <NavLink key={to} to={to} end={to === "/admin"}>
+            {label}
+            {to === "/admin/flagged" && flaggedCount > 0 && <span className="admin-nav-badge">{flaggedCount}</span>}
+          </NavLink>
+        ))}
+        <NavLink to="/admin/activity" onClick={() => setUnseen(0)}>
+          Activity{unseen > 0 && <span className="admin-nav-badge">{unseen}</span>}
+        </NavLink>
+      </nav>
+      <div className="admin-content">
+        <Outlet />
+      </div>
+    </section>
+  );
 }

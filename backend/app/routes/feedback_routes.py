@@ -14,7 +14,13 @@ from app.schemas.feedback_schema import (
     TestimonialResponse,
 )
 from app.services.audit_service import create_audit_log, snapshot_model
-from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, release_for_stream, stream_admin_records
+from app.services.admin_list_service import (
+    AdminJSONResponse,
+    AdminRecordPage,
+    admin_record_page,
+    release_for_stream,
+    stream_admin_records,
+)
 from app.services.feedback_service import (
     create_feedback,
     delete_feedback,
@@ -34,10 +40,20 @@ def _feedback_snapshot(item: Feedback) -> dict:
     return snapshot_model(item, extra_exclude={"screenshot_data"})
 
 
-def _save_feedback_audit(db: Session, admin: User, action: str, record_id: int, *, old_value: dict, new_value: dict | None = None) -> None:
+def _save_feedback_audit(
+    db: Session, admin: User, action: str, record_id: int, *, old_value: dict, new_value: dict | None = None
+) -> None:
     try:
-        create_audit_log(db, actor=admin, action=action, table_name="feedback", record_id=record_id,
-                         old_value=old_value, new_value=new_value, commit=False)
+        create_audit_log(
+            db,
+            actor=admin,
+            action=action,
+            table_name="feedback",
+            record_id=record_id,
+            old_value=old_value,
+            new_value=new_value,
+            commit=False,
+        )
         db.commit()
     except Exception:
         db.rollback()
@@ -73,8 +89,15 @@ def get_feedback_list(
     _admin: User = Depends(require_roles("admin")),
 ) -> Response:
     conditions = (Feedback.rating == rating,) if rating is not None else ()
-    return AdminJSONResponse(stream_admin_records(release_for_stream(db), Feedback, FeedbackResponse,
-        order=(("created_at", True), ("id", True)), where=conditions))
+    return AdminJSONResponse(
+        stream_admin_records(
+            release_for_stream(db),
+            Feedback,
+            FeedbackResponse,
+            order=(("created_at", True), ("id", True)),
+            where=conditions,
+        )
+    )
 
 
 @router.get("/admin/page", response_model=AdminRecordPage[FeedbackResponse])
@@ -85,8 +108,9 @@ def get_feedback_page(
     _admin: User = Depends(require_roles("admin")),
 ) -> AdminRecordPage[FeedbackResponse]:
     conditions = (Feedback.rating == rating,) if rating is not None else ()
-    return admin_record_page(db, Feedback, FeedbackResponse, offset=offset,
-        order=(("created_at", True), ("id", True)), where=conditions)
+    return admin_record_page(
+        db, Feedback, FeedbackResponse, offset=offset, order=(("created_at", True), ("id", True)), where=conditions
+    )
 
 
 @router.get("/{feedback_id}", response_model=FeedbackResponse)
@@ -108,7 +132,9 @@ def publish_testimonial(
     item = get_feedback(db, feedback_id, lock=True)
     old_value = _feedback_snapshot(item)
     item = set_testimonial_publication(db, item, is_public=True, display_name=payload.display_name, commit=False)
-    _save_feedback_audit(db, admin, "feedback.testimonial_publish", item.id, old_value=old_value, new_value=_feedback_snapshot(item))
+    _save_feedback_audit(
+        db, admin, "feedback.testimonial_publish", item.id, old_value=old_value, new_value=_feedback_snapshot(item)
+    )
     return item
 
 
@@ -120,8 +146,12 @@ def hide_testimonial(
 ) -> Feedback:
     item = get_feedback(db, feedback_id, lock=True)
     old_value = _feedback_snapshot(item)
-    item = set_testimonial_publication(db, item, is_public=False, display_name=item.testimonial_display_name, commit=False)
-    _save_feedback_audit(db, admin, "feedback.testimonial_hide", item.id, old_value=old_value, new_value=_feedback_snapshot(item))
+    item = set_testimonial_publication(
+        db, item, is_public=False, display_name=item.testimonial_display_name, commit=False
+    )
+    _save_feedback_audit(
+        db, admin, "feedback.testimonial_hide", item.id, old_value=old_value, new_value=_feedback_snapshot(item)
+    )
     return item
 
 

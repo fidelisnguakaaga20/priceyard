@@ -20,7 +20,9 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, ErrorBound
           <div className="status-box error">
             <strong>Something went wrong.</strong>
             <p>Please try again.</p>
-            <button className="button button-small" type="button" onClick={() => window.location.reload()}>Try again</button>
+            <button className="button button-small" type="button" onClick={() => window.location.reload()}>
+              Try again
+            </button>
           </div>
         </div>
       );

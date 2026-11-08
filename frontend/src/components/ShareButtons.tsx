@@ -29,7 +29,12 @@ export function NativeShareButton({ content, label = "Share" }: { content: Share
   // muted styling (vs. the bold WhatsApp link) so it reads as a secondary, catch-all
   // option rather than a second, equally-weighted choice next to WhatsApp.
   return (
-    <button type="button" className="text-link-button muted share-more-button" disabled={busy} onClick={() => void share()}>
+    <button
+      type="button"
+      className="text-link-button muted share-more-button"
+      disabled={busy}
+      onClick={() => void share()}
+    >
       {busy ? "Sharing…" : `📤 ${label} to other apps`}
     </button>
   );

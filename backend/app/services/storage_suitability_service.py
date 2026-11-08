@@ -29,11 +29,12 @@ def _validate_storage_references(
     if not market.is_active:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Market is inactive")
 
-    validate_linked_price_scope(db, price_update_id=price_update_id,
-                                commodity_id=commodity_id, market_id=market_id)
+    validate_linked_price_scope(db, price_update_id=price_update_id, commodity_id=commodity_id, market_id=market_id)
 
 
-def create_storage_suitability(db: Session, payload: StorageSuitabilityCreate, *, commit: bool = True) -> StorageSuitability:
+def create_storage_suitability(
+    db: Session, payload: StorageSuitabilityCreate, *, commit: bool = True
+) -> StorageSuitability:
     _validate_storage_references(
         db,
         commodity_id=payload.commodity_id,
@@ -61,11 +62,7 @@ def list_storage_suitability(db: Session, *, commodity_id: int | None = None) ->
     if commodity_id is not None:
         statement = statement.where(StorageSuitability.commodity_id == commodity_id)
     return list(
-        db.scalars(
-            statement.order_by(
-                StorageSuitability.created_at.desc(), StorageSuitability.id.desc()
-            )
-        ).all()
+        db.scalars(statement.order_by(StorageSuitability.created_at.desc(), StorageSuitability.id.desc())).all()
     )
 
 
@@ -79,7 +76,10 @@ def update_storage_suitability(
     changes = payload.model_dump(exclude_unset=True)
     required = ("commodity_id", "market_id", "suitability_status")
     if any(field in changes and changes[field] is None for field in required):
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Required storage-suitability values cannot be null")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Required storage-suitability values cannot be null",
+        )
     commodity_id = int(changes.get("commodity_id", item.commodity_id))
     market_id = int(changes.get("market_id", item.market_id))
     price_update_id = changes.get("price_update_id", item.price_update_id)

@@ -4,6 +4,7 @@ Revision ID: 0014_add_referral
 Revises: 0013_add_testimonial
 Create Date: 2026-09-15
 """
+
 import secrets
 import string
 from typing import Sequence, Union

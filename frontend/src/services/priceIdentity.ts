@@ -1,7 +1,7 @@
 type NamedRecord = { id: number; name: string };
 
 export const identityValue = (id: number) => `id:${id}`;
-export const nameSelection = (name: string) => name ? `name:${name}` : "";
+export const nameSelection = (name: string) => (name ? `name:${name}` : "");
 
 export function selectionFromQuery(query: URLSearchParams, key: "commodity" | "market"): string {
   return query.has(`${key}_id`) ? `id:${query.get(`${key}_id`)}` : nameSelection(query.get(key) || "");
@@ -17,7 +17,9 @@ export function selectedIdentity(value: string, records: NamedRecord[]): string 
 export function identityLabel(value: string, records: NamedRecord[]): string {
   return value.startsWith("id:")
     ? records.find((record) => identityValue(record.id) === value)?.name || ""
-    : value.startsWith("name:") ? value.slice(5) : value;
+    : value.startsWith("name:")
+      ? value.slice(5)
+      : value;
 }
 
 export function addIdentityFilter(query: URLSearchParams, key: "commodity" | "market", value?: string): void {

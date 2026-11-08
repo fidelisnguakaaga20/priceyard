@@ -7,12 +7,20 @@ export function rememberBrowserSession(session: BrowserSession): string {
   if (sessions.size > 32) sessions.delete(sessions.keys().next().value!);
   return handle;
 }
-export function browserSession(handle: string): BrowserSession | undefined { return sessions.get(handle); }
-export function forgetBrowserSession(handle: string): void { sessions.delete(handle); }
+export function browserSession(handle: string): BrowserSession | undefined {
+  return sessions.get(handle);
+}
+export function forgetBrowserSession(handle: string): void {
+  sessions.delete(handle);
+}
 export const SESSION_EVENT_KEY = "priceyard_session_event";
 export const LOGOUT_PENDING_KEY = "priceyard_logout_pending";
 export function signalSessionChange(): void {
-  try { localStorage.setItem(SESSION_EVENT_KEY, crypto.randomUUID()); } catch { /* focus still refreshes the session */ }
+  try {
+    localStorage.setItem(SESSION_EVENT_KEY, crypto.randomUUID());
+  } catch {
+    /* focus still refreshes the session */
+  }
 }
 
 export function serializeCookieMutation<T>(send: () => Promise<T>): Promise<T> {
@@ -22,5 +30,7 @@ export function serializeCookieMutation<T>(send: () => Promise<T>): Promise<T> {
     return navigator.locks.request("priceyard-browser-session", send);
   }
   // A tab-only queue would silently lose the cross-tab safety guarantee.
-  return Promise.reject(new Error("Protected browser sessions need an updated browser. Please update your browser and try again."));
+  return Promise.reject(
+    new Error("Protected browser sessions need an updated browser. Please update your browser and try again."),
+  );
 }

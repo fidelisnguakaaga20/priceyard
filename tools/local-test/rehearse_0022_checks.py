@@ -5,6 +5,7 @@ This module imports no application/environment configuration and opens no socket
 It emits aggregate evidence only; rows briefly enter memory for hashing and are
 never printed or written to disk by this callback.
 """
+
 import hashlib
 import json
 import re
@@ -64,7 +65,7 @@ def copy_stream_fingerprints(payload, expected_streams):
     offset, fingerprints = 0, []
     for unused in range(expected_streams):
         start = offset
-        if len(view) - offset < 19 or view[offset:offset + 11] != COPY_SIGNATURE:
+        if len(view) - offset < 19 or view[offset : offset + 11] != COPY_SIGNATURE:
             raise RuntimeError("Missing canonical binary COPY header")
         flags, extension_length = struct.unpack_from("!ii", view, offset + 11)
         if flags != 0 or extension_length != 0:
@@ -110,20 +111,26 @@ def verify_copy_parser_fixtures():
 
     first, empty, nullable = stream([b"fabricated", COPY_SIGNATURE]), stream([]), stream([None, b""])
     if copy_stream_fingerprints(first + empty, 2) != [
-            (2, hashlib.sha256(first).hexdigest()), (0, hashlib.sha256(empty).hexdigest())]:
+        (2, hashlib.sha256(first).hexdigest()),
+        (0, hashlib.sha256(empty).hexdigest()),
+    ]:
         raise RuntimeError("Fabricated concatenated COPY parser check failed")
     if copy_stream_fingerprints(nullable, 1) != [(2, hashlib.sha256(nullable).hexdigest())]:
         raise RuntimeError("Fabricated null/empty COPY field check failed")
     if copy_stream_fingerprints(b"", 0) != []:
         raise RuntimeError("Fabricated zero-stream COPY check failed")
     invalid = [
-        (first[:10], 1), (header[:-1], 1), (first[:-1], 1),
+        (first[:10], 1),
+        (header[:-1], 1),
+        (first[:-1], 1),
         (header + struct.pack("!h", 1) + b"\x00\x00", 1),
         (header + struct.pack("!hi", 1, 9) + b"short", 1),
         (b"X" + first[1:], 1),
         (header + struct.pack("!h", 2) + struct.pack("!h", -1), 1),
         (header + struct.pack("!hi", 1, -2) + struct.pack("!h", -1), 1),
-        (first + b"trailing", 1), (first + empty, 1), (first, 2),
+        (first + b"trailing", 1),
+        (first + empty, 1),
+        (first, 2),
         (COPY_SIGNATURE + struct.pack("!ii", 1, 0) + struct.pack("!h", -1), 1),
         (COPY_SIGNATURE + struct.pack("!ii", 0, 1) + b"x" + struct.pack("!h", -1), 1),
     ]
@@ -133,8 +140,12 @@ def verify_copy_parser_fixtures():
         except RuntimeError:
             continue
         raise RuntimeError("Malformed fabricated binary COPY was accepted")
-    return {"concatenated_streams": True, "empty_and_null_fields": True,
-            "embedded_signature": True, "malformed_cases_rejected": len(invalid)}
+    return {
+        "concatenated_streams": True,
+        "empty_and_null_fields": True,
+        "embedded_signature": True,
+        "malformed_cases_rejected": len(invalid),
+    }
 
 
 def run(psql, execute, shell, manifest, catalog, result):
@@ -145,17 +156,25 @@ def run(psql, execute, shell, manifest, catalog, result):
         raise RuntimeError("Exact migration downgrade refusal must be verified first")
     if not re.match(r"\s*BEGIN;", UPGRADE_SQL) or not re.search(r"COMMIT;\s*$", UPGRADE_SQL):
         raise RuntimeError("Migration must retain its PostgreSQL transaction")
-    checks = {"status": "running", "migration_sha256": MIGRATION_SHA256,
-              "production_connections": 0, "production_changes": False,
-              "original_application_rollback_security_safe": False,
-              "security_aware_application_artifact_runtime_verified": False}
+    checks = {
+        "status": "running",
+        "migration_sha256": MIGRATION_SHA256,
+        "production_connections": 0,
+        "production_changes": False,
+        "original_application_rollback_security_safe": False,
+        "security_aware_application_artifact_runtime_verified": False,
+    }
     result["migration_0022_rehearsal"] = checks
     result["migration_rehearsal"] = checks
     checks["binary_copy_parser_fixtures"] = verify_copy_parser_fixtures()
 
     def sql(statement, database=CLONE, readonly=True):
-        return psql("SET statement_timeout='12s'; SET lock_timeout='2s';\n" + statement,
-                    database=database, readonly=readonly, role="postgres")
+        return psql(
+            "SET statement_timeout='12s'; SET lock_timeout='2s';\n" + statement,
+            database=database,
+            readonly=readonly,
+            role="postgres",
+        )
 
     def obj(statement, database=CLONE):
         return json.loads(sql(statement, database=database))
@@ -175,9 +194,20 @@ def run(psql, execute, shell, manifest, catalog, result):
                 raise RuntimeError("Unexpected source table identifier")
             reference = '"' + schema + '"."' + name + '"'
             where = " WHERE t.id<>" + str(FIXTURE_ID) if fixture and (schema, name) == ("public", "users") else ""
-            expression = "to_jsonb(t)" + (" - 'auth_version'" if upgraded and (schema, name) == ("public", "users") else "")
-            commands.append("COPY (SELECT (" + expression + ")::text FROM ONLY " + reference + " t" + where +
-                            " ORDER BY (" + expression + ')::text COLLATE "C") TO STDOUT (FORMAT binary);')
+            expression = "to_jsonb(t)" + (
+                " - 'auth_version'" if upgraded and (schema, name) == ("public", "users") else ""
+            )
+            commands.append(
+                "COPY (SELECT ("
+                + expression
+                + ")::text FROM ONLY "
+                + reference
+                + " t"
+                + where
+                + " ORDER BY ("
+                + expression
+                + ')::text COLLATE "C") TO STDOUT (FORMAT binary);'
+            )
         commands.append("COMMIT;")
         payload = sql("\n".join(commands), database)
         fingerprints = copy_stream_fingerprints(payload, len(manifest["tables"]))
@@ -189,7 +219,10 @@ def run(psql, execute, shell, manifest, catalog, result):
                 continue  # Count is retained; its one allowed value is checked separately.
             if digest != table["copy_json_sha256"]:
                 raise RuntimeError("Original table digest differs during rehearsal")
-        if upgraded and sql("SELECT version_num FROM public.alembic_version;", database).strip() != b"0022_login_revocation":
+        if (
+            upgraded
+            and sql("SELECT version_num FROM public.alembic_version;", database).strip() != b"0022_login_revocation"
+        ):
             raise RuntimeError("Expected exact upgraded revision")
         return len(fingerprints)
 
@@ -212,8 +245,7 @@ def run(psql, execute, shell, manifest, catalog, result):
       WHERE d.datname=current_database();"""
     wanted_acl, current_acl = obj(database_acl, "postgres"), obj(database_acl)
     if wanted_acl != current_acl:
-        if any(row[0] != owner or row[2] not in {"CONNECT", "CREATE", "TEMPORARY"}
-               for row in wanted_acl):
+        if any(row[0] != owner or row[2] not in {"CONNECT", "CREATE", "TEMPORARY"} for row in wanted_acl):
             raise RuntimeError("Clone database ACL grant chain requires separate review")
         commands = ["BEGIN; SET LOCAL ROLE " + owner_sql + ";"]
         for grantee in sorted({row[1] for row in current_acl} | {"PUBLIC", owner}):
@@ -221,11 +253,23 @@ def run(psql, execute, shell, manifest, catalog, result):
             commands.append("REVOKE ALL PRIVILEGES ON DATABASE " + CLONE + " FROM " + target + ";")
         for grantor, grantee, privilege, grantable in wanted_acl:
             target = "PUBLIC" if grantee == "PUBLIC" else '"' + grantee.replace('"', '""') + '"'
-            commands.append("GRANT " + privilege + " ON DATABASE " + CLONE + " TO " + target +
-                            (" WITH GRANT OPTION" if grantable else "") + ";")
+            commands.append(
+                "GRANT "
+                + privilege
+                + " ON DATABASE "
+                + CLONE
+                + " TO "
+                + target
+                + (" WITH GRANT OPTION" if grantable else "")
+                + ";"
+            )
         commands.append("COMMIT;")
         psql("\n".join(commands), readonly=False)
-    if obj(database_acl) != wanted_acl or sql("SELECT pg_get_userbyid(datdba) FROM pg_database WHERE datname=current_database();").decode().strip() != owner:
+    if (
+        obj(database_acl) != wanted_acl
+        or sql("SELECT pg_get_userbyid(datdba) FROM pg_database WHERE datname=current_database();").decode().strip()
+        != owner
+    ):
         raise RuntimeError("Clone database owner or effective grants differ")
     checks["original_database_owner_and_grants_preserved"] = True
     # CREATE DATABASE TEMPLATE does not copy database-scoped role settings.
@@ -241,8 +285,11 @@ def run(psql, execute, shell, manifest, catalog, result):
                 raise RuntimeError("Unreviewed clone database setting")
             key_sql = '"' + key.replace('"', '""') + '"'
             value_sql = "'" + value.replace("'", "''") + "'"
-            prefix = ("ALTER ROLE \"" + role.replace('"', '""') + "\" IN DATABASE " + CLONE
-                      if role else "ALTER DATABASE " + CLONE)
+            prefix = (
+                'ALTER ROLE "' + role.replace('"', '""') + '" IN DATABASE ' + CLONE
+                if role
+                else "ALTER DATABASE " + CLONE
+            )
             psql(prefix + " SET " + key_sql + " TO " + value_sql + ";", readonly=False)
     checks["source_role_login_and_clone_database_settings_selected"] = True
     if snapshot(CLONE) != (before, sequences):
@@ -275,8 +322,11 @@ def run(psql, execute, shell, manifest, catalog, result):
     checks["preserved_original_tables"] = verify_data(CLONE, upgraded=True)
     after, observed_sequences = snapshot(CLONE)
     user_access = obj(USER_ACCESS_SQL)
-    converted_grants = [row for row in before_user_access["table_grants"]
-                        if row[1] in {"PUBLIC", "anon", "authenticated"} and row[2] == "UPDATE"]
+    converted_grants = [
+        row
+        for row in before_user_access["table_grants"]
+        if row[1] in {"PUBLIC", "anon", "authenticated"} and row[2] == "UPDATE"
+    ]
     expected_table_grants = [row for row in before_user_access["table_grants"] if row not in converted_grants]
     expected_column_grants = {}
     for row in before_user_access["column_grants"]:
@@ -286,18 +336,23 @@ def run(psql, execute, shell, manifest, catalog, result):
             key = (column, grantor, grantee, privilege)
             expected_column_grants[key] = expected_column_grants.get(key, False) or grantable
     observed_column_grants = {tuple(row[:-1]): row[-1] for row in user_access["column_grants"]}
-    if (user_access["effective_original_columns"] != before_user_access["effective_original_columns"]
-            or sorted(user_access["table_grants"]) != sorted(expected_table_grants)
-            or observed_column_grants != expected_column_grants):
+    if (
+        user_access["effective_original_columns"] != before_user_access["effective_original_columns"]
+        or sorted(user_access["table_grants"]) != sorted(expected_table_grants)
+        or observed_column_grants != expected_column_grants
+    ):
         raise RuntimeError("Original user-column rights, grant options or grant chains changed unexpectedly")
     checks["original_user_column_access_and_grant_options_preserved"] = True
     checks["only_new_counter_excluded_from_existing_api_update_grants"] = True
-    allowed_names = {"revoked_access_tokens", "revoked_access_tokens_pkey",
-                     "ix_revoked_access_tokens_user_id", "ix_revoked_access_tokens_expires_at"}
+    allowed_names = {
+        "revoked_access_tokens",
+        "revoked_access_tokens_pkey",
+        "ix_revoked_access_tokens_user_id",
+        "ix_revoked_access_tokens_expires_at",
+    }
     filtered = json.loads(json.dumps(after))
     for key in ("relations", "columns", "constraints", "indexes"):
-        filtered[key] = [row for row in filtered[key] or [] if not
-                         (row[0] == "public" and row[1] in allowed_names)]
+        filtered[key] = [row for row in filtered[key] or [] if not (row[0] == "public" and row[1] in allowed_names)]
     filtered["columns"] = [row for row in filtered["columns"] if row[:3] != ["public", "users", "auth_version"]]
     # Raw ACL representations change only by the exact validated conversion above.
     original_columns = {tuple(row[:3]): row for row in before["columns"]}
@@ -312,18 +367,34 @@ def run(psql, execute, shell, manifest, catalog, result):
         raise RuntimeError("Unexpected original catalog or sequence change")
     checks["original_catalog_and_sequences_preserved"] = True
     columns = [row for row in after["columns"] if row[:2] == ["public", "revoked_access_tokens"]]
-    expected = [("token_hash", "character varying(64)"), ("user_id", "integer"),
-                ("expires_at", "timestamp with time zone"), ("revoked_at", "timestamp with time zone")]
+    expected = [
+        ("token_hash", "character varying(64)"),
+        ("user_id", "integer"),
+        ("expires_at", "timestamp with time zone"),
+        ("revoked_at", "timestamp with time zone"),
+    ]
     if [(row[2], row[4]) for row in columns] != expected or not all(row[5] for row in columns):
         raise RuntimeError("Revocation table fields differ from reviewed migration")
     version = [row for row in after["columns"] if row[:3] == ["public", "users", "auth_version"]]
     if len(version) != 1 or version[0][4:7] != ["integer", True, "0"]:
         raise RuntimeError("Account security counter definition differs")
-    assert_true("NOT EXISTS (SELECT 1 FROM public.users WHERE auth_version<>0 OR auth_version IS NULL)", "Existing account defaults differ")
+    assert_true(
+        "NOT EXISTS (SELECT 1 FROM public.users WHERE auth_version<>0 OR auth_version IS NULL)",
+        "Existing account defaults differ",
+    )
     assert_true("(SELECT count(*) FROM public.revoked_access_tokens)=0", "Revocation table must start empty")
-    assert_true("EXISTS (SELECT 1 FROM pg_constraint WHERE conrelid='public.revoked_access_tokens'::regclass AND contype='p' AND conkey=ARRAY[1]::smallint[])", "Revocation primary key differs")
-    assert_true("EXISTS (SELECT 1 FROM pg_constraint WHERE conrelid='public.revoked_access_tokens'::regclass AND contype='f' AND confrelid='public.users'::regclass AND confdeltype='c' AND conkey=ARRAY[2]::smallint[])", "Revocation user constraint differs")
-    assert_true("(SELECT count(*) FROM pg_indexes WHERE schemaname='public' AND tablename='revoked_access_tokens' AND indexname IN ('ix_revoked_access_tokens_user_id','ix_revoked_access_tokens_expires_at'))=2", "Security indexes missing")
+    assert_true(
+        "EXISTS (SELECT 1 FROM pg_constraint WHERE conrelid='public.revoked_access_tokens'::regclass AND contype='p' AND conkey=ARRAY[1]::smallint[])",
+        "Revocation primary key differs",
+    )
+    assert_true(
+        "EXISTS (SELECT 1 FROM pg_constraint WHERE conrelid='public.revoked_access_tokens'::regclass AND contype='f' AND confrelid='public.users'::regclass AND confdeltype='c' AND conkey=ARRAY[2]::smallint[])",
+        "Revocation user constraint differs",
+    )
+    assert_true(
+        "(SELECT count(*) FROM pg_indexes WHERE schemaname='public' AND tablename='revoked_access_tokens' AND indexname IN ('ix_revoked_access_tokens_user_id','ix_revoked_access_tokens_expires_at'))=2",
+        "Security indexes missing",
+    )
     checks["expected_schema_defaults_constraints_and_indexes"] = True
     token_relation = next(row for row in after["relations"] if row[:2] == ["public", "revoked_access_tokens"])
     if token_relation[3:5] != [True, False]:
@@ -352,7 +423,10 @@ def run(psql, execute, shell, manifest, catalog, result):
     if any(counter_exposure.values()):
         checks.update(status="failed", failure="Provider roles can update account security counters")
         raise RuntimeError("Provider roles can update account security counters; release blocked")
-    assert_true("NOT EXISTS (SELECT 1 FROM public.users WHERE id IN (2147483646,2147483645) OR email='py35-rehearsal@example.invalid' OR referral_code='PY35RAMONLY')", "Synthetic identity conflicts; existing records preserved")
+    assert_true(
+        "NOT EXISTS (SELECT 1 FROM public.users WHERE id IN (2147483646,2147483645) OR email='py35-rehearsal@example.invalid' OR referral_code='PY35RAMONLY')",
+        "Synthetic identity conflicts; existing records preserved",
+    )
     fixture = """INSERT INTO public.users(id,full_name,email,password_hash,auth_provider,role,is_active,referral_code)
       VALUES (2147483646,'PY35 synthetic rehearsal','py35-rehearsal@example.invalid','fabricated-unusable-password-hash','local','free_user',true,'PY35RAMONLY');
       UPDATE public.users SET auth_version=1 WHERE id=2147483646;
@@ -378,7 +452,9 @@ def run(psql, execute, shell, manifest, catalog, result):
     security_sql = "SELECT jsonb_build_array((SELECT to_jsonb(u) FROM public.users u WHERE id=2147483646),(SELECT jsonb_agg(to_jsonb(r) ORDER BY token_hash) FROM public.revoked_access_tokens r));"
     protected_security = hashlib.sha256(sql(security_sql)).hexdigest()
     verify_data(CLONE, upgraded=True, fixture=True)
-    shell("pg_ctl -D /work/cluster -m fast -w -t 15 stop > /work/control.log 2>&1; pg_ctl -D /work/cluster -l /work/server.log -w -t 15 start > /work/control.log 2>&1")
+    shell(
+        "pg_ctl -D /work/cluster -m fast -w -t 15 stop > /work/control.log 2>&1; pg_ctl -D /work/cluster -l /work/server.log -w -t 15 start > /work/control.log 2>&1"
+    )
     if hashlib.sha256(sql(security_sql)).hexdigest() != protected_security:
         raise RuntimeError("Security evidence changed after recovery restart")
     if snapshot(CLONE) != (after, sequences):
@@ -387,11 +463,15 @@ def run(psql, execute, shell, manifest, catalog, result):
     verify_data("postgres")
     if snapshot("postgres") != (before, sequences):
         raise RuntimeError("Preserved 0021 baseline changed")
-    checks.update(status="passed", original_0021_baseline_preserved=True,
-                  restart_recovery_preserves_original_and_security_records=True,
-                  security_evidence_not_downgraded_or_deleted=True,
-                  synthetic_security_accounts=1, synthetic_revocation_records=1,
-                  remaining="Approved hosted checks and security-aware rollback artifact runtime verification")
+    checks.update(
+        status="passed",
+        original_0021_baseline_preserved=True,
+        restart_recovery_preserves_original_and_security_records=True,
+        security_evidence_not_downgraded_or_deleted=True,
+        synthetic_security_accounts=1,
+        synthetic_revocation_records=1,
+        remaining="Approved hosted checks and security-aware rollback artifact runtime verification",
+    )
     return checks
 
 

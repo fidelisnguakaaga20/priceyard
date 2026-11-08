@@ -78,13 +78,20 @@ def register_user(db: Session, payload: RegisterRequest) -> User:
         code = payload.referral_code.strip().upper()
         # Take the parent-user lock before inserting the child referral row;
         # otherwise concurrent FK key-share locks can deadlock on upgrade.
-        referrer = db.scalar(select(User).where(User.referral_code == code).with_for_update().execution_options(populate_existing=True))
+        referrer = db.scalar(
+            select(User).where(User.referral_code == code).with_for_update().execution_options(populate_existing=True)
+        )
         if referrer is None:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Invalid referral code",
             )
-        referrer_subscription = db.scalar(select(Subscription).where(Subscription.user_id == referrer.id).with_for_update().execution_options(populate_existing=True))
+        referrer_subscription = db.scalar(
+            select(Subscription)
+            .where(Subscription.user_id == referrer.id)
+            .with_for_update()
+            .execution_options(populate_existing=True)
+        )
 
     user = User(
         full_name=payload.full_name.strip(),
@@ -105,9 +112,14 @@ def register_user(db: Session, payload: RegisterRequest) -> User:
             old_value = snapshot_model(referrer_subscription) if referrer_subscription else None
             if apply_referral_reward(db, referrer, commit=False):
                 create_audit_log(
-                    db, actor=referrer, action="referral.reward_granted", table_name="subscriptions",
-                    record_id=referrer_subscription.id, old_value=old_value,
-                    new_value=snapshot_model(referrer_subscription), commit=False,
+                    db,
+                    actor=referrer,
+                    action="referral.reward_granted",
+                    table_name="subscriptions",
+                    record_id=referrer_subscription.id,
+                    old_value=old_value,
+                    new_value=snapshot_model(referrer_subscription),
+                    commit=False,
                 )
         db.commit()
     except IntegrityError as exc:
@@ -174,7 +186,10 @@ def authenticate_or_create_google_user(db: Session, token: str) -> User:
                 token, _GoogleCertificateRequest(session=transport), settings.google_client_id
             )
     except (google_errors.TransportError, requests.RequestException) as exc:
-        raise HTTPException(status_code=503, detail="Google sign-in is temporarily unavailable. Please try again or use your email and password.") from exc
+        raise HTTPException(
+            status_code=503,
+            detail="Google sign-in is temporarily unavailable. Please try again or use your email and password.",
+        ) from exc
     except (ValueError, google_errors.GoogleAuthError) as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -183,8 +198,13 @@ def authenticate_or_create_google_user(db: Session, token: str) -> User:
 
     google_sub = claims.get("sub") if isinstance(claims, dict) else None
     email = claims.get("email") if isinstance(claims, dict) else None
-    if (not isinstance(google_sub, str) or not google_sub.strip() or len(google_sub) > 255
-            or not isinstance(email, str) or claims.get("email_verified") is not True):
+    if (
+        not isinstance(google_sub, str)
+        or not google_sub.strip()
+        or len(google_sub) > 255
+        or not isinstance(email, str)
+        or claims.get("email_verified") is not True
+    ):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Google account could not be verified",
@@ -199,7 +219,10 @@ def authenticate_or_create_google_user(db: Session, token: str) -> User:
     if user is None:
         user = db.scalar(select(User).where(func.lower(User.email) == normalized_email))
         if user is not None:
-            raise HTTPException(status_code=409, detail="For your security, use your existing PriceYard email and password. You can reset your password if needed.")
+            raise HTTPException(
+                status_code=409,
+                detail="For your security, use your existing PriceYard email and password. You can reset your password if needed.",
+            )
         else:
             full_name = str(claims.get("name") or normalized_email.split("@")[0]).strip()[:150]
             user = User(

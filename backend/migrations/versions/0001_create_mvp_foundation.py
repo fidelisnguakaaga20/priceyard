@@ -4,6 +4,7 @@ Revision ID: 0001_create_mvp_foundation
 Revises:
 Create Date: 2026-08-12
 """
+
 from typing import Sequence, Union
 
 from alembic import op
@@ -75,7 +76,9 @@ def upgrade() -> None:
         sa.Column("payment_reference", sa.String(length=255), nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
-        sa.CheckConstraint("status IN ('free', 'trial', 'active', 'expired', 'cancelled')", name="ck_subscriptions_status"),
+        sa.CheckConstraint(
+            "status IN ('free', 'trial', 'active', 'expired', 'cancelled')", name="ck_subscriptions_status"
+        ),
         sa.ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="CASCADE"),
         sa.UniqueConstraint("user_id", name="uq_subscriptions_user_id"),
     )
@@ -114,7 +117,10 @@ def upgrade() -> None:
         sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
         sa.CheckConstraint("price_low >= 0", name="ck_price_updates_price_low_nonnegative"),
         sa.CheckConstraint("price_high >= price_low", name="ck_price_updates_price_range"),
-        sa.CheckConstraint("average_price IS NULL OR (average_price >= price_low AND average_price <= price_high)", name="ck_price_updates_average_in_range"),
+        sa.CheckConstraint(
+            "average_price IS NULL OR (average_price >= price_low AND average_price <= price_high)",
+            name="ck_price_updates_average_in_range",
+        ),
         sa.CheckConstraint("movement IN ('up', 'down', 'stable', 'unknown')", name="ck_price_updates_movement"),
         sa.CheckConstraint("status IN ('pending', 'approved', 'rejected')", name="ck_price_updates_status"),
         sa.ForeignKeyConstraint(["commodity_id"], ["commodities.id"], ondelete="RESTRICT"),
@@ -122,7 +128,16 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["created_by"], ["users.id"], ondelete="RESTRICT"),
         sa.ForeignKeyConstraint(["approved_by"], ["users.id"], ondelete="SET NULL"),
     )
-    for column in ("commodity_id", "market_id", "movement", "update_date_time", "is_outdated", "status", "created_by", "approved_by"):
+    for column in (
+        "commodity_id",
+        "market_id",
+        "movement",
+        "update_date_time",
+        "is_outdated",
+        "status",
+        "created_by",
+        "approved_by",
+    ):
         op.create_index(f"ix_price_updates_{column}", "price_updates", [column], unique=False)
 
     op.create_table(

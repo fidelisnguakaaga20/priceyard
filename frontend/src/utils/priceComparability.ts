@@ -2,7 +2,22 @@ import type { PriceUpdate } from "../types/api";
 
 import { priceEpoch } from "./priceTime";
 
-const unknownValues = new Set(["", "unknown", "not known", "not specified", "not confirmed", "not available", "not provided", "n/a", "na", "none", "unspecified", "—", "-", "?"]);
+const unknownValues = new Set([
+  "",
+  "unknown",
+  "not known",
+  "not specified",
+  "not confirmed",
+  "not available",
+  "not provided",
+  "n/a",
+  "na",
+  "none",
+  "unspecified",
+  "—",
+  "-",
+  "?",
+]);
 const normalized = (value: string | null | undefined) => (value ?? "").trim().toLowerCase();
 
 export type RecordedPriceGroup = { items: PriceUpdate[]; comparable: boolean; sizeKnown: boolean };
@@ -19,17 +34,27 @@ export function recordedPriceGroups(items: PriceUpdate[]): RecordedPriceGroup[] 
       if (!Number.isFinite(average) || average < values[0] || average > values[1]) continue;
     }
     const comparable = specifications.every((value) => !unknownValues.has(value));
-    const key = JSON.stringify([item.commodity_id, item.market_id,
-      ...specifications.map((value) => unknownValues.has(value) ? null : value)]);
+    const key = JSON.stringify([
+      item.commodity_id,
+      item.market_id,
+      ...specifications.map((value) => (unknownValues.has(value) ? null : value)),
+    ]);
     const sizeKnown = specifications.slice(0, 2).every((value) => !unknownValues.has(value));
     const group = groups.get(key) ?? { items: [], comparable, sizeKnown };
-    group.items.push(item); groups.set(key, group);
+    group.items.push(item);
+    groups.set(key, group);
   }
-  return [...groups.values()].map((group) => ({ ...group, items: [...group.items].sort((a, b) =>
-    priceEpoch(a.update_date_time) - priceEpoch(b.update_date_time) || a.id - b.id) }));
+  return [...groups.values()].map((group) => ({
+    ...group,
+    items: [...group.items].sort(
+      (a, b) => priceEpoch(a.update_date_time) - priceEpoch(b.update_date_time) || a.id - b.id,
+    ),
+  }));
 }
 
 /** Only existing recorded specifications; no quantity conversion or inferred type. */
 export function comparablePriceGroups(items: PriceUpdate[]): PriceUpdate[][] {
-  return recordedPriceGroups(items).filter((group) => group.comparable).map((group) => group.items);
+  return recordedPriceGroups(items)
+    .filter((group) => group.comparable)
+    .map((group) => group.items);
 }

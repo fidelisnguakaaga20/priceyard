@@ -7,7 +7,13 @@ from app.models.subscription import Subscription
 from app.models.user import User
 from app.schemas.subscription_schema import SubscriptionResponse, SubscriptionStatusUpdate
 from app.services.audit_service import create_audit_log, snapshot_model
-from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, release_for_stream, stream_admin_records
+from app.services.admin_list_service import (
+    AdminJSONResponse,
+    AdminRecordPage,
+    admin_record_page,
+    release_for_stream,
+    stream_admin_records,
+)
 from app.services.subscription_service import (
     get_subscription_for_user,
     lock_subscription_state,
@@ -34,8 +40,9 @@ def get_subscriptions(
     _: User = Depends(require_roles("admin")),
 ) -> Response:
     expire_subscriptions_for_listing(db)
-    return AdminJSONResponse(stream_admin_records(release_for_stream(db), Subscription, SubscriptionResponse,
-        order=(("id", False),)))
+    return AdminJSONResponse(
+        stream_admin_records(release_for_stream(db), Subscription, SubscriptionResponse, order=(("id", False),))
+    )
 
 
 @router.get("/admin/page", response_model=AdminRecordPage[SubscriptionResponse])
@@ -96,17 +103,30 @@ def set_subscription_status(
     old_subscription = snapshot_model(subscription)
     old_user = snapshot_model(user)
     try:
-        apply_trial_expiry(subscription); apply_paid_expiry(subscription)
+        apply_trial_expiry(subscription)
+        apply_paid_expiry(subscription)
         subscription = update_subscription_status(db, subscription, payload.status, commit=False)
         create_audit_log(
-            db, actor=admin, action="subscription.status_update", table_name="subscriptions",
-            record_id=subscription.id, old_value=old_subscription, new_value=snapshot_model(subscription), commit=False,
+            db,
+            actor=admin,
+            action="subscription.status_update",
+            table_name="subscriptions",
+            record_id=subscription.id,
+            old_value=old_subscription,
+            new_value=snapshot_model(subscription),
+            commit=False,
         )
         new_user = snapshot_model(user)
         if old_user != new_user:
             create_audit_log(
-                db, actor=admin, action="user.subscription_role_sync", table_name="users",
-                record_id=user.id, old_value=old_user, new_value=new_user, commit=False,
+                db,
+                actor=admin,
+                action="user.subscription_role_sync",
+                table_name="users",
+                record_id=user.id,
+                old_value=old_user,
+                new_value=new_user,
+                commit=False,
             )
         db.commit()
     except Exception:

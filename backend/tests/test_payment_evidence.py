@@ -29,16 +29,34 @@ class PaymentEvidenceTests(unittest.TestCase):
         self.engine = create_engine("sqlite+pysqlite:///:memory:")
         Base.metadata.create_all(self.engine)
         with Session(self.engine) as db:
-            user = User(full_name="Synthetic payer", email="evidence@example.com", password_hash="not-a-real-password", role="free_user", is_active=True, referral_code="EVIDENCE")
+            user = User(
+                full_name="Synthetic payer",
+                email="evidence@example.com",
+                password_hash="not-a-real-password",
+                role="free_user",
+                is_active=True,
+                referral_code="EVIDENCE",
+            )
             user.subscription = build_trial_subscription(user=user, now=datetime.now(timezone.utc))
             db.add(user)
             db.flush()
             self.user_id = user.id
-            db.add(Payment(user_id=user.id, reference="py_evidence_only", plan="monthly", amount=2500, currency="NGN", status="pending"))
+            db.add(
+                Payment(
+                    user_id=user.id,
+                    reference="py_evidence_only",
+                    plan="monthly",
+                    amount=2500,
+                    currency="NGN",
+                    status="pending",
+                )
+            )
             db.commit()
+
         def sessions():
             with Session(self.engine, expire_on_commit=False) as db:
                 yield db
+
         app.dependency_overrides[get_db] = sessions
         self.settings_patch = patch("app.services.payment_service.get_settings", return_value=FakeSettings())
         self.settings_patch.start()
@@ -51,13 +69,26 @@ class PaymentEvidenceTests(unittest.TestCase):
         self.engine.dispose()
 
     def payload(self):
-        return {"event": "charge.success", "data": {"reference": "py_evidence_only", "id": 123456, "amount": 250000, "currency": "NGN", "status": "success"}}
+        return {
+            "event": "charge.success",
+            "data": {
+                "reference": "py_evidence_only",
+                "id": 123456,
+                "amount": 250000,
+                "currency": "NGN",
+                "status": "success",
+            },
+        }
 
     def send(self, payload, signature=None):
         raw = json.dumps(payload).encode()
         if signature is None:
             signature = hmac.new(FakeSettings.paystack_secret_key.encode(), raw, hashlib.sha512).hexdigest()
-        return self.client.post("/payments/webhook", content=raw, headers={"x-paystack-signature": signature, "Content-Type": "application/json"})
+        return self.client.post(
+            "/payments/webhook",
+            content=raw,
+            headers={"x-paystack-signature": signature, "Content-Type": "application/json"},
+        )
 
     def assert_not_credited(self):
         with Session(self.engine) as db:
@@ -69,7 +100,12 @@ class PaymentEvidenceTests(unittest.TestCase):
             self.assertEqual(user.subscription.status, "trial")
 
     def test_signed_wrong_or_incomplete_evidence_does_not_credit(self):
-        cases = {"amount": [None, 0, -250000, 249999, 250001, 250000.0, "250000", True], "currency": [None, "USD", "ngn"], "status": [None, "pending", "failed"], "id": [None, False, 0, -1, "123456"]}
+        cases = {
+            "amount": [None, 0, -250000, 249999, 250001, 250000.0, "250000", True],
+            "currency": [None, "USD", "ngn"],
+            "status": [None, "pending", "failed"],
+            "id": [None, False, 0, -1, "123456"],
+        }
         for field, values in cases.items():
             for value in values:
                 with self.subTest(field=field, value=value):
@@ -86,7 +122,15 @@ class PaymentEvidenceTests(unittest.TestCase):
                 self.assert_not_credited()
 
     def test_malformed_signed_shapes_fail_without_server_error_or_credit(self):
-        for payload in (None, [], 1, "charge.success", {"event": "charge.success", "data": []}, {"event": "charge.success", "data": "bad"}, {"event": "charge.success", "data": {"reference": ["py_evidence_only"]}}):
+        for payload in (
+            None,
+            [],
+            1,
+            "charge.success",
+            {"event": "charge.success", "data": []},
+            {"event": "charge.success", "data": "bad"},
+            {"event": "charge.success", "data": {"reference": ["py_evidence_only"]}},
+        ):
             with self.subTest(payload=payload):
                 self.assertIn(self.send(payload).status_code, (400, 422))
                 self.assert_not_credited()
@@ -117,7 +161,10 @@ class PaymentEvidenceTests(unittest.TestCase):
             self.assert_not_credited()
 
     def test_activation_failure_rolls_back_and_valid_retry_can_recover(self):
-        with patch("app.services.payment_service.activate_paid_subscription", side_effect=RuntimeError("Synthetic activation outage")):
+        with patch(
+            "app.services.payment_service.activate_paid_subscription",
+            side_effect=RuntimeError("Synthetic activation outage"),
+        ):
             self.assertEqual(self.send(self.payload()).status_code, 500)
         self.assert_not_credited()
         self.assertEqual(self.send(self.payload()).status_code, 200)
@@ -139,7 +186,17 @@ class PaymentEvidenceTests(unittest.TestCase):
 
     def test_provider_transaction_cannot_credit_a_second_purchase(self):
         with Session(self.engine) as db:
-            db.add(Payment(user_id=self.user_id, reference="py_prior_synthetic_payment", plan="monthly", amount=2500, currency="NGN", status="success", paystack_transaction_id="123456"))
+            db.add(
+                Payment(
+                    user_id=self.user_id,
+                    reference="py_prior_synthetic_payment",
+                    plan="monthly",
+                    amount=2500,
+                    currency="NGN",
+                    status="success",
+                    paystack_transaction_id="123456",
+                )
+            )
             db.commit()
         self.assertEqual(self.send(self.payload()).status_code, 409)
         with Session(self.engine) as db:
@@ -148,7 +205,9 @@ class PaymentEvidenceTests(unittest.TestCase):
             self.assertEqual(db.get(User, self.user_id).subscription.status, "trial")
 
     def test_notification_failure_does_not_undo_or_misreport_saved_payment(self):
-        with patch("app.services.payment_service.notify_admins", side_effect=RuntimeError("Synthetic notification outage")):
+        with patch(
+            "app.services.payment_service.notify_admins", side_effect=RuntimeError("Synthetic notification outage")
+        ):
             self.assertEqual(self.send(self.payload()).status_code, 200)
         with Session(self.engine) as db:
             self.assertEqual(db.scalar(select(Payment)).status, "success")
@@ -159,7 +218,7 @@ class PaymentEvidenceTests(unittest.TestCase):
             subscription = db.get(User, self.user_id).subscription
             trial_end = subscription.trial_ends_at
             trial_start = subscription.trial_started_at
-        expected_end = trial_end.date()+timedelta(days=30)
+        expected_end = trial_end.date() + timedelta(days=30)
         self.assertEqual(self.send(self.payload()).status_code, 200)
         self.assertEqual(self.send(self.payload()).status_code, 200)
         with Session(self.engine) as db:
@@ -169,7 +228,7 @@ class PaymentEvidenceTests(unittest.TestCase):
             self.assertEqual(subscription.trial_ends_at, trial_end)
 
     def test_renewal_audit_failure_keeps_paid_days_then_retry_credits_once(self):
-        prior_end = datetime.now(timezone.utc).date()+timedelta(days=10)
+        prior_end = datetime.now(timezone.utc).date() + timedelta(days=10)
         with Session(self.engine) as db:
             user = db.get(User, self.user_id)
             user.role = "paid_user"
@@ -185,4 +244,4 @@ class PaymentEvidenceTests(unittest.TestCase):
         self.assertEqual(self.send(self.payload()).status_code, 200)
         self.assertEqual(self.send(self.payload()).status_code, 200)
         with Session(self.engine) as db:
-            self.assertEqual(db.get(User, self.user_id).subscription.end_date, prior_end+timedelta(days=30))
+            self.assertEqual(db.get(User, self.user_id).subscription.end_date, prior_end + timedelta(days=30))

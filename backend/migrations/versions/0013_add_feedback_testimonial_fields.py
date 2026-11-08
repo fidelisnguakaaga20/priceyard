@@ -4,6 +4,7 @@ Revision ID: 0013_add_testimonial
 Revises: 0012_add_trial_reminder
 Create Date: 2026-09-14
 """
+
 from typing import Sequence, Union
 
 from alembic import op

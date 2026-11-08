@@ -4,6 +4,7 @@ The unittest cases use only an in-memory SQLite database. The explicit helper
 accepts an engine from the guarded native PostgreSQL runner; it never discovers
 credentials or opens an independently configured database.
 """
+
 from datetime import datetime, timedelta, timezone
 import threading
 import time
@@ -31,14 +32,20 @@ NOW = datetime(2026, 10, 18, 12, tzinfo=timezone.utc)
 def seed_account(engine, *, status, role, now):
     tag = uuid4().hex[:10]
     with Session(engine) as db:
-        user = User(full_name="Synthetic expiry race", email=f"expiry-{tag}@example.com",
-                    password_hash="unused-by-this-test", role=role, referral_code="ER" + tag)
+        user = User(
+            full_name="Synthetic expiry race",
+            email=f"expiry-{tag}@example.com",
+            password_hash="unused-by-this-test",
+            role=role,
+            referral_code="ER" + tag,
+        )
         user.subscription = Subscription(
-            status=status, plan_name="trial" if status == "trial" else "paid_monthly",
-            trial_started_at=now-timedelta(days=15),
-            trial_ends_at=now-timedelta(minutes=1) if status == "trial" else None,
-            start_date=(now-timedelta(days=31)).date() if status == "active" else None,
-            end_date=(now-timedelta(days=1)).date() if status == "active" else None,
+            status=status,
+            plan_name="trial" if status == "trial" else "paid_monthly",
+            trial_started_at=now - timedelta(days=15),
+            trial_ends_at=now - timedelta(minutes=1) if status == "trial" else None,
+            start_date=(now - timedelta(days=31)).date() if status == "active" else None,
+            end_date=(now - timedelta(days=1)).date() if status == "active" else None,
             payment_reference=f"synthetic-original-{tag}",
         )
         db.add(user)
@@ -60,30 +67,54 @@ def assert_renewal_preserved(check, engine, user_id, *, role, now):
         check.assertEqual(item.status, "active")
         check.assertEqual(item.plan_name, "paid_monthly")
         check.assertEqual(item.start_date, now.date())
-        check.assertEqual(item.end_date, (now+timedelta(days=30)).date())
+        check.assertEqual(item.end_date, (now + timedelta(days=30)).date())
         check.assertEqual(item.payment_reference, f"synthetic-renewal-{user_id}")
         check.assertEqual(item.user.role, role if role in {"admin", "reporter"} else "paid_user")
 
 
 def seed_pending_renewal(engine, user_id):
     with Session(engine) as db:
-        db.add(Payment(user_id=user_id, reference=f"synthetic-renewal-{user_id}",
-                       plan="monthly", amount=2500, currency="NGN", status="pending"))
+        db.add(
+            Payment(
+                user_id=user_id,
+                reference=f"synthetic-renewal-{user_id}",
+                plan="monthly",
+                amount=2500,
+                currency="NGN",
+                status="pending",
+            )
+        )
         db.commit()
 
 
 def confirm_renewal(db, user_id):
-    payment_service.handle_webhook_event(db, {"event": "charge.success", "data": {
-        "reference": f"synthetic-renewal-{user_id}", "id": 990000+user_id,
-        "amount": 250000, "currency": "NGN", "status": "success"}})
+    payment_service.handle_webhook_event(
+        db,
+        {
+            "event": "charge.success",
+            "data": {
+                "reference": f"synthetic-renewal-{user_id}",
+                "id": 990000 + user_id,
+                "amount": 250000,
+                "currency": "NGN",
+                "status": "success",
+            },
+        },
+    )
 
 
 def assert_payment_once(check, engine, user_id):
     with Session(engine) as db:
         payment = db.scalar(select(Payment).where(Payment.user_id == user_id))
-        check.assertEqual((payment.status, payment.paystack_transaction_id), ("success", str(990000+user_id)))
-        check.assertEqual(len(db.scalars(select(AuditLog).where(
-            AuditLog.user_id == user_id, AuditLog.action == "payment.success")).all()), 1)
+        check.assertEqual((payment.status, payment.paystack_transaction_id), ("success", str(990000 + user_id)))
+        check.assertEqual(
+            len(
+                db.scalars(
+                    select(AuditLog).where(AuditLog.user_id == user_id, AuditLog.action == "payment.success")
+                ).all()
+            ),
+            1,
+        )
 
 
 def verify_subscription_get_renewal_races(check, engine):
@@ -123,9 +154,11 @@ def verify_subscription_get_renewal_races(check, engine):
                         db.rollback()
                         outcomes.append(error)
 
-            with patch.object(service, "lock_subscription_state", side_effect=delayed_lock), \
-                    patch.object(service, "utc_now", return_value=now), \
-                    patch.object(payment_service, "notify_admins"):
+            with (
+                patch.object(service, "lock_subscription_state", side_effect=delayed_lock),
+                patch.object(service, "utc_now", return_value=now),
+                patch.object(payment_service, "notify_admins"),
+            ):
                 worker = threading.Thread(target=read_subscription, name="single-subscription-expiry", daemon=True)
                 worker.start()
                 try:
@@ -137,7 +170,7 @@ def verify_subscription_get_renewal_races(check, engine):
                     worker.join(8)
             check.assertFalse(worker.is_alive(), "Synthetic expiry reader must finish promptly")
             expected_role = role if role in {"admin", "reporter"} else "paid_user"
-            check.assertEqual(outcomes, [("active", (now+timedelta(days=30)).date(), expected_role)])
+            check.assertEqual(outcomes, [("active", (now + timedelta(days=30)).date(), expected_role)])
             assert_renewal_preserved(check, engine, user_id, role=role, now=now)
             assert_payment_once(check, engine, user_id)
 
@@ -159,12 +192,16 @@ def verify_expiry_first_blocks_payment_then_preserves_renewal(check, engine):
             def hold_expiry_lock(db, candidate):
                 result = original_lock(db, candidate)
                 selected.set()
-                if not release.wait(5): raise RuntimeError("Synthetic locked-expiry coordination timed out")
+                if not release.wait(5):
+                    raise RuntimeError("Synthetic locked-expiry coordination timed out")
                 return result
 
             def observe_user_lock(connection, cursor, statement, parameters, context, many):
-                if (threading.current_thread().name == "renewal-writer" and statement.lstrip().startswith("SELECT users.")
-                        and "FOR UPDATE" in statement):
+                if (
+                    threading.current_thread().name == "renewal-writer"
+                    and statement.lstrip().startswith("SELECT users.")
+                    and "FOR UPDATE" in statement
+                ):
                     payment_attempted.set()
 
             def expire():
@@ -172,7 +209,8 @@ def verify_expiry_first_blocks_payment_then_preserves_renewal(check, engine):
                     try:
                         get_user_subscription(user_id, db=db, current_user=db.get(User, user_id))
                         outcomes.append("expired-read-finished")
-                    except BaseException as error: outcomes.append(error)
+                    except BaseException as error:
+                        outcomes.append(error)
 
             def pay():
                 with Session(engine) as db:
@@ -180,28 +218,40 @@ def verify_expiry_first_blocks_payment_then_preserves_renewal(check, engine):
                         writer_pid.append(db.scalar(text("SELECT pg_backend_pid()")))
                         confirm_renewal(db, user_id)
                         outcomes.append("payment-finished")
-                    except BaseException as error: outcomes.append(error)
+                    except BaseException as error:
+                        outcomes.append(error)
 
             event.listen(engine, "before_cursor_execute", observe_user_lock)
             reader = threading.Thread(target=expire, name="expiry-reader", daemon=True)
             writer = threading.Thread(target=pay, name="renewal-writer", daemon=True)
-            with patch.object(service, "lock_subscription_state", side_effect=hold_expiry_lock), \
-                    patch.object(service, "utc_now", return_value=now), patch.object(payment_service, "notify_admins"):
+            with (
+                patch.object(service, "lock_subscription_state", side_effect=hold_expiry_lock),
+                patch.object(service, "utc_now", return_value=now),
+                patch.object(payment_service, "notify_admins"),
+            ):
                 try:
-                    reader.start(); check.assertTrue(selected.wait(5))
-                    writer.start(); check.assertTrue(payment_attempted.wait(5))
+                    reader.start()
+                    check.assertTrue(selected.wait(5))
+                    writer.start()
+                    check.assertTrue(payment_attempted.wait(5))
                     blocked = False
                     with engine.connect() as observer:
                         for _ in range(50):
-                            if observer.scalar(text("SELECT cardinality(pg_blocking_pids(:pid))"), {"pid": writer_pid[0]}):
-                                blocked = True; break
+                            if observer.scalar(
+                                text("SELECT cardinality(pg_blocking_pids(:pid))"), {"pid": writer_pid[0]}
+                            ):
+                                blocked = True
+                                break
                             time.sleep(0.02)
                     check.assertTrue(blocked, "Native payment must wait on the expiry transaction lock")
                 finally:
-                    release.set(); reader.join(8)
-                    if writer.ident is not None: writer.join(8)
+                    release.set()
+                    reader.join(8)
+                    if writer.ident is not None:
+                        writer.join(8)
                     event.remove(engine, "before_cursor_execute", observe_user_lock)
-            check.assertFalse(reader.is_alive()); check.assertFalse(writer.is_alive())
+            check.assertFalse(reader.is_alive())
+            check.assertFalse(writer.is_alive())
             check.assertCountEqual(outcomes, ["expired-read-finished", "payment-finished"])
             assert_renewal_preserved(check, engine, user_id, role=role, now=now)
             assert_payment_once(check, engine, user_id)
@@ -240,8 +290,17 @@ class SubscriptionExpiryRaceTests(unittest.TestCase):
                     user_id = seed_account(self.engine, status=status, role=role, now=NOW)
                     with Session(self.engine) as db:
                         item = db.scalar(select(Subscription).where(Subscription.user_id == user_id))
-                        before = {name: getattr(item, name) for name in (
-                            "plan_name", "trial_started_at", "trial_ends_at", "start_date", "end_date", "payment_reference")}
+                        before = {
+                            name: getattr(item, name)
+                            for name in (
+                                "plan_name",
+                                "trial_started_at",
+                                "trial_ends_at",
+                                "start_date",
+                                "end_date",
+                                "payment_reference",
+                            )
+                        }
                         result = service.expire_trial_if_needed(db, item, now=NOW)
                         self.assertEqual(result.status, "expired")
                         self.assertEqual(result.user.role, role if role in {"admin", "reporter"} else "free_user")
@@ -254,7 +313,7 @@ class SubscriptionExpiryRaceTests(unittest.TestCase):
                 with Session(self.engine) as db:
                     item = db.scalar(select(Subscription).where(Subscription.user_id == user_id))
                     if status == "trial":
-                        item.trial_ends_at = NOW+timedelta(days=1)
+                        item.trial_ends_at = NOW + timedelta(days=1)
                     elif status == "active":
                         item.end_date = NOW.date()
                     db.commit()
@@ -284,8 +343,10 @@ class SubscriptionExpiryRaceTests(unittest.TestCase):
         user_id = seed_account(self.engine, status="active", role="paid_user", now=NOW)
         with Session(self.engine) as db:
             item = db.scalar(select(Subscription).where(Subscription.user_id == user_id))
-            with patch.object(db, "commit", side_effect=RuntimeError("synthetic commit failure")), \
-                    patch.object(db, "rollback", wraps=db.rollback) as rollback:
+            with (
+                patch.object(db, "commit", side_effect=RuntimeError("synthetic commit failure")),
+                patch.object(db, "rollback", wraps=db.rollback) as rollback,
+            ):
                 with self.assertRaisesRegex(RuntimeError, "synthetic commit failure"):
                     service.expire_trial_if_needed(db, item, now=NOW)
                 rollback.assert_called_once()
@@ -297,8 +358,10 @@ class SubscriptionExpiryRaceTests(unittest.TestCase):
         user_id = seed_account(self.engine, status="trial", role="free_user", now=NOW)
         with Session(self.engine) as db:
             item = db.scalar(select(Subscription).where(Subscription.user_id == user_id))
-            with patch.object(service, "lock_subscription_state", return_value=(item.user, None)), \
-                    patch.object(db, "rollback", wraps=db.rollback) as rollback:
+            with (
+                patch.object(service, "lock_subscription_state", return_value=(item.user, None)),
+                patch.object(db, "rollback", wraps=db.rollback) as rollback,
+            ):
                 with self.assertRaises(HTTPException) as caught:
                     service.expire_trial_if_needed(db, item, now=NOW)
                 self.assertEqual(caught.exception.status_code, 404)

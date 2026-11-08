@@ -4,6 +4,7 @@ Revision ID: 0003_stage11_storage_suitability
 Revises: 0002_stage10_buy_sell_watch
 Create Date: 2026-08-12
 """
+
 from typing import Sequence, Union
 
 from alembic import op
@@ -42,7 +43,9 @@ def upgrade() -> None:
     op.create_index("ix_storage_suitability_commodity_id", "storage_suitability", ["commodity_id"], unique=False)
     op.create_index("ix_storage_suitability_market_id", "storage_suitability", ["market_id"], unique=False)
     op.create_index("ix_storage_suitability_price_update_id", "storage_suitability", ["price_update_id"], unique=False)
-    op.create_index("ix_storage_suitability_suitability_status", "storage_suitability", ["suitability_status"], unique=False)
+    op.create_index(
+        "ix_storage_suitability_suitability_status", "storage_suitability", ["suitability_status"], unique=False
+    )
 
 
 def downgrade() -> None:

@@ -1,4 +1,5 @@
 """Build-marker safety without creating files or starting build processes."""
+
 from contextlib import ExitStack
 import importlib.util
 import json
@@ -11,7 +12,9 @@ from unittest.mock import patch
 class LocalBuildRecoveryTests(unittest.TestCase):
     def setUp(self):
         root = Path(__file__).resolve().parents[2]
-        spec = importlib.util.spec_from_file_location("local_build_recovery", root / "tools/local-test/build_frontend.py")
+        spec = importlib.util.spec_from_file_location(
+            "local_build_recovery", root / "tools/local-test/build_frontend.py"
+        )
         self.tool = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(self.tool)
         self.runtime = root / "tools/local-test/runtime/mocked-build-check"
@@ -31,7 +34,11 @@ class LocalBuildRecoveryTests(unittest.TestCase):
         stack.enter_context(patch.object(self.tool.shutil, "copytree"))
         write = stack.enter_context(patch.object(Path, "write_text"))
         move = stack.enter_context(patch.object(Path, "replace"))
-        run = stack.enter_context(patch.object(self.tool.subprocess, "run", side_effect=[SimpleNamespace(returncode=value) for value in outcomes]))
+        run = stack.enter_context(
+            patch.object(
+                self.tool.subprocess, "run", side_effect=[SimpleNamespace(returncode=value) for value in outcomes]
+            )
+        )
         return read, copy, write, move, run
 
     def test_failed_resume_never_creates_ready_marker(self):
@@ -46,10 +53,16 @@ class LocalBuildRecoveryTests(unittest.TestCase):
         with ExitStack() as stack:
             read, copy, write, move, run = self.controls(stack)
             with patch.object(self.tool.socket, "socket") as probe:
-                probe.return_value.__enter__.return_value.connect_ex.side_effect = lambda endpoint: 0 if endpoint == ("127.0.0.1",55449) else 1
-                with self.assertRaisesRegex(RuntimeError,"Stop local preview/PostgreSQL"):
+                probe.return_value.__enter__.return_value.connect_ex.side_effect = lambda endpoint: (
+                    0 if endpoint == ("127.0.0.1", 55449) else 1
+                )
+                with self.assertRaisesRegex(RuntimeError, "Stop local preview/PostgreSQL"):
                     self.tool.main()
-            read.assert_not_called();copy.assert_not_called();write.assert_not_called();move.assert_not_called();run.assert_not_called()
+            read.assert_not_called()
+            copy.assert_not_called()
+            write.assert_not_called()
+            move.assert_not_called()
+            run.assert_not_called()
 
     def test_successful_resume_restores_ready_only_after_both_build_steps(self):
         with ExitStack() as stack:

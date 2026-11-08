@@ -17,7 +17,9 @@ function errorDetail(payload: unknown, fallback: string): string {
     const detail = (payload as { detail: unknown }).detail;
     if (typeof detail === "string") return detail;
     if (Array.isArray(detail)) {
-      return detail.map((item) => (item && typeof item === "object" && "msg" in item ? String(item.msg) : String(item))).join("; ");
+      return detail
+        .map((item) => (item && typeof item === "object" && "msg" in item ? String(item.msg) : String(item)))
+        .join("; ");
     }
   }
   return fallback;
@@ -49,10 +51,16 @@ export async function apiFetch<T>(
     headers.set("X-PriceYard-CSRF", session.csrf_token);
   } else if (token) headers.set("Authorization", `Bearer ${token}`);
 
-  const send = () => fetch(`${API_BASE}${path}`, { ...options, headers,
-    credentials: cookie || path.startsWith("/auth/browser/") ? "include" : "omit",
-    ...((cookie || path.startsWith("/auth/browser/")) ? { cache: "no-store" as RequestCache } : {}) });
-  const cookieMutation = (cookie && path === "/auth/logout") || ["/auth/browser/login", "/auth/browser/google", "/auth/browser/upgrade"].includes(path);
+  const send = () =>
+    fetch(`${API_BASE}${path}`, {
+      ...options,
+      headers,
+      credentials: cookie || path.startsWith("/auth/browser/") ? "include" : "omit",
+      ...(cookie || path.startsWith("/auth/browser/") ? { cache: "no-store" as RequestCache } : {}),
+    });
+  const cookieMutation =
+    (cookie && path === "/auth/logout") ||
+    ["/auth/browser/login", "/auth/browser/google", "/auth/browser/upgrade"].includes(path);
   const response = await (cookieMutation ? serializeCookieMutation(send) : send());
   if (!response.ok) {
     let payload: unknown = null;
@@ -73,14 +81,20 @@ export async function apiFetch<T>(
     // A legacy/invalid saved copy has no trustworthy device-save timestamp.
     throw new ApiError(503, "Request failed with status 503");
   }
-  const data = response.status === 204 ? undefined as T : await (format === "blob" ? response.blob() : response.json()) as T;
+  const data =
+    response.status === 204 ? (undefined as T) : ((await (format === "blob" ? response.blob() : response.json())) as T);
   onProvenance?.(cached ? stamp : null);
   return data;
 }
 
-export async function apiFetchWithProvenance<T>(path: string, options: RequestInit = {}): Promise<{ data: T; savedAt: string | null }> {
+export async function apiFetchWithProvenance<T>(
+  path: string,
+  options: RequestInit = {},
+): Promise<{ data: T; savedAt: string | null }> {
   let savedAt: string | null = null;
-  const data = await apiFetch<T>(path, options, null, value => { savedAt = value; });
+  const data = await apiFetch<T>(path, options, null, (value) => {
+    savedAt = value;
+  });
   return { data, savedAt };
 }
 

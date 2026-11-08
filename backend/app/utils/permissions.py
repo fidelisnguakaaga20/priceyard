@@ -13,15 +13,16 @@ from app.services.login_revocation_service import is_revoked
 from app.services.subscription_service import get_subscription_for_user, has_full_access
 from app.services.browser_session_service import browser_token, validate_browser_request
 
+
 class BrowserOrBearer(HTTPBearer):
     async def __call__(self, request: Request) -> HTTPAuthorizationCredentials | None:
-        if request.headers.get('authorization') is not None:
+        if request.headers.get("authorization") is not None:
             # Explicit invalid bearer credentials must never fall back to a cookie.
             return await super().__call__(request)
         token = browser_token(request)
         if token:
             validate_browser_request(request, token)
-            return HTTPAuthorizationCredentials(scheme='Bearer', credentials=token)
+            return HTTPAuthorizationCredentials(scheme="Bearer", credentials=token)
         return None
 
 
@@ -65,14 +66,25 @@ def get_current_user(
         )
 
     if claims.get("auth_version", 0) != user.auth_version or is_revoked(db, credentials.credentials):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token", headers={"WWW-Authenticate": "Bearer"})
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
     # Admin logins last at most 7 days, including ones issued before this rule
     # existed or before the account was made an admin.
     if user.role == "admin":
         issued_at = claims.get("iat")
-        if type(issued_at) not in (int, float) or datetime.now(timezone.utc).timestamp() - issued_at > login_lifetime_minutes("admin") * 60:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token", headers={"WWW-Authenticate": "Bearer"})
+        if (
+            type(issued_at) not in (int, float)
+            or datetime.now(timezone.utc).timestamp() - issued_at > login_lifetime_minutes("admin") * 60
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid or expired token",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
 
     return user
 

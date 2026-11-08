@@ -7,7 +7,7 @@
   margin: 16px 0;
 }
 .history-list-toolbar label {
-  font-size: .9rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: var(--color-text-muted);
 }
@@ -26,12 +26,27 @@
   outline-offset: 3px;
 }
 
-.history-view-graph { min-height: 44px; margin-top: 4px; }
-#history-chart-results { scroll-margin-top: calc(var(--priceyard-header-bottom, 180px) + 12px); }
-#history-chart-results:focus-visible { outline: 2px solid var(--color-link); outline-offset: 4px; border-radius: 16px; }
+.history-view-graph {
+  min-height: 44px;
+  margin-top: 4px;
+}
+#history-chart-results {
+  scroll-margin-top: calc(var(--priceyard-header-bottom, 180px) + 12px);
+}
+#history-chart-results:focus-visible {
+  outline: 2px solid var(--color-link);
+  outline-offset: 4px;
+  border-radius: 16px;
+}
 
-.history-period-controls { margin-bottom: 18px; }
-.history-period-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+.history-period-controls {
+  margin-bottom: 18px;
+}
+.history-period-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
 .history-period-buttons button {
   min-height: 44px;
   padding: 8px 14px;
@@ -40,7 +55,7 @@
   background: var(--color-surface);
   color: var(--color-text);
   font: inherit;
-  font-size: .88rem;
+  font-size: 0.88rem;
   font-weight: 700;
   cursor: pointer;
 }
@@ -49,5 +64,13 @@
   color: var(--color-surface);
   border-color: var(--color-link);
 }
-.history-period-buttons button:focus-visible { outline: 2px solid var(--color-text); outline-offset: 3px; }
-.history-period-description, .history-period-note { margin: 8px 0 0; font-size: .85rem; line-height: 1.5; }
+.history-period-buttons button:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 3px;
+}
+.history-period-description,
+.history-period-note {
+  margin: 8px 0 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}

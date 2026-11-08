@@ -4,6 +4,7 @@ Revision ID: 0012_add_trial_reminder
 Revises: 0011_add_market_image_url
 Create Date: 2026-09-14
 """
+
 from typing import Sequence, Union
 
 from alembic import op

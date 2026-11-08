@@ -20,7 +20,13 @@ from app.schemas.price_update_schema import (
     TimeOfDay,
 )
 from app.services.audit_service import create_audit_log, snapshot_model
-from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, release_for_stream, stream_admin_records
+from app.services.admin_list_service import (
+    AdminJSONResponse,
+    AdminRecordPage,
+    admin_record_page,
+    release_for_stream,
+    stream_admin_records,
+)
 from app.services.price_flag_service import flag_price_update, flagged_price_page, stream_flagged_prices, resolve_flags
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
@@ -46,11 +52,19 @@ router = APIRouter(prefix="/price-updates", tags=["price-updates"])
 logger = logging.getLogger(__name__)
 
 
-def _save_audited_price(db: Session, item: PriceUpdate, actor: User, action: str, old_value: dict | None = None, *, deleted: bool = False) -> None:
+def _save_audited_price(
+    db: Session, item: PriceUpdate, actor: User, action: str, old_value: dict | None = None, *, deleted: bool = False
+) -> None:
     try:
         create_audit_log(
-            db, actor=actor, action=action, table_name="price_updates",
-            record_id=item.id, old_value=old_value, new_value=None if deleted else snapshot_model(item), commit=False,
+            db,
+            actor=actor,
+            action=action,
+            table_name="price_updates",
+            record_id=item.id,
+            old_value=old_value,
+            new_value=None if deleted else snapshot_model(item),
+            commit=False,
         )
         db.commit()
     except Exception:
@@ -96,7 +110,8 @@ def get_latest_price_updates(
         db,
         commodity_search=commodity,
         market_search=market,
-        commodity_id=commodity_id, market_id=market_id,
+        commodity_id=commodity_id,
+        market_id=market_id,
         selected_date=selected_date,
         movement=movement,
     )
@@ -117,15 +132,18 @@ def get_price_history(
     db: Session = Depends(get_db),
     _current_user: User = Depends(require_full_access),
 ) -> Response:
-    return AdminJSONResponse(stream_price_history(
-        release_for_stream(db),
-        commodity_search=commodity,
-        market_search=market,
-        commodity_id=commodity_id, market_id=market_id,
-        selected_date=selected_date,
-        movement=movement,
-        time_of_day=time_of_day,
-    ))
+    return AdminJSONResponse(
+        stream_price_history(
+            release_for_stream(db),
+            commodity_search=commodity,
+            market_search=market,
+            commodity_id=commodity_id,
+            market_id=market_id,
+            selected_date=selected_date,
+            movement=movement,
+            time_of_day=time_of_day,
+        )
+    )
 
 
 @router.get("/history/pairs", response_model=list[PriceHistoryPair])
@@ -158,8 +176,15 @@ def get_admin_price_history(
     db: Session = Depends(get_db),
     _admin: User = Depends(require_roles("admin")),
 ) -> Response:
-    return AdminJSONResponse(stream_admin_records(release_for_stream(db), PriceUpdate, PriceUpdateAdminResponse,
-        order=(("update_date_time", True), ("id", True)), related=("commodity", "market")))
+    return AdminJSONResponse(
+        stream_admin_records(
+            release_for_stream(db),
+            PriceUpdate,
+            PriceUpdateAdminResponse,
+            order=(("update_date_time", True), ("id", True)),
+            related=("commodity", "market"),
+        )
+    )
 
 
 @router.get("/admin/history/page", response_model=AdminRecordPage[PriceUpdateAdminResponse])
@@ -168,8 +193,14 @@ def get_admin_price_page(
     db: Session = Depends(get_db),
     _admin: User = Depends(require_roles("admin")),
 ) -> AdminRecordPage[PriceUpdateAdminResponse]:
-    return admin_record_page(db, PriceUpdate, PriceUpdateAdminResponse, offset=offset,
-        order=(("update_date_time", True), ("id", True)), related=("commodity", "market"))
+    return admin_record_page(
+        db,
+        PriceUpdate,
+        PriceUpdateAdminResponse,
+        offset=offset,
+        order=(("update_date_time", True), ("id", True)),
+        related=("commodity", "market"),
+    )
 
 
 @router.get("/admin/latest", response_model=PriceUpdateAdminResponse | None)
@@ -180,9 +211,13 @@ def get_admin_latest_pair(
     _admin: User = Depends(require_roles("admin")),
 ) -> PriceUpdate | None:
     # Match the original all-history prefill, including pending/rejected records.
-    return db.scalar(select(PriceUpdate).where(PriceUpdate.commodity_id == commodity_id,
-        PriceUpdate.market_id == market_id).options(joinedload(PriceUpdate.commodity), joinedload(PriceUpdate.market))
-        .order_by(PriceUpdate.update_date_time.desc(), PriceUpdate.id.desc()).limit(1))
+    return db.scalar(
+        select(PriceUpdate)
+        .where(PriceUpdate.commodity_id == commodity_id, PriceUpdate.market_id == market_id)
+        .options(joinedload(PriceUpdate.commodity), joinedload(PriceUpdate.market))
+        .order_by(PriceUpdate.update_date_time.desc(), PriceUpdate.id.desc())
+        .limit(1)
+    )
 
 
 @router.get("/admin/flagged", response_model=list[FlaggedPriceSummary])
@@ -241,7 +276,9 @@ def edit_price_update(
 ) -> PriceUpdate:
     item = get_price_update_for_admin(db, price_update_id, lock=True)
     old_value = snapshot_model(item)
-    price_fields_touched = bool({"price_low", "price_high", "average_price"} & payload.model_dump(exclude_unset=True).keys())
+    price_fields_touched = bool(
+        {"price_low", "price_high", "average_price"} & payload.model_dump(exclude_unset=True).keys()
+    )
     item = update_price_update(db, item, payload, commit=False)
     _save_audited_price(db, item, current_admin, "price_update.edit", old_value)
     if price_fields_touched and item.status == "approved":
@@ -297,9 +334,16 @@ def resolve_price_flags(
     try:
         count = resolve_flags(db, price_update_id, commit=False)
         if count:
-            create_audit_log(db, actor=current_admin, action="price_update.flags_resolve", table_name="price_updates",
-                             record_id=price_update_id, old_value={"unresolved_count": count},
-                             new_value={"unresolved_count": 0, "resolved_count": count}, commit=False)
+            create_audit_log(
+                db,
+                actor=current_admin,
+                action="price_update.flags_resolve",
+                table_name="price_updates",
+                record_id=price_update_id,
+                old_value={"unresolved_count": count},
+                new_value={"unresolved_count": 0, "resolved_count": count},
+                commit=False,
+            )
         db.commit()
     except Exception:
         db.rollback()

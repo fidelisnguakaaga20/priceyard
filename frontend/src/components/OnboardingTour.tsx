@@ -13,7 +13,11 @@ const STEPS = [
 
 export function OnboardingTour() {
   const [dismissed, setDismissed] = useState(() => {
-    try { return localStorage.getItem(SEEN_KEY) === "1"; } catch { return true; }
+    try {
+      return localStorage.getItem(SEEN_KEY) === "1";
+    } catch {
+      return true;
+    }
   });
   const [step, setStep] = useState(0);
   const dialog = useRef<HTMLDivElement>(null);
@@ -23,7 +27,8 @@ export function OnboardingTour() {
     const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     dialog.current?.querySelector<HTMLButtonElement>("button")?.focus();
     return () => {
-      const target = previous?.isConnected && previous !== document.body ? previous : document.querySelector<HTMLElement>(".brand");
+      const target =
+        previous?.isConnected && previous !== document.body ? previous : document.querySelector<HTMLElement>(".brand");
       target?.focus();
     };
   }, [dismissed]);
@@ -38,7 +43,11 @@ export function OnboardingTour() {
 
   const finish = () => {
     setDismissed(true);
-    try { localStorage.setItem(SEEN_KEY, "1"); } catch { /* ignore */ }
+    try {
+      localStorage.setItem(SEEN_KEY, "1");
+    } catch {
+      /* ignore */
+    }
     window.dispatchEvent(new Event(ONBOARDING_TOUR_SEEN_EVENT));
   };
 
@@ -48,22 +57,60 @@ export function OnboardingTour() {
   const isFirst = step === 0;
 
   return (
-    <div ref={dialog} className="onboarding-overlay" role="dialog" aria-modal="true" aria-label="Welcome to PriceYard" aria-describedby="priceyard-onboarding-step" onKeyDown={event => {
-      if (event.key === "Escape") { event.preventDefault(); finish(); return; }
-      if (event.key !== "Tab") return;
-      const controls = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>("button:not(:disabled)"));
-      const first = controls[0], last = controls[controls.length - 1];
-      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
-      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
-    }}>
+    <div
+      ref={dialog}
+      className="onboarding-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Welcome to PriceYard"
+      aria-describedby="priceyard-onboarding-step"
+      onKeyDown={(event) => {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          finish();
+          return;
+        }
+        if (event.key !== "Tab") return;
+        const controls = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>("button:not(:disabled)"));
+        const first = controls[0],
+          last = controls[controls.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last?.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first?.focus();
+        }
+      }}
+    >
       <div className="onboarding-card">
-        <h2 className="onboarding-heading">Welcome to PriceYard ({step + 1}/{STEPS.length})</h2>
-        <p id="priceyard-onboarding-step" aria-live="polite">{STEPS[step]}</p>
+        <h2 className="onboarding-heading">
+          Welcome to PriceYard ({step + 1}/{STEPS.length})
+        </h2>
+        <p id="priceyard-onboarding-step" aria-live="polite">
+          {STEPS[step]}
+        </p>
         <div className="onboarding-actions">
-          <button type="button" className="text-link text-link-button" onClick={finish}>Skip</button>
+          <button type="button" className="text-link text-link-button" onClick={finish}>
+            Skip
+          </button>
           <div className="onboarding-nav-buttons">
-            {!isFirst && <button type="button" className="button button-secondary button-small" onClick={() => setStep((s) => s - 1)}>Back</button>}
-            <button type="button" className="button button-small" onClick={() => (isLast ? finish() : setStep((s) => s + 1))}>{isLast ? "Got it" : "Next"}</button>
+            {!isFirst && (
+              <button
+                type="button"
+                className="button button-secondary button-small"
+                onClick={() => setStep((s) => s - 1)}
+              >
+                Back
+              </button>
+            )}
+            <button
+              type="button"
+              className="button button-small"
+              onClick={() => (isLast ? finish() : setStep((s) => s + 1))}
+            >
+              {isLast ? "Got it" : "Next"}
+            </button>
           </div>
         </div>
       </div>

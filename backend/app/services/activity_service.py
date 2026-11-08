@@ -22,7 +22,9 @@ def log_activity_event(db: Session, *, event_type: str, label: str | None = None
 def get_activity_summary(db: Session) -> dict:
     unseen_count = db.scalar(select(func.count()).select_from(ActivityEvent).where(ActivityEvent.seen.is_(False))) or 0
     recent = list(
-        db.scalars(select(ActivityEvent).order_by(ActivityEvent.created_at.desc(), ActivityEvent.id.desc()).limit(RECENT_LIMIT)).all()
+        db.scalars(
+            select(ActivityEvent).order_by(ActivityEvent.created_at.desc(), ActivityEvent.id.desc()).limit(RECENT_LIMIT)
+        ).all()
     )
     return {"unseen_count": unseen_count, "recent": recent}
 

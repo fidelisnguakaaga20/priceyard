@@ -10,7 +10,10 @@ export function PushAlertPrompt() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!pushSupported() || !token) { setSubscribed(null); return; }
+    if (!pushSupported() || !token) {
+      setSubscribed(null);
+      return;
+    }
     void isSubscribedAsCurrentUser(token).then(setSubscribed);
   }, [token]);
 
@@ -49,7 +52,9 @@ export function PushAlertPrompt() {
     return (
       <div className="push-alert-banner">
         <span>✓ Instant alerts are on for this device.</span>
-        <button type="button" className="text-link text-link-button" disabled={busy} onClick={() => void disable()}>Turn off</button>
+        <button type="button" className="text-link text-link-button" disabled={busy} onClick={() => void disable()}>
+          Turn off
+        </button>
       </div>
     );
   }
@@ -57,7 +62,9 @@ export function PushAlertPrompt() {
   return (
     <div className="push-alert-banner">
       <span>Get a phone notification the instant a watched price changes, even if PriceYard isn&rsquo;t open.</span>
-      <button type="button" className="button button-small" disabled={busy} onClick={() => void enable()}>{busy ? "Enabling…" : "Enable alerts"}</button>
+      <button type="button" className="button button-small" disabled={busy} onClick={() => void enable()}>
+        {busy ? "Enabling…" : "Enable alerts"}
+      </button>
     </div>
   );
 }

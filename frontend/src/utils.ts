@@ -11,7 +11,9 @@ export function money(value: string | number | null | undefined): string {
   if (value === null || value === undefined || value === "") return "—";
   const amount = Number(value);
   if (Number.isNaN(amount)) return String(value);
-  return new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 }).format(amount);
+  return new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 }).format(
+    amount,
+  );
 }
 
 export function shortDate(value: string | null | undefined): string {
@@ -31,7 +33,20 @@ export function agingClass(value: string | null | undefined): string {
   return "";
 }
 
-const MONTH_NAMES = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+const MONTH_NAMES = [
+  "january",
+  "february",
+  "march",
+  "april",
+  "may",
+  "june",
+  "july",
+  "august",
+  "september",
+  "october",
+  "november",
+  "december",
+];
 
 function monthIndex(name: string): number {
   return MONTH_NAMES.indexOf(name.trim().toLowerCase());
@@ -143,7 +158,18 @@ const COMMODITY_BORDER_COLOR: Record<string, string> = {
   "palm oil": "#ef4444",
   egusi: "#3b82f6",
 };
-const COMMODITY_BORDER_PALETTE = ["#a855f7", "#14b8a6", "#ec4899", "#0ea5e9", "#84cc16", "#eab308", "#6366f1", "#f43f5e", "#06b6d4", "#d946ef"];
+const COMMODITY_BORDER_PALETTE = [
+  "#a855f7",
+  "#14b8a6",
+  "#ec4899",
+  "#0ea5e9",
+  "#84cc16",
+  "#eab308",
+  "#6366f1",
+  "#f43f5e",
+  "#06b6d4",
+  "#d946ef",
+];
 
 export function commodityBorderColor(name: string): string {
   const key = name.trim().toLowerCase();

@@ -8,21 +8,33 @@ import requests
 
 # Browser push services documented by Chromium/Google, Mozilla, Apple and WNS.
 # Endpoint paths remain opaque: never rewrite a browser's capability URL.
-PUSH_HOSTS = frozenset({"fcm.googleapis.com", "updates.push.services.mozilla.com", "push.services.mozilla.com", "web.push.apple.com"})
+PUSH_HOSTS = frozenset(
+    {"fcm.googleapis.com", "updates.push.services.mozilla.com", "push.services.mozilla.com", "web.push.apple.com"}
+)
 WNS_HOST = re.compile(r"(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+notify\.windows\.com\Z")
 
 
 def validate_push_endpoint(value: str) -> str:
-    if (not isinstance(value, str) or not 1 <= len(value) <= 500
-            or any(ord(char) <= 32 or ord(char) >= 127 for char in value)
-            or "\\" in value or "#" in value):
+    if (
+        not isinstance(value, str)
+        or not 1 <= len(value) <= 500
+        or any(ord(char) <= 32 or ord(char) >= 127 for char in value)
+        or "\\" in value
+        or "#" in value
+    ):
         raise ValueError("Invalid push destination")
     try:
         parsed = urlsplit(value)
-        if (parsed.scheme != "https" or parsed.username is not None or parsed.password is not None
-                or parsed.port not in {None, 443} or not parsed.hostname
-                or (parsed.hostname not in PUSH_HOSTS and not WNS_HOST.fullmatch(parsed.hostname))
-                or not parsed.path or (parsed.path == "/" and not parsed.query)):
+        if (
+            parsed.scheme != "https"
+            or parsed.username is not None
+            or parsed.password is not None
+            or parsed.port not in {None, 443}
+            or not parsed.hostname
+            or (parsed.hostname not in PUSH_HOSTS and not WNS_HOST.fullmatch(parsed.hostname))
+            or not parsed.path
+            or (parsed.path == "/" and not parsed.query)
+        ):
             raise ValueError("Invalid push destination")
     except ValueError as error:
         raise ValueError("Invalid push destination") from error

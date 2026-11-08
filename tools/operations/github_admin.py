@@ -3,6 +3,7 @@
 Credentials remain in memory, never in command arguments, files or output.
 This helper cannot edit production services or retrieve database credentials.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -38,7 +39,10 @@ def credential() -> str:
     result = subprocess.run(
         [r"C:\Program Files\Git\cmd\git.exe", "credential", "fill"],
         input=f"protocol=https\nhost=github.com\npath={REPOSITORY}.git\n\n",
-        text=True, capture_output=True, timeout=30, env=env,
+        text=True,
+        capture_output=True,
+        timeout=30,
+        env=env,
     )
     if result.returncode:
         raise SafeError("Existing GitHub login is unavailable; no credential was displayed")
@@ -52,13 +56,18 @@ def request(token: str, path: str, *, payload=None, method=None):
     if not path.startswith(f"/repos/{REPOSITORY}/") and path not in (f"/repos/{REPOSITORY}", "/user"):
         raise SafeError("Request outside the approved repository")
     data = None if payload is None else json.dumps(payload).encode()
-    req = urllib.request.Request(API + path, data=data, method=method, headers={
-        "Authorization": "Bearer " + token,
-        "Accept": "application/vnd.github+json",
-        "X-GitHub-Api-Version": "2022-11-28",
-        "User-Agent": "PriceYard-Operations-Setup",
-        **({"Content-Type": "application/json"} if data is not None else {}),
-    })
+    req = urllib.request.Request(
+        API + path,
+        data=data,
+        method=method,
+        headers={
+            "Authorization": "Bearer " + token,
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+            "User-Agent": "PriceYard-Operations-Setup",
+            **({"Content-Type": "application/json"} if data is not None else {}),
+        },
+    )
     opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
     try:
         with opener.open(req, timeout=25) as response:
@@ -74,8 +83,19 @@ def request(token: str, path: str, *, payload=None, method=None):
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("status", "runs", "jobs", "enable-schedule", "disable-schedule",
-                                         "dispatch-health", "dispatch-alert-test", "dispatch-recovery"))
+    parser.add_argument(
+        "action",
+        choices=(
+            "status",
+            "runs",
+            "jobs",
+            "enable-schedule",
+            "disable-schedule",
+            "dispatch-health",
+            "dispatch-alert-test",
+            "dispatch-recovery",
+        ),
+    )
     parser.add_argument("--run-id", type=int)
     args = parser.parse_args()
     token = credential()
@@ -86,24 +106,64 @@ def main() -> int:
     if args.action == "status":
         repo = request(token, repo_path)
         permissions = request(token, repo_path + "/actions/permissions")
-        print(json.dumps({"owner_verified": True, "repository": REPOSITORY,
-                          "visibility": repo.get("visibility"), "default_branch": repo.get("default_branch"),
-                          "actions_enabled": permissions.get("enabled"),
-                          "allowed_actions": permissions.get("allowed_actions")}))
+        print(
+            json.dumps(
+                {
+                    "owner_verified": True,
+                    "repository": REPOSITORY,
+                    "visibility": repo.get("visibility"),
+                    "default_branch": repo.get("default_branch"),
+                    "actions_enabled": permissions.get("enabled"),
+                    "allowed_actions": permissions.get("allowed_actions"),
+                }
+            )
+        )
     elif args.action == "runs":
         result = request(token, repo_path + f"/actions/workflows/{WORKFLOW}/runs?per_page=5")
-        print(json.dumps({"runs": [{key: row.get(key) for key in (
-            "id", "event", "status", "conclusion", "head_sha", "html_url", "created_at",
-        )} for row in result.get("workflow_runs", [])]}))
+        print(
+            json.dumps(
+                {
+                    "runs": [
+                        {
+                            key: row.get(key)
+                            for key in (
+                                "id",
+                                "event",
+                                "status",
+                                "conclusion",
+                                "head_sha",
+                                "html_url",
+                                "created_at",
+                            )
+                        }
+                        for row in result.get("workflow_runs", [])
+                    ]
+                }
+            )
+        )
     elif args.action == "jobs":
         if args.run_id is None or args.run_id <= 0:
             raise SafeError("A valid workflow run ID is required")
         result = request(token, repo_path + f"/actions/runs/{args.run_id}/jobs?per_page=10")
-        print(json.dumps({"jobs": [{"id": job.get("id"), "name": job.get("name"),
-                                   "status": job.get("status"), "conclusion": job.get("conclusion"),
-                                   "steps": [{"name": step.get("name"), "conclusion": step.get("conclusion")}
-                                             for step in job.get("steps", [])]}
-                                  for job in result.get("jobs", [])]}))
+        print(
+            json.dumps(
+                {
+                    "jobs": [
+                        {
+                            "id": job.get("id"),
+                            "name": job.get("name"),
+                            "status": job.get("status"),
+                            "conclusion": job.get("conclusion"),
+                            "steps": [
+                                {"name": step.get("name"), "conclusion": step.get("conclusion")}
+                                for step in job.get("steps", [])
+                            ],
+                        }
+                        for job in result.get("jobs", [])
+                    ]
+                }
+            )
+        )
     elif args.action in ("enable-schedule", "disable-schedule"):
         name = "PRICEYARD_OPERATIONS_ENABLED"
         path = repo_path + "/actions/variables/" + name
@@ -115,17 +175,27 @@ def main() -> int:
                 raise
             exists = False
         value = "true" if args.action == "enable-schedule" else "false"
-        request(token, path if exists else repo_path + "/actions/variables",
-                payload={"name": name, "value": value}, method="PATCH" if exists else "POST")
+        request(
+            token,
+            path if exists else repo_path + "/actions/variables",
+            payload={"name": name, "value": value},
+            method="PATCH" if exists else "POST",
+        )
         verified = request(token, path)
         if verified.get("value") != value:
             raise SafeError("Scheduled operations activation could not be verified")
         print(json.dumps({"schedule_enabled": value == "true", "repository": REPOSITORY}))
     else:
-        inputs = {"mode": {"dispatch-health": "health-only", "dispatch-alert-test": "simulate-failure",
-                            "dispatch-recovery": "recover"}[args.action]}
-        request(token, repo_path + f"/actions/workflows/{WORKFLOW}/dispatches",
-                payload={"ref": "master", "inputs": inputs})
+        inputs = {
+            "mode": {
+                "dispatch-health": "health-only",
+                "dispatch-alert-test": "simulate-failure",
+                "dispatch-recovery": "recover",
+            }[args.action]
+        }
+        request(
+            token, repo_path + f"/actions/workflows/{WORKFLOW}/dispatches", payload={"ref": "master", "inputs": inputs}
+        )
         print(json.dumps({"dispatched": True, "mode": inputs["mode"], "branch": "master"}))
     return 0
 

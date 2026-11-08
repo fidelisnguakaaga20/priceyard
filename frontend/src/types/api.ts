@@ -225,9 +225,19 @@ export type SubmissionStats = {
 };
 
 export type FeedbackItem = {
-  id: number; user_id: number; rating: number; comment: string | null; price_usefulness: string | null; price_accuracy: string | null;
-  missing_market_request: string | null; missing_commodity_request: string | null; complaint_or_suggestion: string | null;
-  continue_using_feedback: boolean | null; willingness_to_pay_feedback: boolean | null; created_at: string; updated_at: string;
+  id: number;
+  user_id: number;
+  rating: number;
+  comment: string | null;
+  price_usefulness: string | null;
+  price_accuracy: string | null;
+  missing_market_request: string | null;
+  missing_commodity_request: string | null;
+  complaint_or_suggestion: string | null;
+  continue_using_feedback: boolean | null;
+  willingness_to_pay_feedback: boolean | null;
+  created_at: string;
+  updated_at: string;
 };
 
 export type FeedbackSummary = { count: number; average_rating: number | null };
@@ -235,4 +245,13 @@ export type Testimonial = { id: number; rating: number; quote: string; display_n
 export type ReferralSummary = { referral_code: string; referred_count: number; reward_days: number };
 export type PaymentPlan = "monthly" | "seasonal";
 export type PaymentInitiateResponse = { authorization_url: string; reference: string };
-export type AuditLog = { id: number; user_id: number; action: string; table_name: string; record_id: number | null; old_value: unknown; new_value: unknown; created_at: string };
+export type AuditLog = {
+  id: number;
+  user_id: number;
+  action: string;
+  table_name: string;
+  record_id: number | null;
+  old_value: unknown;
+  new_value: unknown;
+  created_at: string;
+};

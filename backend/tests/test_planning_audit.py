@@ -1,4 +1,5 @@
 """Existing planning controls must never save without their audit evidence."""
+
 from datetime import datetime, timezone
 from decimal import Decimal
 import unittest
@@ -22,15 +23,31 @@ from app.models.user import User
 from app.security import create_access_token
 
 RESOURCES = (
-    ("buying_zone", "buying-zones", BuyingZone,
-     {"price_low": 210000, "price_high": 220000, "reason": "Synthetic observation", "confidence": "Low confidence"},
-     {"reason": "Synthetic corrected observation"}),
-    ("sell_watch_window", "sell-watch-windows", SellWatchWindow,
-     {"start_period": "Synthetic recorded period", "observation": "Synthetic observation", "confidence": "Low confidence"},
-     {"observation": "Synthetic corrected observation"}),
-    ("storage_suitability", "storage-suitability", StorageSuitability,
-     {"suitability_status": "watch", "summary": "Synthetic observation"},
-     {"summary": "Synthetic corrected observation"}),
+    (
+        "buying_zone",
+        "buying-zones",
+        BuyingZone,
+        {"price_low": 210000, "price_high": 220000, "reason": "Synthetic observation", "confidence": "Low confidence"},
+        {"reason": "Synthetic corrected observation"},
+    ),
+    (
+        "sell_watch_window",
+        "sell-watch-windows",
+        SellWatchWindow,
+        {
+            "start_period": "Synthetic recorded period",
+            "observation": "Synthetic observation",
+            "confidence": "Low confidence",
+        },
+        {"observation": "Synthetic corrected observation"},
+    ),
+    (
+        "storage_suitability",
+        "storage-suitability",
+        StorageSuitability,
+        {"suitability_status": "watch", "summary": "Synthetic observation"},
+        {"summary": "Synthetic corrected observation"},
+    ),
 )
 
 
@@ -48,10 +65,20 @@ class PlanningAuditTests(unittest.TestCase):
         self.engine = create_engine("sqlite+pysqlite:///:memory:")
         Base.metadata.create_all(self.engine)
         with Session(self.engine) as db:
-            admin = User(full_name="Synthetic planning Admin", email="planning@example.com",
-                         password_hash="unused", role="admin", referral_code="PLANADMIN")
-            customer = User(full_name="Synthetic customer", email="planning-user@example.com",
-                            password_hash="unused", role="free_user", referral_code="PLANUSER")
+            admin = User(
+                full_name="Synthetic planning Admin",
+                email="planning@example.com",
+                password_hash="unused",
+                role="admin",
+                referral_code="PLANADMIN",
+            )
+            customer = User(
+                full_name="Synthetic customer",
+                email="planning-user@example.com",
+                password_hash="unused",
+                role="free_user",
+                referral_code="PLANUSER",
+            )
             commodity, market = Commodity(name="Egusi"), Market(name="Kwali Market")
             db.add_all([admin, customer, commodity, market])
             db.flush()
@@ -59,10 +86,18 @@ class PlanningAuditTests(unittest.TestCase):
             self.headers = {"Authorization": "Bearer " + create_access_token(user_id=admin.id)}
             self.customer_headers = {"Authorization": "Bearer " + create_access_token(user_id=customer.id)}
             self.scope = {"commodity_id": commodity.id, "market_id": market.id}
-            price = PriceUpdate(**self.scope, unit="1 bag", bag_size=None, price_low=210000,
-                                price_high=220000, status="approved", movement="unknown",
-                                confidence_level="Low confidence", created_by=admin.id,
-                                update_date_time=datetime.now(timezone.utc))
+            price = PriceUpdate(
+                **self.scope,
+                unit="1 bag",
+                bag_size=None,
+                price_low=210000,
+                price_high=220000,
+                status="approved",
+                movement="unknown",
+                confidence_level="Low confidence",
+                created_by=admin.id,
+                update_date_time=datetime.now(timezone.utc),
+            )
             db.add(price)
             db.commit()
             self.price_id = price.id
@@ -102,13 +137,17 @@ class PlanningAuditTests(unittest.TestCase):
         self.assertEqual(created.status_code, 201)
         before = self.state()
         with patch("app.services.audit_service.create_audit_log", side_effect=RuntimeError("Synthetic audit failure")):
-            response = self.client.patch(f'/{resource[1]}/{created.json()["id"]}', json=resource[4], headers=self.headers)
+            response = self.client.patch(
+                f"/{resource[1]}/{created.json()['id']}", json=resource[4], headers=self.headers
+            )
         self.assertEqual(response.status_code, 500)
         self.assertEqual(self.state(), before)
 
     def success(self, resource):
         prefix, path, model, _, changes = resource
-        self.assertEqual(self.client.post("/" + path, json=self.payload(resource), headers=self.customer_headers).status_code, 403)
+        self.assertEqual(
+            self.client.post("/" + path, json=self.payload(resource), headers=self.customer_headers).status_code, 403
+        )
         created = self.client.post("/" + path, json=self.payload(resource), headers=self.headers)
         self.assertEqual(created.status_code, 201)
         item_id = created.json()["id"]
@@ -120,24 +159,27 @@ class PlanningAuditTests(unittest.TestCase):
         for key, value in changes.items():
             self.assertEqual(updated.json()[key], value)
         with Session(self.engine) as db:
-            logs = db.scalars(select(AuditLog).where(AuditLog.table_name == model.__tablename__).order_by(AuditLog.id)).all()
+            logs = db.scalars(
+                select(AuditLog).where(AuditLog.table_name == model.__tablename__).order_by(AuditLog.id)
+            ).all()
             self.assertEqual([row.action for row in logs], [prefix + ".create", prefix + ".edit"])
             self.assertEqual(audit_values(model, logs[0].new_value), audit_values(model, logs[1].old_value))
             self.assertTrue(all(row.user_id == self.admin_id and row.record_id == item_id for row in logs))
             self.assertEqual(len(db.scalars(select(PriceUpdate)).all()), 1)
             self.assertIsNotNone(db.get(model, item_id))
 
-
     def delete(self, resource):
         prefix, path, model = resource[:3]
         created = self.client.post("/" + path, json=self.payload(resource), headers=self.headers)
-        url = f'/{path}/{created.json()["id"]}'
+        url = f"/{path}/{created.json()['id']}"
         self.assertEqual(self.client.delete(url, headers=self.customer_headers).status_code, 403)
         self.assertEqual(self.client.delete(url, headers=self.headers).status_code, 204)
         self.assertEqual(self.client.delete(url, headers=self.headers).status_code, 404)
         with Session(self.engine) as db:
             self.assertIsNone(db.get(model, created.json()["id"]))
-            logs = db.scalars(select(AuditLog).where(AuditLog.table_name == model.__tablename__).order_by(AuditLog.id)).all()
+            logs = db.scalars(
+                select(AuditLog).where(AuditLog.table_name == model.__tablename__).order_by(AuditLog.id)
+            ).all()
             self.assertEqual([row.action for row in logs], [prefix + ".create", prefix + ".delete"])
             self.assertEqual(audit_values(model, logs[1].old_value), audit_values(model, logs[0].new_value))
             self.assertIsNone(logs[1].new_value)
@@ -147,7 +189,7 @@ class PlanningAuditTests(unittest.TestCase):
         created = self.client.post("/" + resource[1], json=self.payload(resource), headers=self.headers)
         before = self.state()
         with patch("app.services.audit_service.create_audit_log", side_effect=RuntimeError("Synthetic audit failure")):
-            response = self.client.delete(f'/{resource[1]}/{created.json()["id"]}', headers=self.headers)
+            response = self.client.delete(f"/{resource[1]}/{created.json()['id']}", headers=self.headers)
         self.assertEqual(response.status_code, 500)
         self.assertEqual(self.state(), before)
 
@@ -155,6 +197,7 @@ class PlanningAuditTests(unittest.TestCase):
 def attach_test(resource, operation):
     def test(self):
         getattr(self, operation)(resource)
+
     test.__name__ = "test_" + resource[0] + "_" + operation
     setattr(PlanningAuditTests, test.__name__, test)
 

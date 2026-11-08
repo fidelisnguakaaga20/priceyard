@@ -38,7 +38,7 @@ class FeedbackCreate(BaseModel):
         if len(value) - separator - 1 > MAX_SCREENSHOT_ENCODING:
             raise ValueError("Screenshot must be smaller than 2MB")
         try:
-            raw = base64.b64decode(value[separator + 1:], validate=True)
+            raw = base64.b64decode(value[separator + 1 :], validate=True)
         except Exception as exc:
             raise ValueError("Screenshot data is not valid") from exc
         if len(raw) > MAX_SCREENSHOT_BYTES:

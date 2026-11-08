@@ -3,6 +3,7 @@
 The API target is an in-process ASGI application. No HTTP proxy, Render service,
 provider, database server, migration or application configuration is modified.
 """
+
 from datetime import timedelta
 import hashlib
 import hmac
@@ -51,10 +52,15 @@ class LocalRewriteModel:
         path = scope["path"]
         if path.startswith("/api/"):
             forwarded = dict(scope)
-            forwarded.update(path=path[4:], raw_path=scope.get("raw_path", path.encode())[4:],
-                             root_path="", server=("priceyard-api.onrender.com", 443))
-            forwarded["headers"] = [(key, value) for key, value in scope["headers"]
-                                    if key.lower() != b"host"] + [(b"host", b"priceyard-api.onrender.com")]
+            forwarded.update(
+                path=path[4:],
+                raw_path=scope.get("raw_path", path.encode())[4:],
+                root_path="",
+                server=("priceyard-api.onrender.com", 443),
+            )
+            forwarded["headers"] = [(key, value) for key, value in scope["headers"] if key.lower() != b"host"] + [
+                (b"host", b"priceyard-api.onrender.com")
+            ]
             return await self.api(forwarded, receive, send)
         if self.frontend is not None:
             return await self.frontend(scope, receive, send)
@@ -68,15 +74,26 @@ class RenderRoutingContractTests(unittest.TestCase):
         Base.metadata.create_all(engine)
         password = "SyntheticRouting8!"
         with Session(engine) as db:
-            user = User(full_name="Synthetic routing tester", email="routing@example.com",
-                        password_hash=hash_password(password), role="free_user", is_active=True,
-                        referral_code="ROUTING")
+            user = User(
+                full_name="Synthetic routing tester",
+                email="routing@example.com",
+                password_hash=hash_password(password),
+                role="free_user",
+                is_active=True,
+                referral_code="ROUTING",
+            )
             user.subscription = build_trial_subscription(user=user)
-            other = User(full_name="Synthetic other routing tester", email="routing-other@example.com",
-                         password_hash="unused-synthetic-only", role="free_user", is_active=True,
-                         referral_code="ROUTINGOTHER")
+            other = User(
+                full_name="Synthetic other routing tester",
+                email="routing-other@example.com",
+                password_hash="unused-synthetic-only",
+                role="free_user",
+                is_active=True,
+                referral_code="ROUTINGOTHER",
+            )
             other.subscription = build_trial_subscription(user=other)
-            db.add_all([user, other]); db.commit()
+            db.add_all([user, other])
+            db.commit()
             user_id, other_id = user.id, other.id
             trial_end = user.subscription.trial_ends_at
 
@@ -87,11 +104,13 @@ class RenderRoutingContractTests(unittest.TestCase):
         original_override = app.dependency_overrides.get(get_db)
         app.dependency_overrides[get_db] = sessions
         settings = get_settings()
-        patches = [patch.object(settings, "frontend_url", FRONT),
-                   patch.object(settings, "cors_origins", FRONT),
-                   patch.object(settings, "app_env", "staging"),
-                   patch.object(settings, "paystack_secret_key", "sk_test_routing_synthetic_only"),
-                   patch("app.services.payment_service.notify_admins")]
+        patches = [
+            patch.object(settings, "frontend_url", FRONT),
+            patch.object(settings, "cors_origins", FRONT),
+            patch.object(settings, "app_env", "staging"),
+            patch.object(settings, "paystack_secret_key", "sk_test_routing_synthetic_only"),
+            patch("app.services.payment_service.notify_admins"),
+        ]
         for item in patches:
             item.start()
         limiter.reset()
@@ -99,32 +118,43 @@ class RenderRoutingContractTests(unittest.TestCase):
         direct = TestClient(app, base_url=BACK, raise_server_exceptions=False)
         try:
             with self.subTest(contract="method_body_query_status_multiple_cookies"):
+
                 async def probe(scope, receive, send):
-                    if scope['type'] == 'lifespan':
+                    if scope["type"] == "lifespan":
                         while True:
                             message = await receive()
-                            if message['type'] == 'lifespan.startup':
-                                await send({'type': 'lifespan.startup.complete'})
-                            elif message['type'] == 'lifespan.shutdown':
-                                await send({'type': 'lifespan.shutdown.complete'})
+                            if message["type"] == "lifespan.startup":
+                                await send({"type": "lifespan.startup.complete"})
+                            elif message["type"] == "lifespan.shutdown":
+                                await send({"type": "lifespan.shutdown.complete"})
                                 return
                     chunks = []
                     while True:
-                        message = await receive(); chunks.append(message.get("body", b""))
+                        message = await receive()
+                        chunks.append(message.get("body", b""))
                         if not message.get("more_body"):
                             break
-                    response = JSONResponse({"path": scope["path"], "method": scope["method"],
-                                             "query": scope["query_string"].decode(),
-                                             "body": b"".join(chunks).decode()}, status_code=207,
-                                            headers={"Cache-Control": "private, no-store"})
+                    response = JSONResponse(
+                        {
+                            "path": scope["path"],
+                            "method": scope["method"],
+                            "query": scope["query_string"].decode(),
+                            "body": b"".join(chunks).decode(),
+                        },
+                        status_code=207,
+                        headers={"Cache-Control": "private, no-store"},
+                    )
                     response.set_cookie("synthetic_one", "one", httponly=True, secure=True)
                     response.set_cookie("synthetic_two", "two", httponly=True, secure=True)
                     await response(scope, receive, send)
+
                 with TestClient(LocalRewriteModel(probe), base_url=FRONT) as client:
-                    response = client.post("/api/probe?one=a%20b&one=c", content=b"{\n  \"raw\": true\n}")
+                    response = client.post("/api/probe?one=a%20b&one=c", content=b'{\n  "raw": true\n}')
                     self.assertEqual(response.status_code, 207)
-                    self.assertEqual(response.json(), {"path": "/probe", "method": "POST",
-                                                      "query": "one=a%20b&one=c", "body": '{\n  "raw": true\n}'})
+                    self.assertEqual(
+                        response.json(),
+                        {"path": "/probe", "method": "POST", "query": "one=a%20b&one=c", "body": '{\n  "raw": true\n}'},
+                    )
                     self.assertEqual(len(response.headers.get_list("set-cookie")), 2)
                     self.assertEqual(response.headers["cache-control"], "private, no-store")
 
@@ -135,13 +165,18 @@ class RenderRoutingContractTests(unittest.TestCase):
                 self.assertEqual(response.status_code, 404)
                 self.assertIn("application/json", response.headers["content-type"])
                 self.assertEqual(browser.get("/api/https://untrusted.example.invalid/health").status_code, 404)
-                self.assertEqual(browser.get("/api/health?target=https://untrusted.example.invalid").json(),
-                                 {"status": "healthy", "deployed_commit": "unknown"})
+                self.assertEqual(
+                    browser.get("/api/health?target=https://untrusted.example.invalid").json(),
+                    {"status": "healthy", "deployed_commit": "unknown"},
+                )
 
             origin = {"Origin": FRONT}
             with self.subTest(contract="login_secure_cookie_reload_session_and_csrf"):
-                response = browser.post("/api/auth/browser/login", json={"email": "routing@example.com",
-                                        "password": password, "remember": True}, headers=origin)
+                response = browser.post(
+                    "/api/auth/browser/login",
+                    json={"email": "routing@example.com", "password": password, "remember": True},
+                    headers=origin,
+                )
                 self.assertEqual(response.status_code, 200, response.text)
                 metadata = response.json()
                 self.assertEqual(set(metadata), {"session_id", "csrf_token"})
@@ -157,16 +192,23 @@ class RenderRoutingContractTests(unittest.TestCase):
                 self.assertEqual(response.status_code, 200)
                 self.assertEqual(response.json(), metadata)
                 self.assertEqual(response.headers["cache-control"], "private, no-store")
-                csrf = {**origin, "X-PriceYard-CSRF": metadata["csrf_token"],
-                        "X-PriceYard-Session": metadata["session_id"]}
-                for headers in (origin, {**csrf, "X-PriceYard-CSRF": "wrong"},
-                                {**csrf, "Origin": "https://untrusted.example.invalid"}):
+                csrf = {
+                    **origin,
+                    "X-PriceYard-CSRF": metadata["csrf_token"],
+                    "X-PriceYard-Session": metadata["session_id"],
+                }
+                for headers in (
+                    origin,
+                    {**csrf, "X-PriceYard-CSRF": "wrong"},
+                    {**csrf, "Origin": "https://untrusted.example.invalid"},
+                ):
                     self.assertEqual(browser.post("/api/auth/logout", headers=headers).status_code, 403)
                 self.assertEqual(browser.get("/api/auth/me").status_code, 200)
 
             with self.subTest(contract="mocked_TEST_checkout_verification_signature_and_replay"):
                 calls = []
                 reference = None
+
                 def provider(session, method, url, **kwargs):
                     calls.append((method.upper(), url, kwargs))
                     self.assertFalse(session.trust_env)
@@ -176,18 +218,35 @@ class RenderRoutingContractTests(unittest.TestCase):
                     if method.upper() == "POST":
                         self.assertEqual(url, "https://api.paystack.co/transaction/initialize")
                         body = kwargs["json"]
-                        self.assertEqual((body["amount"], body["currency"], body["callback_url"]),
-                                         (250000, "NGN", FRONT + "/payment/callback"))
-                        value = {"status": True, "data": {"reference": body["reference"],
-                                 "authorization_url": "https://checkout.paystack.com/synthetic-routing-only",
-                                 "access_code": "synthetic-routing-only"}}
+                        self.assertEqual(
+                            (body["amount"], body["currency"], body["callback_url"]),
+                            (250000, "NGN", FRONT + "/payment/callback"),
+                        )
+                        value = {
+                            "status": True,
+                            "data": {
+                                "reference": body["reference"],
+                                "authorization_url": "https://checkout.paystack.com/synthetic-routing-only",
+                                "access_code": "synthetic-routing-only",
+                            },
+                        }
                     else:
                         self.assertEqual(url, "https://api.paystack.co/transaction/verify/" + reference)
-                        value = {"status": True, "data": {"reference": reference, "id": 987654321,
-                                 "amount": 250000, "currency": "NGN", "status": "pending"}}
-                    response = requests.Response(); response.status_code = 200
+                        value = {
+                            "status": True,
+                            "data": {
+                                "reference": reference,
+                                "id": 987654321,
+                                "amount": 250000,
+                                "currency": "NGN",
+                                "status": "pending",
+                            },
+                        }
+                    response = requests.Response()
+                    response.status_code = 200
                     response._content = json.dumps(value).encode()
                     return response
+
                 with patch("requests.Session.request", autospec=True, side_effect=provider):
                     response = browser.post("/api/payments/initiate", json={"plan": "monthly"}, headers=csrf)
                     self.assertEqual(response.status_code, 200, response.text)
@@ -199,29 +258,52 @@ class RenderRoutingContractTests(unittest.TestCase):
                     other = {"Authorization": "Bearer " + create_access_token(user_id=other_id)}
                     self.assertEqual(direct.post(f"/payments/{reference}/verify", headers=other).status_code, 404)
                     self.assertEqual(len(calls), 2)
-                    raw = json.dumps({"event": "charge.success", "data": {"domain": "test", "reference": reference,
-                                     "id": 987654321, "amount": 250000, "currency": "NGN", "status": "success"}},
-                                     indent=2).encode()
+                    raw = json.dumps(
+                        {
+                            "event": "charge.success",
+                            "data": {
+                                "domain": "test",
+                                "reference": reference,
+                                "id": 987654321,
+                                "amount": 250000,
+                                "currency": "NGN",
+                                "status": "success",
+                            },
+                        },
+                        indent=2,
+                    ).encode()
                     signature = hmac.new(b"sk_test_routing_synthetic_only", raw, hashlib.sha512).hexdigest()
                     webhook_headers = {"Content-Type": "application/json", "x-paystack-signature": signature}
                     # A provider request has no browser cookie or CSRF header.
                     with TestClient(LocalRewriteModel(app), base_url=FRONT) as provider_client:
-                        self.assertEqual(provider_client.post("/api/payments/webhook", content=raw + b" ",
-                                         headers=webhook_headers).status_code, 401)
-                        self.assertEqual(provider_client.post("/api/payments/webhook", content=raw,
-                                         headers=webhook_headers).status_code, 200)
+                        self.assertEqual(
+                            provider_client.post(
+                                "/api/payments/webhook", content=raw + b" ", headers=webhook_headers
+                            ).status_code,
+                            401,
+                        )
+                        self.assertEqual(
+                            provider_client.post(
+                                "/api/payments/webhook", content=raw, headers=webhook_headers
+                            ).status_code,
+                            200,
+                        )
                     with Session(engine) as db:
                         paid_end = db.get(User, user_id).subscription.end_date
                         self.assertEqual(paid_end, trial_end.date() + timedelta(days=30))
                     # Existing direct webhook is retained; duplicate delivery must not add days.
-                    self.assertEqual(direct.post("/payments/webhook", content=raw, headers=webhook_headers).status_code, 200)
+                    self.assertEqual(
+                        direct.post("/payments/webhook", content=raw, headers=webhook_headers).status_code, 200
+                    )
                     self.assertEqual(browser.post(f"/api/payments/{reference}/verify", headers=csrf).status_code, 200)
                     self.assertEqual(len(calls), 2)
                 with Session(engine) as db:
                     payment = db.scalar(select(Payment).where(Payment.reference == reference))
                     self.assertEqual((payment.status, payment.paystack_transaction_id), ("success", "987654321"))
                     self.assertEqual(db.get(User, user_id).subscription.end_date, paid_end)
-                    self.assertEqual(len(db.scalars(select(AuditLog).where(AuditLog.action == "payment.success")).all()), 1)
+                    self.assertEqual(
+                        len(db.scalars(select(AuditLog).where(AuditLog.action == "payment.success")).all()), 1
+                    )
 
             with self.subTest(contract="logout_cookie_deletion_revoked_replay_and_independent_bearer"):
                 independent = create_access_token(user_id=user_id)
@@ -229,13 +311,17 @@ class RenderRoutingContractTests(unittest.TestCase):
                 self.assertIsNone(browser.cookies.get(SECURE_COOKIE))
                 self.assertEqual(browser.get("/api/auth/browser/session").status_code, 401)
                 self.assertEqual(direct.get("/auth/me", headers={"Authorization": "Bearer " + token}).status_code, 401)
-                self.assertEqual(direct.get("/auth/me", headers={"Authorization": "Bearer " + independent}).status_code, 200)
+                self.assertEqual(
+                    direct.get("/auth/me", headers={"Authorization": "Bearer " + independent}).status_code, 200
+                )
         finally:
-            browser.close(); direct.close()
+            browser.close()
+            direct.close()
             for item in reversed(patches):
                 item.stop()
             if original_override is None:
                 app.dependency_overrides.pop(get_db, None)
             else:
                 app.dependency_overrides[get_db] = original_override
-            limiter.reset(); engine.dispose()
+            limiter.reset()
+            engine.dispose()

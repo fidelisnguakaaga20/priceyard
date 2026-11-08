@@ -4,6 +4,7 @@ Before the fix each request held two connections (authentication + stream), so
 the six parallel Market insights requests exhausted production's 5-connection
 pool and most sections failed to load. A one-connection pool proves the fix.
 """
+
 import json
 import unittest
 
@@ -21,8 +22,16 @@ from app.models.sell_watch_window import SellWatchWindow
 from app.models.user import User
 from app.security import create_access_token
 
-STREAMED_PATHS = ("/market-signals", "/quality-signals", "/buying-zones", "/sell-watch-windows",
-                  "/storage-suitability", "/cost-breakdowns", "/commodities", "/markets")
+STREAMED_PATHS = (
+    "/market-signals",
+    "/quality-signals",
+    "/buying-zones",
+    "/sell-watch-windows",
+    "/storage-suitability",
+    "/cost-breakdowns",
+    "/commodities",
+    "/markets",
+)
 
 
 class StreamConnectionReleaseTests(unittest.TestCase):
@@ -32,17 +41,31 @@ class StreamConnectionReleaseTests(unittest.TestCase):
         # The synthetic runner shares one in-memory connection; allow only one
         # checkout of it at a time, as a deliberately exhausted production pool would.
         shared = self.engine.raw_connection().dbapi_connection
-        self.engine.pool = QueuePool(lambda: shared, pool_size=1, max_overflow=0, timeout=2,
-                                     reset_on_return=None, dialect=self.engine.dialect)
+        self.engine.pool = QueuePool(
+            lambda: shared, pool_size=1, max_overflow=0, timeout=2, reset_on_return=None, dialect=self.engine.dialect
+        )
         with Session(self.engine) as db:
-            admin = User(full_name="Synthetic Admin", email="pool@example.com", password_hash="unused",
-                         role="admin", referral_code="POOLADMIN")
+            admin = User(
+                full_name="Synthetic Admin",
+                email="pool@example.com",
+                password_hash="unused",
+                role="admin",
+                referral_code="POOLADMIN",
+            )
             commodity, market = Commodity(name="Soybeans"), Market(name="Kwali Market")
             db.add_all([admin, commodity, market])
             db.flush()
-            db.add(SellWatchWindow(commodity_id=commodity.id, market_id=market.id, start_period="May",
-                                   end_period="June", observation="Synthetic observation",
-                                   confidence="Low confidence", created_by=admin.id))
+            db.add(
+                SellWatchWindow(
+                    commodity_id=commodity.id,
+                    market_id=market.id,
+                    start_period="May",
+                    end_period="June",
+                    observation="Synthetic observation",
+                    confidence="Low confidence",
+                    created_by=admin.id,
+                )
+            )
             db.commit()
             self.headers = {"Authorization": "Bearer " + create_access_token(user_id=admin.id)}
 

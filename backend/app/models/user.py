@@ -29,6 +29,7 @@ class User(Base):
     @property
     def is_owner(self) -> bool:
         from app.services.owner_policy import is_owner
+
         return is_owner(object_session(self), self)
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -44,7 +45,9 @@ class User(Base):
     referral_code: Mapped[str] = mapped_column(String(12), unique=True, nullable=False, index=True)
     referred_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
 
     subscription: Mapped[Subscription | None] = relationship(back_populates="user", uselist=False)
     feedback_entries: Mapped[list[Feedback]] = relationship(back_populates="user")
@@ -62,7 +65,9 @@ class User(Base):
     sell_watch_windows: Mapped[list[SellWatchWindow]] = relationship(back_populates="creator")
     faq_items: Mapped[list[FAQItem]] = relationship(back_populates="creator")
     audit_logs: Mapped[list[AuditLog]] = relationship(back_populates="user")
-    watchlist_items: Mapped[list[Watchlist]] = relationship(back_populates="user", cascade="all, delete-orphan", passive_deletes=True)
+    watchlist_items: Mapped[list[Watchlist]] = relationship(
+        back_populates="user", cascade="all, delete-orphan", passive_deletes=True
+    )
     password_reset_tokens: Mapped[list[PasswordResetToken]] = relationship(
         back_populates="user", cascade="all, delete-orphan", passive_deletes=True
     )

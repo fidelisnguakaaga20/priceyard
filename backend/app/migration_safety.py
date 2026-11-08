@@ -1,4 +1,5 @@
 """Read-only protection against replaying legacy business-data migrations."""
+
 from sqlalchemy import inspect, text
 from sqlalchemy.engine import Connection
 
@@ -15,4 +16,6 @@ def assert_safe_migration_start(connection: Connection, current_heads: tuple[str
         if table == "alembic_version":
             continue
         if connection.execute(text("SELECT 1 FROM " + quote(table) + " LIMIT 1")).first() is not None:
-            raise RuntimeError("Populated legacy or unversioned database requires a reviewed migration; no changes were applied")
+            raise RuntimeError(
+                "Populated legacy or unversioned database requires a reviewed migration; no changes were applied"
+            )

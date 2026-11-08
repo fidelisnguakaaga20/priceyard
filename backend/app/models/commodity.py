@@ -30,7 +30,9 @@ class Commodity(Base):
     is_upcoming: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, index=True)
     expected_available_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
 
     price_updates: Mapped[list[PriceUpdate]] = relationship(back_populates="commodity")
     market_signals: Mapped[list[MarketSignal]] = relationship(back_populates="commodity")

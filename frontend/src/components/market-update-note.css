@@ -6,7 +6,7 @@
   border-radius: 8px;
   background: var(--color-surface-subtle);
   color: var(--color-text);
-  font-size: .875rem;
+  font-size: 0.875rem;
 }
 
 .market-update-note p {
@@ -19,5 +19,5 @@
   display: block;
   margin-top: 4px;
   color: var(--color-text);
-  font-size: .8rem;
+  font-size: 0.8rem;
 }

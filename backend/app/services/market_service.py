@@ -56,7 +56,9 @@ def update_market(db: Session, market: Market, payload: MarketUpdate, *, commit:
     if "country" in changes and changes["country"] is None:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Market country cannot be null")
     if "is_active" in changes and changes["is_active"] is None:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Market active status cannot be null")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Market active status cannot be null"
+        )
 
     final_name = changes.get("name", market.name)
     final_state = changes.get("state", market.state)

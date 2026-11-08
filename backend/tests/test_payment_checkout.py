@@ -26,30 +26,53 @@ class PaymentCheckoutTests(unittest.TestCase):
         self.engine = create_engine("sqlite+pysqlite:///:memory:")
         Base.metadata.create_all(self.engine)
         with Session(self.engine) as db:
-            user = User(full_name="Synthetic checkout", email="checkout@example.com", password_hash="not-used",
-                        role="free_user", is_active=True, referral_code="CHECKOUT")
+            user = User(
+                full_name="Synthetic checkout",
+                email="checkout@example.com",
+                password_hash="not-used",
+                role="free_user",
+                is_active=True,
+                referral_code="CHECKOUT",
+            )
             user.subscription = build_trial_subscription(user=user)
-            db.add(user); db.commit(); self.user_id = user.id
+            db.add(user)
+            db.commit()
+            self.user_id = user.id
+
         def sessions():
-            with Session(self.engine, expire_on_commit=False) as db: yield db
+            with Session(self.engine, expire_on_commit=False) as db:
+                yield db
+
         app.dependency_overrides[get_db] = sessions
         self.client = TestClient(app, raise_server_exceptions=False)
-        self.headers = {"Authorization": "Bearer "+create_access_token(user_id=self.user_id)}
+        self.headers = {"Authorization": "Bearer " + create_access_token(user_id=self.user_id)}
         self.settings = patch("app.services.payment_service.get_settings", return_value=FakeSettings())
         self.settings.start()
 
     def tearDown(self):
-        self.settings.stop(); self.client.close(); app.dependency_overrides.clear(); self.engine.dispose()
+        self.settings.stop()
+        self.client.close()
+        app.dependency_overrides.clear()
+        self.engine.dispose()
 
     def initiate(self, mutate=lambda body: body, *, plan="monthly", http_status=200):
         self.observed = {}
+
         def provider(session, method, url, **kwargs):
             self.observed = {"url": url, "method": method, "trust_env": session.trust_env, **kwargs}
-            body = {"status": True, "data": {"authorization_url": "https://checkout.paystack.com/synthetic-only",
-                     "reference": kwargs["json"]["reference"], "access_code": "synthetic-only"}}
-            response = requests.Response(); response.status_code = http_status
+            body = {
+                "status": True,
+                "data": {
+                    "authorization_url": "https://checkout.paystack.com/synthetic-only",
+                    "reference": kwargs["json"]["reference"],
+                    "access_code": "synthetic-only",
+                },
+            }
+            response = requests.Response()
+            response.status_code = http_status
             response._content = json.dumps(mutate(body)).encode()
             return response
+
         with patch("requests.Session.request", autospec=True, side_effect=provider):
             return self.client.post("/payments/initiate", json={"plan": plan}, headers=self.headers)
 
@@ -68,33 +91,57 @@ class PaymentCheckoutTests(unittest.TestCase):
                 with Session(self.engine) as db:
                     payment = db.scalar(select(Payment).where(Payment.reference == response.json()["reference"]))
                     self.assertEqual(payment.plan, plan)
-                    self.assertEqual(payment.amount*100, kobo)
+                    self.assertEqual(payment.amount * 100, kobo)
                     self.assertEqual(payment.status, "pending")
-                    self.assertEqual(db.get(User,self.user_id).subscription.status,"trial")
+                    self.assertEqual(db.get(User, self.user_id).subscription.status, "trial")
 
     def test_malformed_shapes_and_nonboolean_success_are_controlled_failures(self):
-        for body in (None, [], "ok", {"status": "true", "data": {}}, {"status": 1, "data": {}},
-                     {"status": True, "data": []}, {"status": True, "data": "bad"}):
+        for body in (
+            None,
+            [],
+            "ok",
+            {"status": "true", "data": {}},
+            {"status": 1, "data": {}},
+            {"status": True, "data": []},
+            {"status": True, "data": "bad"},
+        ):
             with self.subTest(body=body):
                 self.assertEqual(self.initiate(lambda _: body).status_code, 502)
         with Session(self.engine) as db:
             self.assertTrue(all(item.status == "failed" for item in db.scalars(select(Payment))))
-            self.assertEqual(db.get(User,self.user_id).subscription.status,"trial")
+            self.assertEqual(db.get(User, self.user_id).subscription.status, "trial")
 
     def test_unsafe_checkout_links_never_reach_browser(self):
-        for url in ("javascript:alert(1)", "http://checkout.paystack.com/synthetic", "https://example.invalid/synthetic",
-                    "https://checkout.paystack.com.evil.invalid/synthetic", "https://checkout.paystack.com@evil.invalid/synthetic",
-                    "https://user:password@checkout.paystack.com/synthetic", "https://checkout.paystack.com:444/synthetic",
-                    "https://checkout.paystack.com/\r\nheader", "https://checkout.paystack.com\\@evil.invalid/synthetic",
-                    "https://checkout.paystack.com/", 123, "x"*2049):
+        for url in (
+            "javascript:alert(1)",
+            "http://checkout.paystack.com/synthetic",
+            "https://example.invalid/synthetic",
+            "https://checkout.paystack.com.evil.invalid/synthetic",
+            "https://checkout.paystack.com@evil.invalid/synthetic",
+            "https://user:password@checkout.paystack.com/synthetic",
+            "https://checkout.paystack.com:444/synthetic",
+            "https://checkout.paystack.com/\r\nheader",
+            "https://checkout.paystack.com\\@evil.invalid/synthetic",
+            "https://checkout.paystack.com/",
+            123,
+            "x" * 2049,
+        ):
             with self.subTest(url=url):
-                def mutate(body): body["data"]["authorization_url"] = url; return body
+
+                def mutate(body):
+                    body["data"]["authorization_url"] = url
+                    return body
+
                 self.assertEqual(self.initiate(mutate).status_code, 502)
 
     def test_mismatched_or_missing_reference_is_rejected(self):
         for value in (None, "py_other_purchase", 123):
             with self.subTest(reference=value):
-                def mutate(body): body["data"]["reference"] = value; return body
+
+                def mutate(body):
+                    body["data"]["reference"] = value
+                    return body
+
                 self.assertEqual(self.initiate(mutate).status_code, 502)
 
     def test_provider_redirects_and_failures_never_produce_checkout(self):
@@ -104,13 +151,17 @@ class PaymentCheckoutTests(unittest.TestCase):
 
     def test_provider_timeout_preserves_failed_purchase_and_never_grants_access(self):
         with patch("requests.Session.request", side_effect=requests.Timeout("synthetic provider timeout")):
-            self.assertEqual(self.client.post("/payments/initiate", json={"plan":"monthly"}, headers=self.headers).status_code, 502)
+            self.assertEqual(
+                self.client.post("/payments/initiate", json={"plan": "monthly"}, headers=self.headers).status_code, 502
+            )
         with Session(self.engine) as db:
-            self.assertEqual(db.scalar(select(Payment)).status,"failed")
-            self.assertEqual(db.get(User,self.user_id).subscription.status,"trial")
+            self.assertEqual(db.scalar(select(Payment)).status, "failed")
+            self.assertEqual(db.get(User, self.user_id).subscription.status, "trial")
 
     def test_unauthenticated_or_invalid_plan_never_contacts_provider(self):
         with patch("requests.Session.request") as sender:
-            self.assertEqual(self.client.post("/payments/initiate",json={"plan":"monthly"}).status_code,401)
-            self.assertEqual(self.client.post("/payments/initiate",json={"plan":"yearly"},headers=self.headers).status_code,422)
+            self.assertEqual(self.client.post("/payments/initiate", json={"plan": "monthly"}).status_code, 401)
+            self.assertEqual(
+                self.client.post("/payments/initiate", json={"plan": "yearly"}, headers=self.headers).status_code, 422
+            )
             sender.assert_not_called()

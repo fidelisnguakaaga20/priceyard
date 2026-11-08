@@ -10,7 +10,12 @@ function urlBase64ToUint8Array(base64: string): Uint8Array {
 }
 
 export function pushSupported(): boolean {
-  return typeof window !== "undefined" && "serviceWorker" in navigator && "PushManager" in window && Boolean(VAPID_PUBLIC_KEY);
+  return (
+    typeof window !== "undefined" &&
+    "serviceWorker" in navigator &&
+    "PushManager" in window &&
+    Boolean(VAPID_PUBLIC_KEY)
+  );
 }
 
 export async function getExistingPushSubscription(): Promise<PushSubscription | null> {
@@ -27,7 +32,11 @@ export async function isSubscribedAsCurrentUser(token: string): Promise<boolean>
   const subscription = await getExistingPushSubscription();
   if (!subscription) return false;
   try {
-    const result = await apiFetch<{ subscribed: boolean }>(`/push/subscribed?endpoint=${encodeURIComponent(subscription.endpoint)}`, {}, token);
+    const result = await apiFetch<{ subscribed: boolean }>(
+      `/push/subscribed?endpoint=${encodeURIComponent(subscription.endpoint)}`,
+      {},
+      token,
+    );
     return result.subscribed;
   } catch {
     return false;
@@ -52,7 +61,10 @@ export async function enablePushAlerts(token: string): Promise<void> {
   const json = subscription.toJSON();
   await apiFetch(
     "/push/subscribe",
-    { method: "POST", body: JSON.stringify({ endpoint: json.endpoint, keys: { p256dh: json.keys?.p256dh, auth: json.keys?.auth } }) },
+    {
+      method: "POST",
+      body: JSON.stringify({ endpoint: json.endpoint, keys: { p256dh: json.keys?.p256dh, auth: json.keys?.auth } }),
+    },
     token,
   );
 }
@@ -72,18 +84,27 @@ export async function finishLogout(token: string, isStillLoggedOut: () => boolea
   const controller = new AbortController();
   let current = true;
   let timer: ReturnType<typeof setTimeout> | undefined;
-  const deadline = new Promise<void>((resolve) => { timer = setTimeout(resolve, 1000); });
+  const deadline = new Promise<void>((resolve) => {
+    timer = setTimeout(resolve, 1000);
+  });
   const cleanup = async () => {
     if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) return;
     const registration = await navigator.serviceWorker.getRegistration();
     if (!current || !isStillLoggedOut() || !registration) return;
     const subscription = await registration.pushManager.getSubscription();
     if (!current || !isStillLoggedOut() || !subscription) return;
-    const native = Promise.resolve().then(() => subscription.unsubscribe()).catch(() => undefined);
+    const native = Promise.resolve()
+      .then(() => subscription.unsubscribe())
+      .catch(() => undefined);
     const endpoint = subscription.endpoint;
-    const remove = typeof endpoint === "string" && endpoint.length > 0 && endpoint.length <= 500
-      ? apiFetch("/push/unsubscribe", { method: "POST", body: JSON.stringify({ endpoint }), keepalive: true, signal: controller.signal }, token).catch(() => undefined)
-      : Promise.resolve();
+    const remove =
+      typeof endpoint === "string" && endpoint.length > 0 && endpoint.length <= 500
+        ? apiFetch(
+            "/push/unsubscribe",
+            { method: "POST", body: JSON.stringify({ endpoint }), keepalive: true, signal: controller.signal },
+            token,
+          ).catch(() => undefined)
+        : Promise.resolve();
     await Promise.all([native, remove]);
   };
   try {
@@ -96,6 +117,8 @@ export async function finishLogout(token: string, isStillLoggedOut: () => boolea
     try {
       await apiFetch<void>("/auth/logout", { method: "POST", keepalive: true }, token);
       return true;
-    } catch { return false; }
+    } catch {
+      return false;
+    }
   }
 }

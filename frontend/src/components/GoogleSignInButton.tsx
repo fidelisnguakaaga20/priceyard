@@ -7,8 +7,15 @@ declare global {
     google?: {
       accounts: {
         id: {
-          initialize: (config: { client_id: string; callback: (response: GoogleCredentialResponse) => void; use_fedcm_for_prompt?: boolean }) => void;
-          renderButton: (parent: HTMLElement, options: { theme: string; size: string; width?: number; text?: string }) => void;
+          initialize: (config: {
+            client_id: string;
+            callback: (response: GoogleCredentialResponse) => void;
+            use_fedcm_for_prompt?: boolean;
+          }) => void;
+          renderButton: (
+            parent: HTMLElement,
+            options: { theme: string; size: string; width?: number; text?: string },
+          ) => void;
         };
       };
     };
@@ -35,7 +42,13 @@ function loadGoogleScript(): Promise<void> {
   return scriptLoadPromise;
 }
 
-export function GoogleSignInButton({ onCredential, disabled }: { onCredential: (idToken: string) => void; disabled?: boolean }) {
+export function GoogleSignInButton({
+  onCredential,
+  disabled,
+}: {
+  onCredential: (idToken: string) => void;
+  disabled?: boolean;
+}) {
   const containerId = useId();
   const containerRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState(false);
@@ -51,13 +64,24 @@ export function GoogleSignInButton({ onCredential, disabled }: { onCredential: (
         window.google.accounts.id.initialize({
           client_id: CLIENT_ID,
           use_fedcm_for_prompt: true,
-          callback: (response) => { completedRef.current = true; onCredential(response.credential); },
+          callback: (response) => {
+            completedRef.current = true;
+            onCredential(response.credential);
+          },
         });
         containerRef.current.innerHTML = "";
-        window.google.accounts.id.renderButton(containerRef.current, { theme: "outline", size: "large", text: "continue_with" });
+        window.google.accounts.id.renderButton(containerRef.current, {
+          theme: "outline",
+          size: "large",
+          text: "continue_with",
+        });
       })
-      .catch(() => { if (!cancelled) setError(true); });
-    return () => { cancelled = true; };
+      .catch(() => {
+        if (!cancelled) setError(true);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [disabled, onCredential]);
 
   // The Google button opens its own popup/tab for sign-in, which occasionally loads blank
@@ -67,7 +91,9 @@ export function GoogleSignInButton({ onCredential, disabled }: { onCredential: (
   useEffect(() => {
     if (!CLIENT_ID || disabled) return;
     let blurredAt: number | null = null;
-    const onBlur = () => { blurredAt = Date.now(); };
+    const onBlur = () => {
+      blurredAt = Date.now();
+    };
     const onFocus = () => {
       if (blurredAt !== null && !completedRef.current && Date.now() - blurredAt > STUCK_HINT_DELAY_MS) {
         setShowStuckHint(true);
@@ -87,7 +113,9 @@ export function GoogleSignInButton({ onCredential, disabled }: { onCredential: (
   return (
     <div>
       <div id={containerId} ref={containerRef} className="google-signin-button" />
-      {showStuckHint && <p className="muted">Google sign-in stuck or blank? Try again, or use email and password below.</p>}
+      {showStuckHint && (
+        <p className="muted">Google sign-in stuck or blank? Try again, or use email and password below.</p>
+      )}
     </div>
   );
 }

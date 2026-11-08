@@ -7,484 +7,696 @@ import { useAdminEditForm } from "./useAdminEditForm";
 import { AdminPagination, useAdminPagedList } from "./adminPaging";
 import { AdminActionButton, AdminLoading, AdminStatus, errorText, optionalNumber } from "./adminUtils";
 export function AdminBuyingZonesPage() {
-    const r = useAdminPagedList<BuyingZone>("/buying-zones/admin/page");
-    const [error, setError] = useState("");
-    const [message, setMessage] = useState("");
-    const [busy, setBusy] = useState(false);
-    const [searchParams] = useSearchParams();
-    const editor = useAdminEditForm(r.data, r.loading, setError, { path: "/buying-zones", token: r.token }, searchParams.get("id") ?? undefined);
-    async function save(e: FormEvent<HTMLFormElement>) {
-        e.preventDefault();
-        if (!r.token || busy || !editor.canSubmit())
-            return;
-        const f = new FormData(e.currentTarget);
-        const id = String(f.get("id") || "").trim();
-        const payload = {
-            commodity_id: Number(f.get("commodity_id")),
-            market_id: Number(f.get("market_id")),
-            price_low: Number(f.get("price_low")),
-            price_high: Number(f.get("price_high")),
-            reason: String(f.get("reason")),
-            valid_from: String(f.get("valid_from") || "") || null,
-            valid_to: String(f.get("valid_to") || "") || null,
-            confidence: String(f.get("confidence"))
-        };
-        setBusy(true);
-        try {
-            await apiFetch(id ? `/buying-zones/${id}` : "/buying-zones", {
-                method: id ? "PATCH" : "POST",
-                body: JSON.stringify(payload)
-            }, r.token);
-            setMessage(id ? "Buying zone updated." : "Buying zone created.");
-            setError("");
-            await r.reload();
-        }
-        catch (err) {
-            setError(errorText(err));
-        }
-        finally {
-            setBusy(false);
-        }
+  const r = useAdminPagedList<BuyingZone>("/buying-zones/admin/page");
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [searchParams] = useSearchParams();
+  const editor = useAdminEditForm(
+    r.data,
+    r.loading,
+    setError,
+    { path: "/buying-zones", token: r.token },
+    searchParams.get("id") ?? undefined,
+  );
+  async function save(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!r.token || busy || !editor.canSubmit()) return;
+    const f = new FormData(e.currentTarget);
+    const id = String(f.get("id") || "").trim();
+    const payload = {
+      commodity_id: Number(f.get("commodity_id")),
+      market_id: Number(f.get("market_id")),
+      price_low: Number(f.get("price_low")),
+      price_high: Number(f.get("price_high")),
+      reason: String(f.get("reason")),
+      valid_from: String(f.get("valid_from") || "") || null,
+      valid_to: String(f.get("valid_to") || "") || null,
+      confidence: String(f.get("confidence")),
+    };
+    setBusy(true);
+    try {
+      await apiFetch(
+        id ? `/buying-zones/${id}` : "/buying-zones",
+        {
+          method: id ? "PATCH" : "POST",
+          body: JSON.stringify(payload),
+        },
+        r.token,
+      );
+      setMessage(id ? "Buying zone updated." : "Buying zone created.");
+      setError("");
+      await r.reload();
+    } catch (err) {
+      setError(errorText(err));
+    } finally {
+      setBusy(false);
     }
-    async function remove(id: number) {
-        if (!r.token || busy || !confirm("Delete this buying zone?"))
-            return;
-        setBusy(true);
-        try {
-            await apiFetch(`/buying-zones/${id}`, {
-                method: "DELETE"
-            }, r.token);
-            setMessage("Buying zone deleted.");
-            setError("");
-            await r.reload();
-        }
-        catch (err) {
-            setError(errorText(err));
-        }
-        finally {
-            setBusy(false);
-        }
+  }
+  async function remove(id: number) {
+    if (!r.token || busy || !confirm("Delete this buying zone?")) return;
+    setBusy(true);
+    try {
+      await apiFetch(
+        `/buying-zones/${id}`,
+        {
+          method: "DELETE",
+        },
+        r.token,
+      );
+      setMessage("Buying zone deleted.");
+      setError("");
+      await r.reload();
+    } catch (err) {
+      setError(errorText(err));
+    } finally {
+      setBusy(false);
     }
-    return <div>
-    <h2>Buying zones
-    </h2>
-    <AdminStatus error={error || r.error} success={message}/>
-    <form ref={editor.formRef} className="form-stack card admin-form" onSubmit={save}>
-    <div className="form-grid">
-    <label>ID to edit
-    <input name="id" type="number" min="1" onChange={editor.onIdChange}/>
-    </label>
-    <label>Commodity ID
-    <input name="commodity_id" type="number" min="1" required defaultValue={searchParams.get("commodity_id") ?? undefined}/>
-    </label>
-    <label>Market ID
-    <input name="market_id" type="number" min="1" required defaultValue={searchParams.get("market_id") ?? undefined}/>
-    </label>
-    <label>Low
-    <input name="price_low" type="number" min="0" step="0.01" required/>
-    </label>
-    <label>High
-    <input name="price_high" type="number" min="0" step="0.01" required/>
-    </label>
-    <label>Confidence
-    <input name="confidence" required/>
-    </label>
-    <label>Valid from
-    <input name="valid_from" type="date"/>
-    </label>
-    <label>Valid to
-    <input name="valid_to" type="date"/>
-    </label>
+  }
+  return (
+    <div>
+      <h2>Buying zones</h2>
+      <AdminStatus error={error || r.error} success={message} />
+      <form ref={editor.formRef} className="form-stack card admin-form" onSubmit={save}>
+        <div className="form-grid">
+          <label>
+            ID to edit
+            <input name="id" type="number" min="1" onChange={editor.onIdChange} />
+          </label>
+          <label>
+            Commodity ID
+            <input
+              name="commodity_id"
+              type="number"
+              min="1"
+              required
+              defaultValue={searchParams.get("commodity_id") ?? undefined}
+            />
+          </label>
+          <label>
+            Market ID
+            <input
+              name="market_id"
+              type="number"
+              min="1"
+              required
+              defaultValue={searchParams.get("market_id") ?? undefined}
+            />
+          </label>
+          <label>
+            Low
+            <input name="price_low" type="number" min="0" step="0.01" required />
+          </label>
+          <label>
+            High
+            <input name="price_high" type="number" min="0" step="0.01" required />
+          </label>
+          <label>
+            Confidence
+            <input name="confidence" required />
+          </label>
+          <label>
+            Valid from
+            <input name="valid_from" type="date" />
+          </label>
+          <label>
+            Valid to
+            <input name="valid_to" type="date" />
+          </label>
+        </div>
+        <label>
+          Reason
+          <textarea name="reason" required />
+        </label>
+        <AdminActionButton className="button" busy={busy}>
+          Save buying zone
+        </AdminActionButton>
+      </form>
+      {r.loading ? (
+        <AdminLoading label="Loading buying zones…" />
+      ) : (
+        <div className="admin-card-list">
+          {r.data.map((x) => (
+            <article className="card" key={x.id}>
+              <span className="eyebrow">#{x.id}</span>
+              <h3>
+                {x.price_low} – {x.price_high}
+              </h3>
+              <p>{x.reason}</p>
+              <small>Confidence: {x.confidence}</small>
+              <br />
+              <StaleBadge updatedAt={x.updated_at} />
+              <div className="button-row">
+                <AdminActionButton
+                  className="button button-small button-danger"
+                  busy={busy}
+                  onClick={() => void remove(x.id)}
+                >
+                  Delete
+                </AdminActionButton>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+      <AdminPagination page={r} label="Buying zones" />
     </div>
-    <label>Reason
-    <textarea name="reason" required/>
-    </label>
-    <AdminActionButton className="button" busy={busy}>Save buying zone
-    </AdminActionButton>
-    </form>{r.loading ? <AdminLoading label="Loading buying zones…"/> : <div className="admin-card-list">{r.data.map((x) => <article className="card" key={x.id}>
-            <span className="eyebrow">#{x.id}
-            </span>
-            <h3>{x.price_low} – {x.price_high}
-            </h3>
-            <p>{x.reason}
-            </p>
-            <small>Confidence: {x.confidence}
-            </small>
-            <br />
-            <StaleBadge updatedAt={x.updated_at}/>
-            <div className="button-row">
-            <AdminActionButton className="button button-small button-danger" busy={busy} onClick={() => void remove(x.id)}>Delete
-            </AdminActionButton>
-            </div>
-            </article>)}
-        </div>}
-    <AdminPagination page={r} label="Buying zones"/>
-    </div>;
+  );
 }
 export function AdminSellWatchPage() {
-    const r = useAdminPagedList<SellWatchWindow>("/sell-watch-windows/admin/page");
-    const [error, setError] = useState("");
-    const [message, setMessage] = useState("");
-    const [busy, setBusy] = useState(false);
-    const [searchParams] = useSearchParams();
-    const editor = useAdminEditForm(r.data, r.loading, setError, { path: "/sell-watch-windows", token: r.token }, searchParams.get("id") ?? undefined);
-    async function save(e: FormEvent<HTMLFormElement>) {
-        e.preventDefault();
-        if (!r.token || busy || !editor.canSubmit())
-            return;
-        const f = new FormData(e.currentTarget);
-        const id = String(f.get("id") || "").trim();
-        const payload = {
-            commodity_id: Number(f.get("commodity_id")),
-            market_id: Number(f.get("market_id")),
-            start_period: String(f.get("start_period")),
-            end_period: String(f.get("end_period") || "") || null,
-            observation: String(f.get("observation")),
-            confidence: String(f.get("confidence"))
-        };
-        setBusy(true);
-        try {
-            await apiFetch(id ? `/sell-watch-windows/${id}` : "/sell-watch-windows", {
-                method: id ? "PATCH" : "POST",
-                body: JSON.stringify(payload)
-            }, r.token);
-            setMessage(id ? "Sell-watch window updated." : "Sell-watch window created.");
-            setError("");
-            await r.reload();
-        }
-        catch (err) {
-            setError(errorText(err));
-        }
-        finally {
-            setBusy(false);
-        }
+  const r = useAdminPagedList<SellWatchWindow>("/sell-watch-windows/admin/page");
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [searchParams] = useSearchParams();
+  const editor = useAdminEditForm(
+    r.data,
+    r.loading,
+    setError,
+    { path: "/sell-watch-windows", token: r.token },
+    searchParams.get("id") ?? undefined,
+  );
+  async function save(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!r.token || busy || !editor.canSubmit()) return;
+    const f = new FormData(e.currentTarget);
+    const id = String(f.get("id") || "").trim();
+    const payload = {
+      commodity_id: Number(f.get("commodity_id")),
+      market_id: Number(f.get("market_id")),
+      start_period: String(f.get("start_period")),
+      end_period: String(f.get("end_period") || "") || null,
+      observation: String(f.get("observation")),
+      confidence: String(f.get("confidence")),
+    };
+    setBusy(true);
+    try {
+      await apiFetch(
+        id ? `/sell-watch-windows/${id}` : "/sell-watch-windows",
+        {
+          method: id ? "PATCH" : "POST",
+          body: JSON.stringify(payload),
+        },
+        r.token,
+      );
+      setMessage(id ? "Sell-watch window updated." : "Sell-watch window created.");
+      setError("");
+      await r.reload();
+    } catch (err) {
+      setError(errorText(err));
+    } finally {
+      setBusy(false);
     }
-    async function remove(id: number) {
-        if (!r.token || busy || !confirm("Delete this sell-watch window?"))
-            return;
-        setBusy(true);
-        try {
-            await apiFetch(`/sell-watch-windows/${id}`, {
-                method: "DELETE"
-            }, r.token);
-            setMessage("Sell-watch window deleted.");
-            setError("");
-            await r.reload();
-        }
-        catch (err) {
-            setError(errorText(err));
-        }
-        finally {
-            setBusy(false);
-        }
+  }
+  async function remove(id: number) {
+    if (!r.token || busy || !confirm("Delete this sell-watch window?")) return;
+    setBusy(true);
+    try {
+      await apiFetch(
+        `/sell-watch-windows/${id}`,
+        {
+          method: "DELETE",
+        },
+        r.token,
+      );
+      setMessage("Sell-watch window deleted.");
+      setError("");
+      await r.reload();
+    } catch (err) {
+      setError(errorText(err));
+    } finally {
+      setBusy(false);
     }
-    return <div>
-    <h2>Sell-watch windows
-    </h2>
-    <AdminStatus error={error || r.error} success={message}/>
-    <form ref={editor.formRef} className="form-stack card admin-form" onSubmit={save}>
-    <div className="form-grid">
-    <label>ID to edit
-    <input name="id" type="number" min="1" onChange={editor.onIdChange}/>
-    </label>
-    <label>Commodity ID
-    <input name="commodity_id" type="number" min="1" required defaultValue={searchParams.get("commodity_id") ?? undefined}/>
-    </label>
-    <label>Market ID
-    <input name="market_id" type="number" min="1" required defaultValue={searchParams.get("market_id") ?? undefined}/>
-    </label>
-    <label>Start period
-    <input name="start_period" required/>
-    </label>
-    <label>End period
-    <input name="end_period"/>
-    </label>
-    <label>Confidence
-    <input name="confidence" required/>
-    </label>
+  }
+  return (
+    <div>
+      <h2>Sell-watch windows</h2>
+      <AdminStatus error={error || r.error} success={message} />
+      <form ref={editor.formRef} className="form-stack card admin-form" onSubmit={save}>
+        <div className="form-grid">
+          <label>
+            ID to edit
+            <input name="id" type="number" min="1" onChange={editor.onIdChange} />
+          </label>
+          <label>
+            Commodity ID
+            <input
+              name="commodity_id"
+              type="number"
+              min="1"
+              required
+              defaultValue={searchParams.get("commodity_id") ?? undefined}
+            />
+          </label>
+          <label>
+            Market ID
+            <input
+              name="market_id"
+              type="number"
+              min="1"
+              required
+              defaultValue={searchParams.get("market_id") ?? undefined}
+            />
+          </label>
+          <label>
+            Start period
+            <input name="start_period" required />
+          </label>
+          <label>
+            End period
+            <input name="end_period" />
+          </label>
+          <label>
+            Confidence
+            <input name="confidence" required />
+          </label>
+        </div>
+        <label>
+          Observation
+          <textarea name="observation" required />
+        </label>
+        <AdminActionButton className="button" busy={busy}>
+          Save sell-watch window
+        </AdminActionButton>
+      </form>
+      {r.loading ? (
+        <AdminLoading label="Loading sell-watch windows…" />
+      ) : (
+        <div className="admin-card-list">
+          {r.data.map((x) => (
+            <article className="card" key={x.id}>
+              <span className="eyebrow">#{x.id}</span>
+              <h3>
+                {x.start_period}
+                {x.end_period ? ` – ${x.end_period}` : ""}
+              </h3>
+              <p>{x.observation}</p>
+              <small>{x.confidence}</small>
+              <br />
+              <StaleBadge updatedAt={x.updated_at} />
+              <div className="button-row">
+                <AdminActionButton
+                  className="button button-small button-danger"
+                  busy={busy}
+                  onClick={() => void remove(x.id)}
+                >
+                  Delete
+                </AdminActionButton>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+      <AdminPagination page={r} label="Sell-watch windows" />
     </div>
-    <label>Observation
-    <textarea name="observation" required/>
-    </label>
-    <AdminActionButton className="button" busy={busy}>Save sell-watch window
-    </AdminActionButton>
-    </form>{r.loading ? <AdminLoading label="Loading sell-watch windows…"/> : <div className="admin-card-list">{r.data.map((x) => <article className="card" key={x.id}>
-            <span className="eyebrow">#{x.id}
-            </span>
-            <h3>{x.start_period}{x.end_period ? ` – ${x.end_period}` : ""}
-            </h3>
-            <p>{x.observation}
-            </p>
-            <small>{x.confidence}
-            </small>
-            <br />
-            <StaleBadge updatedAt={x.updated_at}/>
-            <div className="button-row">
-            <AdminActionButton className="button button-small button-danger" busy={busy} onClick={() => void remove(x.id)}>Delete
-            </AdminActionButton>
-            </div>
-            </article>)}
-        </div>}
-    <AdminPagination page={r} label="Sell-watch windows"/>
-    </div>;
+  );
 }
 export function AdminStoragePage() {
-    const r = useAdminPagedList<StorageSuitability>("/storage-suitability/admin/page");
-    const [error, setError] = useState("");
-    const [message, setMessage] = useState("");
-    const [busy, setBusy] = useState(false);
-    const [searchParams] = useSearchParams();
-    const editor = useAdminEditForm(r.data, r.loading, setError, { path: "/storage-suitability", token: r.token }, searchParams.get("id") ?? undefined);
-    async function save(e: FormEvent<HTMLFormElement>) {
-        e.preventDefault();
-        if (!r.token || busy || !editor.canSubmit())
-            return;
-        const f = new FormData(e.currentTarget);
-        const id = String(f.get("id") || "").trim();
-        const payload = {
-            commodity_id: Number(f.get("commodity_id")),
-            market_id: Number(f.get("market_id")),
-            price_update_id: optionalNumber(f.get("price_update_id")),
-            suitability_status: String(f.get("suitability_status")),
-            import_risk: String(f.get("import_risk") || "") || null,
-            oversupply_risk: String(f.get("oversupply_risk") || "") || null,
-            spoilage_risk: String(f.get("spoilage_risk") || "") || null,
-            buyer_availability: String(f.get("buyer_availability") || "") || null,
-            quality_storage_notes: String(f.get("quality_storage_notes") || "") || null,
-            summary: String(f.get("summary") || "") || null
-        };
-        setBusy(true);
-        try {
-            await apiFetch(id ? `/storage-suitability/${id}` : "/storage-suitability", {
-                method: id ? "PATCH" : "POST",
-                body: JSON.stringify(payload)
-            }, r.token);
-            setMessage(id ? "Storage suitability updated." : "Storage suitability created.");
-            setError("");
-            await r.reload();
-        }
-        catch (err) {
-            setError(errorText(err));
-        }
-        finally {
-            setBusy(false);
-        }
+  const r = useAdminPagedList<StorageSuitability>("/storage-suitability/admin/page");
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [searchParams] = useSearchParams();
+  const editor = useAdminEditForm(
+    r.data,
+    r.loading,
+    setError,
+    { path: "/storage-suitability", token: r.token },
+    searchParams.get("id") ?? undefined,
+  );
+  async function save(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!r.token || busy || !editor.canSubmit()) return;
+    const f = new FormData(e.currentTarget);
+    const id = String(f.get("id") || "").trim();
+    const payload = {
+      commodity_id: Number(f.get("commodity_id")),
+      market_id: Number(f.get("market_id")),
+      price_update_id: optionalNumber(f.get("price_update_id")),
+      suitability_status: String(f.get("suitability_status")),
+      import_risk: String(f.get("import_risk") || "") || null,
+      oversupply_risk: String(f.get("oversupply_risk") || "") || null,
+      spoilage_risk: String(f.get("spoilage_risk") || "") || null,
+      buyer_availability: String(f.get("buyer_availability") || "") || null,
+      quality_storage_notes: String(f.get("quality_storage_notes") || "") || null,
+      summary: String(f.get("summary") || "") || null,
+    };
+    setBusy(true);
+    try {
+      await apiFetch(
+        id ? `/storage-suitability/${id}` : "/storage-suitability",
+        {
+          method: id ? "PATCH" : "POST",
+          body: JSON.stringify(payload),
+        },
+        r.token,
+      );
+      setMessage(id ? "Storage suitability updated." : "Storage suitability created.");
+      setError("");
+      await r.reload();
+    } catch (err) {
+      setError(errorText(err));
+    } finally {
+      setBusy(false);
     }
-    async function remove(id: number) {
-        if (!r.token || busy || !confirm("Delete this storage suitability entry?"))
-            return;
-        setBusy(true);
-        try {
-            await apiFetch(`/storage-suitability/${id}`, {
-                method: "DELETE"
-            }, r.token);
-            setMessage("Storage suitability deleted.");
-            setError("");
-            await r.reload();
-        }
-        catch (err) {
-            setError(errorText(err));
-        }
-        finally {
-            setBusy(false);
-        }
+  }
+  async function remove(id: number) {
+    if (!r.token || busy || !confirm("Delete this storage suitability entry?")) return;
+    setBusy(true);
+    try {
+      await apiFetch(
+        `/storage-suitability/${id}`,
+        {
+          method: "DELETE",
+        },
+        r.token,
+      );
+      setMessage("Storage suitability deleted.");
+      setError("");
+      await r.reload();
+    } catch (err) {
+      setError(errorText(err));
+    } finally {
+      setBusy(false);
     }
-    return <div>
-    <h2>Storage suitability
-    </h2>
-    <AdminStatus error={error || r.error} success={message}/>
-    <form ref={editor.formRef} className="form-stack card admin-form" onSubmit={save}>
-    <div className="form-grid">
-    <label>ID to edit
-    <input name="id" type="number" min="1" onChange={editor.onIdChange}/>
-    </label>
-    <label>Commodity ID
-    <input name="commodity_id" type="number" min="1" required defaultValue={searchParams.get("commodity_id") ?? undefined}/>
-    </label>
-    <label>Market ID
-    <input name="market_id" type="number" min="1" required defaultValue={searchParams.get("market_id") ?? undefined}/>
-    </label>
-    <label>Price update ID
-    <input name="price_update_id" type="number" min="1"/>
-    </label>
-    <label>Status
-    <select name="suitability_status">{["good", "watch", "risky", "not_recommended"].map((x) => <option key={x}>{x}
-        </option>)}
-    </select>
-    </label>
-    <label>Import risk
-    <input name="import_risk"/>
-    </label>
-    <label>Oversupply risk
-    <input name="oversupply_risk"/>
-    </label>
-    <label>Spoilage risk
-    <input name="spoilage_risk"/>
-    </label>
-    <label>Buyer availability
-    <input name="buyer_availability"/>
-    </label>
-    </div>
-    <label>Quality/storage notes
-    <textarea name="quality_storage_notes"/>
-    </label>
-    <label>Summary
-    <textarea name="summary"/>
-    </label>
-    <AdminActionButton className="button" busy={busy}>Save storage suitability
-    </AdminActionButton>
-    </form>{r.loading ? <AdminLoading label="Loading storage suitability…"/> : <div className="admin-card-list">{r.data.map((x) => <article className="card" key={x.id}>
-            <span className="eyebrow">#{x.id}
-            </span>
-            <h3>{x.suitability_status}
-            </h3>
-            <p>{x.summary || "No summary"}
-            </p>
-            <small>{x.spoilage_risk || "No spoilage risk note"}
-            </small>
-            <br />
-            <StaleBadge updatedAt={x.updated_at}/>
-            <div className="button-row">
-            <AdminActionButton className="button button-small button-danger" busy={busy} onClick={() => void remove(x.id)}>Delete
-            </AdminActionButton>
-            </div>
-            </article>)}
-        </div>}
-    <AdminPagination page={r} label="Storage suitability"/>
-    </div>;
-}
-const COST_ITEM_SUGGESTIONS = ["Transport", "Sack", "Chemical", "Warehouse", "Security", "Market charges", "Loading/offloading", "Labour", "Other costs"];
-export function AdminCostBreakdownPage() {
-    const r = useAdminPagedList<CostBreakdown>("/cost-breakdowns/admin/page");
-    const [error, setError] = useState("");
-    const [message, setMessage] = useState("");
-    const [busy, setBusy] = useState(false);
-    const [searchParams] = useSearchParams();
-    // Each cost line is named by the admin (e.g. Sack, Chemical, Transport).
-    const [rows, setRows] = useState<{ key: number; name: string; amount: string }[]>([{ key: 0, name: "", amount: "" }]);
-    const [nextKey, setNextKey] = useState(1);
-    function fillRows(items: CostItem[]) {
-        const filled = items.map((item, index) => ({ key: nextKey + index, name: item.name, amount: String(item.amount) }));
-        setRows(filled.length ? filled : [{ key: nextKey, name: "", amount: "" }]);
-        setNextKey(nextKey + Math.max(filled.length, 1));
-    }
-    const editor = useAdminEditForm(r.data, r.loading, setError, { path: "/cost-breakdowns", token: r.token }, searchParams.get("id") ?? undefined,
-        (record) => fillRows(record?.cost_items ?? []));
-    function addRow() {
-        setRows([...rows, { key: nextKey, name: "", amount: "" }]);
-        setNextKey(nextKey + 1);
-    }
-    function changeRow(key: number, field: "name" | "amount", value: string) {
-        setRows(rows.map((row) => row.key === key ? { ...row, [field]: value } : row));
-    }
-    async function save(e: FormEvent<HTMLFormElement>) {
-        e.preventDefault();
-        if (!r.token || busy || !editor.canSubmit())
-            return;
-        const f = new FormData(e.currentTarget);
-        const id = String(f.get("id") || "").trim();
-        const filled = rows.filter((row) => row.name.trim() || row.amount.trim());
-        if (filled.some((row) => !row.name.trim())) {
-            setError("Give every cost a name, or clear its amount.");
-            return;
-        }
-        const payload = {
-            commodity_id: Number(f.get("commodity_id")),
-            market_id: Number(f.get("market_id")),
-            cost_items: filled.map((row) => ({ name: row.name.trim(), amount: row.amount.trim() || "0" })),
-            purchase_price_reference: Number(f.get("purchase_price_reference"))
-        };
-        setBusy(true);
-        try {
-            await apiFetch(id ? `/cost-breakdowns/${id}` : "/cost-breakdowns", {
-                method: id ? "PATCH" : "POST",
-                body: JSON.stringify(payload)
-            }, r.token);
-            setMessage(id ? "Cost breakdown updated." : "Cost breakdown created.");
-            setError("");
-            await r.reload();
-        }
-        catch (err) {
-            setError(errorText(err));
-        }
-        finally {
-            setBusy(false);
-        }
-    }
-    async function remove(id: number) {
-        if (!r.token || busy || !confirm("Delete this cost breakdown?"))
-            return;
-        setBusy(true);
-        try {
-            await apiFetch(`/cost-breakdowns/${id}`, {
-                method: "DELETE"
-            }, r.token);
-            setMessage("Cost breakdown deleted.");
-            setError("");
-            await r.reload();
-        }
-        catch (err) {
-            setError(errorText(err));
-        }
-        finally {
-            setBusy(false);
-        }
-    }
-    return <div>
-    <h2>Cost breakdown
-    </h2>
-    <p className="muted">Pinned to a commodity + market, so it stays attached and visible even after the price for that commodity/market changes.
-    </p>
-    <AdminStatus error={error || r.error} success={message}/>
-    <form ref={editor.formRef} className="form-stack card admin-form" onSubmit={save}>
-    <div className="form-grid">
-    <label>ID to edit
-    <input name="id" type="number" min="1" onChange={editor.onIdChange}/>
-    </label>
-    <label>Commodity ID
-    <input name="commodity_id" type="number" min="1" required defaultValue={searchParams.get("commodity_id") ?? undefined}/>
-    </label>
-    <label>Market ID
-    <input name="market_id" type="number" min="1" required defaultValue={searchParams.get("market_id") ?? undefined}/>
-    </label>
-    <label>Purchase price reference
-    <input name="purchase_price_reference" type="number" min="0" step="0.01" defaultValue="0" required/>
-    </label>
-    </div>
-    <fieldset className="form-stack">
-    <legend>Costs: pick an item from the list or type your own</legend>
-    {rows.map((row) => <div className="form-grid" key={row.key}>
-        <label>Item name
-        <input value={row.name} maxLength={100} list="cost-item-suggestions" placeholder="Pick from the list or type your own" onChange={(e) => changeRow(row.key, "name", e.target.value)}/>
-        </label>
-        <label>Amount (₦)
-        <input value={row.amount} type="number" min="0" step="0.01" placeholder="0" onChange={(e) => changeRow(row.key, "amount", e.target.value)}/>
-        </label>
-        <div className="button-row">
-        <button type="button" className="button button-small button-danger" onClick={() => setRows(rows.length > 1 ? rows.filter((x) => x.key !== row.key) : [{ key: nextKey, name: "", amount: "" }])}>Remove</button>
+  }
+  return (
+    <div>
+      <h2>Storage suitability</h2>
+      <AdminStatus error={error || r.error} success={message} />
+      <form ref={editor.formRef} className="form-stack card admin-form" onSubmit={save}>
+        <div className="form-grid">
+          <label>
+            ID to edit
+            <input name="id" type="number" min="1" onChange={editor.onIdChange} />
+          </label>
+          <label>
+            Commodity ID
+            <input
+              name="commodity_id"
+              type="number"
+              min="1"
+              required
+              defaultValue={searchParams.get("commodity_id") ?? undefined}
+            />
+          </label>
+          <label>
+            Market ID
+            <input
+              name="market_id"
+              type="number"
+              min="1"
+              required
+              defaultValue={searchParams.get("market_id") ?? undefined}
+            />
+          </label>
+          <label>
+            Price update ID
+            <input name="price_update_id" type="number" min="1" />
+          </label>
+          <label>
+            Status
+            <select name="suitability_status">
+              {["good", "watch", "risky", "not_recommended"].map((x) => (
+                <option key={x}>{x}</option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Import risk
+            <input name="import_risk" />
+          </label>
+          <label>
+            Oversupply risk
+            <input name="oversupply_risk" />
+          </label>
+          <label>
+            Spoilage risk
+            <input name="spoilage_risk" />
+          </label>
+          <label>
+            Buyer availability
+            <input name="buyer_availability" />
+          </label>
         </div>
-        </div>)}
-    {/* Suggestions only: any other name can still be typed. */}
-    <datalist id="cost-item-suggestions">{COST_ITEM_SUGGESTIONS.map((name) => <option key={name} value={name}/>)}</datalist>
-    <div className="button-row">
-    <button type="button" className="button button-secondary button-small" onClick={addRow}>+ Add another item</button>
+        <label>
+          Quality/storage notes
+          <textarea name="quality_storage_notes" />
+        </label>
+        <label>
+          Summary
+          <textarea name="summary" />
+        </label>
+        <AdminActionButton className="button" busy={busy}>
+          Save storage suitability
+        </AdminActionButton>
+      </form>
+      {r.loading ? (
+        <AdminLoading label="Loading storage suitability…" />
+      ) : (
+        <div className="admin-card-list">
+          {r.data.map((x) => (
+            <article className="card" key={x.id}>
+              <span className="eyebrow">#{x.id}</span>
+              <h3>{x.suitability_status}</h3>
+              <p>{x.summary || "No summary"}</p>
+              <small>{x.spoilage_risk || "No spoilage risk note"}</small>
+              <br />
+              <StaleBadge updatedAt={x.updated_at} />
+              <div className="button-row">
+                <AdminActionButton
+                  className="button button-small button-danger"
+                  busy={busy}
+                  onClick={() => void remove(x.id)}
+                >
+                  Delete
+                </AdminActionButton>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+      <AdminPagination page={r} label="Storage suitability" />
     </div>
-    </fieldset>
-    <AdminActionButton className="button" busy={busy}>Save cost breakdown
-    </AdminActionButton>
-    </form>{r.loading ? <AdminLoading label="Loading cost breakdowns…"/> : <div className="admin-card-list">{r.data.map((x) => <article className="card" key={x.id}>
-            <span className="eyebrow">#{x.id} · Commodity #{x.commodity_id} · Market #{x.market_id}
-            </span>
-            <h3>Total landing/storage: {x.total_estimated_landing_storage_cost}
-            </h3>
-            <p>Additional cost: {x.total_additional_cost}
-            </p>
-            <div className="button-row">
-            <AdminActionButton className="button button-small button-danger" busy={busy} onClick={() => void remove(x.id)}>Delete
-            </AdminActionButton>
+  );
+}
+const COST_ITEM_SUGGESTIONS = [
+  "Transport",
+  "Sack",
+  "Chemical",
+  "Warehouse",
+  "Security",
+  "Market charges",
+  "Loading/offloading",
+  "Labour",
+  "Other costs",
+];
+export function AdminCostBreakdownPage() {
+  const r = useAdminPagedList<CostBreakdown>("/cost-breakdowns/admin/page");
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [searchParams] = useSearchParams();
+  // Each cost line is named by the admin (e.g. Sack, Chemical, Transport).
+  const [rows, setRows] = useState<{ key: number; name: string; amount: string }[]>([{ key: 0, name: "", amount: "" }]);
+  const [nextKey, setNextKey] = useState(1);
+  function fillRows(items: CostItem[]) {
+    const filled = items.map((item, index) => ({ key: nextKey + index, name: item.name, amount: String(item.amount) }));
+    setRows(filled.length ? filled : [{ key: nextKey, name: "", amount: "" }]);
+    setNextKey(nextKey + Math.max(filled.length, 1));
+  }
+  const editor = useAdminEditForm(
+    r.data,
+    r.loading,
+    setError,
+    { path: "/cost-breakdowns", token: r.token },
+    searchParams.get("id") ?? undefined,
+    (record) => fillRows(record?.cost_items ?? []),
+  );
+  function addRow() {
+    setRows([...rows, { key: nextKey, name: "", amount: "" }]);
+    setNextKey(nextKey + 1);
+  }
+  function changeRow(key: number, field: "name" | "amount", value: string) {
+    setRows(rows.map((row) => (row.key === key ? { ...row, [field]: value } : row)));
+  }
+  async function save(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!r.token || busy || !editor.canSubmit()) return;
+    const f = new FormData(e.currentTarget);
+    const id = String(f.get("id") || "").trim();
+    const filled = rows.filter((row) => row.name.trim() || row.amount.trim());
+    if (filled.some((row) => !row.name.trim())) {
+      setError("Give every cost a name, or clear its amount.");
+      return;
+    }
+    const payload = {
+      commodity_id: Number(f.get("commodity_id")),
+      market_id: Number(f.get("market_id")),
+      cost_items: filled.map((row) => ({ name: row.name.trim(), amount: row.amount.trim() || "0" })),
+      purchase_price_reference: Number(f.get("purchase_price_reference")),
+    };
+    setBusy(true);
+    try {
+      await apiFetch(
+        id ? `/cost-breakdowns/${id}` : "/cost-breakdowns",
+        {
+          method: id ? "PATCH" : "POST",
+          body: JSON.stringify(payload),
+        },
+        r.token,
+      );
+      setMessage(id ? "Cost breakdown updated." : "Cost breakdown created.");
+      setError("");
+      await r.reload();
+    } catch (err) {
+      setError(errorText(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function remove(id: number) {
+    if (!r.token || busy || !confirm("Delete this cost breakdown?")) return;
+    setBusy(true);
+    try {
+      await apiFetch(
+        `/cost-breakdowns/${id}`,
+        {
+          method: "DELETE",
+        },
+        r.token,
+      );
+      setMessage("Cost breakdown deleted.");
+      setError("");
+      await r.reload();
+    } catch (err) {
+      setError(errorText(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <div>
+      <h2>Cost breakdown</h2>
+      <p className="muted">
+        Pinned to a commodity + market, so it stays attached and visible even after the price for that commodity/market
+        changes.
+      </p>
+      <AdminStatus error={error || r.error} success={message} />
+      <form ref={editor.formRef} className="form-stack card admin-form" onSubmit={save}>
+        <div className="form-grid">
+          <label>
+            ID to edit
+            <input name="id" type="number" min="1" onChange={editor.onIdChange} />
+          </label>
+          <label>
+            Commodity ID
+            <input
+              name="commodity_id"
+              type="number"
+              min="1"
+              required
+              defaultValue={searchParams.get("commodity_id") ?? undefined}
+            />
+          </label>
+          <label>
+            Market ID
+            <input
+              name="market_id"
+              type="number"
+              min="1"
+              required
+              defaultValue={searchParams.get("market_id") ?? undefined}
+            />
+          </label>
+          <label>
+            Purchase price reference
+            <input name="purchase_price_reference" type="number" min="0" step="0.01" defaultValue="0" required />
+          </label>
+        </div>
+        <fieldset className="form-stack">
+          <legend>Costs: pick an item from the list or type your own</legend>
+          {rows.map((row) => (
+            <div className="form-grid" key={row.key}>
+              <label>
+                Item name
+                <input
+                  value={row.name}
+                  maxLength={100}
+                  list="cost-item-suggestions"
+                  placeholder="Pick from the list or type your own"
+                  onChange={(e) => changeRow(row.key, "name", e.target.value)}
+                />
+              </label>
+              <label>
+                Amount (₦)
+                <input
+                  value={row.amount}
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="0"
+                  onChange={(e) => changeRow(row.key, "amount", e.target.value)}
+                />
+              </label>
+              <div className="button-row">
+                <button
+                  type="button"
+                  className="button button-small button-danger"
+                  onClick={() =>
+                    setRows(
+                      rows.length > 1
+                        ? rows.filter((x) => x.key !== row.key)
+                        : [{ key: nextKey, name: "", amount: "" }],
+                    )
+                  }
+                >
+                  Remove
+                </button>
+              </div>
             </div>
-            </article>)}
-        </div>}
-    <AdminPagination page={r} label="Cost breakdown"/>
-    </div>;
+          ))}
+          {/* Suggestions only: any other name can still be typed. */}
+          <datalist id="cost-item-suggestions">
+            {COST_ITEM_SUGGESTIONS.map((name) => (
+              <option key={name} value={name} />
+            ))}
+          </datalist>
+          <div className="button-row">
+            <button type="button" className="button button-secondary button-small" onClick={addRow}>
+              + Add another item
+            </button>
+          </div>
+        </fieldset>
+        <AdminActionButton className="button" busy={busy}>
+          Save cost breakdown
+        </AdminActionButton>
+      </form>
+      {r.loading ? (
+        <AdminLoading label="Loading cost breakdowns…" />
+      ) : (
+        <div className="admin-card-list">
+          {r.data.map((x) => (
+            <article className="card" key={x.id}>
+              <span className="eyebrow">
+                #{x.id} · Commodity #{x.commodity_id} · Market #{x.market_id}
+              </span>
+              <h3>Total landing/storage: {x.total_estimated_landing_storage_cost}</h3>
+              <p>Additional cost: {x.total_additional_cost}</p>
+              <div className="button-row">
+                <AdminActionButton
+                  className="button button-small button-danger"
+                  busy={busy}
+                  onClick={() => void remove(x.id)}
+                >
+                  Delete
+                </AdminActionButton>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+      <AdminPagination page={r} label="Cost breakdown" />
+    </div>
+  );
 }

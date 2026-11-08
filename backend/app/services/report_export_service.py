@@ -144,21 +144,24 @@ def iter_price_report_csv(items: Iterable[PriceUpdate]) -> Iterator[str]:
         output.seek(0)
         output.truncate(0)
         writer.writerow(
-            [_spreadsheet_safe(value) for value in [
-                item.commodity.name,
-                item.market.name,
-                item.price_low,
-                item.price_high,
-                item.previous_price_low if item.previous_price_low is not None else "",
-                item.previous_price_high if item.previous_price_high is not None else "",
-                item.movement,
-                item.update_date_time.isoformat(),
-                item.confidence_level,
-                item.possible_meaning or "",
-                item.suggested_action or "",
-                _format_market_signals(item),
-                _format_quality_signals(item),
-            ]]
+            [
+                _spreadsheet_safe(value)
+                for value in [
+                    item.commodity.name,
+                    item.market.name,
+                    item.price_low,
+                    item.price_high,
+                    item.previous_price_low if item.previous_price_low is not None else "",
+                    item.previous_price_high if item.previous_price_high is not None else "",
+                    item.movement,
+                    item.update_date_time.isoformat(),
+                    item.confidence_level,
+                    item.possible_meaning or "",
+                    item.suggested_action or "",
+                    _format_market_signals(item),
+                    _format_quality_signals(item),
+                ]
+            ]
         )
         yield output.getvalue()
 

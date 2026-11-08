@@ -66,7 +66,9 @@ class WatchlistAlertServiceTests(unittest.TestCase):
         self.db.refresh(self.price_update)
 
         self.sent_emails: list[dict] = []
-        self.original_send_email = watchlist_alert_service.send_email if hasattr(watchlist_alert_service, "send_email") else None
+        self.original_send_email = (
+            watchlist_alert_service.send_email if hasattr(watchlist_alert_service, "send_email") else None
+        )
 
     def tearDown(self) -> None:
         self.db.close()
@@ -149,24 +151,38 @@ class WatchlistAlertServiceTests(unittest.TestCase):
         self.watcher.phone = "+2348000000001"
         self.market_watcher.phone = "+2348000000002"
         self.db.commit()
+
         def email(*, recipient, **kwargs):
             if recipient == self.watcher.email:
                 raise RuntimeError("synthetic email failure")
-        with patch("app.services.email_service.send_email", side_effect=email) as mail, \
-                patch("app.services.push_service.send_push_to_user", return_value=1) as push, \
-                patch("app.services.whatsapp_service.send_whatsapp_message", return_value=None) as whatsapp:
+
+        with (
+            patch("app.services.email_service.send_email", side_effect=email) as mail,
+            patch("app.services.push_service.send_push_to_user", return_value=1) as push,
+            patch("app.services.whatsapp_service.send_whatsapp_message", return_value=None) as whatsapp,
+        ):
             self.assertEqual(watchlist_alert_service.notify_watchlist_subscribers(self.db, self.price_update), 1)
         self.assertEqual(mail.call_count, 2)
         self.assertCountEqual([call.args[1] for call in push.call_args_list], [self.watcher.id, self.market_watcher.id])
-        self.assertCountEqual([call.kwargs["to_phone"] for call in whatsapp.call_args_list], [self.watcher.phone, self.market_watcher.phone])
+        self.assertCountEqual(
+            [call.kwargs["to_phone"] for call in whatsapp.call_args_list],
+            [self.watcher.phone, self.market_watcher.phone],
+        )
 
     def test_push_and_whatsapp_failures_do_not_block_other_channels_or_watchers(self) -> None:
         self.watcher.phone = "+2348000000001"
         self.market_watcher.phone = "+2348000000002"
         self.db.commit()
-        with patch("app.services.email_service.send_email", return_value=None) as mail, \
-                patch("app.services.push_service.send_push_to_user", side_effect=RuntimeError("synthetic push failure")) as push, \
-                patch("app.services.whatsapp_service.send_whatsapp_message", side_effect=RuntimeError("synthetic WhatsApp failure")) as whatsapp:
+        with (
+            patch("app.services.email_service.send_email", return_value=None) as mail,
+            patch(
+                "app.services.push_service.send_push_to_user", side_effect=RuntimeError("synthetic push failure")
+            ) as push,
+            patch(
+                "app.services.whatsapp_service.send_whatsapp_message",
+                side_effect=RuntimeError("synthetic WhatsApp failure"),
+            ) as whatsapp,
+        ):
             self.assertEqual(watchlist_alert_service.notify_watchlist_subscribers(self.db, self.price_update), 2)
         self.assertEqual(mail.call_count, 2)
         self.assertEqual(push.call_count, 2)

@@ -20,6 +20,11 @@ jobs:
         working-directory: backend
         run: pip install -r requirements-dev.txt
 
+      - name: Check Python code is tidy (layout and common mistakes)
+        run: |
+          ruff format --check .
+          ruff check .
+
       - name: Run synthetic backend test harness
         run: python -I -B tools/local-test/guard.py
 
@@ -72,6 +77,10 @@ jobs:
       - name: Install website dependencies
         working-directory: frontend
         run: npm ci
+
+      - name: Check website code is tidy
+        working-directory: frontend
+        run: npm run format:check
 
       - name: Build website (type check and bundle)
         working-directory: frontend

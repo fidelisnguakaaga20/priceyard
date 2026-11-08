@@ -1,4 +1,5 @@
 """The developer API map (/docs, /redoc, /openapi.json) must not be public on the live server."""
+
 import unittest
 
 from fastapi.testclient import TestClient

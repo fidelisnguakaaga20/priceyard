@@ -30,10 +30,17 @@ export function FeedbackPage() {
 
   const pickScreenshot = async (file: File | undefined) => {
     const sequence = ++screenshotSequence.current;
-    setScreenshot(null); setScreenshotName("");
+    setScreenshot(null);
+    setScreenshotName("");
     if (!file) return;
-    if (!file.type.startsWith("image/")) { setError("Please choose an image file."); return; }
-    if (file.size > MAX_SCREENSHOT_BYTES) { setError("Screenshot must be smaller than 2MB."); return; }
+    if (!file.type.startsWith("image/")) {
+      setError("Please choose an image file.");
+      return;
+    }
+    if (file.size > MAX_SCREENSHOT_BYTES) {
+      setError("Screenshot must be smaller than 2MB.");
+      return;
+    }
     try {
       const data = await readFileAsDataUrl(file);
       if (sequence !== screenshotSequence.current) return;
@@ -87,47 +94,73 @@ export function FeedbackPage() {
     }
   };
 
-  return <section className="page page-section narrow">
-    <div className="page-title">
-      <span className="eyebrow">User feedback</span>
-      <h1>Rate your PriceYard experience</h1>
-      <p>Your rating must be between 1 and 5. Share a complaint or suggestion to help improve PriceYard.</p>
-    </div>
-    <form className="form-stack card" onSubmit={submit}>
-      <fieldset>
-        <legend>Overall rating</legend>
-        <div className="rating-row">
-          {[1, 2, 3, 4, 5].map((value) =>
-            <label key={value} className={rating === value ? "rating-option selected" : "rating-option"}>
-              <input type="radio" name="rating" checked={rating === value} onChange={() => setRating(value)} />
-              {value} ★
-            </label>
-          )}
-        </div>
-      </fieldset>
-      <label>
-        {rating >= 4 ? "What do you like about PriceYard? Your comment might be featured on our homepage." : "Complaint or suggestion"}
-        <textarea rows={4} value={suggestion} onChange={(e) => setSuggestion(e.target.value)} placeholder={rating >= 4 ? "e.g. it helped me buy or sell at a better price…" : "Tell us what went wrong or what we could do better…"} />
-      </label>
-      <label>
-        Add a screenshot (optional)
-        <input type="file" accept="image/*" onChange={(e) => void pickScreenshot(e.target.files?.[0])} />
-        <small className="muted">Up to 2MB. Helpful if you're reporting something that's easier to show than explain.</small>
-      </label>
-      {screenshot && <p className="muted">📎 {screenshotName} attached — <button type="button" className="text-link-button" onClick={() => void pickScreenshot(undefined)}>remove</button></p>}
-      <label>
-        Continue using?
-        <select value={continueUsing === null ? "" : String(continueUsing)} onChange={(e) => setContinueUsing(e.target.value === "" ? null : e.target.value === "true")}>
-          <option value="">No answer</option>
-          <option value="true">Yes</option>
-          <option value="false">No</option>
-        </select>
-      </label>
-      {message && <div className="status-box success">{message}</div>}
-      {error && <div className="status-box error">{error}</div>}
-      <button className="button" disabled={busy}>
-        {busy ? <ButtonSpinner label="Please wait…" /> : "Submit feedback"}
-      </button>
-    </form>
-  </section>;
+  return (
+    <section className="page page-section narrow">
+      <div className="page-title">
+        <span className="eyebrow">User feedback</span>
+        <h1>Rate your PriceYard experience</h1>
+        <p>Your rating must be between 1 and 5. Share a complaint or suggestion to help improve PriceYard.</p>
+      </div>
+      <form className="form-stack card" onSubmit={submit}>
+        <fieldset>
+          <legend>Overall rating</legend>
+          <div className="rating-row">
+            {[1, 2, 3, 4, 5].map((value) => (
+              <label key={value} className={rating === value ? "rating-option selected" : "rating-option"}>
+                <input type="radio" name="rating" checked={rating === value} onChange={() => setRating(value)} />
+                {value} ★
+              </label>
+            ))}
+          </div>
+        </fieldset>
+        <label>
+          {rating >= 4
+            ? "What do you like about PriceYard? Your comment might be featured on our homepage."
+            : "Complaint or suggestion"}
+          <textarea
+            rows={4}
+            value={suggestion}
+            onChange={(e) => setSuggestion(e.target.value)}
+            placeholder={
+              rating >= 4
+                ? "e.g. it helped me buy or sell at a better price…"
+                : "Tell us what went wrong or what we could do better…"
+            }
+          />
+        </label>
+        <label>
+          Add a screenshot (optional)
+          <input type="file" accept="image/*" onChange={(e) => void pickScreenshot(e.target.files?.[0])} />
+          <small className="muted">
+            Up to 2MB. Helpful if you're reporting something that's easier to show than explain.
+          </small>
+        </label>
+        {screenshot && (
+          <p className="muted">
+            📎 {screenshotName}
+            {" attached — "}
+            <button type="button" className="text-link-button" onClick={() => void pickScreenshot(undefined)}>
+              remove
+            </button>
+          </p>
+        )}
+        <label>
+          Continue using?
+          <select
+            value={continueUsing === null ? "" : String(continueUsing)}
+            onChange={(e) => setContinueUsing(e.target.value === "" ? null : e.target.value === "true")}
+          >
+            <option value="">No answer</option>
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+          </select>
+        </label>
+        {message && <div className="status-box success">{message}</div>}
+        {error && <div className="status-box error">{error}</div>}
+        <button className="button" disabled={busy}>
+          {busy ? <ButtonSpinner label="Please wait…" /> : "Submit feedback"}
+        </button>
+      </form>
+    </section>
+  );
 }

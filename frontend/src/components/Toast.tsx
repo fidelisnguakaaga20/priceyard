@@ -40,12 +40,20 @@ export function Toast({ kind, message, action, onDismiss }: ToastProps) {
         onFocus={stopTimer}
         onBlur={startTimer}
       >
-        <span className="toast-icon" aria-hidden="true">{kind === "success" ? "✓" : "!"}</span>
+        <span className="toast-icon" aria-hidden="true">
+          {kind === "success" ? "✓" : "!"}
+        </span>
         <span className="toast-message">
           {message}
-          {action && <Link className="toast-action" to={action.to} onClick={onDismiss}>{action.label}</Link>}
+          {action && (
+            <Link className="toast-action" to={action.to} onClick={onDismiss}>
+              {action.label}
+            </Link>
+          )}
         </span>
-        <button className="toast-dismiss" type="button" onClick={onDismiss} aria-label="Dismiss message">×</button>
+        <button className="toast-dismiss" type="button" onClick={onDismiss} aria-label="Dismiss message">
+          ×
+        </button>
       </div>
     </div>
   );

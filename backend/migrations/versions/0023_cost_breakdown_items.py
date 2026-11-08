@@ -7,6 +7,7 @@ Revision ID: 0023_cost_breakdown_items
 Revises: 0022_login_revocation
 Create Date: 2026-11-04
 """
+
 import json
 from decimal import Decimal
 
@@ -33,13 +34,20 @@ def upgrade():
     bind = op.get_bind()
     columns = ", ".join(column for column, _ in FIXED)
     for row in bind.execute(sa.text(f"SELECT id, {columns} FROM cost_breakdowns")).mappings().all():
-        items = [{"name": label, "amount": f"{Decimal(row[column]):.2f}"}
-                 for column, label in FIXED if row[column] and Decimal(row[column]) > 0]
+        items = [
+            {"name": label, "amount": f"{Decimal(row[column]):.2f}"}
+            for column, label in FIXED
+            if row[column] and Decimal(row[column]) > 0
+        ]
         if not items:
             continue
         zeroed = ", ".join(f"{column} = 0" for column, _ in FIXED)
-        bind.execute(sa.text(f"UPDATE cost_breakdowns SET cost_items = :items, {zeroed} WHERE id = :id")
-                     .bindparams(sa.bindparam("items", type_=sa.JSON())), {"items": items, "id": row["id"]})
+        bind.execute(
+            sa.text(f"UPDATE cost_breakdowns SET cost_items = :items, {zeroed} WHERE id = :id").bindparams(
+                sa.bindparam("items", type_=sa.JSON())
+            ),
+            {"items": items, "id": row["id"]},
+        )
 
 
 def downgrade():
@@ -54,6 +62,7 @@ def downgrade():
             values[labels.get(item["name"], "other_costs")] += Decimal(item["amount"])
         assignments = ", ".join(f"{column} = {column} + :{column}" for column in values)
         statement = sa.text(f"UPDATE cost_breakdowns SET {assignments} WHERE id = :id").bindparams(
-            *(sa.bindparam(column, type_=sa.Numeric(14, 2)) for column in values))
+            *(sa.bindparam(column, type_=sa.Numeric(14, 2)) for column in values)
+        )
         bind.execute(statement, {**values, "id": row["id"]})
     op.drop_column("cost_breakdowns", "cost_items")

@@ -27,9 +27,7 @@ def get_faq_for_admin(db: Session, faq_id: int, *, lock: bool = False) -> FAQIte
 
 
 def get_published_faq(db: Session, faq_id: int) -> FAQItem:
-    item = db.scalar(
-        select(FAQItem).where(FAQItem.id == faq_id, FAQItem.is_published.is_(True))
-    )
+    item = db.scalar(select(FAQItem).where(FAQItem.id == faq_id, FAQItem.is_published.is_(True)))
     if item is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="FAQ item not found")
     return item
@@ -38,9 +36,7 @@ def get_published_faq(db: Session, faq_id: int) -> FAQItem:
 def list_published_faqs(db: Session) -> list[FAQItem]:
     return list(
         db.scalars(
-            select(FAQItem)
-            .where(FAQItem.is_published.is_(True))
-            .order_by(FAQItem.category.asc(), FAQItem.id.asc())
+            select(FAQItem).where(FAQItem.is_published.is_(True)).order_by(FAQItem.category.asc(), FAQItem.id.asc())
         ).all()
     )
 

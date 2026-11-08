@@ -11,6 +11,7 @@ from app.models.audit_log import AuditLog
 
 TRIAL_DURATION_DAYS = 14
 
+
 def utc_now() -> datetime:
     return datetime.now(timezone.utc)
 
@@ -20,7 +21,12 @@ def lock_subscription_state(db: Session, user_id: int) -> tuple[User, Subscripti
     user = db.scalar(select(User).where(User.id == user_id).with_for_update().execution_options(populate_existing=True))
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
-    subscription = db.scalar(select(Subscription).where(Subscription.user_id == user_id).with_for_update().execution_options(populate_existing=True))
+    subscription = db.scalar(
+        select(Subscription)
+        .where(Subscription.user_id == user_id)
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    )
     return user, subscription
 
 
@@ -75,9 +81,14 @@ def expire_trial_if_needed(db: Session, subscription: Subscription, *, now: date
     trial_end = subscription.trial_ends_at
     if trial_end is not None and trial_end.tzinfo is None:
         trial_end = trial_end.replace(tzinfo=timezone.utc)
-    due = (subscription.status == "trial" and trial_end is not None and current_time >= trial_end
-           or subscription.status == "active" and subscription.end_date is not None
-           and current_time.date() > subscription.end_date)
+    due = (
+        subscription.status == "trial"
+        and trial_end is not None
+        and current_time >= trial_end
+        or subscription.status == "active"
+        and subscription.end_date is not None
+        and current_time.date() > subscription.end_date
+    )
     if not due:
         return subscription
 
@@ -142,15 +153,20 @@ def expire_subscriptions_for_listing(db: Session) -> None:
     The sweep commits atomically before any paged/streamed response is produced.
     """
     now = utc_now()
-    due = or_(and_(Subscription.status == "trial", Subscription.trial_ends_at <= now),
-              and_(Subscription.status == "active", Subscription.end_date < now.date()))
+    due = or_(
+        and_(Subscription.status == "trial", Subscription.trial_ends_at <= now),
+        and_(Subscription.status == "active", Subscription.end_date < now.date()),
+    )
     try:
         ceiling = db.scalar(select(func.max(Subscription.user_id))) or 0
         cursor = 0
         while True:
-            users = db.scalars(select(Subscription.user_id).where(
-                due, Subscription.user_id > cursor, Subscription.user_id <= ceiling
-            ).order_by(Subscription.user_id).limit(100)).all()
+            users = db.scalars(
+                select(Subscription.user_id)
+                .where(due, Subscription.user_id > cursor, Subscription.user_id <= ceiling)
+                .order_by(Subscription.user_id)
+                .limit(100)
+            ).all()
             if not users:
                 break
             for user_id in users:
@@ -179,7 +195,9 @@ def list_subscriptions(db: Session) -> list[Subscription]:
     return list(db.scalars(select(Subscription).order_by(Subscription.id)).all())
 
 
-def update_subscription_status(db: Session, subscription: Subscription, new_status: str, *, commit: bool = True) -> Subscription:
+def update_subscription_status(
+    db: Session, subscription: Subscription, new_status: str, *, commit: bool = True
+) -> Subscription:
     now = utc_now()
 
     if new_status == "trial":
@@ -232,7 +250,9 @@ def update_subscription_status(db: Session, subscription: Subscription, new_stat
 PAID_PLAN_DURATIONS_DAYS = {"monthly": 30, "seasonal": 90}
 
 
-def activate_paid_subscription(db: Session, subscription: Subscription, *, plan: str, now: datetime | None = None, commit: bool = True) -> Subscription:
+def activate_paid_subscription(
+    db: Session, subscription: Subscription, *, plan: str, now: datetime | None = None, commit: bool = True
+) -> Subscription:
     """Activate paid access for a completed payment. Distinct from
     update_subscription_status's "active" branch (used for manual admin grants,
     which stay indefinite/end_date=None) - a payment always has a real
@@ -275,7 +295,12 @@ def apply_referral_reward(db: Session, referrer: User, *, commit: bool = True) -
     to trial/free accounts - active/expired/cancelled subscriptions are left untouched
     since extra "trial days" has no meaning for them."""
     db.scalar(select(User).where(User.id == referrer.id).with_for_update().execution_options(populate_existing=True))
-    subscription = db.scalar(select(Subscription).where(Subscription.user_id == referrer.id).with_for_update().execution_options(populate_existing=True))
+    subscription = db.scalar(
+        select(Subscription)
+        .where(Subscription.user_id == referrer.id)
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    )
     if subscription is None:
         return False
 
@@ -286,12 +311,18 @@ def apply_referral_reward(db: Session, referrer: User, *, commit: bool = True) -
         # The parent-account lock above serializes this check with registration's
         # atomic award/audit commit. Count known awards only; never rewrite days
         # or infer missing legacy evidence. The window uses elapsed UTC time.
-        recent = db.scalar(select(func.count(AuditLog.id)).where(
-            AuditLog.user_id == referrer.id, AuditLog.action == "referral.reward_granted",
-            AuditLog.table_name == "subscriptions",
-            AuditLog.created_at > now - timedelta(days=REFERRAL_REWARD_WINDOW_DAYS),
-            AuditLog.created_at <= now,
-        )) or 0
+        recent = (
+            db.scalar(
+                select(func.count(AuditLog.id)).where(
+                    AuditLog.user_id == referrer.id,
+                    AuditLog.action == "referral.reward_granted",
+                    AuditLog.table_name == "subscriptions",
+                    AuditLog.created_at > now - timedelta(days=REFERRAL_REWARD_WINDOW_DAYS),
+                    AuditLog.created_at <= now,
+                )
+            )
+            or 0
+        )
         if recent >= REFERRAL_REWARD_LIMIT:
             return False
     if subscription.status == "trial":

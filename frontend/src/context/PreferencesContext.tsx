@@ -58,7 +58,9 @@ export function PreferencesProvider({ children }: { children: React.ReactNode })
   const [darkOverride, setDarkOverride] = useState<boolean | null>(() => readStoredTheme());
   const darkMode = darkOverride ?? systemPrefersDark();
 
-  useEffect(() => { writeStoredBoolean(DATA_SAVER_KEY, dataSaver); }, [dataSaver]);
+  useEffect(() => {
+    writeStoredBoolean(DATA_SAVER_KEY, dataSaver);
+  }, [dataSaver]);
   useEffect(() => {
     writeStoredBoolean(EASY_READING_KEY, easyReading);
     document.documentElement.classList.toggle("easy-reading", easyReading);

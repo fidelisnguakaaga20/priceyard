@@ -4,6 +4,7 @@ Revision ID: 0021_feedback_screenshot
 Revises: 0020_cost_breakdown_cm
 Create Date: 2026-10-10
 """
+
 from typing import Sequence, Union
 
 from alembic import op

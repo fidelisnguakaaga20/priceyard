@@ -6,6 +6,7 @@ Sentry, which emails the owner. When it is not set, nothing happens at all.
 Privacy: no passwords, cookies, login tokens, request bodies, visitor IP
 addresses or stack variables are ever sent - only where in the code it broke.
 """
+
 import os
 import re
 

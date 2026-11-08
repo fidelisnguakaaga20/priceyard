@@ -8,6 +8,7 @@ from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
 class CostItem(BaseModel):
     """One admin-named cost line, e.g. Sack or Chemical."""
+
     name: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=100)]
     amount: Decimal = Field(ge=0, max_digits=14, decimal_places=2)
 

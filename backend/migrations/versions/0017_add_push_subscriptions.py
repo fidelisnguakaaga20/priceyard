@@ -4,6 +4,7 @@ Revision ID: 0017_add_push_subscriptions
 Revises: 0016_add_activity_events
 Create Date: 2026-10-06
 """
+
 from typing import Sequence, Union
 
 from alembic import op

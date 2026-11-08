@@ -3,6 +3,7 @@
 Never contacts a database or provider. Refuses pre-existing Docker/WSL activity
 and configuration; temporary configuration is removed only after exact checks.
 """
+
 import csv
 import ctypes
 import hashlib
@@ -30,8 +31,7 @@ NO_WINDOW = subprocess.CREATE_NO_WINDOW
 
 
 def scrubbed_environment():
-    allowed = ("SYSTEMROOT", "WINDIR", "USERPROFILE", "APPDATA", "LOCALAPPDATA",
-               "TEMP", "TMP", "PATH")
+    allowed = ("SYSTEMROOT", "WINDIR", "USERPROFILE", "APPDATA", "LOCALAPPDATA", "TEMP", "TMP", "PATH")
     result = {key: os.environ[key] for key in allowed if key in os.environ}
     result["PYTHONDONTWRITEBYTECODE"] = "1"
     return result
@@ -39,19 +39,29 @@ def scrubbed_environment():
 
 def protected(path):
     from ctypes import wintypes
+
     getter = ctypes.WinDLL("kernel32", use_last_error=True).GetFileAttributesW
     getter.argtypes, getter.restype = [wintypes.LPCWSTR], wintypes.DWORD
     attrs = getter(str(path))
-    if attrs == 0xffffffff or attrs & 0x400 or not attrs & 0x4000:
+    if attrs == 0xFFFFFFFF or attrs & 0x400 or not attrs & 0x4000:
         raise RuntimeError("EFS_PROTECTION_REQUIRED")
 
 
 def available_memory():
     class Memory(ctypes.Structure):
         _fields_ = [("length", ctypes.c_ulong), ("load", ctypes.c_ulong)] + [
-            (field, ctypes.c_ulonglong) for field in (
-                "total_physical", "available_physical", "total_page", "available_page",
-                "total_virtual", "available_virtual", "available_extended")]
+            (field, ctypes.c_ulonglong)
+            for field in (
+                "total_physical",
+                "available_physical",
+                "total_page",
+                "available_page",
+                "total_virtual",
+                "available_virtual",
+                "available_extended",
+            )
+        ]
+
     value = Memory()
     value.length = ctypes.sizeof(value)
     if not ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(value)):
@@ -66,15 +76,20 @@ def main():
     journal_path = ROOT / ("0022-resource-run-" + stamp + ".json")
     archive_path = ROOT / ("0022-resource-wslconfig-" + stamp + ".txt")
     log_path = RUN / ("0022-controller-" + stamp + "-private.log")
-    journal = {"status": "failed", "production_connection": False,
-               "original_wslconfig_absent": False, "temporary_config_created": False,
-               "temporary_config_sha256": CONFIG_SHA, "desktop_started_by_runner": False,
-               "desktop_cleanup_passed": False, "temporary_config_removed": False}
+    journal = {
+        "status": "failed",
+        "production_connection": False,
+        "original_wslconfig_absent": False,
+        "temporary_config_created": False,
+        "temporary_config_sha256": CONFIG_SHA,
+        "desktop_started_by_runner": False,
+        "desktop_cleanup_passed": False,
+        "temporary_config_removed": False,
+    }
     started = False
 
     def command(args, timeout=10):
-        return subprocess.run(args, env=env, capture_output=True, timeout=timeout,
-                              creationflags=NO_WINDOW)
+        return subprocess.run(args, env=env, capture_output=True, timeout=timeout, creationflags=NO_WINDOW)
 
     def save():
         journal_path.write_text(json.dumps(journal, indent=2) + "\n", encoding="utf-8")
@@ -90,8 +105,7 @@ def main():
         result = command([TASKLIST, "/FO", "CSV", "/NH"])
         if result.returncode:
             raise RuntimeError("PROCESS_STATE_CHECK_FAILED")
-        return {row[0].lower() for row in csv.reader(
-            io.StringIO(result.stdout.decode("mbcs"))) if row}
+        return {row[0].lower() for row in csv.reader(io.StringIO(result.stdout.decode("mbcs"))) if row}
 
     def stop_own_docker_fallback():
         journal["desktop_cleanup_fallback_used"] = True
@@ -121,15 +135,14 @@ foreach($item in $verified) {
   catch { if(Get-Process -Id $item.Id -ErrorAction SilentlyContinue) { throw } }
 }
 """.replace("LAUNCH_EPOCH_MS", str(journal["desktop_launch_epoch_ms"]))
-        return command([POWERSHELL, "-NoProfile", "-NonInteractive", "-Command", script],
-                       timeout=15).returncode == 0
+        return command([POWERSHELL, "-NoProfile", "-NonInteractive", "-Command", script], timeout=15).returncode == 0
 
     try:
         for path in (PYTHON, CONTROLLER, DESKTOP):
             if not path.is_file():
                 raise RuntimeError("REQUIRED_LOCAL_TOOL_MISSING")
         protected(RUN)
-        if available_memory() < 3 * 1024 ** 3:
+        if available_memory() < 3 * 1024**3:
             raise RuntimeError("THREE_GIB_AVAILABLE_RAM_REQUIRED")
         if os.path.lexists(config):
             raise RuntimeError("EXISTING_WSLCONFIG_PRESERVED")
@@ -148,15 +161,25 @@ foreach($item in $verified) {
         startup.wShowWindow = subprocess.SW_HIDE
         journal["desktop_launch_epoch_ms"] = int(time.time() * 1000)
         save()
-        process = subprocess.Popen([str(DESKTOP)], env=env, startupinfo=startup,
-                                   creationflags=NO_WINDOW, stdout=subprocess.DEVNULL,
-                                   stderr=subprocess.DEVNULL)
+        process = subprocess.Popen(
+            [str(DESKTOP)],
+            env=env,
+            startupinfo=startup,
+            creationflags=NO_WINDOW,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
         started = True
         journal["desktop_started_by_runner"] = True
         journal["desktop_launcher_pid"] = process.pid
         save()
-        base = [CLI, "--config", str(ROOT / "docker-feasibility-cli"),
-                "--host", "npipe:////./pipe/dockerDesktopLinuxEngine"]
+        base = [
+            CLI,
+            "--config",
+            str(ROOT / "docker-feasibility-cli"),
+            "--host",
+            "npipe:////./pipe/dockerDesktopLinuxEngine",
+        ]
         deadline = time.monotonic() + 90
         while True:
             remaining = deadline - time.monotonic()
@@ -173,9 +196,14 @@ foreach($item in $verified) {
             time.sleep(min(5, max(0, deadline - time.monotonic())))
         with log_path.open("xb") as output:
             protected(log_path)  # Check protection before allowing child output.
-            child = subprocess.Popen([str(PYTHON), "-B", str(CONTROLLER)], cwd=REPO,
-                                     env=env, creationflags=NO_WINDOW,
-                                     stdout=output, stderr=subprocess.STDOUT)
+            child = subprocess.Popen(
+                [str(PYTHON), "-B", str(CONTROLLER)],
+                cwd=REPO,
+                env=env,
+                creationflags=NO_WINDOW,
+                stdout=output,
+                stderr=subprocess.STDOUT,
+            )
             try:
                 code = child.wait(timeout=240)
             except subprocess.TimeoutExpired:
@@ -199,14 +227,16 @@ foreach($item in $verified) {
                 if "docker-desktop" in running_distros():
                     command([WSL, "--terminate", "docker-desktop"], timeout=20)
                 journal["desktop_cleanup_passed"] = (
-                    "docker-desktop" not in running_distros() and not process_names() & busy)
+                    "docker-desktop" not in running_distros() and not process_names() & busy
+                )
             except Exception:
                 journal["desktop_cleanup_passed"] = False
             if not journal["desktop_cleanup_passed"]:
                 try:
                     fallback = stop_own_docker_fallback()
                     journal["desktop_cleanup_passed"] = (
-                        fallback and not process_names() & busy and not running_distros())
+                        fallback and not process_names() & busy and not running_distros()
+                    )
                 except Exception:
                     journal["desktop_cleanup_passed"] = False
         if journal["temporary_config_created"]:
@@ -230,8 +260,11 @@ foreach($item in $verified) {
             journal["status"] = "failed"
         save()
     passed = journal["status"] == "passed"
-    print("PASSED: isolated 0022 rehearsal and resource cleanup." if passed else
-          "STOPPED: private local evidence preserved; no production changes.")
+    print(
+        "PASSED: isolated 0022 rehearsal and resource cleanup."
+        if passed
+        else "STOPPED: private local evidence preserved; no production changes."
+    )
     return 0 if passed else 1
 
 

@@ -4,6 +4,7 @@ The offline Alembic environment deliberately does not import app configuration,
 read dotenv files, or create a database connection. The runtime callback receives
 only the existing network-disabled, RAM-only PostgreSQL target's SQL interface.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -38,7 +39,10 @@ def prepare():
     try:
         migration["downgrade"]()
     except RuntimeError as exc:
-        if str(exc) != "Dropping login revocation records can restore revoked credentials; reviewed recovery is required":
+        if (
+            str(exc)
+            != "Dropping login revocation records can restore revoked credentials; reviewed recovery is required"
+        ):
             raise RuntimeError("Downgrade refusal differs") from exc
     else:
         raise RuntimeError("Destructive security downgrade is no longer refused")
@@ -65,10 +69,18 @@ def main():
     args = parser.parse_args()
     sql, migration_sha = prepare()
     if args.prepare_only:
-        print(json.dumps({"offline_compilation": "passed", "downgrade_refusal": "passed",
-                          "migration_sha256": migration_sha,
-                          "generated_sql_sha256": hashlib.sha256(sql.encode()).hexdigest(),
-                          "database_connections": 0, "migrations_run": 0}))
+        print(
+            json.dumps(
+                {
+                    "offline_compilation": "passed",
+                    "downgrade_refusal": "passed",
+                    "migration_sha256": migration_sha,
+                    "generated_sql_sha256": hashlib.sha256(sql.encode()).hexdigest(),
+                    "database_connections": 0,
+                    "migrations_run": 0,
+                }
+            )
+        )
         return
     gate = json.loads((ROOT / "docs/PY35_ACTUAL_RELEASE_GATES.json").read_text())
     backup = next(item for item in gate["gates"] if item["id"] == "actual_backup_restoration")

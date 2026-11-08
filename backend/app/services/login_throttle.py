@@ -5,6 +5,7 @@ login for that email pauses for LOCK_SECONDS. Counting is per account (not per I
 so it still works behind Render's proxy. State is kept in memory for the single API
 process: it resets on restart and needs no database change.
 """
+
 from __future__ import annotations
 
 from collections import deque

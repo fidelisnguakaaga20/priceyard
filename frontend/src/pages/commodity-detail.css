@@ -48,7 +48,9 @@
 /* Market insights: a colored accent per insight type, so the six cards read
    as a distinct, premium section rather than six identical gray boxes. */
 .market-insights-grid .insight-card {
-  transition: box-shadow .2s ease, transform .2s ease;
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
 
 /* Bold border all round in each card's own accent colour (beats Easy reading's width). */
@@ -66,21 +68,45 @@ html .market-insights-grid .card.insight-card {
   align-items: center;
   gap: 8px;
   font-size: 1.08rem;
-  letter-spacing: -.01em;
+  letter-spacing: -0.01em;
 }
 
-.market-insights-grid .insight-card-signals { --insight-accent: #2563eb; }
-.market-insights-grid .insight-card-signals h3 { color: #2563eb; }
-.market-insights-grid .insight-card-quality { --insight-accent: #16a34a; }
-.market-insights-grid .insight-card-quality h3 { color: #16a34a; }
-.market-insights-grid .insight-card-buying { --insight-accent: #d97706; }
-.market-insights-grid .insight-card-buying h3 { color: #d97706; }
-.market-insights-grid .insight-card-sellwatch { --insight-accent: #dc2626; }
-.market-insights-grid .insight-card-sellwatch h3 { color: #dc2626; }
-.market-insights-grid .insight-card-storage { --insight-accent: #b45309; }
-.market-insights-grid .insight-card-storage h3 { color: #b45309; }
-.market-insights-grid .insight-card-costs { --insight-accent: #7c3aed; }
-.market-insights-grid .insight-card-costs h3 { color: #7c3aed; }
+.market-insights-grid .insight-card-signals {
+  --insight-accent: #2563eb;
+}
+.market-insights-grid .insight-card-signals h3 {
+  color: #2563eb;
+}
+.market-insights-grid .insight-card-quality {
+  --insight-accent: #16a34a;
+}
+.market-insights-grid .insight-card-quality h3 {
+  color: #16a34a;
+}
+.market-insights-grid .insight-card-buying {
+  --insight-accent: #d97706;
+}
+.market-insights-grid .insight-card-buying h3 {
+  color: #d97706;
+}
+.market-insights-grid .insight-card-sellwatch {
+  --insight-accent: #dc2626;
+}
+.market-insights-grid .insight-card-sellwatch h3 {
+  color: #dc2626;
+}
+.market-insights-grid .insight-card-storage {
+  --insight-accent: #b45309;
+}
+.market-insights-grid .insight-card-storage h3 {
+  color: #b45309;
+}
+.market-insights-grid .insight-card-costs {
+  --insight-accent: #7c3aed;
+}
+.market-insights-grid .insight-card-costs h3 {
+  color: #7c3aed;
+}
 
 /* The market-name eyebrow and the status word right after it (e.g. "Scarcity",
    "Good") previously ran together with no gap -- "BEANS MARKET AUTA BALEFIGood".
@@ -94,7 +120,7 @@ html .market-insights-grid .card.insight-card {
 }
 
 .market-insights-grid .insight-edit-link {
-  font-size: .78rem;
+  font-size: 0.78rem;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -117,7 +143,7 @@ html .market-insights-grid .card.insight-card {
   align-items: center;
   padding: 3px 10px;
   border-radius: 999px;
-  font-size: .76rem;
+  font-size: 0.76rem;
   font-weight: 700;
   white-space: nowrap;
   color: var(--insight-accent, var(--color-text-muted));

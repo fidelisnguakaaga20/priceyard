@@ -1,4 +1,5 @@
 """Current-price selection must not materialize the entire retained history."""
+
 from datetime import datetime, timedelta, timezone
 import unittest
 
@@ -20,7 +21,13 @@ class CurrentPriceQueryTests(unittest.TestCase):
         Base.metadata.create_all(self.engine)
         self.now = datetime(2026, 10, 16, 12, tzinfo=timezone.utc)
         with Session(self.engine) as db:
-            user = User(full_name="Synthetic Admin", email="query@example.com", password_hash="unused", role="admin", referral_code="QUERYTEST")
+            user = User(
+                full_name="Synthetic Admin",
+                email="query@example.com",
+                password_hash="unused",
+                role="admin",
+                referral_code="QUERYTEST",
+            )
             commodity = Commodity(name="Egusi", is_active=True)
             market = Market(name="Kwali Market", state="FCT", country="Nigeria", is_active=True)
             db.add_all([user, commodity, market])
@@ -38,18 +45,29 @@ class CurrentPriceQueryTests(unittest.TestCase):
         self.engine.dispose()
 
     def row(self, timestamp, **changes):
-        return PriceUpdate(commodity_id=self.commodity_id, market_id=self.market_id,
-                           price_low=210000, price_high=220000, unit="1 bag", bag_size=None,
-                           confidence_level="Low confidence", update_date_time=timestamp,
-                           status="approved", created_by=self.user_id, approved_by=self.user_id,
-                           **changes)
+        return PriceUpdate(
+            commodity_id=self.commodity_id,
+            market_id=self.market_id,
+            price_low=210000,
+            price_high=220000,
+            unit="1 bag",
+            bag_size=None,
+            confidence_level="Low confidence",
+            update_date_time=timestamp,
+            status="approved",
+            created_by=self.user_id,
+            approved_by=self.user_id,
+            **changes,
+        )
 
     def test_current_query_loads_only_winning_records_and_retains_all_history(self):
         loaded = []
         with Session(self.engine) as db:
+
             def record_load(session, instance):
                 if isinstance(instance, PriceUpdate):
                     loaded.append(instance.id)
+
             event.listen(db, "loaded_as_persistent", record_load)
             result = list_latest_approved_price_updates(db)
             self.assertEqual([item.id for item in result], [self.current_id])
@@ -60,7 +78,9 @@ class CurrentPriceQueryTests(unittest.TestCase):
     def test_movement_filter_cannot_resurface_an_older_match(self):
         with Session(self.engine) as db:
             self.assertEqual(list_latest_approved_price_updates(db, movement="down"), [])
-            self.assertEqual([item.id for item in list_latest_approved_price_updates(db, movement="up")], [self.current_id])
+            self.assertEqual(
+                [item.id for item in list_latest_approved_price_updates(db, movement="up")], [self.current_id]
+            )
 
     def test_outdated_winner_does_not_resurface_an_older_price(self):
         with Session(self.engine) as db:

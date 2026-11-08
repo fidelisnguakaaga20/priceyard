@@ -34,8 +34,8 @@ class PasswordResetTests(unittest.TestCase):
         self.db.commit()
         self.sent: dict[str, str] = {}
         self.original_sender = password_reset_service.send_password_reset_email
-        password_reset_service.send_password_reset_email = (
-            lambda *, recipient, reset_url: self.sent.update(recipient=recipient, reset_url=reset_url)
+        password_reset_service.send_password_reset_email = lambda *, recipient, reset_url: self.sent.update(
+            recipient=recipient, reset_url=reset_url
         )
 
     def tearDown(self) -> None:

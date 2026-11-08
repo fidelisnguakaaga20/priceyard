@@ -1,4 +1,5 @@
 """Internal-only login revocation; no business-field or policy change."""
+
 from alembic import op
 import sqlalchemy as sa
 
@@ -10,14 +11,21 @@ depends_on = None
 
 def upgrade():
     op.add_column("users", sa.Column("auth_version", sa.Integer(), nullable=False, server_default=sa.text("0")))
-    op.create_table("revoked_access_tokens", sa.Column("token_hash", sa.String(64), primary_key=True), sa.Column("user_id", sa.Integer(), sa.ForeignKey("users.id", ondelete="CASCADE"), nullable=False), sa.Column("expires_at", sa.DateTime(timezone=True), nullable=False), sa.Column("revoked_at", sa.DateTime(timezone=True), nullable=False))
+    op.create_table(
+        "revoked_access_tokens",
+        sa.Column("token_hash", sa.String(64), primary_key=True),
+        sa.Column("user_id", sa.Integer(), sa.ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
+        sa.Column("expires_at", sa.DateTime(timezone=True), nullable=False),
+        sa.Column("revoked_at", sa.DateTime(timezone=True), nullable=False),
+    )
     op.create_index("ix_revoked_access_tokens_user_id", "revoked_access_tokens", ["user_id"])
     op.create_index("ix_revoked_access_tokens_expires_at", "revoked_access_tokens", ["expires_at"])
     if op.get_bind().dialect.name == "postgresql":
         # Supabase may grant API roles rights on newly created public objects.
         # Login revocations are server-owned. Preserve every old users-column
         # UPDATE right while excluding the new account-security counter.
-        op.execute(sa.text(r"""
+        op.execute(
+            sa.text(r"""
 DO $login_security$
 DECLARE
     users_table oid := 'public.users'::regclass;
@@ -151,8 +159,11 @@ BEGIN
     END LOOP;
 END
 $login_security$;
-"""))
+""")
+        )
 
 
 def downgrade():
-    raise RuntimeError("Dropping login revocation records can restore revoked credentials; reviewed recovery is required")
+    raise RuntimeError(
+        "Dropping login revocation records can restore revoked credentials; reviewed recovery is required"
+    )

@@ -37,7 +37,9 @@ def create_access_token(*, user_id: int, auth_version: int = 0, role: str | None
 def decode_access_claims(token: str) -> dict:
     settings = get_settings()
     try:
-        payload = jwt.decode(token, _jwt_secret(), algorithms=[settings.jwt_algorithm], options={"require": ["sub", "iat", "exp"]})
+        payload = jwt.decode(
+            token, _jwt_secret(), algorithms=[settings.jwt_algorithm], options={"require": ["sub", "iat", "exp"]}
+        )
         subject = payload.get("sub")
         if subject is None:
             raise InvalidTokenError("Missing token subject")

@@ -4,6 +4,7 @@ Revision ID: 0020_cost_breakdown_cm
 Revises: 0019_add_target_price
 Create Date: 2026-10-07
 """
+
 from typing import Sequence, Union
 
 from alembic import op
@@ -35,7 +36,12 @@ def upgrade() -> None:
     op.alter_column("cost_breakdowns", "market_id", nullable=False)
 
     op.create_foreign_key(
-        "fk_cost_breakdowns_commodity_id", "cost_breakdowns", "commodities", ["commodity_id"], ["id"], ondelete="RESTRICT"
+        "fk_cost_breakdowns_commodity_id",
+        "cost_breakdowns",
+        "commodities",
+        ["commodity_id"],
+        ["id"],
+        ondelete="RESTRICT",
     )
     op.create_foreign_key(
         "fk_cost_breakdowns_market_id", "cost_breakdowns", "markets", ["market_id"], ["id"], ondelete="RESTRICT"
@@ -64,7 +70,12 @@ def downgrade() -> None:
     )
     op.alter_column("cost_breakdowns", "price_update_id", nullable=False)
     op.create_foreign_key(
-        "cost_breakdowns_price_update_id_fkey", "cost_breakdowns", "price_updates", ["price_update_id"], ["id"], ondelete="CASCADE"
+        "cost_breakdowns_price_update_id_fkey",
+        "cost_breakdowns",
+        "price_updates",
+        ["price_update_id"],
+        ["id"],
+        ondelete="CASCADE",
     )
     op.create_index("ix_cost_breakdowns_price_update_id", "cost_breakdowns", ["price_update_id"])
 

@@ -19,25 +19,37 @@ def _notification_prices_url(settings) -> str:
     # Settings has a development default; it must not silently become a mailed
     # destination when FRONTEND_URL was omitted from environment configuration.
     explicit = getattr(settings, "model_fields_set", {"frontend_url"})
-    if ("frontend_url" not in explicit or not isinstance(value, str) or not value or len(value) > 2048
-            or environment not in {"production", "staging", "development", "test"}
-            or any(character.isspace() or ord(character) < 32 or ord(character) == 127 for character in value)
-            or any(character in value for character in ("\\", "%", "?", "#"))):
+    if (
+        "frontend_url" not in explicit
+        or not isinstance(value, str)
+        or not value
+        or len(value) > 2048
+        or environment not in {"production", "staging", "development", "test"}
+        or any(character.isspace() or ord(character) < 32 or ord(character) == 127 for character in value)
+        or any(character in value for character in ("\\", "%", "?", "#"))
+    ):
         raise ValueError("Notification application URL is not configured safely")
     try:
         parsed = urlsplit(value)
         host, port = parsed.hostname, parsed.port
-        if (not host or len(host) > 253 or parsed.username is not None or parsed.password is not None
-                or parsed.path not in {"", "/"} or port == 0):
+        if (
+            not host
+            or len(host) > 253
+            or parsed.username is not None
+            or parsed.password is not None
+            or parsed.path not in {"", "/"}
+            or port == 0
+        ):
             raise ValueError
         try:
             address = ipaddress.ip_address(host)
         except ValueError:
             address = None
-            if host != "localhost" and (len(host.split('.')) < 2
-                    or not any(character.isalpha() for character in host.split('.')[-1])
-                    or any(not re.fullmatch(r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?", label)
-                           for label in host.split('.'))):
+            if host != "localhost" and (
+                len(host.split(".")) < 2
+                or not any(character.isalpha() for character in host.split(".")[-1])
+                or any(not re.fullmatch(r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?", label) for label in host.split("."))
+            ):
                 raise ValueError
         loopback = host == "localhost" or address is not None and address.is_loopback
         local_test = environment in {"development", "test"} and loopback
@@ -47,7 +59,9 @@ def _notification_prices_url(settings) -> str:
             raise ValueError
         # This is a deny rule for the original known live host, never a URL
         # fallback. Additional live domains must be reviewed before staging use.
-        if environment != "production" and (host == "priceyard.onrender.com" or host.endswith(".priceyard.onrender.com")):
+        if environment != "production" and (
+            host == "priceyard.onrender.com" or host.endswith(".priceyard.onrender.com")
+        ):
             raise ValueError
     except ValueError:
         raise ValueError("Notification application URL is not configured safely") from None

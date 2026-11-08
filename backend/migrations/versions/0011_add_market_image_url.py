@@ -4,6 +4,7 @@ Revision ID: 0011_add_market_image_url
 Revises: 0010_add_commodity_upcoming
 Create Date: 2026-09-13
 """
+
 from typing import Sequence, Union
 
 from alembic import op

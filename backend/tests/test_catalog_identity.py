@@ -24,16 +24,32 @@ def verify_catalog_races(check, engine, *, first_commits):
     """Two application writers, deterministic lock overlap, no native suite overlap."""
     Base.metadata.create_all(engine)
     with Session(engine) as db:
-        owner = User(full_name="Synthetic catalog race owner", email="catalog-race@example.com",
-                     password_hash="unused", role="admin", referral_code="CATRACE")
+        owner = User(
+            full_name="Synthetic catalog race owner",
+            email="catalog-race@example.com",
+            password_hash="unused",
+            role="admin",
+            referral_code="CATRACE",
+        )
         commodity, market = Commodity(name="Egusi"), Market(name="Kwali Market")
         db.add_all([owner, commodity, market])
         db.flush()
         owner_id = owner.id
-        db.add(PriceUpdate(commodity_id=commodity.id, market_id=market.id, unit="1 bag",
-            price_low=210000, price_high=220000, movement="unknown", confidence_level="Low confidence",
-            status="approved", created_by=owner.id, update_date_time=datetime.now(timezone.utc),
-            source_1="PRIVATE-CATALOG-HISTORY"))
+        db.add(
+            PriceUpdate(
+                commodity_id=commodity.id,
+                market_id=market.id,
+                unit="1 bag",
+                price_low=210000,
+                price_high=220000,
+                movement="unknown",
+                confidence_level="Low confidence",
+                status="approved",
+                created_by=owner.id,
+                update_date_time=datetime.now(timezone.utc),
+                source_1="PRIVATE-CATALOG-HISTORY",
+            )
+        )
         db.commit()
         original_history = db.execute(select(PriceUpdate.__table__)).all()
 
@@ -60,8 +76,15 @@ def verify_catalog_races(check, engine, *, first_commits):
                     attempted.set()
 
             def save_audit(db, item, action):
-                create_audit_log(db, actor=db.get(User, owner_id), action=kind + action,
-                    table_name=model.__tablename__, record_id=item.id, new_value=snapshot_model(item), commit=False)
+                create_audit_log(
+                    db,
+                    actor=db.get(User, owner_id),
+                    action=kind + action,
+                    table_name=model.__tablename__,
+                    record_id=item.id,
+                    new_value=snapshot_model(item),
+                    commit=False,
+                )
 
             def first_writer():
                 try:
@@ -83,7 +106,9 @@ def verify_catalog_races(check, engine, *, first_commits):
                     with Session(engine) as db:
                         try:
                             if contender_edits:
-                                item = update(db, get(db, target_id, lock=True), update_schema(name=name.swapcase()), commit=False)
+                                item = update(
+                                    db, get(db, target_id, lock=True), update_schema(name=name.swapcase()), commit=False
+                                )
                             else:
                                 item = create(db, create_schema(name=name.swapcase()), commit=False)
                             save_audit(db, item, ".edit" if contender_edits else ".create")
@@ -98,8 +123,10 @@ def verify_catalog_races(check, engine, *, first_commits):
                     finished.set()
 
             event.listen(engine, "before_cursor_execute", observe)
-            workers = [threading.Thread(target=first_writer, name="catalog-first"),
-                       threading.Thread(target=second_writer, name="catalog-contender")]
+            workers = [
+                threading.Thread(target=first_writer, name="catalog-first"),
+                threading.Thread(target=second_writer, name="catalog-contender"),
+            ]
             try:
                 for worker in workers:
                     worker.start()
@@ -111,8 +138,10 @@ def verify_catalog_races(check, engine, *, first_commits):
                     worker.join(12)
                 event.remove(engine, "before_cursor_execute", observe)
             check.assertFalse(any(worker.is_alive() for worker in workers))
-            check.assertEqual(results, {"first": "committed" if first_commits else "rolled_back",
-                                        "second": 409 if first_commits else "saved"})
+            check.assertEqual(
+                results,
+                {"first": "committed" if first_commits else "rolled_back", "second": 409 if first_commits else "saved"},
+            )
             with Session(engine) as db:
                 matches = [item for item in db.scalars(select(model)) if item.name.lower() == name.lower()]
                 check.assertEqual(len(matches), 1)
@@ -159,7 +188,7 @@ class CatalogIdentityTests(unittest.TestCase):
         with Session(self.engine) as db:
             for state in (None, "FCT"):
                 item = create_market(db, MarketCreate(name="Kwali Market", state=state))
-                for requested in ((None, "") if state is None else ("fct", " FCT ")):
+                for requested in (None, "") if state is None else ("fct", " FCT "):
                     with self.assertRaises(HTTPException) as error:
                         create_market(db, MarketCreate(name=" kWALI mARKET ", state=requested))
                     self.assertEqual(error.exception.status_code, 409)
@@ -180,8 +209,12 @@ class CatalogIdentityTests(unittest.TestCase):
 
     def test_legacy_duplicate_records_are_not_merged_or_renamed(self):
         with Session(self.engine) as db:
-            db.add_all([Commodity(name="Egusi", description="First evidence"),
-                        Commodity(name="EGUSI", description="Second evidence")])
+            db.add_all(
+                [
+                    Commodity(name="Egusi", description="First evidence"),
+                    Commodity(name="EGUSI", description="Second evidence"),
+                ]
+            )
             db.commit()
             before = db.execute(select(Commodity.__table__).order_by(Commodity.id)).all()
             with self.assertRaises(HTTPException):

@@ -4,6 +4,7 @@ Revision ID: 0010_add_commodity_upcoming
 Revises: 0009_add_google_sign_in
 Create Date: 2026-09-13
 """
+
 from typing import Sequence, Union
 
 from alembic import op

@@ -23,19 +23,25 @@ logger = logging.getLogger(__name__)
 
 def _same_device_key(stored: str, supplied: str) -> bool:
     try:
-        old = base64.b64decode(stored+"="*(-len(stored)%4), altchars=b"-_", validate=True)
-        new = base64.b64decode(supplied+"="*(-len(supplied)%4), altchars=b"-_", validate=True)
+        old = base64.b64decode(stored + "=" * (-len(stored) % 4), altchars=b"-_", validate=True)
+        new = base64.b64decode(supplied + "=" * (-len(supplied) % 4), altchars=b"-_", validate=True)
         return hmac.compare_digest(old, new)
     except (ValueError, binascii.Error):
         return False
 
 
 def save_subscription(db: Session, user: User, payload: PushSubscriptionCreate) -> PushSubscription:
-    statement = select(PushSubscription).where(PushSubscription.endpoint == payload.endpoint).with_for_update().execution_options(populate_existing=True)
+    statement = (
+        select(PushSubscription)
+        .where(PushSubscription.endpoint == payload.endpoint)
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    )
     existing = db.scalar(statement)
     if existing is None:
-        subscription = PushSubscription(user_id=user.id, endpoint=payload.endpoint,
-                                        p256dh=payload.keys.p256dh, auth=payload.keys.auth)
+        subscription = PushSubscription(
+            user_id=user.id, endpoint=payload.endpoint, p256dh=payload.keys.p256dh, auth=payload.keys.auth
+        )
         try:
             with db.begin_nested():
                 db.add(subscription)
@@ -63,6 +69,7 @@ def save_subscription(db: Session, user: User, payload: PushSubscriptionCreate) 
         db.refresh(existing)
         return existing
 
+
 def remove_subscription(db: Session, user: User, endpoint: str) -> None:
     db.query(PushSubscription).filter(
         PushSubscription.user_id == user.id,
@@ -84,10 +91,12 @@ def send_push_to_user(db: Session, user_id: int, *, title: str, body: str, url: 
     sent = 0
     for subscription in subscriptions:
         try:
-            info = PushSubscriptionCreate.model_validate({
+            info = PushSubscriptionCreate.model_validate(
+                {
                     "endpoint": subscription.endpoint,
                     "keys": {"p256dh": subscription.p256dh, "auth": subscription.auth},
-            })
+                }
+            )
             with SafePushSession() as transport:
                 webpush(
                     subscription_info=info.model_dump(),

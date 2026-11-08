@@ -4,6 +4,7 @@ Revision ID: 0006_cr03_egusi_kwali
 Revises: 0005_stage13_watchlists
 Create Date: 2026-08-24
 """
+
 from typing import Sequence, Union
 
 from alembic import op
@@ -52,9 +53,7 @@ def upgrade() -> None:
 
     egusi_id = _find_named_id(connection, commodities, "Egusi")
     if egusi_id is None:
-        connection.execute(
-            sa.insert(commodities).values(name="Egusi", description=None, is_active=True)
-        )
+        connection.execute(sa.insert(commodities).values(name="Egusi", description=None, is_active=True))
         egusi_id = _find_named_id(connection, commodities, "Egusi")
 
     kwali_id = _find_named_id(connection, markets, "Kwali Market")
@@ -75,13 +74,9 @@ def upgrade() -> None:
         raise RuntimeError("CR-03 could not establish the approved Egusi/Kwali focus records")
 
     connection.execute(sa.update(commodities).values(is_active=False))
-    connection.execute(
-        sa.update(commodities).where(commodities.c.id == egusi_id).values(name="Egusi", is_active=True)
-    )
+    connection.execute(sa.update(commodities).where(commodities.c.id == egusi_id).values(name="Egusi", is_active=True))
     connection.execute(sa.update(markets).values(is_active=False))
-    connection.execute(
-        sa.update(markets).where(markets.c.id == kwali_id).values(name="Kwali Market", is_active=True)
-    )
+    connection.execute(sa.update(markets).where(markets.c.id == kwali_id).values(name="Kwali Market", is_active=True))
 
 
 def downgrade() -> None:

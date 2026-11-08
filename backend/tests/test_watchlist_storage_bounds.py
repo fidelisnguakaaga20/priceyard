@@ -1,4 +1,5 @@
 """Targets must survive storage exactly, within the existing NUMERIC(14,2)."""
+
 from decimal import Decimal
 import unittest
 import uuid
@@ -21,12 +22,25 @@ def exercise_watchlist_storage(check, engine, invalid_values):
     Base.metadata.create_all(engine)
     suffix = uuid.uuid4().hex[:8]
     with Session(engine) as db:
-        owner = User(full_name="Synthetic target owner", email=f"target-{suffix}@example.com", password_hash="unused", role="free_user", referral_code="W"+suffix)
-        other = User(full_name="Synthetic other owner", email=f"other-{suffix}@example.com", password_hash="unused", role="free_user", referral_code="O"+suffix)
-        commodity, market = Commodity(name="Synthetic Egusi "+suffix), Market(name="Synthetic Kwali "+suffix)
-        db.add_all([owner, other, commodity, market]); db.commit()
-        headers = {"Authorization": "Bearer "+create_access_token(user_id=owner.id)}
-        other_headers = {"Authorization": "Bearer "+create_access_token(user_id=other.id)}
+        owner = User(
+            full_name="Synthetic target owner",
+            email=f"target-{suffix}@example.com",
+            password_hash="unused",
+            role="free_user",
+            referral_code="W" + suffix,
+        )
+        other = User(
+            full_name="Synthetic other owner",
+            email=f"other-{suffix}@example.com",
+            password_hash="unused",
+            role="free_user",
+            referral_code="O" + suffix,
+        )
+        commodity, market = Commodity(name="Synthetic Egusi " + suffix), Market(name="Synthetic Kwali " + suffix)
+        db.add_all([owner, other, commodity, market])
+        db.commit()
+        headers = {"Authorization": "Bearer " + create_access_token(user_id=owner.id)}
+        other_headers = {"Authorization": "Bearer " + create_access_token(user_id=other.id)}
         scope = {"commodity_id": commodity.id, "market_id": market.id}
 
     def sessions():
@@ -37,7 +51,11 @@ def exercise_watchlist_storage(check, engine, invalid_values):
     try:
         with TestClient(app, raise_server_exceptions=False) as client:
             for target in (None, "0", "210000", "999999999999.99"):
-                payload = {**scope, "target_price": target, "target_direction": None if target is None else "at_or_below"}
+                payload = {
+                    **scope,
+                    "target_price": target,
+                    "target_direction": None if target is None else "at_or_below",
+                }
                 created = client.post("/watchlist", json=payload, headers=headers)
                 check.assertEqual(created.status_code, 201, created.text)
                 item_id = created.json()["id"]
@@ -47,16 +65,25 @@ def exercise_watchlist_storage(check, engine, invalid_values):
                     check.assertEqual(stored.target_direction, payload["target_direction"])
                 listed = client.get("/watchlist", headers=headers).json()
                 row = next(item for item in listed if item["id"] == item_id)
-                check.assertEqual(None if row["target_price"] is None else Decimal(str(row["target_price"])), None if target is None else Decimal(target))
+                check.assertEqual(
+                    None if row["target_price"] is None else Decimal(str(row["target_price"])),
+                    None if target is None else Decimal(target),
+                )
                 check.assertEqual(client.post("/watchlist", json=payload, headers=headers).status_code, 409)
-                check.assertNotIn(item_id, [item["id"] for item in client.get("/watchlist", headers=other_headers).json()])
+                check.assertNotIn(
+                    item_id, [item["id"] for item in client.get("/watchlist", headers=other_headers).json()]
+                )
                 check.assertEqual(client.delete(f"/watchlist/{item_id}", headers=other_headers).status_code, 404)
                 check.assertEqual(client.delete(f"/watchlist/{item_id}", headers=headers).status_code, 204)
 
             with Session(engine) as db:
                 before = db.execute(select(Watchlist.__table__)).all()
             for value in invalid_values:
-                response = client.post("/watchlist", json={**scope, "target_price": value, "target_direction": "at_or_above"}, headers=headers)
+                response = client.post(
+                    "/watchlist",
+                    json={**scope, "target_price": value, "target_direction": "at_or_above"},
+                    headers=headers,
+                )
                 check.assertEqual(response.status_code, 422, response.text)
                 check.assertTrue(any(item["loc"][-1] == "target_price" for item in response.json()["detail"]))
             check.assertEqual(client.get("/watchlist").status_code, 401)

@@ -50,7 +50,16 @@ class PaymentServiceTests(unittest.TestCase):
         self.engine.dispose()
 
     def _signed_webhook(self, reference: str, transaction_id: int = 999, amount: int = 250000) -> tuple[bytes, str]:
-        payload = {"event": "charge.success", "data": {"reference": reference, "id": transaction_id, "amount": amount, "currency": "NGN", "status": "success"}}
+        payload = {
+            "event": "charge.success",
+            "data": {
+                "reference": reference,
+                "id": transaction_id,
+                "amount": amount,
+                "currency": "NGN",
+                "status": "success",
+            },
+        }
         raw_body = json.dumps(payload).encode("utf-8")
         signature = hmac.new(b"sk_test_fake123", raw_body, hashlib.sha512).hexdigest()
         return raw_body, signature
@@ -62,7 +71,9 @@ class PaymentServiceTests(unittest.TestCase):
         self.assertFalse(payment_service.verify_webhook_signature(raw_body, None))
 
     def test_successful_webhook_activates_subscription_with_correct_end_date(self) -> None:
-        payment = Payment(user_id=self.user.id, reference="py_test_2", plan="monthly", amount=2500, currency="NGN", status="pending")
+        payment = Payment(
+            user_id=self.user.id, reference="py_test_2", plan="monthly", amount=2500, currency="NGN", status="pending"
+        )
         self.db.add(payment)
         self.db.commit()
 
@@ -74,7 +85,9 @@ class PaymentServiceTests(unittest.TestCase):
         self.assertEqual(payment.status, "success")
         self.assertEqual(payment.paystack_transaction_id, "999")
 
-        subscription = self.db.scalar(select(self.user.subscription.__class__).where(self.user.subscription.__class__.user_id == self.user.id))
+        subscription = self.db.scalar(
+            select(self.user.subscription.__class__).where(self.user.subscription.__class__.user_id == self.user.id)
+        )
         self.assertEqual(subscription.status, "active")
         self.assertEqual(subscription.plan_name, "paid_monthly")
         self.assertEqual(subscription.end_date, subscription.trial_ends_at.date() + timedelta(days=30))
@@ -82,7 +95,9 @@ class PaymentServiceTests(unittest.TestCase):
         self.assertEqual(self.user.role, "paid_user")
 
     def test_webhook_is_idempotent_on_replay(self) -> None:
-        payment = Payment(user_id=self.user.id, reference="py_test_3", plan="seasonal", amount=6000, currency="NGN", status="pending")
+        payment = Payment(
+            user_id=self.user.id, reference="py_test_3", plan="seasonal", amount=6000, currency="NGN", status="pending"
+        )
         self.db.add(payment)
         self.db.commit()
 

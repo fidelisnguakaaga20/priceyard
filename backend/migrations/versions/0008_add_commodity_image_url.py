@@ -4,6 +4,7 @@ Revision ID: 0008_add_commodity_image_url
 Revises: 0007_auth01_password_reset
 Create Date: 2026-09-13
 """
+
 from typing import Sequence, Union
 
 from alembic import op

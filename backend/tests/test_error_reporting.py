@@ -14,10 +14,21 @@ from app.error_reporting import init_error_reporting, scrub_event
 # Fake private details, kept far from the failing line: Sentry quotes nearby source lines.
 SECRET_QUERY = "/boom?email=secret-user@example.com"
 SECRET_BODY = {"email": "secret-user@example.com", "password": "SuperSecretPassword1"}
-SECRET_HEADERS = {"Authorization": "Bearer secret-login-token", "Cookie": "priceyard_session=secret-cookie",
-                  "CF-Connecting-IP": "203.0.113.9", "X-PriceYard-CSRF": "secret-csrf"}
-SECRET_VALUES = ("SuperSecretPassword1", "secret-user@example.com", "other-user@example.com",
-                 "secret-login-token", "secret-cookie", "203.0.113.9", "secret-csrf")
+SECRET_HEADERS = {
+    "Authorization": "Bearer secret-login-token",
+    "Cookie": "priceyard_session=secret-cookie",
+    "CF-Connecting-IP": "203.0.113.9",
+    "X-PriceYard-CSRF": "secret-csrf",
+}
+SECRET_VALUES = (
+    "SuperSecretPassword1",
+    "secret-user@example.com",
+    "other-user@example.com",
+    "secret-login-token",
+    "secret-cookie",
+    "203.0.113.9",
+    "secret-csrf",
+)
 
 
 class CapturingTransport(Transport):
@@ -39,7 +50,9 @@ class ErrorReportingTests(unittest.TestCase):
     """Owner-approved audit item 10: error alerts that never carry private data."""
 
     def tearDown(self):
-        sentry_sdk.init(dsn=None, release="test", default_integrations=False)  # switch reporting back off for the other tests
+        sentry_sdk.init(
+            dsn=None, release="test", default_integrations=False
+        )  # switch reporting back off for the other tests
 
     def test_does_nothing_without_dsn(self):
         with patch("sentry_sdk.init") as init:
@@ -78,9 +91,15 @@ class ErrorReportingTests(unittest.TestCase):
             self.assertNotIn(private, sent)
 
     def test_scrub_keeps_only_safe_parts(self):
-        event = {"request": {"data": {"password": "x"}, "cookies": {"a": "b"}, "query_string": "q=1",
-                             "headers": {"Authorization": "Bearer t", "User-Agent": "Phone"}},
-                 "user": {"id": 7, "email": "a@b.c", "ip_address": "1.2.3.4"}}
+        event = {
+            "request": {
+                "data": {"password": "x"},
+                "cookies": {"a": "b"},
+                "query_string": "q=1",
+                "headers": {"Authorization": "Bearer t", "User-Agent": "Phone"},
+            },
+            "user": {"id": 7, "email": "a@b.c", "ip_address": "1.2.3.4"},
+        }
         cleaned = scrub_event(event)
         self.assertEqual(cleaned["request"], {"headers": {"User-Agent": "Phone"}})
         self.assertEqual(cleaned["user"], {"id": 7})

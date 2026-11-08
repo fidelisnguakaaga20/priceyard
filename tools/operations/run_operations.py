@@ -3,6 +3,7 @@
 Only aggregate outcomes and a server-encrypted recovery position leave the API.
 All failures have fixed messages: response bodies, URLs and tokens are never logged.
 """
+
 from __future__ import annotations
 
 import io
@@ -47,13 +48,17 @@ class Client:
     def remaining(self):
         return self.deadline - time.monotonic()
 
-    def request(self, url, *, headers=None, data=None, timeout=20, limit=MAX_BODY,
-                allow_redirect=False):
+    def request(self, url, *, headers=None, data=None, timeout=20, limit=MAX_BODY, allow_redirect=False):
         if self.remaining() <= 0:
             raise SafeFailure("Operational check exceeded its bounded time window.")
         parsed = urlsplit(url)
-        if (parsed.scheme != "https" or parsed.username or parsed.password
-                or parsed.port not in (None, 443) or not parsed.hostname):
+        if (
+            parsed.scheme != "https"
+            or parsed.username
+            or parsed.password
+            or parsed.port not in (None, 443)
+            or not parsed.hostname
+        ):
             raise SafeFailure("Operational destination validation failed.")
         request = Request(url, data=data, headers=headers or {}, method="POST" if data is not None else "GET")
         try:
@@ -85,8 +90,11 @@ class Client:
 def _token(value):
     if value is None:
         return None
-    if (not isinstance(value, str) or not 1 <= len(value) <= MAX_CHECKPOINT
-            or re.fullmatch(r"[A-Za-z0-9_-]+={0,2}", value) is None):
+    if (
+        not isinstance(value, str)
+        or not 1 <= len(value) <= MAX_CHECKPOINT
+        or re.fullmatch(r"[A-Za-z0-9_-]+={0,2}", value) is None
+    ):
         raise SafeFailure("Encrypted recovery checkpoint is invalid; no recovery request was sent.")
     return value
 
@@ -95,10 +103,16 @@ def oidc_token(client, environ):
     url = environ.get("ACTIONS_ID_TOKEN_REQUEST_URL", "")
     credential = environ.get("ACTIONS_ID_TOKEN_REQUEST_TOKEN", "")
     parsed = urlsplit(url)
-    if (parsed.scheme != "https" or not parsed.hostname
-            or not parsed.hostname.endswith(".actions.githubusercontent.com")
-            or parsed.username or parsed.password or parsed.port not in (None, 443)
-            or parsed.fragment or not credential):
+    if (
+        parsed.scheme != "https"
+        or not parsed.hostname
+        or not parsed.hostname.endswith(".actions.githubusercontent.com")
+        or parsed.username
+        or parsed.password
+        or parsed.port not in (None, 443)
+        or parsed.fragment
+        or not credential
+    ):
         raise SafeFailure("GitHub short-lived identity is unavailable or invalid.")
     query = [(key, value) for key, value in parse_qsl(parsed.query) if key != "audience"]
     query.append(("audience", RECOVERY))
@@ -114,8 +128,11 @@ def _github_headers(environ):
     token = environ.get("GITHUB_TOKEN", "")
     if not token or environ.get("GITHUB_REPOSITORY") != REPOSITORY or environ.get("GITHUB_REF") != "refs/heads/master":
         raise SafeFailure("Repository or GitHub checkpoint access is not configured correctly.")
-    return {"Authorization": "Bearer " + token, "Accept": "application/vnd.github+json",
-            "X-GitHub-Api-Version": "2022-11-28"}
+    return {
+        "Authorization": "Bearer " + token,
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
 
 
 def load_checkpoint(client, environ):
@@ -125,41 +142,61 @@ def load_checkpoint(client, environ):
     artifacts = data.get("artifacts")
     if not isinstance(artifacts, list) or type(data.get("total_count")) is not int:
         raise SafeFailure("GitHub checkpoint listing is invalid.")
-    candidates = [artifact for artifact in artifacts
-                  if isinstance(artifact, dict) and artifact.get("name") == ARTIFACT
-                  and not artifact.get("expired")
-                  and (artifact.get("workflow_run") or {}).get("head_branch") == "master"]
+    candidates = [
+        artifact
+        for artifact in artifacts
+        if isinstance(artifact, dict)
+        and artifact.get("name") == ARTIFACT
+        and not artifact.get("expired")
+        and (artifact.get("workflow_run") or {}).get("head_branch") == "master"
+    ]
     if not candidates:
         if data["total_count"] == 0:
             return None  # First run or expired retention: a full new idempotent cycle is safe.
         raise SafeFailure("No usable recovery checkpoint was found; inspect workflow artifacts.")
     artifact = max(candidates, key=lambda value: value.get("id", 0))
-    if (type(artifact.get("id")) is not int or type(artifact.get("size_in_bytes")) is not int
-            or not 0 < artifact["size_in_bytes"] <= MAX_BODY):
+    if (
+        type(artifact.get("id")) is not int
+        or type(artifact.get("size_in_bytes")) is not int
+        or not 0 < artifact["size_in_bytes"] <= MAX_BODY
+    ):
         raise SafeFailure("GitHub checkpoint metadata is invalid.")
     run_id = (artifact.get("workflow_run") or {}).get("id")
     if type(run_id) is not int:
         raise SafeFailure("GitHub checkpoint workflow identity is invalid.")
     run = client.json(base + "runs/" + str(run_id), headers=headers)
-    if (run.get("path") != WORKFLOW or run.get("head_branch") != "master"
-            or run.get("event") not in ("schedule", "workflow_dispatch")
-            or (run.get("head_repository") or {}).get("full_name") != REPOSITORY):
+    if (
+        run.get("path") != WORKFLOW
+        or run.get("head_branch") != "master"
+        or run.get("event") not in ("schedule", "workflow_dispatch")
+        or (run.get("head_repository") or {}).get("full_name") != REPOSITORY
+    ):
         raise SafeFailure("GitHub checkpoint came from an unexpected workflow.")
-    status, download_headers, _ = client.request(base + "artifacts/" + str(artifact["id"]) + "/zip",
-                                                headers=headers, allow_redirect=True)
+    status, download_headers, _ = client.request(
+        base + "artifacts/" + str(artifact["id"]) + "/zip", headers=headers, allow_redirect=True
+    )
     location = download_headers.get("Location", "")
     parsed = urlsplit(location)
-    if (status != 302 or parsed.scheme != "https" or not parsed.hostname
-            or not parsed.hostname.endswith((".blob.core.windows.net", ".actions.githubusercontent.com"))
-            or parsed.username or parsed.password or parsed.port not in (None, 443)):
+    if (
+        status != 302
+        or parsed.scheme != "https"
+        or not parsed.hostname
+        or not parsed.hostname.endswith((".blob.core.windows.net", ".actions.githubusercontent.com"))
+        or parsed.username
+        or parsed.password
+        or parsed.port not in (None, 443)
+    ):
         raise SafeFailure("GitHub checkpoint download destination is invalid.")
     # The signed storage URL receives NO GitHub authorization header.
     _, _, archive = client.request(location)
     try:
         with zipfile.ZipFile(io.BytesIO(archive)) as zipped:
             entries = zipped.infolist()
-            if (len(entries) != 1 or entries[0].filename != "checkpoint.json"
-                    or entries[0].file_size > MAX_CHECKPOINT + 64):
+            if (
+                len(entries) != 1
+                or entries[0].filename != "checkpoint.json"
+                or entries[0].file_size > MAX_CHECKPOINT + 64
+            ):
                 raise SafeFailure("GitHub checkpoint archive has unexpected contents.")
             checkpoint = json.loads(zipped.read(entries[0]))
     except (zipfile.BadZipFile, ValueError, UnicodeError, RuntimeError):
@@ -183,9 +220,12 @@ def check_health(client):
     for origin, timeout in ((FRONTEND + "/api", 65), (API, 20)):
         health = client.json(origin + "/health", timeout=timeout)
         # /health may also report the live commit; any other shape still fails.
-        if (not isinstance(health, dict) or health.get("status") != "healthy"
-                or not set(health) <= {"status", "deployed_commit"}
-                or not isinstance(health.get("deployed_commit", ""), str)):
+        if (
+            not isinstance(health, dict)
+            or health.get("status") != "healthy"
+            or not set(health) <= {"status", "deployed_commit"}
+            or not isinstance(health.get("deployed_commit", ""), str)
+        ):
             raise SafeFailure("Application health response did not pass.")
     _, headers, body = client.request(FRONTEND + "/login", timeout=20)
     if headers.get_content_type() != "text/html" or b"priceyard" not in body.lower():
@@ -199,21 +239,36 @@ def recover(client, environ, checkpoint, state_path):
             if not Path(state_path).exists():
                 raise SafeFailure("Insufficient time remains for a safe recovery request.")
             break
-        report = client.json(RECOVERY, headers={"Authorization": "Bearer " + identity,
-                                               "Content-Type": "application/json"},
-                             data=json.dumps({"checkpoint": checkpoint}).encode("utf-8"), timeout=70)
-        if (set(report) != {"busy", "complete", "processed", "outcomes", "checkpoint"}
-                or type(report["busy"]) is not bool or type(report["complete"]) is not bool
-                or type(report["processed"]) is not int or not 0 <= report["processed"] <= 25
-                or not isinstance(report["outcomes"], dict) or set(report["outcomes"]) != OUTCOMES
-                or any(type(count) is not int or count < 0 for count in report["outcomes"].values())
-                or sum(report["outcomes"].values()) != report["processed"]):
+        report = client.json(
+            RECOVERY,
+            headers={"Authorization": "Bearer " + identity, "Content-Type": "application/json"},
+            data=json.dumps({"checkpoint": checkpoint}).encode("utf-8"),
+            timeout=70,
+        )
+        if (
+            set(report) != {"busy", "complete", "processed", "outcomes", "checkpoint"}
+            or type(report["busy"]) is not bool
+            or type(report["complete"]) is not bool
+            or type(report["processed"]) is not int
+            or not 0 <= report["processed"] <= 25
+            or not isinstance(report["outcomes"], dict)
+            or set(report["outcomes"]) != OUTCOMES
+            or any(type(count) is not int or count < 0 for count in report["outcomes"].values())
+            or sum(report["outcomes"].values()) != report["processed"]
+        ):
             raise SafeFailure("Recovery aggregate response is invalid; the previous checkpoint is retained.")
         next_checkpoint = _token(report["checkpoint"])
-        if (report["busy"] and report["complete"]
-                or report["complete"] and next_checkpoint is not None
-                or not report["busy"] and not report["complete"] and next_checkpoint is None
-                or report["busy"] and (next_checkpoint != checkpoint or report["processed"] != 0)):
+        if (
+            report["busy"]
+            and report["complete"]
+            or report["complete"]
+            and next_checkpoint is not None
+            or not report["busy"]
+            and not report["complete"]
+            and next_checkpoint is None
+            or report["busy"]
+            and (next_checkpoint != checkpoint or report["processed"] != 0)
+        ):
             raise SafeFailure("Recovery checkpoint transition is invalid.")
         save_checkpoint(state_path, next_checkpoint)
         checkpoint = next_checkpoint

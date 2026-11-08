@@ -27,9 +27,7 @@ class StorageSuitability(Base):
     commodity_id: Mapped[int] = mapped_column(
         ForeignKey("commodities.id", ondelete="RESTRICT"), nullable=False, index=True
     )
-    market_id: Mapped[int] = mapped_column(
-        ForeignKey("markets.id", ondelete="RESTRICT"), nullable=False, index=True
-    )
+    market_id: Mapped[int] = mapped_column(ForeignKey("markets.id", ondelete="RESTRICT"), nullable=False, index=True)
     price_update_id: Mapped[int | None] = mapped_column(
         ForeignKey("price_updates.id", ondelete="SET NULL"), nullable=True, index=True
     )
@@ -40,9 +38,7 @@ class StorageSuitability(Base):
     buyer_availability: Mapped[str | None] = mapped_column(String(150), nullable=True)
     quality_storage_notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     summary: Mapped[str | None] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
     )

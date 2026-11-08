@@ -26,7 +26,11 @@ export function InstallPrompt() {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [showIosHelp, setShowIosHelp] = useState(false);
   const [dismissed, setDismissed] = useState(() => {
-    try { return localStorage.getItem(DISMISS_KEY) === "1"; } catch { return false; }
+    try {
+      return localStorage.getItem(DISMISS_KEY) === "1";
+    } catch {
+      return false;
+    }
   });
 
   useEffect(() => {
@@ -44,7 +48,11 @@ export function InstallPrompt() {
     setDismissed(true);
     setDeferred(null);
     setShowIosHelp(false);
-    try { localStorage.setItem(DISMISS_KEY, "1"); } catch { /* ignore */ }
+    try {
+      localStorage.setItem(DISMISS_KEY, "1");
+    } catch {
+      /* ignore */
+    }
   };
 
   const install = async () => {
@@ -62,14 +70,22 @@ export function InstallPrompt() {
         <>
           <span>Install PriceYard for quick, one-tap access to prices.</span>
           <div className="install-banner-actions">
-            <button type="button" className="button button-small" onClick={() => void install()}>Install app</button>
-            <button type="button" className="text-link text-link-button" onClick={dismiss}>Not now</button>
+            <button type="button" className="button button-small" onClick={() => void install()}>
+              Install app
+            </button>
+            <button type="button" className="text-link text-link-button" onClick={dismiss}>
+              Not now
+            </button>
           </div>
         </>
       ) : (
         <>
-          <span>Add PriceYard to your home screen: tap <strong>Share</strong>, then <strong>Add to Home Screen</strong>.</span>
-          <button type="button" className="text-link text-link-button" onClick={dismiss}>Got it</button>
+          <span>
+            Add PriceYard to your home screen: tap <strong>Share</strong>, then <strong>Add to Home Screen</strong>.
+          </span>
+          <button type="button" className="text-link text-link-button" onClick={dismiss}>
+            Got it
+          </button>
         </>
       )}
     </div>

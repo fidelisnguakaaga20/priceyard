@@ -28,7 +28,10 @@ export function ReportPricePage() {
   useEffect(() => {
     setOptionsLoading(true);
     void Promise.all([apiFetch<Commodity[]>("/commodities"), apiFetch<Market[]>("/markets")])
-      .then(([c, m]) => { setCommodities(c); setMarkets(m); })
+      .then(([c, m]) => {
+        setCommodities(c);
+        setMarkets(m);
+      })
       .catch((err) => setError(errorText(err)))
       .finally(() => setOptionsLoading(false));
   }, []);
@@ -71,46 +74,83 @@ export function ReportPricePage() {
   }
 
   if (user && user.role !== "reporter" && user.role !== "admin") {
-    return <section className="page page-section narrow">
-      <div className="status-box error">This page is only available to approved field reporters.</div>
-    </section>;
+    return (
+      <section className="page page-section narrow">
+        <div className="status-box error">This page is only available to approved field reporters.</div>
+      </section>
+    );
   }
 
-  return <section className="page page-section narrow">
-    <div className="page-title">
-      <span className="eyebrow">Field report</span>
-      <h1>Report a market price</h1>
-      <p>Quick price report from the market. An admin will review before it goes live — no need to add commentary or sourcing.</p>
-    </div>
-    <form className="form-stack card" onSubmit={submit}>
-      <label>
-        Commodity
-        <select name="commodity_id" required disabled={optionsLoading}>
-          <option value="">Choose a commodity</option>
-          {commodities.map((item) => <option value={item.id} key={item.id}>{item.name}</option>)}
-        </select>
-      </label>
-      <label>
-        Market
-        <select name="market_id" required disabled={optionsLoading}>
-          <option value="">Choose a market</option>
-          {markets.map((item) => <option value={item.id} key={item.id}>{item.name}</option>)}
-        </select>
-      </label>
-      <p className="muted">{PRICE_TIME_LABEL}</p>
-      <div className="form-grid">
-        <label>Price low<input name="price_low" type="number" min="0" step="0.01" required /></label>
-        <label>Price high<input name="price_high" type="number" min="0" step="0.01" required /></label>
-        <label>Number of bags<input name="unit" defaultValue="1 bag" placeholder="e.g. 1 bag" required /></label>
-        <label>Bag size (kg)<input name="bag_size" placeholder="e.g. 50kg" required /></label>
-        <label>Movement<select name="movement" defaultValue="unknown">{movements.map((item) => <option key={item}>{item}</option>)}</select></label>
-        <label>Date/time seen<input name="update_date_time" type="datetime-local" defaultValue={priceInputNow()} required /></label>
+  return (
+    <section className="page page-section narrow">
+      <div className="page-title">
+        <span className="eyebrow">Field report</span>
+        <h1>Report a market price</h1>
+        <p>
+          Quick price report from the market. An admin will review before it goes live — no need to add commentary or
+          sourcing.
+        </p>
       </div>
-      {message && <div className="status-box success">{message}</div>}
-      {error && <div className="status-box error">{error}</div>}
-      <button className="button" disabled={busy || optionsLoading}>
-        {busy ? <ButtonSpinner label="Submitting…" /> : "Submit price report"}
-      </button>
-    </form>
-  </section>;
+      <form className="form-stack card" onSubmit={submit}>
+        <label>
+          Commodity
+          <select name="commodity_id" required disabled={optionsLoading}>
+            <option value="">Choose a commodity</option>
+            {commodities.map((item) => (
+              <option value={item.id} key={item.id}>
+                {item.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Market
+          <select name="market_id" required disabled={optionsLoading}>
+            <option value="">Choose a market</option>
+            {markets.map((item) => (
+              <option value={item.id} key={item.id}>
+                {item.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <p className="muted">{PRICE_TIME_LABEL}</p>
+        <div className="form-grid">
+          <label>
+            Price low
+            <input name="price_low" type="number" min="0" step="0.01" required />
+          </label>
+          <label>
+            Price high
+            <input name="price_high" type="number" min="0" step="0.01" required />
+          </label>
+          <label>
+            Number of bags
+            <input name="unit" defaultValue="1 bag" placeholder="e.g. 1 bag" required />
+          </label>
+          <label>
+            Bag size (kg)
+            <input name="bag_size" placeholder="e.g. 50kg" required />
+          </label>
+          <label>
+            Movement
+            <select name="movement" defaultValue="unknown">
+              {movements.map((item) => (
+                <option key={item}>{item}</option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Date/time seen
+            <input name="update_date_time" type="datetime-local" defaultValue={priceInputNow()} required />
+          </label>
+        </div>
+        {message && <div className="status-box success">{message}</div>}
+        {error && <div className="status-box error">{error}</div>}
+        <button className="button" disabled={busy || optionsLoading}>
+          {busy ? <ButtonSpinner label="Submitting…" /> : "Submit price report"}
+        </button>
+      </form>
+    </section>
+  );
 }

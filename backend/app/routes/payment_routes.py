@@ -7,8 +7,19 @@ from app.database import get_db
 from app.models.payment import Payment
 from app.models.user import User
 from app.schemas.payment_schema import PaymentInitiateRequest, PaymentInitiateResponse, PaymentResponse
-from app.services.payment_service import handle_webhook_event, initiate_payment, verify_recorded_payment, verify_webhook_signature
-from app.services.admin_list_service import AdminJSONResponse, AdminRecordPage, admin_record_page, release_for_stream, stream_admin_records
+from app.services.payment_service import (
+    handle_webhook_event,
+    initiate_payment,
+    verify_recorded_payment,
+    verify_webhook_signature,
+)
+from app.services.admin_list_service import (
+    AdminJSONResponse,
+    AdminRecordPage,
+    admin_record_page,
+    release_for_stream,
+    stream_admin_records,
+)
 from app.rate_limit import client_address, limiter
 from app.utils.permissions import get_current_user, require_roles
 
@@ -66,8 +77,11 @@ def get_payments(
     db: Session = Depends(get_db),
     _: User = Depends(require_roles("admin")),
 ) -> Response:
-    return AdminJSONResponse(stream_admin_records(release_for_stream(db), Payment, PaymentResponse,
-                                                order=(("created_at", True), ("id", True))))
+    return AdminJSONResponse(
+        stream_admin_records(
+            release_for_stream(db), Payment, PaymentResponse, order=(("created_at", True), ("id", True))
+        )
+    )
 
 
 @router.get("/page", response_model=AdminRecordPage[PaymentResponse])
@@ -76,5 +90,4 @@ def get_payments_page(
     db: Session = Depends(get_db),
     _: User = Depends(require_roles("admin")),
 ) -> AdminRecordPage[PaymentResponse]:
-    return admin_record_page(db, Payment, PaymentResponse, offset=offset,
-                             order=(("created_at", True), ("id", True)))
+    return admin_record_page(db, Payment, PaymentResponse, offset=offset, order=(("created_at", True), ("id", True)))

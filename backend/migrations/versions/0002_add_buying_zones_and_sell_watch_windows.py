@@ -4,6 +4,7 @@ Revision ID: 0002_stage10_buy_sell_watch
 Revises: 0001_create_mvp_foundation
 Create Date: 2026-08-12
 """
+
 from typing import Sequence, Union
 
 from alembic import op

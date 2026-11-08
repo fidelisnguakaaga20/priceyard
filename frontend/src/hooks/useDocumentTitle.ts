@@ -4,6 +4,8 @@ export function useDocumentTitle(title: string): void {
   useEffect(() => {
     const previous = document.title;
     document.title = `${title} — PriceYard`;
-    return () => { document.title = previous; };
+    return () => {
+      document.title = previous;
+    };
   }, [title]);
 }

@@ -1,4 +1,5 @@
 """Private, bounded operational trigger; no browser or customer authentication."""
+
 import base64
 import json
 
@@ -31,14 +32,14 @@ def _cipher() -> Fernet:
     if not isinstance(secret, str) or len(secret) < 32:
         _reject(503, "Operational checkpoint protection is not configured")
     # Distinct purpose: the browser JWT key is never used directly for encryption.
-    key = HKDF(algorithm=hashes.SHA256(), length=32, salt=None,
-               info=b"priceyard-operational-recovery-checkpoint-v1").derive(secret.encode())
+    key = HKDF(
+        algorithm=hashes.SHA256(), length=32, salt=None, info=b"priceyard-operational-recovery-checkpoint-v1"
+    ).derive(secret.encode())
     return Fernet(base64.urlsafe_b64encode(key))
 
 
 def _valid_cursor(after_id: object, ceiling_id: object) -> bool:
-    return (type(after_id) is int and type(ceiling_id) is int
-            and 0 <= after_id <= ceiling_id <= MAX_RECORD_ID)
+    return type(after_id) is int and type(ceiling_id) is int and 0 <= after_id <= ceiling_id <= MAX_RECORD_ID
 
 
 def _decode_checkpoint(checkpoint: str | None) -> tuple[int, int | None]:
@@ -46,9 +47,13 @@ def _decode_checkpoint(checkpoint: str | None) -> tuple[int, int | None]:
         return 0, None
     try:
         value = json.loads(_cipher().decrypt(checkpoint.encode("ascii")))
-        if (not isinstance(value, dict) or set(value) != {"version", "after_id", "ceiling_id"}
-                or type(value["version"]) is not int or value["version"] != 1
-                or not _valid_cursor(value["after_id"], value["ceiling_id"])):
+        if (
+            not isinstance(value, dict)
+            or set(value) != {"version", "after_id", "ceiling_id"}
+            or type(value["version"]) is not int
+            or value["version"] != 1
+            or not _valid_cursor(value["after_id"], value["ceiling_id"])
+        ):
             raise ValueError("Invalid checkpoint")
         return value["after_id"], value["ceiling_id"]
     except (InvalidToken, ValueError, UnicodeError, TypeError):
@@ -77,8 +82,9 @@ async def _payload(request: Request) -> str | None:
         if not isinstance(payload, dict) or set(payload) - {"checkpoint"}:
             raise ValueError("Invalid payload")
         checkpoint = payload.get("checkpoint")
-        if checkpoint is not None and (not isinstance(checkpoint, str)
-                                      or not 1 <= len(checkpoint) <= MAX_CHECKPOINT_CHARACTERS):
+        if checkpoint is not None and (
+            not isinstance(checkpoint, str) or not 1 <= len(checkpoint) <= MAX_CHECKPOINT_CHARACTERS
+        ):
             raise ValueError("Invalid checkpoint")
         return checkpoint
     except (ValueError, UnicodeError, TypeError):
@@ -87,11 +93,16 @@ async def _payload(request: Request) -> str | None:
 
 def _recover(checkpoint: str | None, after_id: int, ceiling_id: int | None) -> dict:
     try:
-        report = reconcile_payments(get_engine(), apply=True, limit=25, after_id=after_id,
-                                    ceiling_id=ceiling_id, time_budget_seconds=45)
-        if (report["dry_run"] is not False or type(report["busy"]) is not bool
-                or type(report["complete"]) is not bool or not isinstance(report["outcomes"], list)
-                or len(report["outcomes"]) > 25):
+        report = reconcile_payments(
+            get_engine(), apply=True, limit=25, after_id=after_id, ceiling_id=ceiling_id, time_budget_seconds=45
+        )
+        if (
+            report["dry_run"] is not False
+            or type(report["busy"]) is not bool
+            or type(report["complete"]) is not bool
+            or not isinstance(report["outcomes"], list)
+            or len(report["outcomes"]) > 25
+        ):
             raise ValueError("Invalid recovery result")
         counts = dict.fromkeys(OUTCOMES, 0)
         for item in report["outcomes"]:
@@ -104,10 +115,17 @@ def _recover(checkpoint: str | None, after_id: int, ceiling_id: int | None) -> d
                 next_after, next_ceiling = report["next_after_id"], report["ceiling_id"]
                 if not _valid_cursor(next_after, next_ceiling):
                     raise ValueError("Invalid recovery cursor")
-                value = json.dumps({"version": 1, "after_id": next_after, "ceiling_id": next_ceiling}, separators=(",", ":"))
+                value = json.dumps(
+                    {"version": 1, "after_id": next_after, "ceiling_id": next_ceiling}, separators=(",", ":")
+                )
                 next_checkpoint = _cipher().encrypt(value.encode()).decode("ascii")
-        return {"busy": report["busy"], "complete": report["complete"],
-                "processed": len(report["outcomes"]), "outcomes": counts, "checkpoint": next_checkpoint}
+        return {
+            "busy": report["busy"],
+            "complete": report["complete"],
+            "processed": len(report["outcomes"]),
+            "outcomes": counts,
+            "checkpoint": next_checkpoint,
+        }
     except Exception:
         # Database URLs, private references and provider bodies never leave this trigger.
         _reject(503, "Operational recovery could not complete")

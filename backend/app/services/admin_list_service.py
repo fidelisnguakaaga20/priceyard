@@ -1,4 +1,5 @@
 """Bounded Admin pages and complete, schema-checked legacy JSON streams."""
+
 from collections.abc import Iterator
 from typing import Generic, TypeVar
 
@@ -22,21 +23,29 @@ class AdminRecordPage(BaseModel, Generic[T]):
 
 
 def _ordering(entity, order):
-    return [getattr(entity, name).desc() if descending else getattr(entity, name).asc()
-            for name, descending in order]
+    return [getattr(entity, name).desc() if descending else getattr(entity, name).asc() for name, descending in order]
 
 
-def admin_record_page(db: Session, model, schema: type[T], *, offset: int, order, where=(), related=()) -> AdminRecordPage[T]:
+def admin_record_page(
+    db: Session, model, schema: type[T], *, offset: int, order, where=(), related=()
+) -> AdminRecordPage[T]:
     # One statement gives count and rows the same DB snapshot, including an
     # empty/out-of-range page. Count never hydrates the rest of the catalog.
     total = select(func.count().label("total")).select_from(model).where(*where).cte("matched_total")
-    page = select(model).where(*where).order_by(*_ordering(model, order)).offset(offset).limit(PAGE_SIZE).cte("page_rows")
+    page = (
+        select(model).where(*where).order_by(*_ordering(model, order)).offset(offset).limit(PAGE_SIZE).cte("page_rows")
+    )
     entity = aliased(model, page)
-    rows = db.execute(select(entity, total.c.total).select_from(total).outerjoin(entity, true())
-                      .options(*(joinedload(getattr(entity, name)) for name in related))
-                      .order_by(*_ordering(entity, order))).all()
-    return AdminRecordPage(items=[schema.model_validate(item) for item, _ in rows if item is not None],
-                           total=rows[0][1], offset=offset)
+    rows = db.execute(
+        select(entity, total.c.total)
+        .select_from(total)
+        .outerjoin(entity, true())
+        .options(*(joinedload(getattr(entity, name)) for name in related))
+        .order_by(*_ordering(entity, order))
+    ).all()
+    return AdminRecordPage(
+        items=[schema.model_validate(item) for item, _ in rows if item is not None], total=rows[0][1], offset=offset
+    )
 
 
 def release_for_stream(db: Session) -> Engine:
@@ -51,7 +60,13 @@ def release_for_stream(db: Session) -> Engine:
 
 
 def stream_admin_records(engine: Engine, model, schema: type[T], *, order, where=(), related=()) -> Iterator[str]:
-    statement = select(model).where(*where).options(*(joinedload(getattr(model, name)) for name in related)).order_by(*_ordering(model, order)).execution_options(yield_per=100)
+    statement = (
+        select(model)
+        .where(*where)
+        .options(*(joinedload(getattr(model, name)) for name in related))
+        .order_by(*_ordering(model, order))
+        .execution_options(yield_per=100)
+    )
     return stream_schema_records(engine, statement, schema)
 
 
@@ -72,13 +87,16 @@ def stream_schema_records(engine: Engine, statement, schema: type[T]) -> Iterato
                 yield "]"
             finally:
                 result.close()
+
     return content()
 
 
 class AdminJSONResponse(StreamingResponse):
     def __init__(self, content, *, private=True):
         self._content = content
-        super().__init__(content, media_type="application/json", headers={"Cache-Control": "private, no-store"} if private else None)
+        super().__init__(
+            content, media_type="application/json", headers={"Cache-Control": "private, no-store"} if private else None
+        )
 
     async def __call__(self, scope, receive, send):
         try:

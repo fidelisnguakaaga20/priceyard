@@ -47,11 +47,7 @@ def list_sell_watch_windows(db: Session, *, commodity_id: int | None = None) -> 
     statement = select(SellWatchWindow)
     if commodity_id is not None:
         statement = statement.where(SellWatchWindow.commodity_id == commodity_id)
-    return list(
-        db.scalars(
-            statement.order_by(SellWatchWindow.created_at.desc(), SellWatchWindow.id.desc())
-        ).all()
-    )
+    return list(db.scalars(statement.order_by(SellWatchWindow.created_at.desc(), SellWatchWindow.id.desc())).all())
 
 
 def update_sell_watch_window(
@@ -60,7 +56,9 @@ def update_sell_watch_window(
     changes = payload.model_dump(exclude_unset=True)
     required = ("commodity_id", "market_id", "start_period", "observation", "confidence")
     if any(field in changes and changes[field] is None for field in required):
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Required sell-watch values cannot be null")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Required sell-watch values cannot be null"
+        )
     commodity_id = int(changes.get("commodity_id", window.commodity_id))
     market_id = int(changes.get("market_id", window.market_id))
     _validate_active_market_scope(db, commodity_id=commodity_id, market_id=market_id)

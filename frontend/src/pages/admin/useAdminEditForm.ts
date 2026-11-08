@@ -6,8 +6,14 @@ const missingRecord = "Record not found. Enter an existing ID or leave it blank 
 const loadingRecord = "Wait for the selected record to load.";
 
 /** Populate existing controls; an optional paged-list lookup uses the existing ID endpoint. */
-export function useAdminEditForm<T extends { id: number }>(data: T[], loading: boolean, setError: (message: string) => void,
-  lookup?: { path: string; token: string | null }, initialId?: string, onPopulate?: (record: T | null) => void) {
+export function useAdminEditForm<T extends { id: number }>(
+  data: T[],
+  loading: boolean,
+  setError: (message: string) => void,
+  lookup?: { path: string; token: string | null },
+  initialId?: string,
+  onPopulate?: (record: T | null) => void,
+) {
   const formRef = useRef<HTMLFormElement>(null);
   // Lets a form fill controls the generic name-matching below cannot (e.g. a list of rows).
   const onPopulateRef = useRef(onPopulate);
@@ -50,10 +56,18 @@ export function useAdminEditForm<T extends { id: number }>(data: T[], loading: b
     const controller = new AbortController();
     function populate(record: T) {
       if (!current || idInput.value !== editId) return;
-      if (record.id !== Number(editId)) { failed(missingRecord); return; }
+      if (record.id !== Number(editId)) {
+        failed(missingRecord);
+        return;
+      }
       for (const control of Array.from(selectedForm.elements)) {
-        if ((control instanceof HTMLInputElement || control instanceof HTMLTextAreaElement || control instanceof HTMLSelectElement)
-            && control.name !== "id" && Object.prototype.hasOwnProperty.call(record, control.name)) {
+        if (
+          (control instanceof HTMLInputElement ||
+            control instanceof HTMLTextAreaElement ||
+            control instanceof HTMLSelectElement) &&
+          control.name !== "id" &&
+          Object.prototype.hasOwnProperty.call(record, control.name)
+        ) {
           const value = (record as Record<string, unknown>)[control.name];
           control.value = value == null ? "" : String(value);
         }
@@ -65,15 +79,31 @@ export function useAdminEditForm<T extends { id: number }>(data: T[], loading: b
     }
     function failed(message: string) {
       if (!current || idInput.value !== editId) return;
-      idInput.setCustomValidity(message); setError(message);
+      idInput.setCustomValidity(message);
+      setError(message);
     }
-    const record = data.find(item => item.id === Number(editId));
+    const record = data.find((item) => item.id === Number(editId));
     if (record) populate(record);
-    else if (lookup?.token && Number.isSafeInteger(Number(editId)) && Number(editId) > 0 && Number(editId) <= 2_147_483_647) {
+    else if (
+      lookup?.token &&
+      Number.isSafeInteger(Number(editId)) &&
+      Number(editId) > 0 &&
+      Number(editId) <= 2_147_483_647
+    ) {
       void apiFetch<T>(`${lookup.path}/${Number(editId)}`, { signal: controller.signal }, lookup.token)
-        .then(populate).catch(err => failed(err instanceof ApiError && err.status === 404 ? missingRecord : "Unable to load the selected record. Re-enter its ID to retry."));
+        .then(populate)
+        .catch((err) =>
+          failed(
+            err instanceof ApiError && err.status === 404
+              ? missingRecord
+              : "Unable to load the selected record. Re-enter its ID to retry.",
+          ),
+        );
     } else failed(missingRecord);
-    return () => { current = false; controller.abort(); };
+    return () => {
+      current = false;
+      controller.abort();
+    };
   }, [data, loading, editId, setError, lookup?.path, lookup?.token]);
 
   function canSubmit() {

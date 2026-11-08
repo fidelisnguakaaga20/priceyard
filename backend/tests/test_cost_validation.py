@@ -1,4 +1,5 @@
 """Invalid cost edits must not crash, round, or alter historical/audit records."""
+
 from datetime import datetime, timezone
 from decimal import Decimal
 import unittest
@@ -27,13 +28,33 @@ def exercise_cost_validation(check, engine, scenario):
     Base.metadata.create_all(engine)
     suffix = uuid.uuid4().hex[:8]
     with Session(engine) as db:
-        admin = User(full_name="Synthetic cost Admin", email=f"cost-{suffix}@example.com", password_hash="unused", role="admin", referral_code="C"+suffix)
-        commodity, market = Commodity(name="Synthetic Egusi "+suffix), Market(name="Synthetic Kwali "+suffix)
-        db.add_all([admin, commodity, market]); db.flush()
+        admin = User(
+            full_name="Synthetic cost Admin",
+            email=f"cost-{suffix}@example.com",
+            password_hash="unused",
+            role="admin",
+            referral_code="C" + suffix,
+        )
+        commodity, market = Commodity(name="Synthetic Egusi " + suffix), Market(name="Synthetic Kwali " + suffix)
+        db.add_all([admin, commodity, market])
+        db.flush()
         scope = {"commodity_id": commodity.id, "market_id": market.id}
-        db.add(PriceUpdate(**scope, unit="1 bag", bag_size=None, price_low=210000, price_high=220000, status="approved", movement="unknown", confidence_level="Low confidence", created_by=admin.id, update_date_time=datetime.now(timezone.utc)))
+        db.add(
+            PriceUpdate(
+                **scope,
+                unit="1 bag",
+                bag_size=None,
+                price_low=210000,
+                price_high=220000,
+                status="approved",
+                movement="unknown",
+                confidence_level="Low confidence",
+                created_by=admin.id,
+                update_date_time=datetime.now(timezone.utc),
+            )
+        )
         db.commit()
-        headers = {"Authorization": "Bearer "+create_access_token(user_id=admin.id)}
+        headers = {"Authorization": "Bearer " + create_access_token(user_id=admin.id)}
 
     def sessions():
         with Session(engine) as db:
@@ -41,18 +62,30 @@ def exercise_cost_validation(check, engine, scenario):
 
     def state():
         with Session(engine) as db:
-            return {model.__tablename__: db.execute(select(model.__table__).order_by(model.id)).all() for model in (CostBreakdown, AuditLog, PriceUpdate)}
+            return {
+                model.__tablename__: db.execute(select(model.__table__).order_by(model.id)).all()
+                for model in (CostBreakdown, AuditLog, PriceUpdate)
+            }
 
     app.dependency_overrides[get_db] = sessions
     try:
         with TestClient(app, raise_server_exceptions=False) as client:
-            payload = {**scope, **{field: "0" for field in COSTS}, "transport": "120", "warehouse": "80", "purchase_price_reference": "210000"}
+            payload = {
+                **scope,
+                **{field: "0" for field in COSTS},
+                "transport": "120",
+                "warehouse": "80",
+                "purchase_price_reference": "210000",
+            }
             response = client.post("/cost-breakdowns", json=payload, headers=headers)
             check.assertEqual(response.status_code, 201, response.text)
             item_id = response.json()["id"]
             before = state()
             if scenario == "nulls":
-                requests = [("PATCH", f"/cost-breakdowns/{item_id}", {field: None}) for field in (*scope, *COSTS, "purchase_price_reference")]
+                requests = [
+                    ("PATCH", f"/cost-breakdowns/{item_id}", {field: None})
+                    for field in (*scope, *COSTS, "purchase_price_reference")
+                ]
             else:
                 zeroes = {**scope, **{field: "0" for field in COSTS}, "purchase_price_reference": "0"}
                 requests = [

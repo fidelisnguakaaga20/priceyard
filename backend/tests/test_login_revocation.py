@@ -29,15 +29,31 @@ class LoginRevocationTests(unittest.TestCase):
         self.engine = create_engine("sqlite+pysqlite:///:memory:")
         Base.metadata.create_all(self.engine)
         with Session(self.engine) as db:
-            user = User(full_name="Synthetic user", email="security@example.com", password_hash=self.password_hash, role="free_user", is_active=True, referral_code="SECURITY")
+            user = User(
+                full_name="Synthetic user",
+                email="security@example.com",
+                password_hash=self.password_hash,
+                role="free_user",
+                is_active=True,
+                referral_code="SECURITY",
+            )
             user.subscription = build_trial_subscription(user=user)
-            admin = User(full_name="Synthetic admin", email="security-admin@example.com", password_hash=self.password_hash, role="admin", is_active=True, referral_code="SECADMIN")
+            admin = User(
+                full_name="Synthetic admin",
+                email="security-admin@example.com",
+                password_hash=self.password_hash,
+                role="admin",
+                is_active=True,
+                referral_code="SECADMIN",
+            )
             db.add_all([user, admin])
             db.commit()
             self.user_id, self.admin_id = user.id, admin.id
+
         def sessions():
             with Session(self.engine, expire_on_commit=False) as db:
                 yield db
+
         app.dependency_overrides[get_db] = sessions
         self.client = TestClient(app, raise_server_exceptions=False)
         self.token = create_access_token(user_id=self.user_id)
@@ -51,13 +67,19 @@ class LoginRevocationTests(unittest.TestCase):
     def reset_link(self):
         raw = "synthetic-only-reset-link-" + "x" * 32
         with Session(self.engine) as db:
-            db.add(PasswordResetToken(user_id=self.user_id, token_hash=hashlib.sha256(raw.encode()).hexdigest(), expires_at=datetime.now(timezone.utc)+timedelta(minutes=10)))
+            db.add(
+                PasswordResetToken(
+                    user_id=self.user_id,
+                    token_hash=hashlib.sha256(raw.encode()).hexdigest(),
+                    expires_at=datetime.now(timezone.utc) + timedelta(minutes=10),
+                )
+            )
             db.commit()
         return raw
 
     def legacy_token(self, **changes):
         now = datetime.now(timezone.utc)
-        payload = {"sub": str(self.user_id), "iat": now, "exp": now+timedelta(days=90)}
+        payload = {"sub": str(self.user_id), "iat": now, "exp": now + timedelta(days=90)}
         payload.update(changes)
         return jwt.encode(payload, get_settings().jwt_secret, algorithm=get_settings().jwt_algorithm)
 
@@ -68,7 +90,7 @@ class LoginRevocationTests(unittest.TestCase):
         self.assertEqual(self.client.post("/auth/logout", headers=self.headers).status_code, 204)
         self.assertEqual(self.client.post("/auth/logout", headers=self.headers).status_code, 204)
         self.assertEqual(self.client.get("/auth/me", headers=self.headers).status_code, 401)
-        self.assertEqual(self.client.get("/auth/me", headers={"Authorization": "Bearer "+other}).status_code, 200)
+        self.assertEqual(self.client.get("/auth/me", headers={"Authorization": "Bearer " + other}).status_code, 200)
         with Session(self.engine) as db:
             stored = db.scalar(select(RevokedAccessToken))
             self.assertEqual(stored.token_hash, hashlib.sha256(self.token.encode()).hexdigest())
@@ -76,15 +98,15 @@ class LoginRevocationTests(unittest.TestCase):
 
     def test_legacy_login_preserved_until_password_reset_revokes_all(self):
         legacy = self.legacy_token()
-        self.assertEqual(self.client.get("/auth/me", headers={"Authorization": "Bearer "+legacy}).status_code, 200)
+        self.assertEqual(self.client.get("/auth/me", headers={"Authorization": "Bearer " + legacy}).status_code, 200)
         link = self.reset_link()
         response = self.client.post("/auth/reset-password", json={"token": link, "new_password": "NewPassword1"})
         self.assertEqual(response.status_code, 200, response.text)
         for token in (legacy, self.token):
-            self.assertEqual(self.client.get("/auth/me", headers={"Authorization": "Bearer "+token}).status_code, 401)
+            self.assertEqual(self.client.get("/auth/me", headers={"Authorization": "Bearer " + token}).status_code, 401)
         login = self.client.post("/auth/login", json={"email": "security@example.com", "password": "NewPassword1"})
         self.assertEqual(login.status_code, 200, login.text)
-        profile = self.client.get("/auth/me", headers={"Authorization": "Bearer "+login.json()["access_token"]})
+        profile = self.client.get("/auth/me", headers={"Authorization": "Bearer " + login.json()["access_token"]})
         self.assertEqual(profile.status_code, 200)
         self.assertNotIn("auth_version", profile.json())
         with Session(self.engine) as db:
@@ -92,8 +114,16 @@ class LoginRevocationTests(unittest.TestCase):
 
     def test_reset_link_single_use_and_rejected_retry_has_no_effect(self):
         link = self.reset_link()
-        self.assertEqual(self.client.post("/auth/reset-password", json={"token": link, "new_password": "NewPassword1"}).status_code, 200)
-        self.assertEqual(self.client.post("/auth/reset-password", json={"token": link, "new_password": "DifferentPassword1"}).status_code, 400)
+        self.assertEqual(
+            self.client.post("/auth/reset-password", json={"token": link, "new_password": "NewPassword1"}).status_code,
+            200,
+        )
+        self.assertEqual(
+            self.client.post(
+                "/auth/reset-password", json={"token": link, "new_password": "DifferentPassword1"}
+            ).status_code,
+            400,
+        )
         with Session(self.engine) as db:
             user = db.get(User, self.user_id)
             self.assertEqual(user.auth_version, 1)
@@ -110,7 +140,7 @@ class LoginRevocationTests(unittest.TestCase):
             self.assertIsNone(db.scalar(select(PasswordResetToken)).used_at)
 
     def test_disabling_then_reenabling_does_not_restore_old_login(self):
-        admin_headers = {"Authorization": "Bearer "+create_access_token(user_id=self.admin_id)}
+        admin_headers = {"Authorization": "Bearer " + create_access_token(user_id=self.admin_id)}
         for enabled in (False, True):
             response = self.client.patch(f"/users/{self.user_id}", headers=admin_headers, json={"is_active": enabled})
             self.assertEqual(response.status_code, 200, response.text)
@@ -122,11 +152,11 @@ class LoginRevocationTests(unittest.TestCase):
     def test_invalid_version_and_unauthenticated_logout_rejected(self):
         for version in (True, "0", -1):
             token = self.legacy_token(auth_version=version)
-            self.assertEqual(self.client.get("/auth/me", headers={"Authorization": "Bearer "+token}).status_code, 401)
+            self.assertEqual(self.client.get("/auth/me", headers={"Authorization": "Bearer " + token}).status_code, 401)
         self.assertEqual(self.client.post("/auth/logout").status_code, 401)
 
     def test_manual_role_changes_preserve_existing_access_rules(self):
-        admin_headers = {"Authorization": "Bearer "+create_access_token(user_id=self.admin_id)}
+        admin_headers = {"Authorization": "Bearer " + create_access_token(user_id=self.admin_id)}
         for role, expected_status in (("paid_user", "active"), ("free_user", "free")):
             response = self.client.patch(f"/users/{self.user_id}", headers=admin_headers, json={"role": role})
             self.assertEqual(response.status_code, 200, response.text)
@@ -136,10 +166,12 @@ class LoginRevocationTests(unittest.TestCase):
             self.assertIsNone(subscription.json()["end_date"])
 
     def test_last_admin_owner_rejection_keeps_account_and_credential_working(self):
-        admin_headers = {"Authorization": "Bearer "+create_access_token(user_id=self.admin_id)}
+        admin_headers = {"Authorization": "Bearer " + create_access_token(user_id=self.admin_id)}
         with patch.object(get_settings(), "owner_email", "security-admin@example.com"):
             for payload in ({"is_active": False}, {"role": "free_user"}):
-                self.assertEqual(self.client.patch(f"/users/{self.admin_id}", headers=admin_headers, json=payload).status_code, 409)
+                self.assertEqual(
+                    self.client.patch(f"/users/{self.admin_id}", headers=admin_headers, json=payload).status_code, 409
+                )
         profile = self.client.get("/auth/me", headers=admin_headers)
         self.assertEqual(profile.status_code, 200)
         self.assertEqual(profile.json()["role"], "admin")

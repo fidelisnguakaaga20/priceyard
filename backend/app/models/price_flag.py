@@ -15,12 +15,12 @@ if TYPE_CHECKING:
 
 class PriceFlag(Base):
     __tablename__ = "price_flags"
-    __table_args__ = (
-        UniqueConstraint("price_update_id", "user_id", name="uq_price_flags_price_update_user"),
-    )
+    __table_args__ = (UniqueConstraint("price_update_id", "user_id", name="uq_price_flags_price_update_user"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    price_update_id: Mapped[int] = mapped_column(ForeignKey("price_updates.id", ondelete="CASCADE"), nullable=False, index=True)
+    price_update_id: Mapped[int] = mapped_column(
+        ForeignKey("price_updates.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     reason: Mapped[str | None] = mapped_column(String(50), nullable=True)
     resolved: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="false", index=True)

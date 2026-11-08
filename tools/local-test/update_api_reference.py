@@ -1,4 +1,5 @@
 """Generate a source-only route index without importing app/settings or using a DB."""
+
 import ast
 from pathlib import Path
 
@@ -71,7 +72,12 @@ def declared_dependencies(function):
     defaults = list(args.defaults) + [value for value in args.kw_defaults if value is not None]
     result = []
     for value in defaults:
-        if isinstance(value, ast.Call) and isinstance(value.func, ast.Name) and value.func.id == "Depends" and value.args:
+        if (
+            isinstance(value, ast.Call)
+            and isinstance(value.func, ast.Name)
+            and value.func.id == "Depends"
+            and value.args
+        ):
             expression = ast.unparse(value.args[0])
             if expression != "get_db":
                 result.append(expression)
@@ -84,8 +90,15 @@ def render_reference():
         tree = ast.parse(source.read_text(encoding="utf-8-sig"))
         prefixes = {}
         for node in tree.body:
-            if isinstance(node, ast.Assign) and isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Name) and node.value.func.id in {"APIRouter", "FastAPI"}:
-                prefix = next((ast.literal_eval(value.value) for value in node.value.keywords if value.arg == "prefix"), "")
+            if (
+                isinstance(node, ast.Assign)
+                and isinstance(node.value, ast.Call)
+                and isinstance(node.value.func, ast.Name)
+                and node.value.func.id in {"APIRouter", "FastAPI"}
+            ):
+                prefix = next(
+                    (ast.literal_eval(value.value) for value in node.value.keywords if value.arg == "prefix"), ""
+                )
                 for target in node.targets:
                     if isinstance(target, ast.Name):
                         prefixes[target.id] = prefix
@@ -97,7 +110,11 @@ def render_reference():
                     continue
                 owner = decorator.func.value
                 method = decorator.func.attr
-                if not isinstance(owner, ast.Name) or owner.id not in prefixes or method not in {"get", "post", "patch", "put", "delete", "head", "options"}:
+                if (
+                    not isinstance(owner, ast.Name)
+                    or owner.id not in prefixes
+                    or method not in {"get", "post", "patch", "put", "delete", "head", "options"}
+                ):
                     continue
                 endpoint = prefixes[owner.id] + ast.literal_eval(decorator.args[0])
                 dependencies = declared_dependencies(function).replace("|", "\\|")
@@ -105,7 +122,9 @@ def render_reference():
                 entries.append((endpoint, method.upper(), dependencies, link))
     assert len(entries) > 80, "Refuse to replace the reference with a partial inventory"
     assert len({(path, method) for path, method, _, _ in entries}) == len(entries), "Duplicate operation declaration"
-    lines = [f"| {method} | `{path}` | `{dependencies}` | {link} |" for path, method, dependencies, link in sorted(entries)]
+    lines = [
+        f"| {method} | `{path}` | `{dependencies}` | {link} |" for path, method, dependencies, link in sorted(entries)
+    ]
     return INTRO + "\n".join(lines) + "\n", len(entries)
 
 

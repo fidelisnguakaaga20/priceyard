@@ -48,12 +48,54 @@ export default function App() {
         <Route path="register" element={<RegisterPage />} />
         <Route path="forgot-password" element={<ForgotPasswordPage />} />
         <Route path="reset-password" element={<ResetPasswordPage />} />
-        <Route path="dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-        <Route path="payment/callback" element={<ProtectedRoute><PaymentCallbackPage /></ProtectedRoute>} />
-        <Route path="watchlist" element={<ProtectedRoute><WatchlistPage /></ProtectedRoute>} />
-        <Route path="feedback" element={<ProtectedRoute><FeedbackPage /></ProtectedRoute>} />
-        <Route path="report-price" element={<ProtectedRoute><ReportPricePage /></ProtectedRoute>} />
-        <Route path="admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+        <Route
+          path="dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="payment/callback"
+          element={
+            <ProtectedRoute>
+              <PaymentCallbackPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="watchlist"
+          element={
+            <ProtectedRoute>
+              <WatchlistPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="feedback"
+          element={
+            <ProtectedRoute>
+              <FeedbackPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="report-price"
+          element={
+            <ProtectedRoute>
+              <ReportPricePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="admin"
+          element={
+            <AdminRoute>
+              <AdminLayout />
+            </AdminRoute>
+          }
+        >
           <Route index element={<AdminDashboardPage />} />
           <Route path="activity" element={<AdminActivityPage />} />
           <Route path="users" element={<AdminUsersPage />} />

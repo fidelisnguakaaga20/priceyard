@@ -12,9 +12,14 @@ export function shortPriceDate(value: string | null | undefined): string {
   if (!value) return "—";
   const epoch = priceEpoch(value);
   if (!Number.isFinite(epoch)) return value;
-  return new Intl.DateTimeFormat("en-NG", {
-    timeZone: "Africa/Lagos", dateStyle: "medium", timeStyle: "short", hour12: true,
-  }).format(epoch) + " WAT";
+  return (
+    new Intl.DateTimeFormat("en-NG", {
+      timeZone: "Africa/Lagos",
+      dateStyle: "medium",
+      timeStyle: "short",
+      hour12: true,
+    }).format(epoch) + " WAT"
+  );
 }
 
 export function relativePriceTime(value: string | null | undefined): string {

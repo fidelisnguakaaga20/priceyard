@@ -30,8 +30,7 @@ def _validate_signal_references(
     if not market.is_active:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Market is inactive")
 
-    validate_linked_price_scope(db, price_update_id=price_update_id,
-                                commodity_id=commodity_id, market_id=market_id)
+    validate_linked_price_scope(db, price_update_id=price_update_id, commodity_id=commodity_id, market_id=market_id)
 
 
 def create_market_signal(db: Session, payload: MarketSignalCreate, admin: User, *, commit: bool = True) -> MarketSignal:
@@ -64,11 +63,15 @@ def list_market_signals(db: Session, *, commodity_id: int | None = None) -> list
     return list(db.scalars(statement.order_by(MarketSignal.created_at.desc(), MarketSignal.id.desc())).all())
 
 
-def update_market_signal(db: Session, signal: MarketSignal, payload: MarketSignalUpdate, *, commit: bool = True) -> MarketSignal:
+def update_market_signal(
+    db: Session, signal: MarketSignal, payload: MarketSignalUpdate, *, commit: bool = True
+) -> MarketSignal:
     changes = payload.model_dump(exclude_unset=True)
     required = ("commodity_id", "market_id", "signal_type", "signal_description")
     if any(field in changes and changes[field] is None for field in required):
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Required market-signal values cannot be null")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Required market-signal values cannot be null"
+        )
     commodity_id = int(changes.get("commodity_id", signal.commodity_id))
     market_id = int(changes.get("market_id", signal.market_id))
     price_update_id = changes.get("price_update_id", signal.price_update_id)

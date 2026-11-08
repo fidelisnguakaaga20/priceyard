@@ -4,6 +4,7 @@ Revision ID: 0015_add_payments
 Revises: 0014_add_referral
 Create Date: 2026-09-21
 """
+
 from typing import Sequence, Union
 
 from alembic import op

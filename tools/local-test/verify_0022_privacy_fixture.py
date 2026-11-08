@@ -1,4 +1,5 @@
 """Fabricated-only PG17 migration privacy checks; no backup or provider access."""
+
 import json
 import os
 import subprocess
@@ -100,14 +101,31 @@ echo DEPENDENT_GRANT_ATOMIC_REFUSAL_PASSED
 def main():
     upgrade_sql, migration_sha = prepare()
     script = SCRIPT.replace("__UPGRADE__", upgrade_sql).replace("__ACCESS__", USER_ACCESS_SQL.strip().rstrip(";"))
-    env = {key: os.environ[key] for key in ("SYSTEMROOT", "WINDIR", "USERPROFILE", "APPDATA", "LOCALAPPDATA", "TEMP", "TMP") if key in os.environ}
+    env = {
+        key: os.environ[key]
+        for key in ("SYSTEMROOT", "WINDIR", "USERPROFILE", "APPDATA", "LOCALAPPDATA", "TEMP", "TMP")
+        if key in os.environ
+    }
     name = "priceyard-0022-fabricated-" + uuid.uuid4().hex[:10]
-    result = {"status": "failed", "synthetic_only": True, "customer_records_read": 0, "production_connections": 0, "migration_sha256": migration_sha}
+    result = {
+        "status": "failed",
+        "synthetic_only": True,
+        "customer_records_read": 0,
+        "production_connections": 0,
+        "migration_sha256": migration_sha,
+    }
     with tempfile.TemporaryDirectory(prefix="priceyard-empty-docker-config-") as config:
         base = [CLI, "--config", config, "--host", "npipe:////./pipe/dockerDesktopLinuxEngine"]
 
         def docker(args, timeout=8, payload=None):
-            completed = subprocess.run(base + args, env=env, input=None if payload is None else payload.encode("utf-8"), capture_output=True, timeout=timeout, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+            completed = subprocess.run(
+                base + args,
+                env=env,
+                input=None if payload is None else payload.encode("utf-8"),
+                capture_output=True,
+                timeout=timeout,
+                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+            )
             completed.stdout = completed.stdout.decode("utf-8", errors="replace")
             completed.stderr = completed.stderr.decode("utf-8", errors="replace")
             return completed
@@ -118,18 +136,69 @@ def main():
         meta = json.loads(image.stdout)
         if meta["Os"] != "linux" or meta["Architecture"] != "amd64" or meta["Config"].get("Volumes"):
             raise RuntimeError("Pinned image platform or volumes differ")
-        created = docker(["container", "create", "--pull=never", "--rm", "--interactive", "--name", name,
-                          "--label", "purpose=priceyard-fabricated-0022-privacy", "--network=none", "--read-only", "--user=postgres", "--cap-drop=ALL", "--security-opt=no-new-privileges", "--log-driver=none", "--no-healthcheck", "--memory=512m", "--memory-swap=512m", "--cpus=1", "--pids-limit=64", "--shm-size=16m", "--ulimit=core=0", "--tmpfs=/work:rw,noexec,nosuid,nodev,size=268435456,mode=1777", "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=8388608,mode=1777", "--entrypoint=/bin/sh", IMAGE, "-s"])
+        created = docker(
+            [
+                "container",
+                "create",
+                "--pull=never",
+                "--rm",
+                "--interactive",
+                "--name",
+                name,
+                "--label",
+                "purpose=priceyard-fabricated-0022-privacy",
+                "--network=none",
+                "--read-only",
+                "--user=postgres",
+                "--cap-drop=ALL",
+                "--security-opt=no-new-privileges",
+                "--log-driver=none",
+                "--no-healthcheck",
+                "--memory=512m",
+                "--memory-swap=512m",
+                "--cpus=1",
+                "--pids-limit=64",
+                "--shm-size=16m",
+                "--ulimit=core=0",
+                "--tmpfs=/work:rw,noexec,nosuid,nodev,size=268435456,mode=1777",
+                "--tmpfs=/tmp:rw,noexec,nosuid,nodev,size=8388608,mode=1777",
+                "--entrypoint=/bin/sh",
+                IMAGE,
+                "-s",
+            ]
+        )
         if created.returncode:
             raise RuntimeError("Synthetic container creation failed")
         try:
             inspected = docker(["container", "inspect", name, "--format", "{{json .}}"])
             info = json.loads(inspected.stdout)
             host = info["HostConfig"]
-            if not (host["NetworkMode"] == "none" and host["ReadonlyRootfs"] and host["Memory"] == host["MemorySwap"] == 536870912 and host["NanoCpus"] == 1_000_000_000 and host["PidsLimit"] == 64 and host["LogConfig"]["Type"] == "none" and host["AutoRemove"] and not host["Privileged"] and not host.get("Binds") and not host.get("VolumesFrom") and not host.get("PortBindings") and "ALL" in host["CapDrop"] and "no-new-privileges" in host["SecurityOpt"] and info["Config"]["User"] == "postgres" and {m["Type"] for m in info.get("Mounts", [])} <= {"tmpfs"} and set(host["Tmpfs"]) == {"/work", "/tmp"}):
+            if not (
+                host["NetworkMode"] == "none"
+                and host["ReadonlyRootfs"]
+                and host["Memory"] == host["MemorySwap"] == 536870912
+                and host["NanoCpus"] == 1_000_000_000
+                and host["PidsLimit"] == 64
+                and host["LogConfig"]["Type"] == "none"
+                and host["AutoRemove"]
+                and not host["Privileged"]
+                and not host.get("Binds")
+                and not host.get("VolumesFrom")
+                and not host.get("PortBindings")
+                and "ALL" in host["CapDrop"]
+                and "no-new-privileges" in host["SecurityOpt"]
+                and info["Config"]["User"] == "postgres"
+                and {m["Type"] for m in info.get("Mounts", [])} <= {"tmpfs"}
+                and set(host["Tmpfs"]) == {"/work", "/tmp"}
+            ):
                 raise RuntimeError("Synthetic container isolation differs")
             completed = docker(["container", "start", "--attach", "--interactive", name], timeout=30, payload=script)
-            markers = ("FRESH_MIGRATION_PASSED", "DEFAULT_ACL_PRIVACY_AND_ORIGINAL_ACCESS_PASSED", "INHERITED_UPDATE_ATOMIC_REFUSAL_PASSED", "DEPENDENT_GRANT_ATOMIC_REFUSAL_PASSED")
+            markers = (
+                "FRESH_MIGRATION_PASSED",
+                "DEFAULT_ACL_PRIVACY_AND_ORIGINAL_ACCESS_PASSED",
+                "INHERITED_UPDATE_ATOMIC_REFUSAL_PASSED",
+                "DEPENDENT_GRANT_ATOMIC_REFUSAL_PASSED",
+            )
             result["checks"] = {marker: marker in completed.stdout for marker in markers}
             if completed.returncode or not all(result["checks"].values()):
                 print(completed.stdout + completed.stderr)

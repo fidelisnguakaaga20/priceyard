@@ -21,7 +21,10 @@ export function accessExpiresAt(subscription: Subscription | null): number | nul
   return Number.NaN;
 }
 
-export function computeAccess(user: User | null, subscription: Subscription | null): { label: AccessLabel; full: boolean } {
+export function computeAccess(
+  user: User | null,
+  subscription: Subscription | null,
+): { label: AccessLabel; full: boolean } {
   if (!user) return { label: "Guest", full: false };
   if (user.role === "admin") return { label: user.is_owner === true ? "Owner" : "Admin", full: true };
   const expiry = accessExpiresAt(subscription);

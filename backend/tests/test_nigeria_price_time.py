@@ -17,7 +17,11 @@ from app.models.subscription import Subscription
 from app.models.user import User
 from app.security import create_access_token
 from app.services.price_time_service import price_day_bounds
-from app.services.price_update_service import list_latest_approved_price_updates, list_market_comparison, list_price_history
+from app.services.price_update_service import (
+    list_latest_approved_price_updates,
+    list_market_comparison,
+    list_price_history,
+)
 from app.services.report_export_service import stream_price_report_csv
 
 
@@ -29,22 +33,49 @@ END = datetime(2026, 10, 18, 23, tzinfo=timezone.utc)
 def seed_time_boundaries(engine):
     Base.metadata.create_all(engine)
     with Session(engine) as db:
-        owner = User(full_name="Synthetic time Admin", email="wat-boundary@example.com",
-                     role="admin", password_hash="unused", referral_code="WATBOUNDARY")
-        free = User(full_name="Synthetic free", email="wat-free@example.com",
-                    role="free_user", password_hash="unused", referral_code="WATFREE")
+        owner = User(
+            full_name="Synthetic time Admin",
+            email="wat-boundary@example.com",
+            role="admin",
+            password_hash="unused",
+            referral_code="WATBOUNDARY",
+        )
+        free = User(
+            full_name="Synthetic free",
+            email="wat-free@example.com",
+            role="free_user",
+            password_hash="unused",
+            referral_code="WATFREE",
+        )
         free.subscription = Subscription(status="free", plan_name="free")
         commodity, market = Commodity(name="Egusi"), Market(name="Kwali Market")
         db.add_all([owner, free, commodity, market])
         db.flush()
         ids = []
         # Includes both sides of WAT midnight and the UTC/Nigerian date overlap.
-        for index, stamp in enumerate((START-timedelta(microseconds=1), START,
-                START+timedelta(minutes=30), END-timedelta(microseconds=1), END)):
-            row = PriceUpdate(commodity_id=commodity.id, market_id=market.id,
-                price_low=210000+index, price_high=220000, unit="1 bag", bag_size=None,
-                status="approved", movement="unknown", confidence_level="Low confidence",
-                created_by=owner.id, update_date_time=stamp, source_1="PRIVATE-TIME-SOURCE")
+        for index, stamp in enumerate(
+            (
+                START - timedelta(microseconds=1),
+                START,
+                START + timedelta(minutes=30),
+                END - timedelta(microseconds=1),
+                END,
+            )
+        ):
+            row = PriceUpdate(
+                commodity_id=commodity.id,
+                market_id=market.id,
+                price_low=210000 + index,
+                price_high=220000,
+                unit="1 bag",
+                bag_size=None,
+                status="approved",
+                movement="unknown",
+                confidence_level="Low confidence",
+                created_by=owner.id,
+                update_date_time=stamp,
+                source_1="PRIVATE-TIME-SOURCE",
+            )
             db.add(row)
             db.flush()
             ids.append(row.id)
@@ -60,7 +91,9 @@ def verify_price_day(check, engine):
         history = list_price_history(db, selected_date=DAY)
         check.assertEqual([row.id for row in history], ids[1:4])
         check.assertEqual([row.id for row in list_latest_approved_price_updates(db, selected_date=DAY)], [ids[3]])
-        check.assertEqual([row.id for row in list_market_comparison(db, commodity_search="Egusi", selected_date=DAY)], [ids[3]])
+        check.assertEqual(
+            [row.id for row in list_market_comparison(db, commodity_search="Egusi", selected_date=DAY)], [ids[3]]
+        )
         check.assertEqual([row.id for row in list_latest_approved_price_updates(db)], [ids[4]])
         check.assertEqual(len(list_price_history(db)), 5)
     rows = list(csv.DictReader(StringIO("".join(stream_price_report_csv(engine, date_from=DAY, date_to=DAY)))))
@@ -87,12 +120,14 @@ class NigeriaPriceTimeTests(unittest.TestCase):
 
     def test_nigerian_day_urls_keep_current_and_history_access_boundaries(self):
         admin, free, ids = seed_time_boundaries(self.engine)
+
         def sessions():
             with Session(self.engine) as db:
                 yield db
+
         app.dependency_overrides[get_db] = sessions
-        admin_headers = {"Authorization": "Bearer "+create_access_token(user_id=admin)}
-        free_headers = {"Authorization": "Bearer "+create_access_token(user_id=free)}
+        admin_headers = {"Authorization": "Bearer " + create_access_token(user_id=admin)}
+        free_headers = {"Authorization": "Bearer " + create_access_token(user_id=free)}
         with TestClient(app) as client:
             for path in ("/price-updates?date=2026-10-18", "/price-updates/comparison?commodity=Egusi&date=2026-10-18"):
                 self.assertEqual(client.get(path).status_code, 401)

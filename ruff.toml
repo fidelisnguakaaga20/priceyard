@@ -1,0 +1,20 @@
+# Python code style for PriceYard (server code, tests and helper tools).
+# Checked automatically before every deploy:
+#   ruff format --check .   (layout: spacing, line breaks, quotes)
+#   ruff check .            (common mistakes, e.g. unused imports or undefined names)
+line-length = 120
+target-version = "py312"
+# Historical evidence scripts are kept exactly as they were recorded.
+extend-exclude = ["docs/evidence"]
+
+[lint]
+# Core checks only: syntax errors, unused imports/variables, undefined names.
+select = ["E4", "E7", "E9", "F"]
+
+[lint.pyflakes]
+# "import app.models" is intentional: it registers every database table.
+allowed-unused-imports = ["app.models"]
+
+[lint.per-file-ignores]
+# Local test scripts must switch on network/process isolation before importing app code.
+"tools/local-test/*" = ["E402"]

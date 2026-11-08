@@ -4,6 +4,7 @@ Revision ID: 0007_auth01_password_reset
 Revises: 0006_cr03_egusi_kwali
 Create Date: 2026-08-29
 """
+
 from typing import Sequence, Union
 
 from alembic import op

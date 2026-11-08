@@ -42,7 +42,10 @@ def _calculate_totals(values: dict, items: list[dict[str, str]]) -> tuple[Decima
     additional += sum((Decimal(item["amount"]) for item in items), _ZERO)
     total = values["purchase_price_reference"] + additional
     if additional > _MAX_TOTAL or total > _MAX_TOTAL:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Calculated cost total exceeds the existing storage limit")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Calculated cost total exceeds the existing storage limit",
+        )
     return additional, total
 
 
@@ -81,11 +84,7 @@ def list_cost_breakdowns(db: Session, *, commodity_id: int | None = None) -> lis
     statement = select(CostBreakdown)
     if commodity_id is not None:
         statement = statement.where(CostBreakdown.commodity_id == commodity_id)
-    return list(
-        db.scalars(
-            statement.order_by(CostBreakdown.created_at.desc(), CostBreakdown.id.desc())
-        ).all()
-    )
+    return list(db.scalars(statement.order_by(CostBreakdown.created_at.desc(), CostBreakdown.id.desc())).all())
 
 
 def update_cost_breakdown(
@@ -99,18 +98,16 @@ def update_cost_breakdown(
     # Every editable cost column is non-nullable. Omitted values keep their
     # saved values; an explicit zero remains a valid way to clear a cost.
     if any(value is None for value in changes.values()):
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Cost breakdown values cannot be null")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Cost breakdown values cannot be null"
+        )
     commodity_id = int(changes.get("commodity_id", item.commodity_id))
     market_id = int(changes.get("market_id", item.market_id))
     _validate_commodity(db, commodity_id)
     _validate_market(db, market_id)
 
-    values: dict[str, Decimal] = {
-        field: changes.get(field, getattr(item, field)) for field in _COST_FIELDS
-    }
-    values["purchase_price_reference"] = changes.get(
-        "purchase_price_reference", item.purchase_price_reference
-    )
+    values: dict[str, Decimal] = {field: changes.get(field, getattr(item, field)) for field in _COST_FIELDS}
+    values["purchase_price_reference"] = changes.get("purchase_price_reference", item.purchase_price_reference)
     if "cost_items" in changes:
         changes["cost_items"] = _stored_items(changes["cost_items"])
     additional, total = _calculate_totals(values, changes.get("cost_items", item.cost_items or []))

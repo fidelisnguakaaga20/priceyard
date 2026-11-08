@@ -4,6 +4,7 @@ Revision ID: 0019_add_target_price
 Revises: 0018_add_price_flags
 Create Date: 2026-10-07
 """
+
 from typing import Sequence, Union
 
 from alembic import op

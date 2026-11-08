@@ -27,11 +27,23 @@ class AdminLoginLifetimeTests(unittest.TestCase):
         self.engine = create_engine("sqlite+pysqlite:///:memory:")
         Base.metadata.create_all(self.engine)
         with Session(self.engine) as db:
-            user = User(full_name="Synthetic user", email="lifetime-user@example.com", password_hash=self.password_hash,
-                        role="free_user", is_active=True, referral_code="LIFEUSER")
+            user = User(
+                full_name="Synthetic user",
+                email="lifetime-user@example.com",
+                password_hash=self.password_hash,
+                role="free_user",
+                is_active=True,
+                referral_code="LIFEUSER",
+            )
             user.subscription = build_trial_subscription(user=user)
-            admin = User(full_name="Synthetic admin", email="lifetime-admin@example.com", password_hash=self.password_hash,
-                         role="admin", is_active=True, referral_code="LIFEADMN")
+            admin = User(
+                full_name="Synthetic admin",
+                email="lifetime-admin@example.com",
+                password_hash=self.password_hash,
+                role="admin",
+                is_active=True,
+                referral_code="LIFEADMN",
+            )
             db.add_all([user, admin])
             db.commit()
             self.user_id, self.admin_id = user.id, admin.id
@@ -54,7 +66,13 @@ class AdminLoginLifetimeTests(unittest.TestCase):
 
     def old_token(self, user_id, *, days_ago, valid_for_days=90):
         issued = datetime.now(timezone.utc) - timedelta(days=days_ago)
-        payload = {"sub": str(user_id), "iat": issued, "exp": issued + timedelta(days=valid_for_days), "auth_version": 0, "jti": "old"}
+        payload = {
+            "sub": str(user_id),
+            "iat": issued,
+            "exp": issued + timedelta(days=valid_for_days),
+            "auth_version": 0,
+            "jti": "old",
+        }
         settings = get_settings()
         return jwt.encode(payload, settings.jwt_secret, algorithm=settings.jwt_algorithm)
 
@@ -62,12 +80,16 @@ class AdminLoginLifetimeTests(unittest.TestCase):
         return self.client.get("/auth/me", headers={"Authorization": "Bearer " + token})
 
     def test_admin_login_lasts_seven_days(self):
-        response = self.client.post("/auth/login", json={"email": "lifetime-admin@example.com", "password": "Password123"})
+        response = self.client.post(
+            "/auth/login", json={"email": "lifetime-admin@example.com", "password": "Password123"}
+        )
         self.assertEqual(response.status_code, 200)
         self.assertAlmostEqual(self.lifetime_days(response.json()["access_token"]), 7, places=2)
 
     def test_normal_user_login_still_lasts_ninety_days(self):
-        response = self.client.post("/auth/login", json={"email": "lifetime-user@example.com", "password": "Password123"})
+        response = self.client.post(
+            "/auth/login", json={"email": "lifetime-user@example.com", "password": "Password123"}
+        )
         self.assertEqual(response.status_code, 200)
         self.assertAlmostEqual(self.lifetime_days(response.json()["access_token"]), 90, places=2)
 

@@ -6,7 +6,12 @@ from app.models.user import User
 from app.models.subscription import Subscription
 from app.schemas.user_schema import AdminUserUpdate
 from app.services.owner_policy import authorize_user_update
-from app.services.subscription_service import apply_paid_expiry, apply_trial_expiry, lock_subscription_state, update_subscription_status
+from app.services.subscription_service import (
+    apply_paid_expiry,
+    apply_trial_expiry,
+    lock_subscription_state,
+    update_subscription_status,
+)
 
 
 def list_users(db: Session) -> list[User]:
@@ -24,9 +29,7 @@ def _is_last_active_admin(db: Session, user: User) -> bool:
     if user.role != "admin" or not user.is_active:
         return False
     other_active_admins = db.scalar(
-        select(func.count()).select_from(User).where(
-            User.role == "admin", User.is_active.is_(True), User.id != user.id
-        )
+        select(func.count()).select_from(User).where(User.role == "admin", User.is_active.is_(True), User.id != user.id)
     )
     return (other_active_admins or 0) == 0
 
@@ -40,8 +43,14 @@ def prepare_user_update(db: Session, user_id: int) -> tuple[User, Subscription |
 
 
 def update_user(
-    db: Session, user: User, payload: AdminUserUpdate, *, actor: User,
-    actor_auth_version: int | None = None, commit: bool = True, prepared: bool = False,
+    db: Session,
+    user: User,
+    payload: AdminUserUpdate,
+    *,
+    actor: User,
+    actor_auth_version: int | None = None,
+    commit: bool = True,
+    prepared: bool = False,
 ) -> User:
     actor_id = actor.id
     captured_version = actor.auth_version if actor_auth_version is None else actor_auth_version
