@@ -1,135 +1,80 @@
 # PriceYard Backend
 
-FastAPI backend for the PriceYard MVP.
+FastAPI + SQLAlchemy API for PriceYard, with Alembic migrations and PostgreSQL.
+See the [architecture](../docs/architecture.md) and [API reference](../docs/api-endpoints.md).
 
 ## Requirements
-- Python 3.11+
-- PostgreSQL
+
+- Python 3.12
+- PostgreSQL (production uses Supabase)
 
 ## Setup
 
 ```bash
-python -m pip install -r requirements.txt
+python -m pip install -r requirements-dev.txt   # app + test/style tools
 ```
 
-For owner/local verification tooling:
+`requirements.txt` pins the app's direct libraries; `constraints.txt` pins everything
+they pull in, so every install matches the versions the tests passed with.
 
-```bash
-python -m pip install -r requirements-dev.txt
-```
+Copy `.env.example` to `.env` and fill it in. Never commit `.env`.
 
-Copy `.env.example` to `.env` and set the real PostgreSQL connection and a private JWT secret.
+| Setting | Purpose |
+|---|---|
+| `DATABASE_URL` | PostgreSQL connection, e.g. `postgresql+psycopg://USER:PASSWORD@HOST:5432/DATABASE` |
+| `JWT_SECRET` | Long random secret for signing logins (`python -c "import secrets; print(secrets.token_urlsafe(48))"`) |
+| `FRONTEND_URL`, `CORS_ORIGINS` | The website's address and the exact origins allowed to call the API |
+| `OWNER_EMAIL` | The protected owner account ([access control](../docs/access-control.md#protected-owner-account)) |
+| `GOOGLE_CLIENT_ID` | Google sign-in (blank disables it) |
+| `BREVO_API_KEY` or `SMTP_*` | Email delivery (password reset, alerts, trial reminders) |
+| `PAYSTACK_SECRET_KEY`, `PAYSTACK_PUBLIC_KEY` | Payments (blank disables checkout) |
+| `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_CLAIM_EMAIL` | Web Push alerts |
+| `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_ACCESS_TOKEN` | WhatsApp alerts (blank disables them) |
+| `CRON_SECRET` | Secret header for the trial-reminder scheduler |
+| `OPS_RECOVERY_ENABLED` | Allows the scheduled payment-recovery workflow ([operations](../docs/operations.md)) |
+| `SENTRY_DSN` | Error alerts (blank disables them) |
+| `API_DOCS_ENABLED` | Shows `/docs` and `/openapi.json`; keep `false` in production |
 
-```text
-DATABASE_URL=postgresql+psycopg://USER:PASSWORD@HOST:5432/DATABASE
-JWT_SECRET=REPLACE_WITH_A_LONG_RANDOM_SECRET
-JWT_ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=60
-```
-
-Generate a secret locally if needed:
-
-```bash
-python -c "import secrets; print(secrets.token_urlsafe(48))"
-```
-
-Never commit `.env` or expose `JWT_SECRET`/database credentials.
-
-## Run migrations
+## Database
 
 ```bash
 python -m alembic upgrade head
 ```
 
-## Verify database connection
+Migrations live in [`migrations/versions`](migrations/versions); tables are described in
+the [database schema](../docs/database-schema.md).
 
-```bash
-python -c "from app.database import verify_database_connection; verify_database_connection(); print('database connection: PASS')"
-```
-
-## Run API
+## Run
 
 ```bash
 python -m uvicorn app.main:app --reload
 ```
 
-Health endpoint:
+`GET /health` returns `{"status": "healthy", "deployed_commit": "..."}`.
 
-```text
-GET /health
-```
+## Tests and style
 
-Expected response:
-
-```json
-{"status":"healthy"}
-```
-
-## Stage 4 authentication endpoints
-
-```text
-POST /auth/register
-POST /auth/login
-GET  /auth/me
-```
-
-Registration creates an active `free_user` account and, from Stage 5 onward, an associated 14-day `trial` subscription. Clients cannot self-register as admin or paid users.
-
-Protected requests use:
-
-```text
-Authorization: Bearer <access_token>
-```
-
-## Stage 4 owner smoke test
-
-With the real PostgreSQL `DATABASE_URL` and `JWT_SECRET` configured in `.env`:
+From the repository root:
 
 ```bash
-python ../docs/evidence/stage-4-owner-smoke.py
+python -I -B tools/local-test/guard.py   # 370 tests, isolated: no network or real database
+ruff format --check . && ruff check .
 ```
 
-Expected final line:
+See [testing](../docs/testing.md).
 
-```text
-STAGE 4 OWNER SMOKE: PASS
+## Layout
+
 ```
-
-
-## Stage 5 subscription/trial endpoints
-
-```text
-GET   /subscriptions
-GET   /subscriptions/{user_id}
-PATCH /subscriptions/{user_id}/status
-```
-
-Approved statuses: `free`, `trial`, `active`, `expired`, `cancelled`. Payment gateway integration remains deferred.
-
-## Stage 5 owner smoke test
-
-With the real PostgreSQL `DATABASE_URL` and `JWT_SECRET` configured in `.env`:
-
-```bash
-python ../docs/evidence/stage-5-owner-smoke.py
-```
-
-Expected final line:
-
-```text
-STAGE 5 OWNER SMOKE: PASS
-```
-
-## Stage 6 owner verification
-
-With the same `.env` used for the working Supabase PostgreSQL database:
-
-```bash
-python ../docs/evidence/stage-6-owner-smoke.py
-```
-
-Expected final line:
-
-```text
-STAGE 6 OWNER SMOKE: PASS
+app/
+  main.py         app setup, middleware, routers, /health
+  config.py       settings from environment variables
+  routes/         HTTP endpoints and access checks
+  services/       business rules (prices, subscriptions, payments, alerts, audit)
+  models/         database tables
+  schemas/        request/response validation
+  utils/          shared helpers, including sign-in and role checks
+  jobs/           command-line jobs (payment recovery)
+migrations/       Alembic migrations
+tests/            backend tests
 ```

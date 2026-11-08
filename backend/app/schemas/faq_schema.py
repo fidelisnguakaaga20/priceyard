@@ -5,7 +5,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-# Stage 14 content guardrails implement the approved rules that can be
+# Content guardrails implement the approved rules that can be
 # checked locally. Word-for-word copying from a paid source still requires
 # human/editorial verification because PriceYard does not store that source
 # corpus for automated comparison.

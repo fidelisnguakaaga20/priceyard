@@ -1,4 +1,4 @@
-"""add Stage 11 storage suitability
+"""add storage suitability
 
 Revision ID: 0003_stage11_storage_suitability
 Revises: 0002_stage10_buy_sell_watch

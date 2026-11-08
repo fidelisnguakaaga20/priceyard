@@ -261,7 +261,7 @@ button:disabled {
   font-weight: 700;
 }
 
-/* Stage 39/40 easy-reading mode */
+/* Easy-reading mode */
 html.easy-reading {
   font-size: 118%;
 }
@@ -1334,7 +1334,7 @@ legend {
   }
 }
 
-/* Stage 19 admin frontend */
+/* Admin pages */
 .admin-page {
   width: min(1320px, calc(100% - 40px));
 }
@@ -1596,7 +1596,7 @@ legend {
   color: var(--color-text);
 }
 
-/* Stage 38 mobile-friendly price history */
+/* Mobile-friendly price history */
 .history-card-list {
   display: none;
 }
@@ -1613,7 +1613,7 @@ legend {
   }
 }
 
-/* Stage 38b mobile-friendly admin tables */
+/* Mobile-friendly admin tables */
 .admin-mobile-list {
   display: none;
 }
@@ -1630,7 +1630,7 @@ legend {
   }
 }
 
-/* Stage 35 confidence explainer */
+/* Confidence explainer */
 .confidence-info {
   position: relative;
   display: inline-block;
@@ -1759,7 +1759,7 @@ legend {
   }
 }
 
-/* Stage 34 WhatsApp share */
+/* WhatsApp share */
 .card-actions {
   display: flex;
   flex-wrap: wrap;
@@ -1767,7 +1767,7 @@ legend {
   align-items: center;
 }
 
-/* Stage 28 Google sign-in */
+/* Google sign-in */
 .auth-divider {
   display: flex;
   align-items: center;
@@ -1791,7 +1791,7 @@ legend {
   max-width: 100%;
 }
 
-/* Stage 27 confidence badges */
+/* Confidence badges */
 .confidence-badge {
   display: inline-flex;
   padding: 3px 9px;
@@ -1824,7 +1824,7 @@ legend {
   font-weight: 750;
 }
 
-/* Stage 27 trial countdown banner */
+/* Trial countdown banner */
 .trial-banner {
   background: #173d28;
   color: white;
@@ -2270,7 +2270,7 @@ legend {
   }
 }
 
-/* Stage 26 commodity images */
+/* Commodity images */
 .commodity-image {
   width: 100%;
   aspect-ratio: 4 / 3;

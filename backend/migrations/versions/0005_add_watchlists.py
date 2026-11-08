@@ -1,4 +1,4 @@
-"""add Stage 13 watchlists
+"""add watchlists
 
 Revision ID: 0005_stage13_watchlists
 Revises: 0004_stage12_cost_breakdowns

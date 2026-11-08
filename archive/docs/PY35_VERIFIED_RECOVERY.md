@@ -35,7 +35,7 @@ network none, no host binds/ports/persistent volumes/logs, read-only image root,
 WSL temporarily capped at2GiB/one CPU/swap0. This protects data files; it is not
 full-disk encryption or protection against a compromised logged-in host.
 
-Secret-free [recovery code](../archive/local-test/restore_verified_supabase_ram.py)
+Secret-free [recovery code](../local-test/restore_verified_supabase_ram.py)
 retains reviewed bundle/SQL/image pins and the original bootstrap administrator.
 Only that already-existing role's duplicate CREATE is skipped. Every original
 GRANTED BY/attribute remains. Two recorded pg_stat_statements view owners and

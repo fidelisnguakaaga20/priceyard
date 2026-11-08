@@ -74,7 +74,7 @@ sources. Keep the original CSS and visible behavior unless specifically approved
 
 ## Smaller native PostgreSQL fixture
 
-Follow [the test harness guide](../archive/local-test/README.md) for exact commands.
+Follow [the test harness guide](../local-test/README.md) for exact commands.
 The current pinned `postgres-paging-20261018` fixture is literal127.0.0.1:55449
 (system identifier7697910732590408300). The old recovery fixture is exhausted80/80
 and must remain stopped/intact. The runner verifies the live

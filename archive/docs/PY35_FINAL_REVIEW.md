@@ -21,7 +21,7 @@ load, alert-delivery or rollback certification. No logs, secrets or DB reads.
 The confirmed direct-Render cookie-routing blocker below remains. Blank health
 uses TCP, not a separate established defect.35/36 unchanged; no production changes,
 repeated passed tests, push, migrations or deployment. Evidence:
-[batch134](../archive/local-test/evidence/batch-134-render-readonly.json).
+[batch134](../local-test/evidence/batch-134-render-readonly.json).
 
 Current133 confirmed owner configuration, no repeated tests or production change:
 frontend calls https://priceyard-api.onrender.com directly and has only
@@ -40,7 +40,7 @@ Use app.main:app in any exact release configuration. Blank health path provides
 default TCP checks, so blank alone is not another proven launch blocker.
 Existing hosted candidate/rollback artifact, migration cutover/reconciliation and
 operational acceptance remain unverified;35/36, no deployment authorization.
-Evidence:[batch133](../archive/local-test/evidence/batch-133-render-configuration.json).
+Evidence:[batch133](../local-test/evidence/batch-133-render-configuration.json).
 
 Current132 RENDER SETTINGS REVIEW (2026-10-20 WAT), no production changes:
 
@@ -56,7 +56,7 @@ value and existing `/api` Redirects/Rewrites rule (or absent). Do not edit/save
 production settings, expose secrets, switch cookie policy or trigger deployment.
 Build still runs Alembic automatically; approval must cover exact controlled
 release configuration/migration/rollback sequence.35/36; PY-35 partial.
-New bounded evidence:[batch132](../archive/local-test/evidence/batch-132-render-contract.json).
+New bounded evidence:[batch132](../local-test/evidence/batch-132-render-contract.json).
 Sources: [Render FastAPI](https://render.com/docs/deploy-fastapi),
 [health checks](https://render.com/docs/health-checks),
 [deploys](https://render.com/docs/deploys),

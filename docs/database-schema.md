@@ -1,372 +1,409 @@
-# PriceYard Database Schema
+# Database schema
 
-## Status
-Stage 3 foundation is RETESTED/PASS. Stage 10, Stage 11, and Stage 12 tables are owner-verified. Stage 13 is authorized to add only the approved `watchlists` table.
+PostgreSQL (hosted on Supabase), defined by the SQLAlchemy models in
+[`backend/app/models`](../backend/app/models) and created by the Alembic migrations in
+[`backend/migrations/versions`](../backend/migrations/versions). Money is stored as
+`numeric(14,2)` in naira. Times are stored in UTC and shown in Nigeria time (WAT).
 
-## Approved database stack
-- PostgreSQL
-- SQLAlchemy 2.x ORM
-- Alembic migrations
-- Psycopg PostgreSQL driver
+Records that other records depend on (commodities, markets, users) cannot be deleted
+while still referenced (`on delete restrict`). A user's own data (subscription,
+payments, watchlist, feedback, flags, push subscriptions) is removed with the user
+(`on delete cascade`).
 
-## Stage 3 tables
-Exactly these MVP foundation tables are implemented:
+## Accounts
 
-1. `users`
-   - id
-   - full_name
-   - email
-   - phone
-   - password_hash
-   - role
-   - is_active
-   - created_at
-   - updated_at
+### `users`
 
-2. `subscriptions`
-   - id
-   - user_id
-   - plan_name
-   - status
-   - trial_started_at
-   - trial_ends_at
-   - start_date
-   - end_date
-   - payment_reference
-   - created_at
-   - updated_at
+Everyone with an account. `role` is `free_user`, `paid_user`, `reporter` or `admin`. `auth_version` rises on a password reset or deactivation, ending older logins. `referral_code` is each user's share code; `referred_by_id` records who invited them.
 
-3. `commodities`
-   - id
-   - name
-   - description
-   - is_active
-   - created_at
-   - updated_at
+| Column | Type | Notes |
+|---|---|---|
+| `id` | integer | primary key |
+| `full_name` | varchar(150) | required |
+| `email` | varchar(320) | required, unique |
+| `phone` | varchar(30) | unique |
+| `password_hash` | varchar(255) | required |
+| `google_id` | varchar(255) | unique |
+| `auth_provider` | varchar(20) | required |
+| `role` | varchar(32) | required |
+| `is_active` | boolean | required |
+| `auth_version` | integer | required, default 0 |
+| `referral_code` | varchar(12) | required, unique |
+| `referred_by_id` | integer | → `users` |
+| `created_at` | timestamp | required, default now |
+| `updated_at` | timestamp | required, default now |
 
-4. `markets`
-   - id
-   - name
-   - state
-   - country
-   - market_day
-   - description
-   - is_active
-   - created_at
-   - updated_at
+### `subscriptions`
 
-5. `price_updates`
-   - id
-   - commodity_id
-   - market_id
-   - price_low
-   - price_high
-   - average_price
-   - previous_price_low
-   - previous_price_high
-   - unit
-   - bag_size
-   - commodity_type
-   - market_day
-   - time_of_day
-   - movement
-   - confidence_level
-   - source_type
-   - source_1
-   - source_2
-   - update_date_time
-   - is_outdated
-   - status
-   - created_by
-   - approved_by
-   - possible_meaning
-   - suggested_action
-   - notes
-   - created_at
-   - updated_at
+One per user: free, trial, active (paid), expired or cancelled, with trial and paid-period dates.
 
-   Important: `possible_meaning` and `suggested_action` are stored directly on `price_updates` and do not depend on a market signal.
+| Column | Type | Notes |
+|---|---|---|
+| `id` | integer | primary key |
+| `user_id` | integer | required, unique, → `users` (on delete cascade) |
+| `plan_name` | varchar(50) | required |
+| `status` | varchar(20) | required |
+| `trial_started_at` | timestamp |  |
+| `trial_ends_at` | timestamp |  |
+| `trial_reminder_sent_at` | timestamp |  |
+| `start_date` | date |  |
+| `end_date` | date |  |
+| `payment_reference` | varchar(255) |  |
+| `created_at` | timestamp | required, default now |
+| `updated_at` | timestamp | required, default now |
 
-6. `market_signals`
-   - id
-   - commodity_id
-   - market_id
-   - price_update_id
-   - signal_type
-   - signal_description
-   - possible_meaning
-   - suggested_action
-   - created_by
-   - created_at
-   - updated_at
+Rules: `status IN ('free', 'trial', 'active', 'expired', 'cancelled')`.
 
-7. `quality_signals`
-   - id
-   - commodity_id
-   - market_id
-   - price_update_id
-   - quality_status
-   - moisture_status
-   - storage_readiness
-   - risk_note
-   - created_by
-   - created_at
-   - updated_at
+### `payments`
 
-8. `faq_items`
-   - id
-   - question
-   - answer
-   - category
-   - is_published
-   - created_by
-   - created_at
-   - updated_at
+Each Paystack checkout. Access is granted only after the payment is confirmed.
 
-9. `audit_logs`
-   - id
-   - user_id
-   - action
-   - table_name
-   - record_id
-   - old_value
-   - new_value
-   - created_at
+| Column | Type | Notes |
+|---|---|---|
+| `id` | integer | primary key |
+| `user_id` | integer | required, → `users` (on delete cascade) |
+| `reference` | varchar(100) | required, unique |
+| `plan` | varchar(20) | required |
+| `amount` | numeric(14,2) | required |
+| `currency` | varchar(10) | required |
+| `status` | varchar(20) | required |
+| `paystack_transaction_id` | varchar(100) |  |
+| `created_at` | timestamp | required, default now |
+| `updated_at` | timestamp | required, default now |
 
-10. `feedback`
-   - id
-   - user_id
-   - rating
-   - comment
-   - price_usefulness
-   - price_accuracy
-   - missing_market_request
-   - missing_commodity_request
-   - complaint_or_suggestion
-   - continue_using_feedback
-   - willingness_to_pay_feedback
-   - created_at
-   - updated_at
+Rules: `status IN ('pending', 'success', 'failed')`; `plan IN ('monthly', 'seasonal')`.
 
-## Main relationships
-- User has one subscription.
-- User can give feedback.
-- Commodity has many price updates.
-- Market has many price updates.
-- Price update can have market signals.
-- Price update can have quality signals.
-- Admin/user creator relationships are preserved through foreign keys.
-- Audit logs reference the acting user.
+### `password_reset_tokens`
 
-## Data-integrity constraints introduced at the schema layer
-- Subscription status is limited to approved states: free, trial, active, expired, cancelled.
-- Current price low cannot be negative.
-- Current price high cannot be below current price low.
-- Average price, when provided, must fall inside the current price range.
-- Price movement is limited to up, down, stable, unknown.
-- Price-update status is limited to pending, approved, rejected.
-- Overall feedback ratings are limited to 1–5; price usefulness/accuracy fields remain free-text feedback as described in the architecture.
+Single-use reset links, stored only as a hash and valid for 15 minutes.
 
-## Deferred tables — not created in Stage 3
-- storage_suitability
-- watchlists
-- cost_breakdowns
-- reporter_submissions
-- alerts
-- reports
+| Column | Type | Notes |
+|---|---|---|
+| `id` | integer | primary key |
+| `user_id` | integer | required, → `users` (on delete cascade) |
+| `token_hash` | varchar(64) | required, unique |
+| `expires_at` | timestamp | required |
+| `used_at` | timestamp |  |
+| `created_at` | timestamp | required, default now |
 
-## Stage 6 — Admin Core Management
+### `revoked_access_tokens`
 
-No database migration is required for Stage 6. The approved Stage 3 tables already contain the fields needed for user, commodity, market, and subscription management.
+Hashes of logged-out tokens until they would have expired anyway; raw tokens are never stored.
 
-Stage 6 does not create any Stage 7+ table or column.
+| Column | Type | Notes |
+|---|---|---|
+| `token_hash` | varchar(64) | primary key |
+| `user_id` | integer | required, → `users` (on delete cascade) |
+| `expires_at` | timestamp | required |
+| `revoked_at` | timestamp | required |
 
-## Stage 7 — Price Updates
+### `push_subscriptions`
 
-No migration is required. Stage 7 uses the existing Stage 3 `price_updates` table and its approved fields/constraints.
+Browser push endpoints for each user's devices.
 
-API-layer validation now additionally enforces the approved suggested-action choices, current/previous range consistency, and observational/non-guaranteed `possible_meaning` wording. Private `source_1`/`source_2` values remain stored in PostgreSQL but are excluded from public price response schemas.
+| Column | Type | Notes |
+|---|---|---|
+| `id` | integer | primary key |
+| `user_id` | integer | required, → `users` (on delete cascade) |
+| `endpoint` | varchar(500) | required, unique |
+| `p256dh` | varchar(300) | required |
+| `auth` | varchar(100) | required |
+| `created_at` | timestamp | required, default now |
 
-## Stage 9 — Market Signals and Quality Signals
+## Catalogue and prices
 
-No database migration is required. Stage 9 uses the existing Stage 3 `market_signals` and `quality_signals` tables exactly as approved.
+### `commodities`
 
-Stage 9 adds API/service validation only:
-- referenced commodity and market must exist and be active;
-- optional `price_update_id`, when supplied, must point to an existing price update with the same commodity and market;
-- market-signal observations reject explicit guarantee/financial-advice wording;
-- quality risk notes reject explicit unsupported laboratory-confirmation wording.
+Commodities such as Egusi, Honey Beans and Palm Oil. `is_upcoming` lists a commodity before prices exist.
 
-`possible_meaning` and `suggested_action` on `market_signals` remain separate from the same-named fields on `price_updates`.
+| Column | Type | Notes |
+|---|---|---|
+| `id` | integer | primary key |
+| `name` | varchar(100) | required, unique |
+| `description` | text |  |
+| `image_url` | varchar(500) |  |
+| `is_active` | boolean | required |
+| `is_upcoming` | boolean | required |
+| `expected_available_date` | date |  |
+| `created_at` | timestamp | required, default now |
+| `updated_at` | timestamp | required, default now |
 
-## Stage 10 — Buying Zones and Sell-Watch Windows
+### `markets`
 
-Alembic revision `0002_stage10_buy_sell_watch` creates the two Stage 10 tables that were intentionally deferred at Stage 3.
+Markets with their state and market day.
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | integer | primary key |
+| `name` | varchar(150) | required |
+| `state` | varchar(100) |  |
+| `country` | varchar(100) | required |
+| `market_day` | varchar(30) |  |
+| `description` | text |  |
+| `image_url` | varchar(500) |  |
+| `is_active` | boolean | required |
+| `created_at` | timestamp | required, default now |
+| `updated_at` | timestamp | required, default now |
+
+### `price_updates`
+
+Price records: a low–high range per commodity, market and specification (unit, bag size, type). `status` is pending → approved or rejected; only approved records are public. `source_1` and `source_2` are private.
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | integer | primary key |
+| `commodity_id` | integer | required, → `commodities` (on delete restrict) |
+| `market_id` | integer | required, → `markets` (on delete restrict) |
+| `price_low` | numeric(14,2) | required |
+| `price_high` | numeric(14,2) | required |
+| `average_price` | numeric(14,2) |  |
+| `previous_price_low` | numeric(14,2) |  |
+| `previous_price_high` | numeric(14,2) |  |
+| `unit` | varchar(100) | required |
+| `bag_size` | varchar(100) |  |
+| `commodity_type` | varchar(150) |  |
+| `market_day` | varchar(30) |  |
+| `time_of_day` | varchar(20) |  |
+| `movement` | varchar(20) | required |
+| `confidence_level` | varchar(100) | required |
+| `source_type` | varchar(100) |  |
+| `source_1` | varchar(255) |  |
+| `source_2` | varchar(255) |  |
+| `update_date_time` | timestamp | required |
+| `is_outdated` | boolean | required |
+| `status` | varchar(20) | required |
+| `created_by` | integer | required, → `users` (on delete restrict) |
+| `approved_by` | integer | → `users` |
+| `possible_meaning` | text |  |
+| `suggested_action` | varchar(50) |  |
+| `notes` | text |  |
+| `created_at` | timestamp | required, default now |
+| `updated_at` | timestamp | required, default now |
+
+Rules: `price_high >= price_low`; `status IN ('pending', 'approved', 'rejected')`; `price_low >= 0`; `average_price IS NULL OR (average_price >= price_low AND average_price <= price_high)`; `movement IN ('up', 'down', 'stable', 'unknown')`.
+
+### `price_flags`
+
+A member's report that a price looks wrong; one per member per price.
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | integer | primary key |
+| `price_update_id` | integer | required, → `price_updates` (on delete cascade) |
+| `user_id` | integer | required, → `users` (on delete cascade) |
+| `reason` | varchar(50) |  |
+| `resolved` | boolean | required, default false |
+| `created_at` | timestamp | required, default now |
+
+Rules: unique together `price_update_id`, `user_id`.
+
+## Market intelligence
+
+### `market_signals`
+
+Observations about demand, supply or movement, optionally tied to a price record.
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | integer | primary key |
+| `commodity_id` | integer | required, → `commodities` (on delete restrict) |
+| `market_id` | integer | required, → `markets` (on delete restrict) |
+| `price_update_id` | integer | → `price_updates` (on delete cascade) |
+| `signal_type` | varchar(100) | required |
+| `signal_description` | text | required |
+| `possible_meaning` | text |  |
+| `suggested_action` | varchar(50) |  |
+| `created_by` | integer | required, → `users` (on delete restrict) |
+| `created_at` | timestamp | required, default now |
+| `updated_at` | timestamp | required, default now |
+
+### `quality_signals`
+
+Quality, moisture and storage-readiness notes.
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | integer | primary key |
+| `commodity_id` | integer | required, → `commodities` (on delete restrict) |
+| `market_id` | integer | required, → `markets` (on delete restrict) |
+| `price_update_id` | integer | → `price_updates` (on delete cascade) |
+| `quality_status` | varchar(100) |  |
+| `moisture_status` | varchar(100) |  |
+| `storage_readiness` | varchar(100) |  |
+| `risk_note` | text |  |
+| `created_by` | integer | required, → `users` (on delete restrict) |
+| `created_at` | timestamp | required, default now |
+| `updated_at` | timestamp | required, default now |
 
 ### `buying_zones`
-- id
-- commodity_id
-- market_id
-- price_low
-- price_high
-- reason
-- valid_from
-- valid_to
-- confidence
-- created_by
-- created_at
-- updated_at
 
-Integrity rules:
-- `price_low` cannot be negative;
-- `price_high` cannot be below `price_low`;
-- `valid_to`, when both dates are supplied, cannot be earlier than `valid_from`;
-- commodity, market, and creator are relational foreign keys.
+Suggested buying price ranges with a reason, a confidence level and an optional validity period.
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | integer | primary key |
+| `commodity_id` | integer | required, → `commodities` (on delete restrict) |
+| `market_id` | integer | required, → `markets` (on delete restrict) |
+| `price_low` | numeric(14,2) | required |
+| `price_high` | numeric(14,2) | required |
+| `reason` | text | required |
+| `valid_from` | date |  |
+| `valid_to` | date |  |
+| `confidence` | varchar(100) | required |
+| `created_by` | integer | required, → `users` (on delete restrict) |
+| `created_at` | timestamp | required, default now |
+| `updated_at` | timestamp | required, default now |
+
+Rules: `valid_to IS NULL OR valid_from IS NULL OR valid_to >= valid_from`; `price_low >= 0`; `price_high >= price_low`.
 
 ### `sell_watch_windows`
-- id
-- commodity_id
-- market_id
-- start_period
-- end_period
-- observation
-- confidence
-- created_by
-- created_at
-- updated_at
 
-`start_period` and `end_period` are short text fields rather than forced calendar dates so approved observations such as “December ending” and “January upward” can be stored without inventing false precision.
+Periods worth watching for selling.
 
-Stage 10 did not create `storage_suitability`, `cost_breakdowns`, `watchlists`, alerts, reports, or any other later-stage table.
+| Column | Type | Notes |
+|---|---|---|
+| `id` | integer | primary key |
+| `commodity_id` | integer | required, → `commodities` (on delete restrict) |
+| `market_id` | integer | required, → `markets` (on delete restrict) |
+| `start_period` | varchar(100) | required |
+| `end_period` | varchar(100) |  |
+| `observation` | text | required |
+| `confidence` | varchar(100) | required |
+| `created_by` | integer | required, → `users` (on delete restrict) |
+| `created_at` | timestamp | required, default now |
+| `updated_at` | timestamp | required, default now |
 
+### `storage_suitability`
 
-## Stage 11 — Storage Suitability
+Whether storing a commodity at a market is good, watch, risky or not recommended, with the risks behind it.
 
-Alembic revision `0003_stage11_storage_suitability` creates the approved `storage_suitability` table.
+| Column | Type | Notes |
+|---|---|---|
+| `id` | integer | primary key |
+| `commodity_id` | integer | required, → `commodities` (on delete restrict) |
+| `market_id` | integer | required, → `markets` (on delete restrict) |
+| `price_update_id` | integer | → `price_updates` |
+| `suitability_status` | varchar(30) | required |
+| `import_risk` | varchar(100) |  |
+| `oversupply_risk` | varchar(100) |  |
+| `spoilage_risk` | varchar(100) |  |
+| `buyer_availability` | varchar(150) |  |
+| `quality_storage_notes` | text |  |
+| `summary` | text |  |
+| `created_at` | timestamp | required, default now |
+| `updated_at` | timestamp | required, default now |
 
-Fields:
-- id
-- commodity_id
-- market_id
-- price_update_id
-- suitability_status
-- import_risk
-- oversupply_risk
-- spoilage_risk
-- buyer_availability
-- quality_storage_notes
-- summary
-- created_at
-- updated_at
+Rules: `suitability_status IN ('good', 'watch', 'risky', 'not_recommended')`.
 
-Approved `suitability_status` values:
-- `good`
-- `watch`
-- `risky`
-- `not_recommended`
+### `cost_breakdowns`
 
-Relationships:
-- commodity and market are required foreign keys;
-- `price_update_id` is optional and, when used, must match the same commodity and market;
-- deleting a linked price update sets the optional storage-suitability link to null rather than deleting the storage observation.
+Transport, warehouse, security, market and handling costs on top of a purchase price, giving a total landing and storage cost.
 
-Stage 11 does not create `cost_breakdowns`, `watchlists`, alerts, reports, or other later-stage tables.
+| Column | Type | Notes |
+|---|---|---|
+| `id` | integer | primary key |
+| `commodity_id` | integer | required, → `commodities` (on delete restrict) |
+| `market_id` | integer | required, → `markets` (on delete restrict) |
+| `transport` | numeric(14,2) | required |
+| `warehouse` | numeric(14,2) | required |
+| `security` | numeric(14,2) | required |
+| `market_charges` | numeric(14,2) | required |
+| `loading_offloading` | numeric(14,2) | required |
+| `other_costs` | numeric(14,2) | required |
+| `cost_items` | json | required, default '[]' |
+| `total_additional_cost` | numeric(14,2) | required |
+| `purchase_price_reference` | numeric(14,2) | required |
+| `total_estimated_landing_storage_cost` | numeric(14,2) | required |
+| `created_at` | timestamp | required, default now |
+| `updated_at` | timestamp | required, default now |
 
-## Stage 12 — Cost Breakdown
+Rules: every amount must be zero or more.
 
-Alembic revision `0004_stage12_cost_breakdowns` creates the approved `cost_breakdowns` table.
+## Member features
 
-Fields:
-- id
-- price_update_id
-- transport
-- warehouse
-- security
-- market_charges
-- loading_offloading
-- other_costs
-- total_additional_cost
-- purchase_price_reference
-- total_estimated_landing_storage_cost
-- created_at
-- updated_at
+### `watchlists`
 
-Integrity/calculation rules:
-- `price_update_id` is a required foreign key to `price_updates`;
-- each component cost and `purchase_price_reference` must be non-negative;
-- `total_additional_cost` is server-calculated as transport + warehouse + security + market charges + loading/offloading + other costs;
-- `total_estimated_landing_storage_cost` is server-calculated as purchase-price reference + total additional cost;
-- edits recalculate both totals rather than trusting client-supplied totals.
+What a user watches (a commodity, a market or both), with an optional target price and direction for alerts.
 
-This preserves cost data for a later approved average-cost feature without implementing a full accounting system or complex average-cost calculator in the MVP.
+| Column | Type | Notes |
+|---|---|---|
+| `id` | integer | primary key |
+| `user_id` | integer | required, → `users` (on delete cascade) |
+| `commodity_id` | integer | → `commodities` (on delete cascade) |
+| `market_id` | integer | → `markets` (on delete cascade) |
+| `target_price` | numeric(14,2) |  |
+| `target_direction` | varchar(20) |  |
+| `created_at` | timestamp | required, default now |
+| `updated_at` | timestamp | required, default now |
 
-Stage 12 does not create `watchlists`, alerts, reports, or any other Stage 13+ table.
+Rules: `commodity_id IS NOT NULL OR market_id IS NOT NULL`; `target_price IS NULL OR target_price >= 0`; `target_direction IS NULL OR target_direction IN ('at_or_below', 'at_or_above')`; `(target_price IS NULL) = (target_direction IS NULL)`.
 
-## Stage 13 — Watchlist
+### `feedback`
 
-Alembic revision `0005_stage13_watchlists` creates the approved `watchlists` table.
+Ratings and comments, optionally published as a testimonial. The optional screenshot is visible only to admins.
 
-Fields:
-- id
-- user_id
-- commodity_id
-- market_id
-- target_price
-- created_at
-- updated_at
+| Column | Type | Notes |
+|---|---|---|
+| `id` | integer | primary key |
+| `user_id` | integer | required, → `users` (on delete cascade) |
+| `rating` | smallint | required |
+| `comment` | text |  |
+| `price_usefulness` | text |  |
+| `price_accuracy` | text |  |
+| `missing_market_request` | text |  |
+| `missing_commodity_request` | text |  |
+| `complaint_or_suggestion` | text |  |
+| `continue_using_feedback` | boolean |  |
+| `willingness_to_pay_feedback` | boolean |  |
+| `is_public_testimonial` | boolean | required, default false |
+| `testimonial_display_name` | text |  |
+| `screenshot_data` | text |  |
+| `created_at` | timestamp | required, default now |
+| `updated_at` | timestamp | required, default now |
 
-Integrity/relationship rules:
-- `user_id` is required and links each item to its owner;
-- at least one of `commodity_id` or `market_id` must be present;
-- commodity and market links are optional so a user can save a commodity only, a market only, or both;
-- `target_price` is nullable and retained from the approved Architecture Design, but Stage 13 does not expose it through the API or implement target-price alerts;
-- deleting the owning user, commodity, or market cascades removal of the affected watchlist row.
+Rules: `rating BETWEEN 1 AND 5`.
 
-Stage 13 does not create FAQ, alert, report, reporter, payment, or other Stage 14+ tables.
+## Content and administration
 
-## Stage 14 — FAQ schema use
-Stage 14 requires no migration. It reuses the `faq_items` table created in the Stage 3 foundation with fields `id`, `question`, `answer`, `category`, `is_published`, `created_by`, `created_at`, and `updated_at`. Publication is controlled by the FAQ publish/hide API flow.
+### `faq_items`
 
+FAQ entries; only published ones are public.
 
-## Stage 15 — Feedback schema use
-Stage 15 requires no migration. It reuses the `feedback` table created in Stage 3 with fields `id`, `user_id`, `rating`, `comment`, `price_usefulness`, `price_accuracy`, `missing_market_request`, `missing_commodity_request`, `complaint_or_suggestion`, `continue_using_feedback`, `willingness_to_pay_feedback`, `created_at`, and `updated_at`.
+| Column | Type | Notes |
+|---|---|---|
+| `id` | integer | primary key |
+| `question` | text | required |
+| `answer` | text | required |
+| `category` | varchar(100) | required |
+| `is_published` | boolean | required |
+| `created_by` | integer | required, → `users` (on delete restrict) |
+| `created_at` | timestamp | required, default now |
+| `updated_at` | timestamp | required, default now |
 
-Integrity/access rules:
-- rating remains constrained to 1 through 5 at both API and database levels;
-- `user_id` is derived from the authenticated user, not client input;
-- feedback is linked to the submitting user;
-- ordinary users can submit feedback but cannot browse all users' private feedback;
-- admin summary is limited to count and average rating, with no advanced analytics.
+### `audit_logs`
 
-## Stage 16 — Audit-log schema use
-Stage 16 requires no migration. It reuses the `audit_logs` table created in Stage 3 with fields `id`, `user_id`, `action`, `table_name`, `record_id`, `old_value`, `new_value`, and `created_at`.
+Who changed what: every admin change, with old and new values, saved in the same transaction as the change.
 
-Stage 16 rules:
-- `user_id` identifies the admin who performed the audited action;
-- `old_value` and `new_value` contain JSON-safe snapshots where applicable;
-- password/password-hash data, JWT/secret/token data, database credentials/URLs, `.env` data, and private price-source identities are excluded from audit snapshots;
-- ordinary users cannot view audit history;
-- no Stage 17 CSV-report schema or other later-stage schema is introduced.
+| Column | Type | Notes |
+|---|---|---|
+| `id` | integer | primary key |
+| `user_id` | integer | required, → `users` (on delete restrict) |
+| `action` | varchar(100) | required |
+| `table_name` | varchar(100) | required |
+| `record_id` | integer |  |
+| `old_value` | json |  |
+| `new_value` | json |  |
+| `created_at` | timestamp | required, default now |
 
-## Stage 17 — CSV export schema use
-Stage 17 requires no migration and creates no report-storage table. The CSV export reads approved `price_updates` and their existing commodity, market, market-signal, and quality-signal relationships. Repository Alembic head remains `0005_stage13_watchlists`.
+### `activity_events`
 
-## Stage 18 — No database change
+Anonymous counts of app opens and shared-link visits for the admin activity feed; no visitor identity is stored.
 
-The public/user React frontend introduces no database table, column, constraint, relationship, or migration. Alembic head remains `0005_stage13_watchlists`.
+| Column | Type | Notes |
+|---|---|---|
+| `id` | integer | primary key |
+| `event_type` | varchar(30) | required |
+| `label` | varchar(200) |  |
+| `seen` | boolean | required, default false |
+| `created_at` | timestamp | required, default now |
 
-## Stage 19 — No Database Change
-
-Stage 19 is frontend-only. No table, column, relationship, constraint or migration is added or changed. Alembic head remains `0005_stage13_watchlists`.
-
-## CR-03 — Active MVP Data Focus
-
-Alembic revision `0006_cr03_egusi_kwali` changes data flags only; it creates no table or column.
-
-- Ensures one canonical `Egusi` commodity and `Kwali Market` market exist for fresh databases.
-- Sets every commodity inactive, then activates only the canonical Egusi record.
-- Sets every market inactive, then activates only the canonical Kwali Market record.
-- Preserves all existing rows, relationships, users, subscriptions, audit logs, authentication data, and historical price intelligence.
-- Admin can later create or reactivate commodities/markets through the existing `is_active` CRUD fields.
-
-Alembic head becomes `0006_cr03_egusi_kwali` after owner migration verification.

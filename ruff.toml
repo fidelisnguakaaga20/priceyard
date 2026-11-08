@@ -5,7 +5,7 @@
 line-length = 120
 target-version = "py312"
 # Historical evidence scripts are kept exactly as they were recorded.
-extend-exclude = ["docs/evidence"]
+extend-exclude = ["archive/docs/evidence"]
 
 [lint]
 # Core checks only: syntax errors, unused imports/variables, undefined names.

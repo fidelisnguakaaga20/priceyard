@@ -96,6 +96,6 @@ recovery targets and post-snapshot write/payment reconciliation. Render master
 still has automatic deployment/migration build behavior: no push, merge or release
 until controlled migration/rollback and owner approval are complete.
 
-Evidence: [redacted result](../archive/local-test/evidence/batch-122-0022-rehearsal.json),
+Evidence: [redacted result](../local-test/evidence/batch-122-0022-rehearsal.json),
 [actual gate ledger](PY35_ACTUAL_RELEASE_GATES.json). Original prior-startup blocker
 and successful backup/recovery reports are retained as history.

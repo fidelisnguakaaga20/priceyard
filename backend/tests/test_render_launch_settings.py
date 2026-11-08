@@ -8,7 +8,7 @@ import unittest
 class RenderLaunchSettingsTests(unittest.TestCase):
     def test_ordered_same_origin_route_preserves_original_spa_and_security(self):
         root = Path(__file__).resolve().parents[2]
-        config = json.loads((root / "docs" / "RENDER_LAUNCH_SETTINGS.json").read_text())
+        config = json.loads((root / "archive" / "docs" / "RENDER_LAUNCH_SETTINGS.json").read_text())
         self.assertFalse(config["production_change_approved"])
         self.assertFalse(config["frontend"]["platform_edge_verified"])
         self.assertEqual(config["frontend"]["build_environment_changes"], {"VITE_API_URL": "/api"})

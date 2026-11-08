@@ -38,7 +38,7 @@ def get_session_factory() -> sessionmaker[Session]:
 
 
 def get_db() -> Generator[Session, None, None]:
-    """FastAPI database-session dependency for later API stages."""
+    """FastAPI dependency that provides one database session per request."""
     db = get_session_factory()()
     try:
         yield db

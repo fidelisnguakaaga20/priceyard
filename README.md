@@ -4,7 +4,7 @@
 
 PriceYard is an agricultural commodity price intelligence platform built for Nigerian traders. It replaces scattered WhatsApp price updates with structured, verified market data — current prices, price history, confidence levels, and decision-support signals (buying zones, sell-watch windows, storage suitability) for commodities like Egusi, Honey Beans, and Palm Oil across real markets (Kwali Market, Owukpa Market, Beans Market Auta Balefi, and more).
 
-Built and shipped solo, end to end: product design, database schema, backend API, admin tooling, payment integration, and a production deployment with real paying users.
+Built and shipped solo, end to end, using AI coding tools under my direction: product design, database schema, backend API, admin tooling, payment integration, and a production deployment with real paying users.
 
 ## What it does
 
@@ -28,7 +28,7 @@ Built and shipped solo, end to end: product design, database schema, backend API
 - **Consistent code style, enforced automatically:** Ruff for Python ([`ruff.toml`](ruff.toml)) and Prettier for the website ([`frontend/.prettierrc.json`](frontend/.prettierrc.json)).
 - **Deploys only after all checks pass** ([`.github/workflows/backend-tests.yml`](.github/workflows/backend-tests.yml)): every push runs the style checks, backend tests, website build and page checks. Only `master` deploys, and the backend deploy waits until `/health` reports the new commit.
 - **Security:** HttpOnly `__Host-` session cookie with a CSRF token, login throttling and rate limiting, sign-out-everywhere (login revocation), protected owner account, webhook-verified payments, and API docs hidden in production.
-- **Operations:** error alerts with personal data removed before sending, scheduled operational safeguards ([`tools/operations`](tools/operations)), and encrypted database backups with a tested restore procedure ([docs/BACKUP_RECOVERY.md](docs/BACKUP_RECOVERY.md)).
+- **Operations:** error alerts with personal data removed before sending, scheduled operational safeguards ([`tools/operations`](tools/operations)), and encrypted database backups with a verified restore ([operations](docs/operations.md)).
 
 ## Project structure
 
@@ -43,8 +43,8 @@ frontend/
 tools/
   local-test/     isolated test harness
   operations/     scheduled operational safeguards and backup adapter
-docs/             architecture, API, database, access control and recovery docs
-archive/          past one-off scripts and result records, kept for the record
+docs/             architecture, rules, access control, database, API, operations, testing
+archive/          earlier build notes, one-off scripts and records, kept for the record
 ```
 
 ## Running locally
@@ -85,16 +85,15 @@ node tests/smoke/smoke.mjs
 
 ## Documentation
 
-- [Architecture](docs/architecture-design.md)
-- [Database schema](docs/database-schema.md)
-- [API routes](docs/api-endpoints.md)
-- [Access control matrix](docs/access-control-matrix.md)
-- [Product, security and data-preservation contracts](docs/APPLICATION_CONTRACTS.md)
-- [Test coverage](docs/TEST_COVERAGE.md)
-- [Monitoring](docs/MONITORING.md)
-- [Backup and recovery](docs/BACKUP_RECOVERY.md)
-- [Local development](docs/LOCAL_DEVELOPMENT.md)
-- [Build log](PRICEYARD_PROGRESS.md)
+- [Architecture](docs/architecture.md): how the pieces fit, sign-in, prices, payments, notifications
+- [Business rules](docs/business-rules.md): price, plan, referral and offline rules
+- [Access control](docs/access-control.md): roles, plans and who can do what
+- [Database schema](docs/database-schema.md): every table, column and rule
+- [API reference](docs/api-endpoints.md): every endpoint and who can call it
+- [Operations](docs/operations.md): hosting, deploys, alerts, scheduled safeguards, backups
+- [Testing](docs/testing.md): backend tests, page checks, style checks
+
+Earlier build notes, approvals and test records are kept in [`archive/`](archive).
 
 ## Product notes
 

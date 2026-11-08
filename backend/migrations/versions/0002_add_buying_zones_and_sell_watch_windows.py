@@ -1,4 +1,4 @@
-"""add Stage 10 buying zones and sell-watch windows
+"""add buying zones and sell-watch windows
 
 Revision ID: 0002_stage10_buy_sell_watch
 Revises: 0001_create_mvp_foundation
