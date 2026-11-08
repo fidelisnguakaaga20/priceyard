@@ -25,7 +25,10 @@ export function ResetPasswordPage() {
     }
     setBusy(true);
     try {
-      const response = await apiFetch<{ message: string }>("/auth/reset-password", { method: "POST", body: JSON.stringify({ token, new_password: password }) });
+      const response = await apiFetch<{ message: string }>("/auth/reset-password", {
+        method: "POST",
+        body: JSON.stringify({ token, new_password: password }),
+      });
       setComplete(true);
       showToast(response.message);
     } catch (err) {
@@ -35,8 +38,70 @@ export function ResetPasswordPage() {
     }
   };
 
-  if (!token) return <section className="page auth-page"><div className="auth-card"><h1>Invalid reset link</h1><p>This password reset link is incomplete.</p><Link className="text-link" to="/forgot-password">Request a new link</Link>.</div></section>;
-  if (complete) return <section className="page auth-page"><div className="auth-card"><h1>Password updated</h1><div className="status-box success">Your password was reset successfully.</div><Link className="button" to="/login">Log in</Link></div></section>;
+  if (!token)
+    return (
+      <section className="page auth-page">
+        <div className="auth-card">
+          <h1>Invalid reset link</h1>
+          <p>This password reset link is incomplete.</p>
+          <Link className="text-link" to="/forgot-password">
+            Request a new link
+          </Link>
+          .
+        </div>
+      </section>
+    );
+  if (complete)
+    return (
+      <section className="page auth-page">
+        <div className="auth-card">
+          <h1>Password updated</h1>
+          <div className="status-box success">Your password was reset successfully.</div>
+          <Link className="button" to="/login">
+            Log in
+          </Link>
+        </div>
+      </section>
+    );
 
-  return <section className="page auth-page"><div className="auth-card"><span className="eyebrow">Secure reset</span><h1>Create a new password</h1><p>Use at least 8 characters. This reset link works only once.</p><form className="form-stack" onSubmit={submit}><label>New password<PasswordField id="reset-password" value={password} onChange={setPassword} visible={showPassword} onToggle={() => setShowPassword((value) => !value)} autoComplete="new-password" minLength={8} maxLength={72} /></label><label>Confirm new password<PasswordField id="confirm-reset-password" value={confirmPassword} onChange={setConfirmPassword} visible={showConfirmation} onToggle={() => setShowConfirmation((value) => !value)} autoComplete="new-password" minLength={8} maxLength={72} /></label><button className="button" disabled={busy}>{busy ? <ButtonSpinner label="Please wait…" /> : "Reset password"}</button></form></div></section>;
+  return (
+    <section className="page auth-page">
+      <div className="auth-card">
+        <span className="eyebrow">Secure reset</span>
+        <h1>Create a new password</h1>
+        <p>Use at least 8 characters. This reset link works only once.</p>
+        <form className="form-stack" onSubmit={submit}>
+          <label>
+            New password
+            <PasswordField
+              id="reset-password"
+              value={password}
+              onChange={setPassword}
+              visible={showPassword}
+              onToggle={() => setShowPassword((value) => !value)}
+              autoComplete="new-password"
+              minLength={8}
+              maxLength={72}
+            />
+          </label>
+          <label>
+            Confirm new password
+            <PasswordField
+              id="confirm-reset-password"
+              value={confirmPassword}
+              onChange={setConfirmPassword}
+              visible={showConfirmation}
+              onToggle={() => setShowConfirmation((value) => !value)}
+              autoComplete="new-password"
+              minLength={8}
+              maxLength={72}
+            />
+          </label>
+          <button className="button" disabled={busy}>
+            {busy ? <ButtonSpinner label="Please wait…" /> : "Reset password"}
+          </button>
+        </form>
+      </div>
+    </section>
+  );
 }

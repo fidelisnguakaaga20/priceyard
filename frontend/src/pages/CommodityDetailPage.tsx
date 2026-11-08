@@ -8,19 +8,42 @@ import { PremiumGate } from "../components/PremiumGate";
 import { useAuth } from "../context/AuthContext";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { apiFetch } from "../services/api";
-import type { BuyingZone, Commodity, CostBreakdown, Market, MarketSignal, PriceUpdate, QualitySignal, SellWatchWindow, StorageSuitability } from "../types/api";
+import type {
+  BuyingZone,
+  Commodity,
+  CostBreakdown,
+  Market,
+  MarketSignal,
+  PriceUpdate,
+  QualitySignal,
+  SellWatchWindow,
+  StorageSuitability,
+} from "../types/api";
 import { commodityTitleColor, humanize, money, shortDate } from "../utils";
 import "./commodity-detail.css";
 
 const NIGERIA_UPDATED_FORMAT = new Intl.DateTimeFormat("en-GB", {
-  timeZone: "Africa/Lagos", day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true,
+  timeZone: "Africa/Lagos",
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+  hour: "numeric",
+  minute: "2-digit",
+  hour12: true,
 });
 
 function updatedTag(value: string | null | undefined) {
   if (!value) return null;
   const when = new Date(value);
   if (Number.isNaN(when.getTime())) return null;
-  return <time className="insight-updated" dateTime={value} title="Nigeria time">🕒 Updated {NIGERIA_UPDATED_FORMAT.format(when).replace(" at ", ", ").replace(/\b(am|pm)\b/i, (m) => m.toUpperCase())}</time>;
+  return (
+    <time className="insight-updated" dateTime={value} title="Nigeria time">
+      {"🕒 Updated "}
+      {NIGERIA_UPDATED_FORMAT.format(when)
+        .replace(" at ", ", ")
+        .replace(/\b(am|pm)\b/i, (m) => m.toUpperCase())}
+    </time>
+  );
 }
 
 export function CommodityDetailPage() {
@@ -30,7 +53,10 @@ export function CommodityDetailPage() {
   const requestedId = searchParams.get("commodity_id");
   const scope = requestedId !== null ? `id:${requestedId}` : `name:${name}`;
   const { token, user, hasFullAccess } = useAuth();
-  const [commodityResult, setCommodityResult] = useState<{ scope: string; item: Commodity | null }>({ scope: "", item: null });
+  const [commodityResult, setCommodityResult] = useState<{ scope: string; item: Commodity | null }>({
+    scope: "",
+    item: null,
+  });
   const commodity = commodityResult.scope === scope ? commodityResult.item : null;
   const displayName = commodity?.name || name;
   useDocumentTitle(displayName ? `${displayName} market insights` : "Market insights");
@@ -48,15 +74,33 @@ export function CommodityDetailPage() {
   const [intelligenceError, setIntelligenceError] = useState("");
   const [loading, setLoading] = useState(true);
   const [intelligenceLoading, setIntelligenceLoading] = useState(false);
-  const [intelligenceContext, setIntelligenceContext] = useState<{ scope: string; userId: number; token: string } | null>(null);
-  const intelligenceReady = intelligenceContext?.scope === scope && intelligenceContext?.userId === user?.id && intelligenceContext?.token === token;
+  const [intelligenceContext, setIntelligenceContext] = useState<{
+    scope: string;
+    userId: number;
+    token: string;
+  } | null>(null);
+  const intelligenceReady =
+    intelligenceContext?.scope === scope &&
+    intelligenceContext?.userId === user?.id &&
+    intelligenceContext?.token === token;
   const marketMap = useMemo(() => new Map(markets.map((m) => [m.id, m.name])), [markets]);
   // Admin-only shortcut straight to the record's existing Admin form, pre-selected
   // by id, instead of leaving an admin to hunt for it by hand.
-  const editLink = (adminPath: string, id: number) => user?.role === "admin"
-    ? <Link className="text-link insight-edit-link" to={`/admin/${adminPath}?id=${id}`}>Edit</Link> : null;
-  const addLink = (adminPath: string) => user?.role === "admin"
-    ? <Link className="text-link insight-edit-link insight-add-link" to={`/admin/${adminPath}?commodity_id=${commodity?.id ?? ""}${latestMarketId ? `&market_id=${latestMarketId}` : ""}`}>+ Add</Link> : null;
+  const editLink = (adminPath: string, id: number) =>
+    user?.role === "admin" ? (
+      <Link className="text-link insight-edit-link" to={`/admin/${adminPath}?id=${id}`}>
+        Edit
+      </Link>
+    ) : null;
+  const addLink = (adminPath: string) =>
+    user?.role === "admin" ? (
+      <Link
+        className="text-link insight-edit-link insight-add-link"
+        to={`/admin/${adminPath}?commodity_id=${commodity?.id ?? ""}${latestMarketId ? `&market_id=${latestMarketId}` : ""}`}
+      >
+        + Add
+      </Link>
+    ) : null;
   const marketLabel = (marketId: number) => marketMap.get(marketId) || `Market #${marketId}`;
 
   useEffect(() => {
@@ -65,22 +109,38 @@ export function CommodityDetailPage() {
     setLoading(true);
     const loadCommodity = async () => {
       if (requestedId !== null) return apiFetch<Commodity>(`/commodities/${encodeURIComponent(requestedId)}`);
-      const items = (await apiFetch<Commodity[]>("/commodities"))
-        .filter((item) => item.name.toLowerCase() === name.toLowerCase());
+      const items = (await apiFetch<Commodity[]>("/commodities")).filter(
+        (item) => item.name.toLowerCase() === name.toLowerCase(),
+      );
       // An old name-only bookmark cannot choose between legacy duplicate IDs.
       if (items.length > 1) throw new Error("Choose this commodity from Current Prices to view its market insights.");
       return items[0] || null;
     };
-    loadCommodity().then((item) => { if (current) setCommodityResult({ scope, item }); })
-      .catch((err: Error) => { if (current) setError(err.message); })
-      .finally(() => { if (current) setLoading(false); });
-    return () => { current = false; };
+    loadCommodity()
+      .then((item) => {
+        if (current) setCommodityResult({ scope, item });
+      })
+      .catch((err: Error) => {
+        if (current) setError(err.message);
+      })
+      .finally(() => {
+        if (current) setLoading(false);
+      });
+    return () => {
+      current = false;
+    };
   }, [scope]);
 
   useEffect(() => {
     let current = true;
-    apiFetch<Market[]>("/markets").then((items) => { if (current) setMarkets(items); }).catch(() => undefined);
-    return () => { current = false; };
+    apiFetch<Market[]>("/markets")
+      .then((items) => {
+        if (current) setMarkets(items);
+      })
+      .catch(() => undefined);
+    return () => {
+      current = false;
+    };
   }, []);
 
   const commodityId = commodity?.id;
@@ -91,18 +151,28 @@ export function CommodityDetailPage() {
     let current = true;
     setLatestMarketId(null);
     if (!commodityId || user?.role !== "admin") return;
-    apiFetch<PriceUpdate[]>(`/price-updates?commodity_id=${commodityId}`).then((items) => {
-      const latest = items.filter((item) => item.commodity_id === commodityId)
-        .sort((a, b) => new Date(b.update_date_time).getTime() - new Date(a.update_date_time).getTime())[0];
-      if (current && latest) setLatestMarketId(latest.market_id);
-    }).catch(() => undefined);
-    return () => { current = false; };
+    apiFetch<PriceUpdate[]>(`/price-updates?commodity_id=${commodityId}`)
+      .then((items) => {
+        const latest = items
+          .filter((item) => item.commodity_id === commodityId)
+          .sort((a, b) => new Date(b.update_date_time).getTime() - new Date(a.update_date_time).getTime())[0];
+        if (current && latest) setLatestMarketId(latest.market_id);
+      })
+      .catch(() => undefined);
+    return () => {
+      current = false;
+    };
   }, [commodityId, user?.role]);
 
   useEffect(() => {
     let current = true;
     // Clear data belonging to an old commodity/account before another load.
-    setSignals([]); setQuality([]); setZones([]); setSellWatch([]); setStorage([]); setCosts([]);
+    setSignals([]);
+    setQuality([]);
+    setZones([]);
+    setSellWatch([]);
+    setStorage([]);
+    setCosts([]);
     setFailedSections(new Set());
     setIntelligenceContext(null);
     setIntelligenceError("");
@@ -118,53 +188,240 @@ export function CommodityDetailPage() {
       apiFetch<SellWatchWindow[]>(`/sell-watch-windows?commodity_id=${commodityId}`, {}, token),
       apiFetch<StorageSuitability[]>(`/storage-suitability?commodity_id=${commodityId}`, {}, token),
       apiFetch<CostBreakdown[]>(`/cost-breakdowns?commodity_id=${commodityId}`, {}, token),
-    ]).then((results) => {
-      if (!current) return;
-      const [marketSignals, qualitySignals, buyingZones, sellWindows, storageItems, costItems] = results;
-      if (marketSignals.status === "fulfilled") setSignals(marketSignals.value.filter((item) => item.commodity_id === commodityId));
-      if (qualitySignals.status === "fulfilled") setQuality(qualitySignals.value.filter((item) => item.commodity_id === commodityId));
-      if (buyingZones.status === "fulfilled") setZones(buyingZones.value.filter((item) => item.commodity_id === commodityId));
-      if (sellWindows.status === "fulfilled") setSellWatch(sellWindows.value.filter((item) => item.commodity_id === commodityId));
-      if (storageItems.status === "fulfilled") setStorage(storageItems.value.filter((item) => item.commodity_id === commodityId));
-      if (costItems.status === "fulfilled") setCosts(costItems.value.filter((item) => item.commodity_id === commodityId));
-      const sectionNames = ["signals", "quality", "zones", "sellWatch", "storage", "costs"] as const;
-      setFailedSections(new Set(sectionNames.filter((_, i) => results[i].status === "rejected")));
-      // One section failing (often a cold-start blip) shouldn't block the others --
-      // each already shows its own "no data" state. Only surface a banner, in plain
-      // language rather than the raw fetch error, if every section failed together.
-      if (results.every((result) => result.status === "rejected")) {
-        setIntelligenceError("Market insights could not load right now. Please refresh the page.");
-      }
-    }).catch((err: Error) => { if (current) setIntelligenceError(err.message); })
-      .finally(() => { if (current) {
-        setIntelligenceLoading(false);
-        setIntelligenceContext({ scope, userId: user.id, token });
-      } });
-    return () => { current = false; };
+    ])
+      .then((results) => {
+        if (!current) return;
+        const [marketSignals, qualitySignals, buyingZones, sellWindows, storageItems, costItems] = results;
+        if (marketSignals.status === "fulfilled")
+          setSignals(marketSignals.value.filter((item) => item.commodity_id === commodityId));
+        if (qualitySignals.status === "fulfilled")
+          setQuality(qualitySignals.value.filter((item) => item.commodity_id === commodityId));
+        if (buyingZones.status === "fulfilled")
+          setZones(buyingZones.value.filter((item) => item.commodity_id === commodityId));
+        if (sellWindows.status === "fulfilled")
+          setSellWatch(sellWindows.value.filter((item) => item.commodity_id === commodityId));
+        if (storageItems.status === "fulfilled")
+          setStorage(storageItems.value.filter((item) => item.commodity_id === commodityId));
+        if (costItems.status === "fulfilled")
+          setCosts(costItems.value.filter((item) => item.commodity_id === commodityId));
+        const sectionNames = ["signals", "quality", "zones", "sellWatch", "storage", "costs"] as const;
+        setFailedSections(new Set(sectionNames.filter((_, i) => results[i].status === "rejected")));
+        // One section failing (often a cold-start blip) shouldn't block the others --
+        // each already shows its own "no data" state. Only surface a banner, in plain
+        // language rather than the raw fetch error, if every section failed together.
+        if (results.every((result) => result.status === "rejected")) {
+          setIntelligenceError("Market insights could not load right now. Please refresh the page.");
+        }
+      })
+      .catch((err: Error) => {
+        if (current) setIntelligenceError(err.message);
+      })
+      .finally(() => {
+        if (current) {
+          setIntelligenceLoading(false);
+          setIntelligenceContext({ scope, userId: user.id, token });
+        }
+      });
+    return () => {
+      current = false;
+    };
   }, [commodityId, user?.id, hasFullAccess, token, name, scope]);
 
-  return <section className="page page-section commodity-detail-page">
-    <div className="page-title detail-title-row commodity-page-intro">
-      <CommodityImage src={commodity?.image_url} alt={displayName} className="commodity-image-detail" />
-      <div className="commodity-intro-copy"><span className="eyebrow">Full-access insights</span><h1 style={{ color: commodityTitleColor(displayName) }}>{displayName}</h1><p>Understand price changes, quality and storage.</p></div>
-    </div>
-    {(error || intelligenceError) && <div className="status-box error">{error || intelligenceError}</div>}
-    {loading ? <LoadingSpinner label={`Loading ${name} market insights…`} /> : commodity ? <>
-    <div className="section-heading"><h2>Market insights</h2></div>
-    <PremiumGate description={user ? "Full access needed to see this commodity’s market insights. Check your trial or subscription below." : "Sign in or register free to see this commodity’s market insights."}>
-      {intelligenceLoading || !intelligenceReady ? <LoadingSpinner label="Loading full market insights…" /> : <div className="intelligence-grid market-insights-grid">
-        <article className="card insight-card insight-card-signals"><h3>📊 Market signals for {displayName}{addLink("market-signals")}</h3>{signals.length ? signals.map((x) => <div className="stack-item" key={x.id}><div className="stack-item-head"><span className="insight-meta"><span className="eyebrow">{marketLabel(x.market_id)}</span>{updatedTag(x.updated_at)}</span>{editLink("market-signals", x.id)}</div><strong>{humanize(x.signal_type)}</strong><p>{x.signal_description}</p>{x.possible_meaning && <small>{x.possible_meaning}</small>}</div>) : <p className="muted">{failedSections.has("signals") ? "Could not load market signals right now -- try refreshing." : "No linked market signals currently available."}</p>}<Disclaimer>{MARKET_DISCLAIMER}</Disclaimer></article>
-        <article className="card insight-card insight-card-quality"><h3>✅ How to identify good {displayName} for storage{addLink("quality-signals")}</h3>{quality.length ? quality.map((x) => <div className="stack-item" key={x.id}><div className="stack-item-head"><span className="insight-meta"><span className="eyebrow">{marketLabel(x.market_id)}</span>{updatedTag(x.updated_at)}</span>{editLink("quality-signals", x.id)}</div><strong>{humanize(x.quality_status) || "Quality observation"}</strong>{(x.moisture_status || x.storage_readiness) && <p>{[x.moisture_status && `Moisture: ${humanize(x.moisture_status)}`, x.storage_readiness && `Storage readiness: ${humanize(x.storage_readiness)}`].filter(Boolean).join(" · ")}</p>}{x.risk_note && <small>{x.risk_note}</small>}</div>) : <p className="muted">{failedSections.has("quality") ? "Could not load quality readiness right now -- try refreshing." : "No quality observation currently available."}</p>}</article>
-        <article className="card insight-card insight-card-buying"><h3>🛒 Right time to buy {displayName} for storage{addLink("buying-zones")}</h3>{zones.length ? zones.map((x) => { const today = new Date().toISOString().slice(0, 10); const outOfSeason = x.valid_from && x.valid_to && (today < x.valid_from || today > x.valid_to); return <div className="stack-item" key={x.id}><div className="stack-item-head"><span className="insight-meta"><span className="eyebrow">{marketLabel(x.market_id)}</span>{updatedTag(x.updated_at)}</span>{editLink("buying-zones", x.id)}</div><strong>{money(x.price_low)} – {money(x.price_high)}</strong><p>{x.reason}</p>{outOfSeason && <small className="season-note">Not currently in season — active {shortDate(x.valid_from)} to {shortDate(x.valid_to)}</small>}</div>; }) : <p className="muted">{failedSections.has("zones") ? "Could not load buying zone right now -- try refreshing." : "No buying-zone observation currently available."}</p>}</article>
-        <article className="card insight-card insight-card-sellwatch"><h3>📈 Right time to sell {displayName}{addLink("sell-watch")}</h3>{sellWatch.length ? sellWatch.map((x) => { return <div className="stack-item" key={x.id}><div className="stack-item-head"><span className="insight-meta"><span className="eyebrow">{marketLabel(x.market_id)}</span>{updatedTag(x.updated_at)}</span>{editLink("sell-watch", x.id)}</div><strong>{x.start_period}{x.end_period ? ` – ${x.end_period}` : ""}</strong><p>{x.observation}</p></div>; }) : <p className="muted">{failedSections.has("sellWatch") ? "Could not load sell-watch window right now -- try refreshing." : "No sell-watch observation currently available."}</p>}</article>
-        <article className="card insight-card insight-card-costs"><h3>💰 Cost breakdown{addLink("costs")}</h3>{costs.length ? costs.map((x) => {
-          return <div className="stack-item" key={x.id}>
-            <div className="stack-item-head"><span className="insight-meta"><span className="eyebrow">{marketLabel(x.market_id)}</span>{updatedTag(x.updated_at)}</span>{editLink("costs", x.id)}</div>
-            <CostCalculator breakdown={x} />
-          </div>;
-        }) : <p className="muted">{failedSections.has("costs") ? "Could not load cost breakdown right now -- try refreshing." : "No cost breakdown currently available for this commodity."}</p>}</article>
-      </div>}
-    </PremiumGate>
-    </> : !error && <div className="status-box">No active {name} commodity is available.</div>}
-  </section>;
+  return (
+    <section className="page page-section commodity-detail-page">
+      <div className="page-title detail-title-row commodity-page-intro">
+        <CommodityImage src={commodity?.image_url} alt={displayName} className="commodity-image-detail" />
+        <div className="commodity-intro-copy">
+          <span className="eyebrow">Full-access insights</span>
+          <h1 style={{ color: commodityTitleColor(displayName) }}>{displayName}</h1>
+          <p>Understand price changes, quality and storage.</p>
+        </div>
+      </div>
+      {(error || intelligenceError) && <div className="status-box error">{error || intelligenceError}</div>}
+      {loading ? (
+        <LoadingSpinner label={`Loading ${name} market insights…`} />
+      ) : commodity ? (
+        <>
+          <div className="section-heading">
+            <h2>Market insights</h2>
+          </div>
+          <PremiumGate
+            description={
+              user
+                ? "Full access needed to see this commodity’s market insights. Check your trial or subscription below."
+                : "Sign in or register free to see this commodity’s market insights."
+            }
+          >
+            {intelligenceLoading || !intelligenceReady ? (
+              <LoadingSpinner label="Loading full market insights…" />
+            ) : (
+              <div className="intelligence-grid market-insights-grid">
+                <article className="card insight-card insight-card-signals">
+                  <h3>
+                    📊 Market signals for {displayName}
+                    {addLink("market-signals")}
+                  </h3>
+                  {signals.length ? (
+                    signals.map((x) => (
+                      <div className="stack-item" key={x.id}>
+                        <div className="stack-item-head">
+                          <span className="insight-meta">
+                            <span className="eyebrow">{marketLabel(x.market_id)}</span>
+                            {updatedTag(x.updated_at)}
+                          </span>
+                          {editLink("market-signals", x.id)}
+                        </div>
+                        <strong>{humanize(x.signal_type)}</strong>
+                        <p>{x.signal_description}</p>
+                        {x.possible_meaning && <small>{x.possible_meaning}</small>}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="muted">
+                      {failedSections.has("signals")
+                        ? "Could not load market signals right now -- try refreshing."
+                        : "No linked market signals currently available."}
+                    </p>
+                  )}
+                  <Disclaimer>{MARKET_DISCLAIMER}</Disclaimer>
+                </article>
+                <article className="card insight-card insight-card-quality">
+                  <h3>
+                    ✅ How to identify good {displayName} for storage{addLink("quality-signals")}
+                  </h3>
+                  {quality.length ? (
+                    quality.map((x) => (
+                      <div className="stack-item" key={x.id}>
+                        <div className="stack-item-head">
+                          <span className="insight-meta">
+                            <span className="eyebrow">{marketLabel(x.market_id)}</span>
+                            {updatedTag(x.updated_at)}
+                          </span>
+                          {editLink("quality-signals", x.id)}
+                        </div>
+                        <strong>{humanize(x.quality_status) || "Quality observation"}</strong>
+                        {(x.moisture_status || x.storage_readiness) && (
+                          <p>
+                            {[
+                              x.moisture_status && `Moisture: ${humanize(x.moisture_status)}`,
+                              x.storage_readiness && `Storage readiness: ${humanize(x.storage_readiness)}`,
+                            ]
+                              .filter(Boolean)
+                              .join(" · ")}
+                          </p>
+                        )}
+                        {x.risk_note && <small>{x.risk_note}</small>}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="muted">
+                      {failedSections.has("quality")
+                        ? "Could not load quality readiness right now -- try refreshing."
+                        : "No quality observation currently available."}
+                    </p>
+                  )}
+                </article>
+                <article className="card insight-card insight-card-buying">
+                  <h3>
+                    🛒 Right time to buy {displayName} for storage{addLink("buying-zones")}
+                  </h3>
+                  {zones.length ? (
+                    zones.map((x) => {
+                      const today = new Date().toISOString().slice(0, 10);
+                      const outOfSeason = x.valid_from && x.valid_to && (today < x.valid_from || today > x.valid_to);
+                      return (
+                        <div className="stack-item" key={x.id}>
+                          <div className="stack-item-head">
+                            <span className="insight-meta">
+                              <span className="eyebrow">{marketLabel(x.market_id)}</span>
+                              {updatedTag(x.updated_at)}
+                            </span>
+                            {editLink("buying-zones", x.id)}
+                          </div>
+                          <strong>
+                            {money(x.price_low)} – {money(x.price_high)}
+                          </strong>
+                          <p>{x.reason}</p>
+                          {outOfSeason && (
+                            <small className="season-note">
+                              Not currently in season — active {shortDate(x.valid_from)} to {shortDate(x.valid_to)}
+                            </small>
+                          )}
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <p className="muted">
+                      {failedSections.has("zones")
+                        ? "Could not load buying zone right now -- try refreshing."
+                        : "No buying-zone observation currently available."}
+                    </p>
+                  )}
+                </article>
+                <article className="card insight-card insight-card-sellwatch">
+                  <h3>
+                    📈 Right time to sell {displayName}
+                    {addLink("sell-watch")}
+                  </h3>
+                  {sellWatch.length ? (
+                    sellWatch.map((x) => {
+                      return (
+                        <div className="stack-item" key={x.id}>
+                          <div className="stack-item-head">
+                            <span className="insight-meta">
+                              <span className="eyebrow">{marketLabel(x.market_id)}</span>
+                              {updatedTag(x.updated_at)}
+                            </span>
+                            {editLink("sell-watch", x.id)}
+                          </div>
+                          <strong>
+                            {x.start_period}
+                            {x.end_period ? ` – ${x.end_period}` : ""}
+                          </strong>
+                          <p>{x.observation}</p>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <p className="muted">
+                      {failedSections.has("sellWatch")
+                        ? "Could not load sell-watch window right now -- try refreshing."
+                        : "No sell-watch observation currently available."}
+                    </p>
+                  )}
+                </article>
+                <article className="card insight-card insight-card-costs">
+                  <h3>💰 Cost breakdown{addLink("costs")}</h3>
+                  {costs.length ? (
+                    costs.map((x) => {
+                      return (
+                        <div className="stack-item" key={x.id}>
+                          <div className="stack-item-head">
+                            <span className="insight-meta">
+                              <span className="eyebrow">{marketLabel(x.market_id)}</span>
+                              {updatedTag(x.updated_at)}
+                            </span>
+                            {editLink("costs", x.id)}
+                          </div>
+                          <CostCalculator breakdown={x} />
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <p className="muted">
+                      {failedSections.has("costs")
+                        ? "Could not load cost breakdown right now -- try refreshing."
+                        : "No cost breakdown currently available for this commodity."}
+                    </p>
+                  )}
+                </article>
+              </div>
+            )}
+          </PremiumGate>
+        </>
+      ) : (
+        !error && <div className="status-box">No active {name} commodity is available.</div>
+      )}
+    </section>
+  );
 }

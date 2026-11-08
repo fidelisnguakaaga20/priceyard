@@ -9,7 +9,13 @@ import { useCommodityMarketPairs } from "../hooks/useCommodityMarketPairs";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { usePreferences } from "../context/PreferencesContext";
 import { apiFetch, apiFetchWithProvenance } from "../services/api";
-import { addIdentityFilter, identityLabel, identityValue, selectedIdentity, selectionFromQuery } from "../services/priceIdentity";
+import {
+  addIdentityFilter,
+  identityLabel,
+  identityValue,
+  selectedIdentity,
+  selectionFromQuery,
+} from "../services/priceIdentity";
 import type { Commodity, Market, PriceUpdate } from "../types/api";
 
 const AUTO_REFRESH_MS = 60_000;
@@ -31,14 +37,17 @@ export function PricesPage() {
   const commodityMarketPairs = useCommodityMarketPairs();
   const commodityLabel = identityLabel(commodity, commodities);
   const marketLabel = identityLabel(market, markets);
-  const trackedMarkets = commodityLabel && commodityMarketPairs.has(commodityLabel)
-    ? markets.filter((item) => commodityMarketPairs.get(commodityLabel)!.has(item.name))
-    : markets;
+  const trackedMarkets =
+    commodityLabel && commodityMarketPairs.has(commodityLabel)
+      ? markets.filter((item) => commodityMarketPairs.get(commodityLabel)!.has(item.name))
+      : markets;
   const selectedMarket = markets.find((item) => identityValue(item.id) === selectedIdentity(market, markets));
   // Preserve an explicit homepage/URL selection even if this pair has no prices.
   // The empty result should be clear, without silently changing the filter.
-  const availableMarkets = selectedMarket && !trackedMarkets.some((item) => item.id === selectedMarket.id)
-    ? [...trackedMarkets, selectedMarket] : trackedMarkets;
+  const availableMarkets =
+    selectedMarket && !trackedMarkets.some((item) => item.id === selectedMarket.id)
+      ? [...trackedMarkets, selectedMarket]
+      : trackedMarkets;
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [filtersLoading, setFiltersLoading] = useState(true);
@@ -52,13 +61,16 @@ export function PricesPage() {
     if (!silent) {
       foregroundPending.current = true;
       appliedFilters.current = params || {};
-      setLoading(true); setError("");
+      setLoading(true);
+      setError("");
     }
     const query = new URLSearchParams();
     addIdentityFilter(query, "commodity", params?.commodity);
     addIdentityFilter(query, "market", params?.market);
     try {
-      const { data, savedAt } = await apiFetchWithProvenance<PriceUpdate[]>(`/price-updates${query.size ? `?${query}` : ""}`);
+      const { data, savedAt } = await apiFetchWithProvenance<PriceUpdate[]>(
+        `/price-updates${query.size ? `?${query}` : ""}`,
+      );
       if (sequence !== requestSequence.current) return;
       setItems(data);
       setSavedAt(savedAt);
@@ -76,22 +88,30 @@ export function PricesPage() {
   useEffect(() => {
     const commodity = selectionFromQuery(searchParams, "commodity");
     const market = selectionFromQuery(searchParams, "market");
-    setCommodity(commodity); setMarket(market);
+    setCommodity(commodity);
+    setMarket(market);
     void load({ commodity, market });
-    return () => { requestSequence.current++; foregroundPending.current = false; };
+    return () => {
+      requestSequence.current++;
+      foregroundPending.current = false;
+    };
   }, [searchParams]);
 
   useEffect(() => {
     let current = true;
-    void Promise.all([
-      apiFetch<Commodity[]>("/commodities"),
-      apiFetch<Market[]>("/markets"),
-    ]).then(([commodityItems, marketItems]) => {
-      if (!current) return;
-      setCommodities(commodityItems);
-      setMarkets(marketItems);
-    }).catch(() => undefined).finally(() => { if (current) setFiltersLoading(false); });
-    return () => { current = false; };
+    void Promise.all([apiFetch<Commodity[]>("/commodities"), apiFetch<Market[]>("/markets")])
+      .then(([commodityItems, marketItems]) => {
+        if (!current) return;
+        setCommodities(commodityItems);
+        setMarkets(marketItems);
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        if (current) setFiltersLoading(false);
+      });
+    return () => {
+      current = false;
+    };
   }, []);
 
   // Silently keep the list current while it's open, so an admin's new/edited price
@@ -99,12 +119,15 @@ export function PricesPage() {
   // repeated background fetches cost mobile data that toggle exists to avoid.
   useEffect(() => {
     if (dataSaver) return;
-    const interval = setInterval(() => { void load(appliedFilters.current, true); }, AUTO_REFRESH_MS);
+    const interval = setInterval(() => {
+      void load(appliedFilters.current, true);
+    }, AUTO_REFRESH_MS);
     return () => clearInterval(interval);
   }, [dataSaver]);
 
   useEffect(() => {
-    if (location.hash !== "#price-search" || loading || filtersLoading || searchFocusKey.current === location.key) return;
+    if (location.hash !== "#price-search" || loading || filtersLoading || searchFocusKey.current === location.key)
+      return;
     let frame = 0;
     const reveal = () => {
       window.cancelAnimationFrame(frame);
@@ -116,8 +139,13 @@ export function PricesPage() {
         searchFocusKey.current = location.key;
         form.querySelector<HTMLSelectElement>("select")?.focus({ preventScroll: true });
         const header = document.querySelector(".site-header");
-        const headerHeight = header ? header.getBoundingClientRect().height + (parseFloat(getComputedStyle(header).top) || 0) : 0;
-        window.scrollTo({ top: Math.max(0, window.scrollY + form.getBoundingClientRect().top - headerHeight - 12), behavior: "auto" });
+        const headerHeight = header
+          ? header.getBoundingClientRect().height + (parseFloat(getComputedStyle(header).top) || 0)
+          : 0;
+        window.scrollTo({
+          top: Math.max(0, window.scrollY + form.getBoundingClientRect().top - headerHeight - 12),
+          behavior: "auto",
+        });
       });
     };
     reveal();
@@ -128,24 +156,87 @@ export function PricesPage() {
     };
   }, [location.hash, location.key, loading, filtersLoading]);
 
-  const submit = (event: FormEvent) => { event.preventDefault(); void load({ commodity: selectedIdentity(commodity, commodities), market: selectedIdentity(market, markets) }); };
-  const clear = () => { setCommodity(""); setMarket(""); void load(); };
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    void load({ commodity: selectedIdentity(commodity, commodities), market: selectedIdentity(market, markets) });
+  };
+  const clear = () => {
+    setCommodity("");
+    setMarket("");
+    void load();
+  };
   const changeCommodity = (value: string) => {
     setCommodity(value);
     const label = identityLabel(value, commodities);
-    if (market && label && commodityMarketPairs.has(label) && !commodityMarketPairs.get(label)!.has(marketLabel)) setMarket("");
+    if (market && label && commodityMarketPairs.has(label) && !commodityMarketPairs.get(label)!.has(marketLabel))
+      setMarket("");
   };
 
-  return <section className="page page-section">
-    <div className="page-title"><span className="eyebrow">Latest approved records</span><h1>Search commodity prices</h1><p>Search current commodity price ranges by commodity and market.</p></div>
-    <form id="price-search" ref={searchFormRef} className="filter-bar filter-bar-two" role="search" aria-label="Search current prices" onSubmit={submit}>
-      <label>Commodity<select value={selectedIdentity(commodity, commodities)} onChange={(e) => changeCommodity(e.target.value)}><option value="">Choose a commodity</option>{commodities.map((item) => <option value={identityValue(item.id)} key={item.id}>{item.name}</option>)}</select></label>
-      <label>Market<select value={selectedIdentity(market, markets)} onChange={(e) => setMarket(e.target.value)}><option value="">Choose a market</option>{availableMarkets.map((item) => <option value={identityValue(item.id)} key={item.id}>{item.name}</option>)}</select>{commodity && trackedMarkets.length < markets.length && <small className="muted">{commodityLabel} is only tracked at {trackedMarkets.length} market{trackedMarkets.length === 1 ? "" : "s"} here.</small>}</label>
-      <div className="filter-actions"><button className="button button-small" type="submit" disabled={loading}>{loading ? <ButtonSpinner label="Please wait…" /> : "Search prices"}</button><button className="button button-ghost button-small" type="button" onClick={clear} disabled={loading}>Clear</button></div>
-    </form>
-    {error && <div className="status-box error">{error}</div>}
-    {!loading && items.length > 0 && <SavedPriceNotice savedAt={savedAt} />}
-    {loading || filtersLoading ? <LoadingSpinner label="Loading approved prices…" /> : items.length ? <GroupedPriceCards items={items} /> : <div className="status-box">No current prices found{commodity ? ` for ${commodityLabel}` : ""}{market ? ` at ${marketLabel}` : ""}. Try clearing the filters or check back soon for new records.</div>}
-    <Disclaimer>{PRICE_DISCLAIMER}</Disclaimer>
-  </section>;
+  return (
+    <section className="page page-section">
+      <div className="page-title">
+        <span className="eyebrow">Latest approved records</span>
+        <h1>Search commodity prices</h1>
+        <p>Search current commodity price ranges by commodity and market.</p>
+      </div>
+      <form
+        id="price-search"
+        ref={searchFormRef}
+        className="filter-bar filter-bar-two"
+        role="search"
+        aria-label="Search current prices"
+        onSubmit={submit}
+      >
+        <label>
+          Commodity
+          <select value={selectedIdentity(commodity, commodities)} onChange={(e) => changeCommodity(e.target.value)}>
+            <option value="">Choose a commodity</option>
+            {commodities.map((item) => (
+              <option value={identityValue(item.id)} key={item.id}>
+                {item.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Market
+          <select value={selectedIdentity(market, markets)} onChange={(e) => setMarket(e.target.value)}>
+            <option value="">Choose a market</option>
+            {availableMarkets.map((item) => (
+              <option value={identityValue(item.id)} key={item.id}>
+                {item.name}
+              </option>
+            ))}
+          </select>
+          {commodity && trackedMarkets.length < markets.length && (
+            <small className="muted">
+              {commodityLabel} is only tracked at {trackedMarkets.length} market{trackedMarkets.length === 1 ? "" : "s"}
+              {" here."}
+            </small>
+          )}
+        </label>
+        <div className="filter-actions">
+          <button className="button button-small" type="submit" disabled={loading}>
+            {loading ? <ButtonSpinner label="Please wait…" /> : "Search prices"}
+          </button>
+          <button className="button button-ghost button-small" type="button" onClick={clear} disabled={loading}>
+            Clear
+          </button>
+        </div>
+      </form>
+      {error && <div className="status-box error">{error}</div>}
+      {!loading && items.length > 0 && <SavedPriceNotice savedAt={savedAt} />}
+      {loading || filtersLoading ? (
+        <LoadingSpinner label="Loading approved prices…" />
+      ) : items.length ? (
+        <GroupedPriceCards items={items} />
+      ) : (
+        <div className="status-box">
+          No current prices found{commodity ? ` for ${commodityLabel}` : ""}
+          {market ? ` at ${marketLabel}` : ""}. Try clearing the filters or check back soon for new records.
+        </div>
+      )}
+      <Disclaimer>{PRICE_DISCLAIMER}</Disclaimer>
+    </section>
+  );
 }
