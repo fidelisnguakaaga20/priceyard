@@ -23,7 +23,8 @@ const navItems = [
   ["/prices", "Current Prices"],
   ["/history", "Price History"],
   ["/market-days", "Market Days"],
-  ["/faq", "FAQ"],
+  ["/faq", "Help"],
+  ["/about", "About"],
 ] as const;
 
 export function Layout() {
@@ -33,9 +34,7 @@ export function Layout() {
   const { showToast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
-  const [open, setOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
-  const menuButton = useRef<HTMLButtonElement>(null);
   const [loggingOut, setLoggingOut] = useState(false);
   const [tickerPrices, setTickerPrices] = useState<PriceUpdate[]>([]);
   const [tickerSavedAt, setTickerSavedAt] = useState<string | null>(null);
@@ -44,8 +43,7 @@ export function Layout() {
   useEffect(() => {
     const header = headerRef.current;
     if (!header) return;
-    // Keep the menu within the space below the whole sticky header, including
-    // preferences and ticker, even on a short landscape screen.
+    // Publish the sticky header's height so pages can scroll content clear of it.
     const measure = () =>
       header.style.setProperty("--priceyard-header-bottom", `${Math.ceil(header.getBoundingClientRect().bottom)}px`);
     measure();
@@ -111,7 +109,6 @@ export function Layout() {
     setLoggingOut(true);
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
     logout();
-    setOpen(false);
     setLoggingOut(false);
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
     showToast("Logout successful.");
@@ -151,7 +148,7 @@ export function Layout() {
     <div className="app-shell">
       <header ref={headerRef} className="site-header">
         <div className="header-inner">
-          <Link to="/" className="brand" aria-label="PriceYard home" onClick={() => setOpen(false)}>
+          <Link to="/" className="brand" aria-label="PriceYard home">
             <span className="brand-mark">PY</span>
             <span>
               <strong>PriceYard</strong>
@@ -159,72 +156,28 @@ export function Layout() {
             </span>
           </Link>
           <div className="header-actions">
-            <Link to="/prices#price-search" className="header-search-link" onClick={() => setOpen(false)}>
+            <Link to="/prices#price-search" className="header-search-link">
               Search prices
             </Link>
-            <button
-              ref={menuButton}
-              className="menu-button"
-              type="button"
-              aria-label="Toggle navigation"
-              aria-controls="priceyard-primary-navigation"
-              aria-expanded={open}
-              onClick={() => setOpen((value) => !value)}
-              onKeyDown={(event) => {
-                if (open && event.key === "Escape") {
-                  event.preventDefault();
-                  setOpen(false);
-                }
-              }}
-            >
-              ☰ Menu
-            </button>
           </div>
-          <nav
-            id="priceyard-primary-navigation"
-            className={open ? "main-nav open" : "main-nav"}
-            aria-label="Primary navigation"
-            onKeyDown={(event) => {
-              if (open && event.key === "Escape") {
-                event.preventDefault();
-                setOpen(false);
-                menuButton.current?.focus();
-              }
-            }}
-          >
+          <nav id="priceyard-primary-navigation" className="main-nav" aria-label="Primary navigation">
             <div className="nav-primary">
               {navItems.map(([to, label]) => (
-                <NavLink key={to} to={to} onClick={() => setOpen(false)}>
+                <NavLink key={to} to={to}>
                   {label}
                 </NavLink>
               ))}
             </div>
             <div className="nav-account">
-              {user && (
-                <NavLink to="/watchlist" onClick={() => setOpen(false)}>
-                  Watchlist
-                </NavLink>
-              )}
-              {user && (
-                <NavLink to="/feedback" onClick={() => setOpen(false)}>
-                  Feedback
-                </NavLink>
-              )}
+              {user && <NavLink to="/watchlist">Watchlist</NavLink>}
+              {user && <NavLink to="/feedback">Feedback</NavLink>}
               {(user?.role === "reporter" || user?.role === "admin") && (
-                <NavLink to="/report-price" onClick={() => setOpen(false)}>
-                  Report a price
-                </NavLink>
+                <NavLink to="/report-price">Report a price</NavLink>
               )}
-              {user?.role === "admin" && (
-                <NavLink to="/admin" onClick={() => setOpen(false)}>
-                  Admin
-                </NavLink>
-              )}
+              {user?.role === "admin" && <NavLink to="/admin">Admin</NavLink>}
               {user ? (
                 <>
-                  <NavLink to="/dashboard" onClick={() => setOpen(false)}>
-                    Dashboard
-                  </NavLink>
+                  <NavLink to="/dashboard">Dashboard</NavLink>
                   <button
                     className="nav-button"
                     type="button"
@@ -235,13 +188,11 @@ export function Layout() {
                   </button>
                 </>
               ) : (
-                <NavLink className="nav-cta" to="/login" onClick={() => setOpen(false)}>
+                <NavLink className="nav-cta" to="/login">
                   Log in
                 </NavLink>
               )}
             </div>
-            {/* Phone only: display settings live in the menu to keep the top bar short. */}
-            <div className="nav-display-toggles">{displayToggles}</div>
           </nav>
         </div>
         <div className="access-strip">
@@ -286,7 +237,7 @@ export function Layout() {
         <div>
           <strong>PriceYard</strong> by NGU TOP PRODUCTS AND SERVICES
         </div>
-        <div>Market information only — no guaranteed profit or prediction.</div>
+        <div>Market insights or intelligence only — no guaranteed profit or prediction.</div>
         <a className="text-link" href={WHATSAPP_COMMUNITY_URL} target="_blank" rel="noopener noreferrer">
           Join our free WhatsApp updates →
         </a>

@@ -8,7 +8,8 @@
 .site-header .header-inner {
   width: min(1480px, calc(100% - 40px));
   min-height: 64px;
-  gap: 12px;
+  gap: 0 12px;
+  flex-wrap: wrap;
 }
 
 .site-header .header-actions {
@@ -52,8 +53,13 @@
   line-height: 1.35;
 }
 
+/* Every link stays visible on its own row under the logo; extra links wrap to
+   another line on computers and scroll sideways on phones (below). */
 .site-header .main-nav {
+  flex: 1 1 100%;
+  flex-wrap: wrap;
   gap: 2px;
+  padding-bottom: 6px;
 }
 
 .site-header .main-nav a,
@@ -102,41 +108,8 @@
 }
 
 @media (max-width: 1440px) {
-  .site-header .menu-button {
-    display: block;
-    min-height: 44px;
-    min-width: 44px;
-  }
-
   .site-header .brand small {
     display: none;
-  }
-
-  .site-header .main-nav {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 20px;
-    right: 20px;
-    padding: 10px;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: 12px;
-    box-shadow: 0 18px 40px rgba(20, 40, 25, 0.12);
-    flex-direction: column;
-    align-items: stretch;
-    max-height: min(70vh, calc(100dvh - var(--priceyard-header-bottom, 180px) - 12px));
-    overflow-y: auto;
-  }
-
-  .site-header .main-nav.open {
-    display: flex;
-  }
-
-  .site-header .main-nav a,
-  .site-header .nav-button {
-    justify-content: flex-start;
-    text-align: left;
   }
 }
 
@@ -154,7 +127,7 @@
     padding-inline: 12px;
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
-    gap: 10px;
+    gap: 0 10px;
   }
 
   .site-header .brand {
@@ -164,15 +137,25 @@
     margin-right: 0;
   }
 
-  .site-header .menu-button {
-    width: auto;
-    justify-self: end;
-    white-space: nowrap;
-  }
-
+  /* Phone: one row of links that swipes sideways; the fade on the right edge hints
+     that more links follow. */
   .site-header .main-nav {
-    left: 12px;
-    right: 12px;
+    grid-column: 1 / -1;
+    flex-wrap: nowrap;
+    min-width: 0;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    padding-right: 28px;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  }
+  .site-header .main-nav::-webkit-scrollbar {
+    display: none;
+  }
+  .site-header .main-nav a,
+  .site-header .main-nav .nav-button {
+    flex: 0 0 auto;
   }
 
   .site-header .nav-account .nav-cta {
@@ -210,10 +193,7 @@
     font-size: 0.82rem;
   }
 
-  /* Phone only: display settings move into the menu; access shows on one short line. */
-  .site-header .access-strip .display-toggles {
-    display: none;
-  }
+  /* Phone: access shows on one short line. */
   .site-header .access-strip {
     padding: 3px 12px;
   }
@@ -226,33 +206,6 @@
   .site-header .access-identity > span + span::before {
     content: " · ";
   }
-
-  .site-header .main-nav .nav-display-toggles {
-    display: grid;
-    gap: 6px;
-    margin-top: 8px;
-    padding-top: 10px;
-    border-top: 1px solid var(--color-border);
-  }
-  .site-header .nav-display-toggles .toggle-pill {
-    min-height: 44px;
-    padding: 8px 12px;
-    border: 1px solid var(--color-border-strong);
-    border-radius: 10px;
-    background: transparent;
-    color: var(--color-text);
-    font-size: 0.88rem;
-    text-align: left;
-  }
-  .site-header .nav-display-toggles .toggle-pill.on {
-    background: var(--color-surface-subtle);
-    border-color: var(--color-link);
-  }
-}
-
-/* Laptop/tablet keep the buttons on the bar, so the menu copy stays hidden. */
-.site-header .nav-display-toggles {
-  display: none;
 }
 
 @media (min-width: 1281px) and (max-width: 1500px) {

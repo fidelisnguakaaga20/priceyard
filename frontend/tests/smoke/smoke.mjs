@@ -11,7 +11,7 @@ const BASE = (process.env.SMOKE_BASE_URL || "http://127.0.0.1:4322").replace(/\/
 const CHANNEL = process.env.SMOKE_BROWSER_CHANNEL || undefined;
 
 const PUBLIC_PAGES = ["/", "/prices", "/prices?market=Kwali%20Market", "/commodities/Egusi", "/history", "/market-days",
-  "/faq", "/login", "/register", "/forgot-password", "/no-such-page"];
+  "/faq", "/about", "/login", "/register", "/forgot-password", "/no-such-page"];
 const MEMBER_PAGES = ["/dashboard", "/watchlist", "/feedback", "/report-price"];
 const ADMIN_PAGES = ["/admin", "/admin/activity", "/admin/users", "/admin/commodities", "/admin/markets", "/admin/prices",
   "/admin/flagged", "/admin/market-signals", "/admin/quality-signals", "/admin/buying-zones", "/admin/sell-watch",
@@ -89,18 +89,16 @@ async function checkPages(browser, { width, signedIn, pages }) {
   }
 
   if (signedIn) {
-    // The menu must open and lead somewhere, and the browser Back button must return.
+    // The top links must lead somewhere, and the browser Back button must return.
     await page.goto(BASE + "/", { waitUntil: "load" });
     await page.waitForTimeout(500);
-    const menuButton = page.locator(".menu-button");
-    if (await menuButton.isVisible()) await menuButton.click();
-    await page.locator("#priceyard-primary-navigation a", { hasText: "FAQ" }).first().click();
+    await page.locator("#priceyard-primary-navigation a", { hasText: "Help" }).first().click();
     await page.waitForTimeout(400);
     const afterClick = await page.evaluate(() => location.pathname);
     await page.goBack();
     await page.waitForTimeout(400);
     const afterBack = await page.evaluate(() => location.pathname);
-    if (afterClick !== "/faq" || afterBack !== "/") problems.push(`admin ${width}px menu: FAQ -> ${afterClick}, back -> ${afterBack}`);
+    if (afterClick !== "/faq" || afterBack !== "/") problems.push(`admin ${width}px top links: Help -> ${afterClick}, back -> ${afterBack}`);
   }
   await page.close();
   return problems;

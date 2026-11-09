@@ -3,6 +3,7 @@ import { AdminLayout } from "./components/AdminLayout";
 import { AdminRoute } from "./components/AdminRoute";
 import { Layout } from "./components/Layout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { AboutPage } from "./pages/AboutPage";
 import { CommodityDetailPage } from "./pages/CommodityDetailPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { FAQPage } from "./pages/FAQPage";
@@ -44,6 +45,7 @@ export default function App() {
         <Route path="history" element={<PriceHistoryPage />} />
         <Route path="market-days" element={<MarketDaysPage />} />
         <Route path="faq" element={<FAQPage />} />
+        <Route path="about" element={<AboutPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
         <Route path="forgot-password" element={<ForgotPasswordPage />} />
