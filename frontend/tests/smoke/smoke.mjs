@@ -89,16 +89,20 @@ async function checkPages(browser, { width, signedIn, pages }) {
   }
 
   if (signedIn) {
-    // The top links must lead somewhere, and the browser Back button must return.
-    await page.goto(BASE + "/", { waitUntil: "load" });
-    await page.waitForTimeout(500);
-    await page.locator("#priceyard-primary-navigation a", { hasText: "Help" }).first().click();
-    await page.waitForTimeout(400);
-    const afterClick = await page.evaluate(() => location.pathname);
-    await page.goBack();
-    await page.waitForTimeout(400);
-    const afterBack = await page.evaluate(() => location.pathname);
-    if (afterClick !== "/faq" || afterBack !== "/") problems.push(`admin ${width}px top links: Help -> ${afterClick}, back -> ${afterBack}`);
+    // The visible links must lead somewhere, and the browser Back button must return:
+    // "Help" from the Account page (top bar on computers, Account links on phones),
+    // and "Market Days" from the top bar or the phone bottom tab bar.
+    for (const [start, label, target] of [["/dashboard", "Help", "/faq"], ["/", "Market Days", "/market-days"]]) {
+      await page.goto(BASE + start, { waitUntil: "load" });
+      await page.waitForTimeout(500);
+      await page.locator("a:visible", { hasText: new RegExp(`^${label}$`) }).first().click();
+      await page.waitForTimeout(400);
+      const afterClick = await page.evaluate(() => location.pathname);
+      await page.goBack();
+      await page.waitForTimeout(400);
+      const afterBack = await page.evaluate(() => location.pathname);
+      if (afterClick !== target || afterBack !== start) problems.push(`admin ${width}px links: ${label} -> ${afterClick}, back -> ${afterBack}`);
+    }
   }
   await page.close();
   return problems;

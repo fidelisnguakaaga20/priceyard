@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useLogout } from "../hooks/useLogout";
 import { apiFetch, apiFetchWithProvenance } from "../services/api";
+import { BottomTabs } from "./BottomTabs";
 import { InstallPrompt } from "./InstallPrompt";
 import { ButtonSpinner } from "./LoadingSpinner";
 import { OfflineBanner } from "./OfflineBanner";
 import { OnboardingTour } from "./OnboardingTour";
 import { PriceTicker } from "./PriceTicker";
 import { usePreferences } from "../context/PreferencesContext";
-import { useToast } from "../context/ToastContext";
 import { SUPPORT_WHATSAPP_NUMBER, WhatsAppSupportButton } from "./WhatsAppSupportButton";
 import type { PriceUpdate } from "../types/api";
 import { daysUntil, WHATSAPP_COMMUNITY_URL } from "../utils";
@@ -28,14 +29,12 @@ const navItems = [
 ] as const;
 
 export function Layout() {
-  const { user, accessLabel, subscription, logout, loading: authLoading } = useAuth();
+  const { user, accessLabel, subscription, loading: authLoading } = useAuth();
   const trialDaysLeft = accessLabel === "Trial" ? daysUntil(subscription?.trial_ends_at) : null;
   const { dataSaver, toggleDataSaver, easyReading, toggleEasyReading, darkMode, toggleDarkMode } = usePreferences();
-  const { showToast } = useToast();
-  const navigate = useNavigate();
   const location = useLocation();
   const headerRef = useRef<HTMLElement>(null);
-  const [loggingOut, setLoggingOut] = useState(false);
+  const { loggingOut, handleLogout } = useLogout();
   const [tickerPrices, setTickerPrices] = useState<PriceUpdate[]>([]);
   const [tickerSavedAt, setTickerSavedAt] = useState<string | null>(null);
   const showTicker = !TICKER_HIDDEN_PREFIXES.some((prefix) => location.pathname.startsWith(prefix));
@@ -103,17 +102,6 @@ export function Layout() {
     }).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authLoading, user]);
-
-  const handleLogout = async () => {
-    if (loggingOut) return;
-    setLoggingOut(true);
-    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
-    logout();
-    setLoggingOut(false);
-    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
-    showToast("Logout successful.");
-    navigate("/", { replace: true });
-  };
 
   const displayToggles = (
     <>
@@ -251,6 +239,7 @@ export function Layout() {
         </a>
       </footer>
       <WhatsAppSupportButton />
+      <BottomTabs />
       <OnboardingTour />
     </div>
   );

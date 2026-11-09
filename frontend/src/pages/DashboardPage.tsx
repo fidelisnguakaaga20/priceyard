@@ -1,8 +1,10 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { ButtonSpinner } from "../components/LoadingSpinner";
 import { ONBOARDING_TOUR_SEEN_EVENT, ONBOARDING_TOUR_SEEN_KEY } from "../components/OnboardingTour";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
+import { useLogout } from "../hooks/useLogout";
 import { apiFetch } from "../services/api";
 import type { PaymentInitiateResponse, PaymentPlan, ReferralSummary, SubmissionStats } from "../types/api";
 import { dateOnly, referralLink, referralWhatsAppShareUrl } from "../utils";
@@ -27,6 +29,7 @@ function readTourSeen(): boolean {
 
 export function DashboardPage() {
   const { user, subscription, accessLabel, hasFullAccess, token } = useAuth();
+  const { loggingOut, handleLogout } = useLogout();
   const { showToast } = useToast();
   const [onboardingDismissed, setOnboardingDismissed] = useState(readOnboardingDismissed);
   const [tourSeen, setTourSeen] = useState(readTourSeen);
@@ -135,6 +138,17 @@ export function DashboardPage() {
         <h1>Welcome, {user.full_name}</h1>
         <p>Your account and quick links to PriceYard tools.</p>
       </div>
+      {/* Phone only: links that are not in the bottom tab bar. */}
+      <nav className="account-links" aria-label="More from PriceYard">
+        <Link to="/faq">Help</Link>
+        <Link to="/about">About</Link>
+        <Link to="/feedback">Feedback</Link>
+        {(user.role === "reporter" || user.role === "admin") && <Link to="/report-price">Report a price</Link>}
+        {user.role === "admin" && <Link to="/admin">Admin</Link>}
+        <button type="button" disabled={loggingOut} onClick={() => void handleLogout()}>
+          {loggingOut ? <ButtonSpinner label="Please wait…" /> : "Log out"}
+        </button>
+      </nav>
       {user.role !== "admin" && !onboardingDismissed && tourSeen && (
         <article className="card onboarding-card dashboard-onboarding-card">
           <div className="card-row">

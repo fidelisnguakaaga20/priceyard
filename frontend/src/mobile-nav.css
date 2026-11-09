@@ -53,8 +53,8 @@
   line-height: 1.35;
 }
 
-/* Every link stays visible on its own row under the logo; extra links wrap to
-   another line on computers and scroll sideways on phones (below). */
+/* Every link stays visible on its own row under the logo and wraps to another
+   line when needed. Phones use the bottom tab bar instead (below). */
 .site-header .main-nav {
   flex: 1 1 100%;
   flex-wrap: wrap;
@@ -137,25 +137,9 @@
     margin-right: 0;
   }
 
-  /* Phone: one row of links that swipes sideways; the fade on the right edge hints
-     that more links follow. */
+  /* Phone: the top links move to the bottom tab bar (below). */
   .site-header .main-nav {
-    grid-column: 1 / -1;
-    flex-wrap: nowrap;
-    min-width: 0;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scrollbar-width: none;
-    padding-right: 28px;
-    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
-    mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
-  }
-  .site-header .main-nav::-webkit-scrollbar {
     display: none;
-  }
-  .site-header .main-nav a,
-  .site-header .main-nav .nav-button {
-    flex: 0 0 auto;
   }
 
   .site-header .nav-account .nav-cta {
@@ -211,5 +195,89 @@
 @media (min-width: 1281px) and (max-width: 1500px) {
   html.easy-reading .site-header .brand small {
     display: none;
+  }
+}
+
+/* Phone bottom tab bar (BottomTabs.tsx) and the Account page links that are not in it. */
+.bottom-tabs,
+.account-links {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --bottom-tabs-height: calc(62px + env(safe-area-inset-bottom, 0px));
+  }
+  .app-shell {
+    padding-bottom: var(--bottom-tabs-height);
+  }
+
+  .bottom-tabs {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 90;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: var(--color-surface);
+    border-top: 1px solid var(--color-border);
+    box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.08);
+  }
+  .bottom-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-width: 0;
+    min-height: 62px;
+    padding: 6px 2px;
+    color: var(--color-text-muted);
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1.15;
+    text-align: center;
+    text-decoration: none;
+  }
+  .bottom-tab.active {
+    color: var(--color-link);
+  }
+  .bottom-tab.active svg {
+    stroke-width: 2.4;
+  }
+  .bottom-tab:focus-visible {
+    outline: 2px solid var(--color-text);
+    outline-offset: -3px;
+  }
+
+  /* Keep floating buttons and pop-ups clear of the tab bar. */
+  body .whatsapp-support-button,
+  body .history-back-to-filters,
+  body .confidence-info-popover {
+    bottom: calc(var(--bottom-tabs-height) + 12px);
+  }
+
+  .account-links {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin: 0 0 20px;
+  }
+  .account-links a,
+  .account-links button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 8px 12px;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 10px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font: inherit;
+    font-weight: 700;
+    text-decoration: none;
   }
 }
