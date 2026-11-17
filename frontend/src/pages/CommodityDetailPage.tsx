@@ -271,7 +271,6 @@ export function CommodityDetailPage() {
                           </span>
                           {editLink("market-signals", x.id)}
                         </div>
-                        <strong>{humanize(x.signal_type)}</strong>
                         <p>{x.signal_description}</p>
                         {x.possible_meaning && <small>{x.possible_meaning}</small>}
                       </div>
@@ -299,7 +298,15 @@ export function CommodityDetailPage() {
                           </span>
                           {editLink("quality-signals", x.id)}
                         </div>
-                        <strong>{humanize(x.quality_status) || "Quality observation"}</strong>
+                        <ul className="tip-list">
+                          {[humanize(x.quality_status), x.risk_note ?? ""]
+                            .flatMap((text) => text.split(/\r?\n/))
+                            .map((line) => line.trim())
+                            .filter(Boolean)
+                            .map((line, index) => (
+                              <li key={index}>{line}</li>
+                            ))}
+                        </ul>
                         {(x.moisture_status || x.storage_readiness) && (
                           <p>
                             {[
@@ -310,7 +317,6 @@ export function CommodityDetailPage() {
                               .join(" · ")}
                           </p>
                         )}
-                        {x.risk_note && <small>{x.risk_note}</small>}
                       </div>
                     ))
                   ) : (

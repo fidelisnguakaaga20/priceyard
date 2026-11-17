@@ -26,9 +26,13 @@ export function CostCalculator({ breakdown }: { breakdown: CostBreakdown }) {
         </div>
       </dl>
       {breakdown.cost_items?.length ? (
-        <p className="cost-items-line">
-          {breakdown.cost_items.map((item) => `${item.name} ${money(Number(item.amount) * safeQuantity)}`).join(" · ")}
-        </p>
+        <ol className="cost-items-list">
+          {breakdown.cost_items.map((item, index) => (
+            <li key={index}>
+              {item.name} {money(Number(item.amount) * safeQuantity)}
+            </li>
+          ))}
+        </ol>
       ) : null}
       <div className="cost-total">
         <span>Estimated Total cost</span>

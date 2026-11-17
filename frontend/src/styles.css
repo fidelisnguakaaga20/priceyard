@@ -1885,9 +1885,20 @@ legend {
 .cost-calculator .form-stack {
   margin: 10px 0;
 }
-.cost-calculator .cost-items-line {
-  margin: 8px 0 0;
+.cost-calculator .cost-items-list {
+  margin: 8px 0 12px;
+  padding-left: 22px;
   color: var(--color-text-muted);
+}
+.cost-calculator .cost-items-list li {
+  margin-bottom: 4px;
+}
+.tip-list {
+  margin: 6px 0 0;
+  padding-left: 22px;
+}
+.tip-list li {
+  margin-bottom: 4px;
 }
 .cost-calculator .cost-total {
   display: flex;
